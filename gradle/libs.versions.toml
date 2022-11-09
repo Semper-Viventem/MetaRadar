@@ -1,0 +1,227 @@
+[versions]
+# You also need to bump the version of ksp, anvil, compose
+kotlin-general = "1.7.20"
+kotlinx = "1.6.4"
+ksp = "1.7.20-1.0.6"
+anvil = "2.4.2"
+android-gradle = "7.3.1"
+protobuf = "3.21.7"
+protobuf-gradle = "0.9.1"
+# Protobuf JVM library https://github.com/flipperdevices/flipperzero-protobuf-jvm
+protobuf-jvm = "0.12.0-0.3.0"
+compose = "1.2.1"
+compose-wear = "1.0.2"
+compose-compiler = "1.3.2"
+compose-accompanist = "0.25.1"
+compose-constraint = "1.0.1"
+compose-navigation = "2.5.2"
+horologist = "0.1.13"
+serialization-json = "1.4.0"
+wear = "1.2.0"
+wear-gms = "18.0.0"
+wear-interaction-phone = "1.1.0-alpha03"
+wear-interaction-remote = "1.0.0"
+room = "2.4.3"
+dagger = "2.44"
+timber = "5.0.1"
+timber-treessence = "1.0.5"
+sentry-runtime = "6.5.0"
+sentry-gradle = "3.2.0"
+zip4j = "2.11.2"
+seismic = "1.0.3"
+cicerone = "7.1"
+ktx = "1.9.0"
+ktx-fragment = "1.5.3"
+ktx-activity = "1.6.0"
+ktx-testing = "1.1.3"
+lifecycle = "2.5.1"
+# https://github.com/vigna/fastutil/issues/136
+fastutil = "7.2.1"
+ble = "2.5.1"
+ble-scan = "1.6.0"
+lottie = "5.2.0"
+material = "1.6.1"
+annotations = "1.4.0"
+appcompat = "1.5.1"
+datastore = "1.0.0"
+# https://github.com/vsch/flexmark-java/issues/442
+flexmark = "0.42.14"
+markdown = "0.1.5"
+ktor = "2.1.2"
+apache-compress = "1.21"
+apache-codec = "1.15"
+countly = "22.06.0"
+# https://github.com/JLLeitschuh/ktlint-gradle/issues/589
+ktlint-runtime = "0.45.2"
+ktlint-gradle = "10.2.0"
+detekt-gradle = "1.21.0"
+grgit-gradle = "8d818b74b9"
+tangle = "0.15.1"
+work = "2.7.1"
+
+# Testing
+junit = "4.12"
+mockito = "4.0.0"
+roboelectric = "4.9"
+mockk = "1.13.2"
+
+[libraries]
+# Gradle - Core
+android-gradle = { module = "com.android.tools.build:gradle", version.ref = "android-gradle" }
+kotlin-ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
+kotlin-annotation-processing = { module = "org.jetbrains.kotlin:kotlin-annotation-processing-embeddable", version.ref = "kotlin-general" }
+kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-general" }
+kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-general" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin-general" }
+kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin-general" }
+
+grgit-gradle = { module = "com.github.LionZXY:grgit", version.ref = "grgit-gradle" }
+
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
+kotlin-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx" }
+
+kotlin-serialization-gradle = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin-general" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization-json" }
+
+protobuf-gradle = { module = "com.google.protobuf:protobuf-gradle-plugin", version.ref = "protobuf-gradle" }
+detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt-gradle" }
+ktlint-gradle = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint-gradle" }
+
+datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+
+# UI
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "ktx-activity" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+
+# UI - Wear
+compose-wear-material = { module = "androidx.wear.compose:compose-material", version.ref = "compose-wear" }
+compose-wear-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "compose-wear" }
+horologist-layout = { module = "com.google.android.horologist:horologist-compose-layout", version.ref = "horologist" }
+
+# UI - Compose Extension
+compose-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "compose-accompanist" }
+compose-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "compose-accompanist" }
+compose-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "compose-accompanist" }
+compose-placeholder = { module = "com.google.accompanist:accompanist-placeholder", version.ref = "compose-accompanist" }
+compose-swipetorefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "compose-accompanist" }
+compose-constraint = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "compose-constraint" }
+
+# Markdown
+flexmark-core = { module = "com.vladsch.flexmark:flexmark", version.ref = "flexmark" }
+markdown-renderer = { module = "com.github.Programistich.multiplatform-markdown-renderer:multiplatform-markdown-renderer-android", version.ref = "markdown" }
+
+# Storage
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ksp = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+
+# Dependency Injection
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+dagger-kapt = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+
+# Dependency Injection - Anvil
+square-anvil-annotations = { module = "com.squareup.anvil:annotations", version.ref = "anvil" }
+square-anvil-compiler-api = { module = "com.squareup.anvil:compiler-api", version.ref = "anvil" }
+square-anvil-compiler-core = { module = "com.squareup.anvil:compiler", version.ref = "anvil" }
+square-anvil-compiler-utils = { module = "com.squareup.anvil:compiler-utils", version.ref = "anvil" }
+square-anvil-gradle = { module = "com.squareup.anvil:gradle-plugin", version.ref = "anvil" }
+
+# Dependency Injection - Tangle
+tangle-fragment-api = { module = "com.rickbusarow.tangle:tangle-fragment-api", version.ref = "tangle" }
+tangle-fragment-compiler = { module = "com.rickbusarow.tangle:tangle-fragment-compiler", version.ref = "tangle" }
+tangle-viewmodel-api = { module = "com.rickbusarow.tangle:tangle-viewmodel-api", version.ref = "tangle" }
+tangle-viewmodel-compiler = { module = "com.rickbusarow.tangle:tangle-viewmodel-compiler", version.ref = "tangle" }
+tangle-viewmodel-compose = { module = "com.rickbusarow.tangle:tangle-viewmodel-compose", version.ref = "tangle" }
+tangle-viewmodel-fragment = { module = "com.rickbusarow.tangle:tangle-viewmodel-fragment", version.ref = "tangle" }
+
+# Navigation
+cicerone = { module = "com.github.terrakok:cicerone", version.ref = "cicerone" }
+compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
+compose-wear-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "compose-wear" }
+
+# Bug report dependencies
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+timber-tressence = { module = "com.github.bastienpaulfr:Treessence", version.ref = "timber-treessence" }
+sentry = { module = "io.sentry:sentry-android", version.ref = "sentry-runtime" }
+sentry-gradle = { module = "io.sentry:sentry-android-gradle-plugin", version.ref = "sentry-gradle" }
+sentry-timber = { module = "io.sentry:sentry-android-timber", version.ref = "sentry-runtime" }
+zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j" }
+seismic = { module = "com.squareup:seismic", version.ref = "seismic" }
+countly = { module = "ly.count.android:sdk", version.ref = "countly" }
+
+# KTX
+ktx = { module = "androidx.core:core-ktx", version.ref = "ktx" }
+ktx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "ktx-fragment" }
+ktx-activity = { module = "androidx.activity:activity-ktx", version.ref = "ktx-activity" }
+ktx-testing = { module = "androidx.test.ext:junit", version.ref = "ktx-testing" }
+
+# Lifecycle
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycle-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
+lifecycle-kapt = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "lifecycle" }
+lifecycle-test = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "lifecycle" }
+
+# Utils
+fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
+annotations = { module = "androidx.annotation:annotation", version.ref = "annotations" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+
+# Ktor
+ktor-client = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-logging = { module = "io.ktor:ktor-client-logging-jvm", version.ref = "ktor" }
+ktor-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+
+# Apache commons
+apache-compress = { module = "org.apache.commons:commons-compress", version.ref = "apache-compress" }
+apache-codec = { module = "commons-codec:commons-codec", version.ref = "apache-codec" }
+# BLE
+ble = { module = "no.nordicsemi.android:ble", version.ref = "ble" }
+ble-common = { module = "no.nordicsemi.android:ble-common", version.ref = "ble" }
+ble-scan = { module = "no.nordicsemi.android.support.v18:scanner", version.ref = "ble-scan" }
+
+# Images
+image-lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
+
+# Protobuf
+protobuf-kotlinlite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
+protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+protobuf-jvm = { module = "com.github.flipperdevices:flipperzero-protobuf-jvm", version.ref = "protobuf-jvm" }
+protobuf-metric = { module = "com.github.flipperdevices.flipperzero-protobuf-jvm:protobuf-jvm-metric", version.ref = "protobuf-jvm" }
+
+# Testing
+junit = { module = "junit:junit", version.ref = "junit" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito" }
+roboelectric = { module = "org.robolectric:robolectric", version.ref = "roboelectric" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+# Wear
+wear = { module = "androidx.wear:wear", version.ref = "wear" }
+wear-gms = { module = "com.google.android.gms:play-services-wearable", version.ref = "wear-gms" }
+wear-interaction-phone = { module = "androidx.wear:wear-phone-interactions", version.ref = "wear-interaction-phone" }
+wear-interaction-remote = { module = "androidx.wear:wear-remote-interactions", version.ref = "wear-interaction-remote" }
+
+# Work manager
+work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+
+
+
+[plugins]
+android-app = { id = "com.android.application", version.ref = "android-gradle" }
+android-lib = { id = "com.android.library", version.ref = "android-gradle" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt-gradle" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-general" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-general" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradle" }
+square-anvil = { id = "com.squareup.anvil", version.ref = "anvil" }
