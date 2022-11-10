@@ -57,6 +57,8 @@ dependencies {
     // android general
     implementation(libs.appcompat)
     implementation(libs.work.ktx)
+    implementation(libs.concurrent.futures)
+    implementation(libs.concurrent.futures.ktx)
 
     // android jetpack
     implementation(libs.material)

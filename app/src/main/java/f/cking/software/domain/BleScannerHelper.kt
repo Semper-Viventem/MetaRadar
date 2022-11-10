@@ -22,7 +22,27 @@ class BleScannerHelper(
     private val batch = mutableSetOf<BleDevice>()
     private var currentScanTimeMs: Long = System.currentTimeMillis()
 
+    private var inProgress: Boolean = false
+        set(value) {
+            field = value
+            listeners.forEach { it.onScanProgressChanged(field) }
+        }
+
     private var scanCallback: ((batch: List<BleDevice>) -> Unit)? = null
+    private var listeners: MutableSet<Listener> = mutableSetOf()
+
+    init {
+        val bluetoothAdapter = appContext.getSystemService(BluetoothManager::class.java).adapter
+        bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
+    }
+
+    fun addListener(listener: Listener) {
+        listeners.add(listener)
+    }
+
+    fun removeListener(listener: Listener) {
+        listeners.remove(listener)
+    }
 
     private val callback = object : ScanCallback() {
         @SuppressLint("MissingPermission")
@@ -48,21 +68,24 @@ class BleScannerHelper(
 
     @SuppressLint("MissingPermission")
     fun scan(scanCallback: (batch: List<BleDevice>) -> Unit) {
+        if (inProgress) return
+
         this.scanCallback = scanCallback
         batch.clear()
         handler.postDelayed(::cancelScanning, 10_000L)
+        inProgress = true
         currentScanTimeMs = System.currentTimeMillis()
         bluetoothScanner.startScan(callback)
     }
 
     @SuppressLint("MissingPermission")
     private fun cancelScanning() {
+        inProgress = false
         bluetoothScanner.stopScan(callback)
         scanCallback?.invoke(batch.toList())
     }
 
-    init {
-        val bluetoothAdapter = appContext.getSystemService(BluetoothManager::class.java).adapter
-        bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
+    interface Listener {
+        fun onScanProgressChanged(inProgress: Boolean)
     }
 }

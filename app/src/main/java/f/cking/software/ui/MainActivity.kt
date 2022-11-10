@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         val allPermissionsGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (requestCode == PermissionHelper.PERMISSIONS_REQUEST_CODE && allPermissionsGranted) {
-            viewModel.onPermissionResult()
+            viewModel.onScanButtonClick()
         } else if (requestCode == PermissionHelper.PERMISSIONS_BACKGROUND_REQUEST_CODE && allPermissionsGranted) {
             viewModel.runBackgroundScanning()
         }
@@ -82,7 +82,8 @@ class MainActivity : AppCompatActivity() {
                         onClick = { viewModel.runBackgroundScanning() },
                         modifier = Modifier.height(56.dp),
                     ) {
-                        Text(text = "Background")
+                        val backgroundPresented = TheApp.instance.activeWorkId.isPresent
+                        Text(text = if (backgroundPresented) "Stop background" else "Background")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(

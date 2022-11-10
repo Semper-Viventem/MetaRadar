@@ -58,6 +58,7 @@ detekt-gradle = "1.21.0"
 grgit-gradle = "8d818b74b9"
 tangle = "0.15.1"
 work = "2.7.1"
+concurrent = "1.1.0"
 
 # Testing
 junit = "4.12"
@@ -213,6 +214,8 @@ wear-interaction-remote = { module = "androidx.wear:wear-remote-interactions", v
 # Work manager
 work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 
+concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrent" }
+concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrent" }
 
 
 [plugins]

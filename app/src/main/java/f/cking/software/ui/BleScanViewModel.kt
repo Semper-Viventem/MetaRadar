@@ -22,7 +22,7 @@ class BleScanViewModel(
     private val permissionHelper: PermissionHelper,
     private val devicesRepository: DevicesRepository,
     private val bleScanner: BleScannerHelper,
-) : ViewModel() {
+) : ViewModel(), BleScannerHelper.Listener {
 
     private val TAG = "BleScanViewModel"
 
@@ -33,6 +33,10 @@ class BleScanViewModel(
     private val updateListRunnable: Runnable = Runnable {
         updateUiList()
         rescheduleListUpdate()
+    }
+
+    init {
+        bleScanner.addListener(this)
     }
 
     private val generalComparator = Comparator<DeviceData> { first, second ->
@@ -68,20 +72,18 @@ class BleScanViewModel(
         scan()
     }
 
-    fun onPermissionResult() {
-        scan()
+    override fun onScanProgressChanged(inProgress: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            scanStarted = inProgress
+        }
     }
 
     private fun scan() {
         permissionHelper.checkBlePermissions {
-            if (!scanStarted) {
-                scanStarted = true
-                bleScanner.scan { batch ->
-                    scanStarted = false
-                    viewModelScope.launch(Dispatchers.IO) {
-                        devicesRepository.detectBatch(batch.toList())
-                        updateUiList()
-                    }
+            bleScanner.scan { batch ->
+                viewModelScope.launch(Dispatchers.IO) {
+                    devicesRepository.detectBatch(batch.toList())
+                    updateUiList()
                 }
             }
         }
@@ -92,7 +94,11 @@ class BleScanViewModel(
             permissionRequestCode = PermissionHelper.PERMISSIONS_BACKGROUND_REQUEST_CODE,
             permissions = PermissionHelper.BACKGROUND_LOCATION
         ) {
-            BgScanWorker.schedule(TheApp.instance)
+            if (TheApp.instance.activeWorkId.isPresent) {
+                BgScanWorker.stop(TheApp.instance)
+            } else {
+                BgScanWorker.schedule(TheApp.instance)
+            }
         }
     }
 
