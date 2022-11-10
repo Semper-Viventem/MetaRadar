@@ -11,4 +11,6 @@ data class DeviceEntity(
     @ColumnInfo(name = "last_detect_time_ms") val lastDetectTimeMs: Long,
     @ColumnInfo(name = "first_detect_time_ms") val firstDetectTimeMs: Long,
     @ColumnInfo(name = "detect_count") val detectCount: Int,
+    @ColumnInfo(name = "custom_name") val customName: String? = null,
+    @ColumnInfo(name = "favorite") val favorite: Boolean = false,
 )

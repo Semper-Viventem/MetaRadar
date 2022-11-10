@@ -6,4 +6,6 @@ data class DeviceData(
     val lastDetectTimeMs: Long,
     val firstDetectTimeMs: Long,
     val detectCount: Int,
+    val customName: String?,
+    val favorite: Boolean
 )

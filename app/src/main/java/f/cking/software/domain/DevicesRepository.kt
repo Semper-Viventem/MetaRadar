@@ -55,6 +55,8 @@ class DevicesRepository(
             lastDetectTimeMs = device.scanTimeMs,
             firstDetectTimeMs = device.scanTimeMs,
             detectCount = 1,
+            customName = null,
+            favorite = false,
         )
 
         deviceDao.insert(dataItem.toData())

@@ -111,10 +111,16 @@ class MainActivity : AppCompatActivity() {
                 Text(text = listData.name ?: "N/A", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = listData.address)
+                Spacer(modifier = Modifier.height(4.dp))
+
                 val lifetimeMs = System.currentTimeMillis() - listData.firstDetectTimeMs
                 val lifetimeMin = lifetimeMs / 1000 / 60
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "lifetime: $lifetimeMin min", fontWeight = FontWeight.Light)
+                val lastUpdateMs = System.currentTimeMillis() - listData.lastDetectTimeMs
+                val lastUpdateMin = lastUpdateMs / 1000 / 60
+                Text(
+                    text = "lifetime: $lifetimeMin min | last update: $lastUpdateMin min ago",
+                    fontWeight = FontWeight.Light
+                )
             }
             Text(text = listData.detectCount.toString(), modifier = Modifier.padding(8.dp))
         }

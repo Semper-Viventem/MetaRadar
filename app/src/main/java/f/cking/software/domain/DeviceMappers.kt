@@ -9,6 +9,8 @@ fun DeviceEntity.toDomain(): DeviceData {
         lastDetectTimeMs = lastDetectTimeMs,
         firstDetectTimeMs = firstDetectTimeMs,
         detectCount = detectCount,
+        customName = customName,
+        favorite = favorite,
     )
 }
 
@@ -19,5 +21,7 @@ fun DeviceData.toData(): DeviceEntity {
         lastDetectTimeMs = lastDetectTimeMs,
         firstDetectTimeMs = firstDetectTimeMs,
         detectCount = detectCount,
+        customName = customName,
+        favorite = favorite,
     )
 }
