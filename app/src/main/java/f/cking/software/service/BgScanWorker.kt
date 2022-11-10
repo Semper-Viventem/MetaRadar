@@ -1,16 +1,23 @@
 package f.cking.software.service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.core.app.NotificationCompat
 import androidx.work.*
 import com.google.common.util.concurrent.ListenableFuture
 import f.cking.software.R
 import f.cking.software.TheApp
+import f.cking.software.domain.BleDevice
+import f.cking.software.domain.BleScannerHelper
+import f.cking.software.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
@@ -25,6 +32,7 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
 
     lateinit var completer: CallbackToFutureAdapter.Completer<Result>
     private val handler = Handler(Looper.getMainLooper())
+    private var failureScanCounter: Int = 0
     private val nextScanRunnable = Runnable {
         scan()
     }
@@ -46,6 +54,7 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
 
     override fun onStopped() {
         handler.removeCallbacks(nextScanRunnable)
+        notificationManager.cancel(NOTIFICATION_ID)
         complete(Result.failure())
         super.onStopped()
     }
@@ -53,18 +62,32 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
     private fun buildForegroundInfo(): ForegroundInfo {
         createChannel()
 
-        val intent = WorkManager.getInstance(TheApp.instance)
-            .createCancelPendingIntent(id)
-
-        val notification = NotificationCompat.Builder(TheApp.instance, NOTIFICATION_CHANNEL)
-            .setContentTitle("BLE scan...")
-            .setContentText("Scan ble environment in background")
-            .setOngoing(true)
-            .setSmallIcon(R.drawable.ic_ble)
-            .addAction(R.drawable.ic_cancel, "cancel", intent)
-            .build()
+        val notification = buildNotification()
 
         return ForegroundInfo(NOTIFICATION_ID, notification)
+    }
+
+    private fun buildNotification(): Notification {
+
+        val cancelIntent = WorkManager.getInstance(TheApp.instance)
+            .createCancelPendingIntent(id)
+
+        val openAppIntent = Intent(TheApp.instance, MainActivity::class.java)
+        val openAppPendingIntent = PendingIntent.getActivity(
+            TheApp.instance,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        return NotificationCompat.Builder(TheApp.instance, NOTIFICATION_CHANNEL)
+            .setContentTitle("MetaRadar service")
+            .setContentText("Scan BLE environment in background")
+            .setOngoing(true)
+            .setSmallIcon(R.drawable.ic_ble)
+            .setContentIntent(openAppPendingIntent)
+            .addAction(R.drawable.ic_cancel, "cancel", cancelIntent)
+            .build()
     }
 
     private fun complete(result: Result) {
@@ -73,14 +96,30 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
     }
 
     private fun scan() {
-        TheApp.instance.bleScannerHelper.scan { batch ->
-            runBlocking {
-                launch(Dispatchers.IO) {
-                    TheApp.instance.devicesRepository.detectBatch(batch)
-                    scheduleNextScan()
+        TheApp.instance.bleScannerHelper.scan(
+            scanListener = object : BleScannerHelper.ScanListener {
+
+                override fun onFailure() {
+                    Toast.makeText(TheApp.instance, "Scan failed", Toast.LENGTH_SHORT).show()
+                    failureScanCounter++
+
+                    if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
+                        complete(Result.failure())
+                    } else {
+                        scheduleNextScan()
+                    }
+                }
+
+                override fun onSuccess(batch: List<BleDevice>) {
+                    runBlocking {
+                        launch(Dispatchers.IO) {
+                            TheApp.instance.devicesRepository.detectBatch(batch)
+                            scheduleNextScan()
+                        }
+                    }
                 }
             }
-        }
+        )
     }
 
     private fun scheduleNextScan() {
@@ -99,6 +138,7 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
     companion object {
         private const val NOTIFICATION_CHANNEL = "background_scan"
         private const val NOTIFICATION_ID = 42
+        private const val MAX_FAILURE_SCANS_TO_CLOSE = 5
 
         private const val BG_REPEAT_INTERVAL_MS = 1000L * 60L
 

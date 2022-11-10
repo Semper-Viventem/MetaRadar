@@ -9,7 +9,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 
 class BleScannerHelper(
     private val appContext: Context,
@@ -28,7 +27,7 @@ class BleScannerHelper(
             listeners.forEach { it.onScanProgressChanged(field) }
         }
 
-    private var scanCallback: ((batch: List<BleDevice>) -> Unit)? = null
+    private var scanListener: ScanListener? = null
     private var listeners: MutableSet<Listener> = mutableSetOf()
 
     init {
@@ -38,6 +37,7 @@ class BleScannerHelper(
 
     fun addListener(listener: Listener) {
         listeners.add(listener)
+        listener.onScanProgressChanged(inProgress)
     }
 
     fun removeListener(listener: Listener) {
@@ -45,6 +45,7 @@ class BleScannerHelper(
     }
 
     private val callback = object : ScanCallback() {
+
         @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
@@ -60,32 +61,48 @@ class BleScannerHelper(
 
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
-            Toast.makeText(appContext, "Scan failed", Toast.LENGTH_SHORT).show()
             Log.e(TAG, "Scan failed with error: $errorCode")
-            cancelScanning()
+            cancelScanning(ScanResultInternal.FAILURE)
         }
     }
 
     @SuppressLint("MissingPermission")
-    fun scan(scanCallback: (batch: List<BleDevice>) -> Unit) {
-        if (inProgress) return
+    fun scan(
+        scanListener: ScanListener,
+    ) {
+        this.scanListener = scanListener
 
-        this.scanCallback = scanCallback
+        if (inProgress) {
+            scanListener.onFailure()
+            return
+        }
+
         batch.clear()
-        handler.postDelayed(::cancelScanning, 10_000L)
+        handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, 10_000L)
         inProgress = true
         currentScanTimeMs = System.currentTimeMillis()
         bluetoothScanner.startScan(callback)
     }
 
     @SuppressLint("MissingPermission")
-    private fun cancelScanning() {
+    private fun cancelScanning(scanResult: ScanResultInternal) {
         inProgress = false
         bluetoothScanner.stopScan(callback)
-        scanCallback?.invoke(batch.toList())
+
+        when (scanResult) {
+            ScanResultInternal.SUCCESS -> scanListener?.onSuccess(batch.toList())
+            ScanResultInternal.FAILURE -> scanListener?.onFailure()
+        }
+    }
+
+    interface ScanListener {
+        fun onSuccess(batch: List<BleDevice>)
+        fun onFailure()
     }
 
     interface Listener {
         fun onScanProgressChanged(inProgress: Boolean)
     }
+
+    private enum class ScanResultInternal { SUCCESS, FAILURE }
 }

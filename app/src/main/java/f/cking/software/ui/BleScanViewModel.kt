@@ -2,6 +2,7 @@ package f.cking.software.ui
 
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,10 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.TheApp
-import f.cking.software.domain.BleScannerHelper
-import f.cking.software.domain.DeviceData
-import f.cking.software.domain.DevicesRepository
-import f.cking.software.domain.PermissionHelper
+import f.cking.software.domain.*
 import f.cking.software.service.BgScanWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,12 +78,19 @@ class BleScanViewModel(
 
     private fun scan() {
         permissionHelper.checkBlePermissions {
-            bleScanner.scan { batch ->
-                viewModelScope.launch(Dispatchers.IO) {
-                    devicesRepository.detectBatch(batch.toList())
-                    updateUiList()
+            bleScanner.scan(object : BleScannerHelper.ScanListener {
+                override fun onSuccess(batch: List<BleDevice>) {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        devicesRepository.detectBatch(batch.toList())
+                        updateUiList()
+                    }
                 }
-            }
+
+                override fun onFailure() {
+                    Toast.makeText(TheApp.instance, "Scan failed", Toast.LENGTH_SHORT).show()
+                }
+
+            })
         }
     }
 
