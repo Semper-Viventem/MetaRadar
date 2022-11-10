@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun ListItem(listData: BleDevice) {
+    fun ListItem(listData: DevicesRepository.DeviceData) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,13 +106,8 @@ class MainActivity : AppCompatActivity() {
                 Text(text = listData.name ?: "N/A")
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = listData.address)
-                listData.state?.let {
-                    val characteristics = (it as? BleDevice.State.Connected)?.characteristics?.count()
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "${it.name}${characteristics?.let { "($it)" } ?: ""}")
-                }
             }
-            Text(text = listData.bondState.toString(), modifier = Modifier.padding(8.dp))
+            Text(text = listData.detectCount.toString(), modifier = Modifier.padding(8.dp))
         }
     }
 

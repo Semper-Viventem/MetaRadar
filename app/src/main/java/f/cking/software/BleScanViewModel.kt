@@ -18,16 +18,28 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 
 class BleScanViewModel(
     private val permissionHelper: PermissionHelper,
+    private val devicesRepository: DevicesRepository,
 ) : ViewModel() {
 
     private val TAG = "BleScanViewModel"
 
     private var bluetoothScanner: BluetoothLeScanner
     private val handler: Handler = Handler(Looper.getMainLooper())
-    private val devices = mutableSetOf<BleDevice>()
+    private val batch = mutableSetOf<BleDevice>()
+    private var currentScanTimeMs: Long = System.currentTimeMillis()
 
-    var devicesViewState by mutableStateOf(devices.toList())
+    var devicesViewState by mutableStateOf(emptyList<DevicesRepository.DeviceData>())
     var scanStarted by mutableStateOf(false)
+
+    private val generalComparator = Comparator<DevicesRepository.DeviceData> { first, second ->
+        when {
+            first.detectCount != second.detectCount -> first.detectCount.compareTo(second.detectCount)
+            first.name != null && second.name != null -> first.name.compareTo(second.name)
+            first.name != null && second.name == null -> 1
+            first.name == null && second.name != null -> -1
+            else -> first.address.compareTo(second.address)
+        }
+    }
 
     private val callback = object : ScanCallback() {
 
@@ -38,11 +50,10 @@ class BleScanViewModel(
                 address = result.device.address,
                 name = result.device.name,
                 bondState = result.device.bondState,
-                device = result.device,
+                scanTimeMs = currentScanTimeMs,
             )
 
-            devices.add(device)
-            updateUiList(devices.toList())
+            batch.add(device)
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -58,8 +69,8 @@ class BleScanViewModel(
         bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
     }
 
-    private fun updateUiList(devices: List<BleDevice>) {
-        devicesViewState = devices.sortedBy { it.name }.reversed()
+    private fun updateUiList() {
+        devicesViewState = devicesRepository.getDevices().sortedWith(generalComparator).reversed()
     }
 
     fun onActivityAttached() {
@@ -78,8 +89,10 @@ class BleScanViewModel(
     private fun scan() {
         permissionHelper.checkBlePermissions {
             if (!scanStarted) {
+                batch.clear()
                 handler.postDelayed(::cancelScanning, 10_000L)
                 scanStarted = true
+                currentScanTimeMs = System.currentTimeMillis()
                 bluetoothScanner.startScan(callback)
             }
         }
@@ -89,12 +102,14 @@ class BleScanViewModel(
     private fun cancelScanning() {
         scanStarted = false
         bluetoothScanner.stopScan(callback)
+        devicesRepository.detectBatch(batch.toList())
+        updateUiList()
     }
 
     companion object {
         val factory = viewModelFactory {
             initializer {
-                BleScanViewModel(TheApp.instance.permissionHelper)
+                BleScanViewModel(TheApp.instance.permissionHelper, TheApp.instance.devicesRepository)
             }
         }
     }

@@ -5,6 +5,7 @@ import android.app.Application
 class TheApp : Application() {
 
     val permissionHelper: PermissionHelper = PermissionHelper()
+    val devicesRepository: DevicesRepository = DevicesRepository()
 
     override fun onCreate() {
         super.onCreate()
