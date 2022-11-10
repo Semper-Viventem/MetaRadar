@@ -28,8 +28,8 @@ class BleScanViewModel(
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
     var scanStarted by mutableStateOf(false)
 
-    val updateListHandler: Handler = Handler(Looper.getMainLooper())
-    val updateListRunnable: Runnable = Runnable {
+    private val updateListHandler: Handler = Handler(Looper.getMainLooper())
+    private val updateListRunnable: Runnable = Runnable {
         updateUiList()
         rescheduleListUpdate()
     }
@@ -38,9 +38,8 @@ class BleScanViewModel(
         when {
             first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
             first.detectCount != second.detectCount -> first.detectCount.compareTo(second.detectCount)
-            first.name != null && second.name != null -> first.name.compareTo(second.name)
-            first.name != null && second.name == null -> 1
-            first.name == null && second.name != null -> -1
+            first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
+            first.firstDetectTimeMs != second.firstDetectTimeMs -> second.firstDetectTimeMs.compareTo(first.firstDetectTimeMs)
             else -> first.address.compareTo(second.address)
         }
     }
