@@ -22,7 +22,7 @@ class BleScanViewModel(
 
     private val TAG = "BleScanViewModel"
 
-    private lateinit var bluetoothScanner: BluetoothLeScanner
+    private var bluetoothScanner: BluetoothLeScanner
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val devices = mutableSetOf<BleDevice>()
 
@@ -38,7 +38,6 @@ class BleScanViewModel(
                 address = result.device.address,
                 name = result.device.name,
                 bondState = result.device.bondState,
-                state = null,
                 device = result.device,
             )
 
