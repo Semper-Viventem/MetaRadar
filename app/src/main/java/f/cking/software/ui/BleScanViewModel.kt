@@ -89,7 +89,7 @@ class BleScanViewModel(
     }
 
     companion object {
-        private const val LIST_UPDATE_TIME_MS = 30_000L
+        private const val LIST_UPDATE_TIME_MS = 15_000L
         val factory = viewModelFactory {
             initializer {
                 BleScanViewModel(
