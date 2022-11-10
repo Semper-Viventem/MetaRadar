@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "f.cking.software"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -56,6 +56,7 @@ dependencies {
 
     // android general
     implementation(libs.appcompat)
+    implementation(libs.work.ktx)
 
     // android jetpack
     implementation(libs.material)

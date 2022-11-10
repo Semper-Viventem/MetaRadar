@@ -74,6 +74,10 @@ class MainActivity : AppCompatActivity() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
+                    Button(onClick = { viewModel.runBackgroundScanning() }) {
+                        Text(text = "Background")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = { viewModel.onScanButtonClick() },
                         enabled = !viewModel.scanStarted
@@ -81,6 +85,7 @@ class MainActivity : AppCompatActivity() {
                         Text(text = "scan", modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                     }
                     if (viewModel.scanStarted) {
+                        Spacer(modifier = Modifier.width(8.dp))
                         CircularProgressIndicator(
                             Modifier
                                 .width(24.dp)

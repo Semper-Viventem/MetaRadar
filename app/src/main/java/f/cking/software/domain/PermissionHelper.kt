@@ -10,15 +10,23 @@ class PermissionHelper() {
 
     private var context: Activity? = null
 
-    fun checkBlePermissions(permissionsGranted: () -> Unit) {
+    fun checkBlePermissions(
+        requestPermissions: (permissions: Array<String>) -> Unit = ::requestPermissions,
+        permissionsGranted: () -> Unit,
+    ) {
         val permissions = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
             arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
             )
         } else {
-            arrayOf(Manifest.permission.BLUETOOTH, Manifest.permission.ACCESS_FINE_LOCATION)
+            arrayOf(
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            )
         }
 
         val allPermissionsGranted = permissions.all { checkPermission(it) }

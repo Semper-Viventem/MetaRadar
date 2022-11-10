@@ -14,6 +14,7 @@ import f.cking.software.domain.BleScannerHelper
 import f.cking.software.domain.DeviceData
 import f.cking.software.domain.DevicesRepository
 import f.cking.software.domain.PermissionHelper
+import f.cking.software.service.BgScanWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -85,6 +86,10 @@ class BleScanViewModel(
                 }
             }
         }
+    }
+
+    fun runBackgroundScanning() {
+        BgScanWorker.schedule(TheApp.instance)
     }
 
     companion object {
