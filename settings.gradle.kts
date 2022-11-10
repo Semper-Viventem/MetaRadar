@@ -1,5 +1,11 @@
 pluginManagement {
+
     includeBuild("build-logic")
+
+    plugins {
+        `kotlin-dsl`
+    }
+
     repositories {
         gradlePluginPortal()
         google()

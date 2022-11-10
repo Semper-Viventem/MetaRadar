@@ -20,6 +20,7 @@ android {
     buildTypes {
         maybeCreate("debug").apply {
             isMinifyEnabled = false
+            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -59,10 +60,14 @@ dependencies {
 
     // compose
     implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
     implementation(libs.compose.material)
     implementation(libs.compose.tooling)
     implementation(libs.lifecycle.compose)
     implementation(libs.compose.activity)
+
+    // di
+    implementation(libs.dagger)
 
     // tests
     testImplementation(libs.junit)
