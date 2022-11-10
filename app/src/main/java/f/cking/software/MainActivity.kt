@@ -13,8 +13,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 class MainActivity : AppCompatActivity() {
 
@@ -103,9 +105,13 @@ class MainActivity : AppCompatActivity() {
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = listData.name ?: "N/A")
+                Text(text = listData.name ?: "N/A", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = listData.address)
+                val lifetimeMs = System.currentTimeMillis() - listData.firstDetectTimeMs
+                val lifetimeMin = lifetimeMs / 1000 / 60
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "lifetime: $lifetimeMin min", fontWeight = FontWeight.Light)
             }
             Text(text = listData.detectCount.toString(), modifier = Modifier.padding(8.dp))
         }

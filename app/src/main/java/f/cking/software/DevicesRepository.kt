@@ -36,7 +36,7 @@ class DevicesRepository {
         val nodes = hashSetOf(first.address, second.address)
         val hash = (nodes.first() + nodes.last()).hashCode()
 
-        val newRef = Ref(hash, nodes, weight = 1)
+        val newRef = Ref(hash, first = nodes.first(), second = nodes.last(), weight = 1)
         val existingRef = this.refs[hash]
 
         if (existingRef != null) {
@@ -77,7 +77,8 @@ class DevicesRepository {
 
     data class Ref(
         val refHash: Int,
-        val nodes: Set<String>,
+        val first: String,
+        val second: String,
         val weight: Int,
     )
 }
