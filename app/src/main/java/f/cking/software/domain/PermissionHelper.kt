@@ -1,4 +1,4 @@
-package f.cking.software
+package f.cking.software.domain
 
 import android.Manifest
 import android.app.Activity

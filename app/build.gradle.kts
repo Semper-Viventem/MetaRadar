@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -50,6 +51,8 @@ dependencies {
 
     // kotlin
     implementation(libs.ktx)
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.kotlin.annotation.processing)
 
     // android general
     implementation(libs.appcompat)
@@ -65,6 +68,11 @@ dependencies {
     implementation(libs.compose.tooling)
     implementation(libs.lifecycle.compose)
     implementation(libs.compose.activity)
+
+    // room
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.ksp)
+    kapt(libs.room.ksp)
 
     // di
     implementation(libs.dagger)

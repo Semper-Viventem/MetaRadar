@@ -1,4 +1,4 @@
-package f.cking.software
+package f.cking.software.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -17,6 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.TheApp
+import f.cking.software.domain.DeviceData
+import f.cking.software.domain.PermissionHelper
 
 class MainActivity : AppCompatActivity() {
 
@@ -98,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun ListItem(listData: DevicesRepository.DeviceData) {
+    fun ListItem(listData: DeviceData) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

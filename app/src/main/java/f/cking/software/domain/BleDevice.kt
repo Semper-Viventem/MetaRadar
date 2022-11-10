@@ -1,4 +1,4 @@
-package f.cking.software
+package f.cking.software.domain
 
 data class BleDevice(
     val address: String,

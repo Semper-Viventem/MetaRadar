@@ -1,8 +1,11 @@
-package f.cking.software
+package f.cking.software.domain
 
-class DevicesRepository {
+import f.cking.software.data.DeviceDao
 
-    private val devices = mutableSetOf<DeviceData>()
+class DevicesRepository(
+    private val deviceDao: DeviceDao,
+) {
+
     private val refs = hashMapOf<Int, Ref>()
 
     fun detectBatch(devices: List<BleDevice>) {
@@ -10,9 +13,8 @@ class DevicesRepository {
         makeRelations(devices)
     }
 
-    @Synchronized
     fun detect(device: BleDevice) {
-        val existing = devices.firstOrNull { it.address == device.address && it.name == device.name }
+        val existing = deviceDao.findByAddress(device.address)?.toDomain()
 
         if (existing != null) {
             updateExisting(existing, device)
@@ -30,7 +32,7 @@ class DevicesRepository {
         }
     }
 
-    fun getDevices() = devices.toList()
+    fun getDevices() = deviceDao.getAll().map { it.toDomain() }
 
     private fun findRef(first: BleDevice, second: BleDevice) {
         val nodes = hashSetOf(first.address, second.address)
@@ -55,7 +57,7 @@ class DevicesRepository {
             detectCount = 1,
         )
 
-        devices.add(dataItem)
+        deviceDao.insert(dataItem.toData())
     }
 
     private fun updateExisting(existing: DeviceData, device: BleDevice) {
@@ -63,17 +65,8 @@ class DevicesRepository {
             detectCount = existing.detectCount + 1,
             lastDetectTimeMs = device.scanTimeMs,
         )
-        devices.remove(existing)
-        devices.add(newData)
+        deviceDao.update(newData.toData())
     }
-
-    data class DeviceData(
-        val address: String,
-        val name: String?,
-        val lastDetectTimeMs: Long,
-        val firstDetectTimeMs: Long,
-        val detectCount: Int,
-    )
 
     data class Ref(
         val refHash: Int,

@@ -1,4 +1,4 @@
-package f.cking.software
+package f.cking.software.ui
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
@@ -13,8 +13,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import f.cking.software.TheApp
+import f.cking.software.domain.BleDevice
+import f.cking.software.domain.DeviceData
+import f.cking.software.domain.DevicesRepository
+import f.cking.software.domain.PermissionHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BleScanViewModel(
     private val permissionHelper: PermissionHelper,
@@ -28,10 +36,10 @@ class BleScanViewModel(
     private val batch = mutableSetOf<BleDevice>()
     private var currentScanTimeMs: Long = System.currentTimeMillis()
 
-    var devicesViewState by mutableStateOf(emptyList<DevicesRepository.DeviceData>())
+    var devicesViewState by mutableStateOf(emptyList<DeviceData>())
     var scanStarted by mutableStateOf(false)
 
-    private val generalComparator = Comparator<DevicesRepository.DeviceData> { first, second ->
+    private val generalComparator = Comparator<DeviceData> { first, second ->
         when {
             first.detectCount != second.detectCount -> first.detectCount.compareTo(second.detectCount)
             first.name != null && second.name != null -> first.name.compareTo(second.name)
@@ -70,10 +78,14 @@ class BleScanViewModel(
     }
 
     private fun updateUiList() {
-        devicesViewState = devicesRepository.getDevices().sortedWith(generalComparator).reversed()
+        val devices = devicesRepository.getDevices().sortedWith(generalComparator).reversed()
+        viewModelScope.launch(Dispatchers.Main) {
+            devicesViewState = devices
+        }
     }
 
     fun onActivityAttached() {
+        viewModelScope.launch(Dispatchers.IO) { updateUiList() }
         scan()
     }
 
@@ -102,8 +114,11 @@ class BleScanViewModel(
     private fun cancelScanning() {
         scanStarted = false
         bluetoothScanner.stopScan(callback)
-        devicesRepository.detectBatch(batch.toList())
-        updateUiList()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            devicesRepository.detectBatch(batch.toList())
+            updateUiList()
+        }
     }
 
     companion object {
