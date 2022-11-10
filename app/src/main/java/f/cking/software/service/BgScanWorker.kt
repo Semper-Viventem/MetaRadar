@@ -26,10 +26,10 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Worker
         setForegroundAsync(buildForegroundInfo())
 
         TheApp.instance.permissionHelper.checkBlePermissions(
-            requestPermissions = {
+            onRequestPermissions = { _, _ ->
                 result = Result.failure()
             },
-            permissionsGranted = ::scan
+            onPermissionGranted = ::scan
         )
         while (result == null) {
             // waiting

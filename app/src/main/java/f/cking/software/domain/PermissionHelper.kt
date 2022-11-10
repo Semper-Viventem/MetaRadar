@@ -11,38 +11,26 @@ class PermissionHelper() {
     private var context: Activity? = null
 
     fun checkBlePermissions(
-        requestPermissions: (permissions: Array<String>) -> Unit = ::requestPermissions,
-        permissionsGranted: () -> Unit,
+        onRequestPermissions: (permissions: Array<String>, permissionRequestCode: Int) -> Unit = ::requestPermissions,
+        permissions: Array<String> = BLE_PERMISSIONS,
+        permissionRequestCode: Int = PERMISSIONS_REQUEST_CODE,
+        onPermissionGranted: () -> Unit,
     ) {
-        val permissions = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-            )
-        } else {
-            arrayOf(
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
-        }
 
         val allPermissionsGranted = permissions.all { checkPermission(it) }
 
         if (allPermissionsGranted) {
-            permissionsGranted.invoke()
+            onPermissionGranted.invoke()
         } else {
-            requestPermissions(permissions)
+            onRequestPermissions.invoke(permissions, permissionRequestCode)
         }
     }
 
-    private fun requestPermissions(permissions: Array<String>) {
+    private fun requestPermissions(permissions: Array<String>, permissionRequestCode: Int) {
         ActivityCompat.requestPermissions(
             requireContext(),
             permissions,
-            PERMISSIONS_REQUEST_CODE
+            permissionRequestCode
         )
     }
 
@@ -61,5 +49,20 @@ class PermissionHelper() {
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 1000
+        const val PERMISSIONS_BACKGROUND_REQUEST_CODE = 1001
+
+        val BACKGROUND_LOCATION = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        val BLE_PERMISSIONS: Array<String> = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            )
+        } else {
+            arrayOf(
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            )
+        }
     }
 }

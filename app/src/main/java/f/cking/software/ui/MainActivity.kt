@@ -1,5 +1,6 @@
 package f.cking.software.ui
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -41,8 +42,11 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == PermissionHelper.PERMISSIONS_REQUEST_CODE) {
+        val allPermissionsGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (requestCode == PermissionHelper.PERMISSIONS_REQUEST_CODE && allPermissionsGranted) {
             viewModel.onPermissionResult()
+        } else if (requestCode == PermissionHelper.PERMISSIONS_BACKGROUND_REQUEST_CODE && allPermissionsGranted) {
+            viewModel.runBackgroundScanning()
         }
     }
 
@@ -74,13 +78,17 @@ class MainActivity : AppCompatActivity() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Button(onClick = { viewModel.runBackgroundScanning() }) {
+                    Button(
+                        onClick = { viewModel.runBackgroundScanning() },
+                        modifier = Modifier.height(56.dp),
+                    ) {
                         Text(text = "Background")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = { viewModel.onScanButtonClick() },
-                        enabled = !viewModel.scanStarted
+                        enabled = !viewModel.scanStarted,
+                        modifier = Modifier.height(56.dp),
                     ) {
                         Text(text = "scan", modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                     }

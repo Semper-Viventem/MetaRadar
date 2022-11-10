@@ -62,7 +62,6 @@ class BleScanViewModel(
     fun onActivityAttached() {
         updateUiList()
         rescheduleListUpdate()
-        scan()
     }
 
     fun onScanButtonClick() {
@@ -89,7 +88,12 @@ class BleScanViewModel(
     }
 
     fun runBackgroundScanning() {
-        BgScanWorker.schedule(TheApp.instance)
+        permissionHelper.checkBlePermissions(
+            permissionRequestCode = PermissionHelper.PERMISSIONS_BACKGROUND_REQUEST_CODE,
+            permissions = PermissionHelper.BACKGROUND_LOCATION
+        ) {
+            BgScanWorker.schedule(TheApp.instance)
+        }
     }
 
     companion object {
