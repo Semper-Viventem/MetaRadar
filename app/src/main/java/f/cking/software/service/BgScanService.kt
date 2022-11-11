@@ -234,7 +234,7 @@ class BgScanService : Service() {
         private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
 
         private const val BLE_SCAN_DURATION_MS = 5_000L // 5 sec
-        private const val BG_REPEAT_INTERVAL_MS = 30_000L // 30 sec
+        private const val BG_REPEAT_INTERVAL_MS = 15_000L // 15 sec
 
         private fun createCloseServiceIntent(context: Context): Intent {
             return Intent(context, BgScanService::class.java).apply {
