@@ -28,6 +28,12 @@ class DevicesRepository(
 
     fun getDevices() = deviceDao.getAll().map { it.toDomain() }
 
+    fun getKnownDevices(): List<DeviceData> {
+        return getDevices().filter { device ->
+            device.lastDetectTimeMs - device.firstDetectTimeMs > KNOWN_DEVICE_PERIOD_MS
+        }
+    }
+
     /**
      * @return count of known devices (device lifetime > 1 hour)
      */

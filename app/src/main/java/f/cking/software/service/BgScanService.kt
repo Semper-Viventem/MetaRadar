@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
@@ -24,6 +25,7 @@ class BgScanService : Service() {
 
     private val notificationManager: NotificationManager =
         TheApp.instance.getSystemService(NotificationManager::class.java)
+    private val powerManager = TheApp.instance.getSystemService(PowerManager::class.java)
 
     private val handler = Handler(Looper.getMainLooper())
     private var failureScanCounter: Int = 0
@@ -115,6 +117,7 @@ class BgScanService : Service() {
 
     private fun scan() {
         TheApp.instance.bleScannerHelper.scan(
+            scanRestricted = !powerManager.isInteractive,
             scanListener = object : BleScannerHelper.ScanListener {
 
                 override fun onFailure() {

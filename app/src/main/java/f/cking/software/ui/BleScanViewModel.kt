@@ -56,7 +56,7 @@ class BleScanViewModel(
 
     private fun scan() {
         permissionHelper.checkBlePermissions {
-            bleScanner.scan(object : BleScannerHelper.ScanListener {
+            bleScanner.scan(scanListener = object : BleScannerHelper.ScanListener {
                 override fun onSuccess(batch: List<BleDevice>) {
                     viewModelScope.launch(Dispatchers.IO) {
                         devicesRepository.detectBatch(batch)
