@@ -29,40 +29,77 @@ class DevicesRepository(
     fun getDevices() = deviceDao.getAll().map { it.toDomain() }
 
     fun getKnownDevices(): List<DeviceData> {
-        return getDevices().filter { device ->
-            device.lastDetectTimeMs - device.firstDetectTimeMs > KNOWN_DEVICE_PERIOD_MS
-        }
+        return getDevices().filter { device -> device.isKnownDevice() }
     }
 
     /**
      * @return count of known devices (device lifetime > 1 hour)
      */
-    fun detectBatch(devices: List<BleDevice>): Int {
-        devices.forEach { detect(it) }
-        //makeRelations(devices) TODO: implement devices relations
+    fun detectBatch(devices: List<BleDevice>): Result {
+        val wantedDevices: MutableSet<DeviceData> = mutableSetOf()
+        devices.forEach {
+            detect(it)?.let { wantedDevices.add(it) }
+        }
         notifyListeners()
-        return getKnownDevicesCount(devices.map { it.address })
+        val knownDeviceCount = getKnownDevicesCount(devices.map { it.address })
+        return Result(knownDeviceCount, wantedDevices)
     }
+
+    data class Result(
+        val knownDevicesCount: Int,
+        val wanted: Set<DeviceData>,
+    )
 
     private fun notifyListeners() {
         val data = getDevices()
         listeners.forEach { it.onDevicesUpdate(data) }
     }
 
-    private fun detect(device: BleDevice) {
+    /**
+     * @return Should return device if it's wanted
+     */
+    private fun detect(device: BleDevice): DeviceData? {
         val existing = deviceDao.findByAddress(device.address)?.toDomain()
+        val isWanted = existing?.isInterestingForDetection(detectionTimeMs = device.scanTimeMs) ?: false
 
-        if (existing != null) {
-            updateExisting(existing, device)
+        return if (existing != null) {
+            val updated = updateExisting(existing, device)
+            if (isWanted) {
+                updated
+            } else {
+                null
+            }
         } else {
             createNew(device)
+            null
         }
     }
 
     private fun getKnownDevicesCount(addresses: List<String>): Int {
-        return deviceDao.findAllByAddresses(addresses).filter { device ->
-            device.lastDetectTimeMs - device.firstDetectTimeMs > KNOWN_DEVICE_PERIOD_MS
-        }.count()
+        return deviceDao.findAllByAddresses(addresses).count { it.toDomain().isKnownDevice() }
+    }
+
+    private fun createNew(device: BleDevice) {
+        val dataItem = DeviceData(
+            address = device.address,
+            name = device.name,
+            lastDetectTimeMs = device.scanTimeMs,
+            firstDetectTimeMs = device.scanTimeMs,
+            detectCount = 1,
+            customName = null,
+            favorite = false,
+        )
+
+        deviceDao.insert(dataItem.toData())
+    }
+
+    private fun updateExisting(existing: DeviceData, device: BleDevice): DeviceData {
+        val newData = existing.copy(
+            detectCount = existing.detectCount + 1,
+            lastDetectTimeMs = device.scanTimeMs,
+        )
+        deviceDao.update(newData.toData())
+        return newData
     }
 
     private fun makeRelations(devices: List<BleDevice>) {
@@ -88,28 +125,6 @@ class DevicesRepository(
         }
     }
 
-    private fun createNew(device: BleDevice) {
-        val dataItem = DeviceData(
-            address = device.address,
-            name = device.name,
-            lastDetectTimeMs = device.scanTimeMs,
-            firstDetectTimeMs = device.scanTimeMs,
-            detectCount = 1,
-            customName = null,
-            favorite = false,
-        )
-
-        deviceDao.insert(dataItem.toData())
-    }
-
-    private fun updateExisting(existing: DeviceData, device: BleDevice) {
-        val newData = existing.copy(
-            detectCount = existing.detectCount + 1,
-            lastDetectTimeMs = device.scanTimeMs,
-        )
-        deviceDao.update(newData.toData())
-    }
-
     data class Ref(
         val refHash: Int,
         val first: String,
@@ -119,9 +134,5 @@ class DevicesRepository(
 
     interface OnDevicesUpdateListener {
         fun onDevicesUpdate(devices: List<DeviceData>)
-    }
-
-    companion object {
-        private const val KNOWN_DEVICE_PERIOD_MS = 1000L * 60L * 60L // 1 hour
     }
 }

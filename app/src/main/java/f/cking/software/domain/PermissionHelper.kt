@@ -11,7 +11,7 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 
-class PermissionHelper() {
+class PermissionHelper {
 
     private var context: Activity? = null
 
