@@ -76,6 +76,7 @@ class BleScanViewModel(
             permissionRequestCode = PermissionHelper.PERMISSIONS_BACKGROUND_REQUEST_CODE,
             permissions = PermissionHelper.BACKGROUND_LOCATION
         ) {
+            permissionHelper.checkDozeModePermission()
             if (TheApp.instance.activeWorkId.isPresent) {
                 BgScanService.stop(TheApp.instance)
             } else {
