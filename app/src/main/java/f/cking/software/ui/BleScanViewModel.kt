@@ -1,7 +1,5 @@
 package f.cking.software.ui
 
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,20 +18,13 @@ class BleScanViewModel(
     private val permissionHelper: PermissionHelper,
     private val devicesRepository: DevicesRepository,
     private val bleScanner: BleScannerHelper,
-) : ViewModel(), BleScannerHelper.Listener {
-
-    private val TAG = "BleScanViewModel"
+) : ViewModel(), BleScannerHelper.Listener, DevicesRepository.OnDevicesUpdateListener {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
     var scanStarted by mutableStateOf(false)
 
-    private val updateListHandler: Handler = Handler(Looper.getMainLooper())
-    private val updateListRunnable: Runnable = Runnable {
-        updateUiList()
-        rescheduleListUpdate()
-    }
-
     init {
+        devicesRepository.addListener(this)
         bleScanner.addListener(this)
     }
 
@@ -47,32 +38,19 @@ class BleScanViewModel(
         }
     }
 
-    private fun updateUiList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val devices = devicesRepository.getDevices().sortedWith(generalComparator).reversed()
-
-            launch(Dispatchers.Main) {
-                devicesViewState = devices
-            }
-        }
-    }
-
-    private fun rescheduleListUpdate() {
-        updateListHandler.postDelayed(updateListRunnable, LIST_UPDATE_TIME_MS)
-    }
-
-    fun onActivityAttached() {
-        updateUiList()
-        rescheduleListUpdate()
-    }
-
     fun onScanButtonClick() {
         scan()
     }
 
     override fun onScanProgressChanged(inProgress: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Main) {
             scanStarted = inProgress
+        }
+    }
+
+    override fun onDevicesUpdate(devices: List<DeviceData>) {
+        viewModelScope.launch(Dispatchers.Main) {
+            devicesViewState = devices.sortedWith(generalComparator).reversed()
         }
     }
 
@@ -81,8 +59,7 @@ class BleScanViewModel(
             bleScanner.scan(object : BleScannerHelper.ScanListener {
                 override fun onSuccess(batch: List<BleDevice>) {
                     viewModelScope.launch(Dispatchers.IO) {
-                        devicesRepository.detectBatch(batch.toList())
-                        updateUiList()
+                        devicesRepository.detectBatch(batch)
                     }
                 }
 
@@ -108,7 +85,6 @@ class BleScanViewModel(
     }
 
     companion object {
-        private const val LIST_UPDATE_TIME_MS = 15_000L
         val factory = viewModelFactory {
             initializer {
                 BleScanViewModel(

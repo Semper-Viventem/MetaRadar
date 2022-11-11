@@ -32,11 +32,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         TheApp.instance.permissionHelper.setActivity(this)
+
         setContent {
             Content()
         }
-
-        viewModel.onActivityAttached()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

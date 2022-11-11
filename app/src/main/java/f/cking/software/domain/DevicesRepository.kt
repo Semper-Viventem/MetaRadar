@@ -1,6 +1,9 @@
 package f.cking.software.domain
 
 import f.cking.software.data.DeviceDao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class DevicesRepository(
     private val deviceDao: DeviceDao,
@@ -8,16 +11,39 @@ class DevicesRepository(
 
     private val refs = hashMapOf<Int, Ref>()
 
+    private var listeners: MutableSet<OnDevicesUpdateListener> = mutableSetOf()
+
+    fun addListener(listener: OnDevicesUpdateListener) {
+        listeners.add(listener)
+        runBlocking {
+            launch(Dispatchers.IO) {
+                listener.onDevicesUpdate(getDevices())
+            }
+        }
+    }
+
+    fun removeListener(listener: OnDevicesUpdateListener) {
+        listeners.remove(listener)
+    }
+
+    fun getDevices() = deviceDao.getAll().map { it.toDomain() }
+
     /**
      * @return count of known devices (device lifetime > 1 hour)
      */
     fun detectBatch(devices: List<BleDevice>): Int {
         devices.forEach { detect(it) }
-        makeRelations(devices)
+        //makeRelations(devices) TODO: implement devices relations
+        notifyListeners()
         return getKnownDevicesCount(devices.map { it.address })
     }
 
-    fun detect(device: BleDevice) {
+    private fun notifyListeners() {
+        val data = getDevices()
+        listeners.forEach { it.onDevicesUpdate(data) }
+    }
+
+    private fun detect(device: BleDevice) {
         val existing = deviceDao.findByAddress(device.address)?.toDomain()
 
         if (existing != null) {
@@ -33,7 +59,7 @@ class DevicesRepository(
         }.count()
     }
 
-    fun makeRelations(devices: List<BleDevice>) {
+    private fun makeRelations(devices: List<BleDevice>) {
         devices.forEachIndexed { i, first ->
             ((i + 1)..(devices.lastIndex)).forEach { j ->
                 val second = devices[j]
@@ -41,8 +67,6 @@ class DevicesRepository(
             }
         }
     }
-
-    fun getDevices() = deviceDao.getAll().map { it.toDomain() }
 
     private fun findRef(first: BleDevice, second: BleDevice) {
         val nodes = hashSetOf(first.address, second.address)
@@ -86,6 +110,10 @@ class DevicesRepository(
         val second: String,
         val weight: Int,
     )
+
+    interface OnDevicesUpdateListener {
+        fun onDevicesUpdate(devices: List<DeviceData>)
+    }
 
     companion object {
         private const val KNOWN_DEVICE_PERIOD_MS = 1000L * 60L * 60L // 1 hour
