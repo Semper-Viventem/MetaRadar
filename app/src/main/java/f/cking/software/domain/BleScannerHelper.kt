@@ -67,7 +67,7 @@ class BleScannerHelper(
 
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
-            Log.e(TAG, "Scan failed with error: $errorCode")
+            Log.e(TAG, "BLE Scan failed with error: $errorCode")
             cancelScanning(ScanResultInternal.FAILURE)
         }
     }
@@ -75,17 +75,20 @@ class BleScannerHelper(
     @SuppressLint("MissingPermission")
     fun scan(
         scanRestricted: Boolean = false,
+        scanDurationMs: Long = DEFAULT_SCAN_DURATION,
         scanListener: ScanListener,
     ) {
         runBlocking {
             launch(Dispatchers.IO) {
                 this@BleScannerHelper.scanListener = scanListener
+                Log.d(TAG, "Start BLE Scan. Restricted mode: $scanRestricted")
 
                 if (inProgress) {
                     scanListener.onFailure()
+                    Log.e(TAG, "BLE Scan failed because previous scan is not finished")
                 } else {
                     batch.clear()
-                    handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, 10_000L)
+                    handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, scanDurationMs)
                     inProgress = true
                     currentScanTimeMs = System.currentTimeMillis()
 
@@ -126,9 +129,15 @@ class BleScannerHelper(
         inProgress = false
         bluetoothScanner.stopScan(callback)
 
+
         when (scanResult) {
-            ScanResultInternal.SUCCESS -> scanListener?.onSuccess(batch.toList())
-            ScanResultInternal.FAILURE -> scanListener?.onFailure()
+            ScanResultInternal.SUCCESS -> {
+                Log.d(TAG, "BLE Scan finished ${batch.count()} devices found")
+                scanListener?.onSuccess(batch.toList())
+            }
+            ScanResultInternal.FAILURE -> {
+                scanListener?.onFailure()
+            }
         }
     }
 
@@ -144,6 +153,7 @@ class BleScannerHelper(
     private enum class ScanResultInternal { SUCCESS, FAILURE }
 
     companion object {
+        const val DEFAULT_SCAN_DURATION = 10_000L // 10 sec
         private val popularServicesUUID = setOf(
             "0000fe8f-0000-1000-8000-00805f9b34fb",
             "0000fe9f-0000-1000-8000-00805f9b34fb",

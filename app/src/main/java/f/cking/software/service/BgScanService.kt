@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
@@ -25,6 +26,8 @@ import java.util.*
 
 
 class BgScanService : Service() {
+
+    private val TAG = "BgScanService"
 
     private val notificationManager: NotificationManager =
         TheApp.instance.getSystemService(NotificationManager::class.java)
@@ -45,10 +48,12 @@ class BgScanService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (intent != null && intent.action == ACTION_STOP_SERVICE) {
+            Log.d(TAG, "Background service close action handled")
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         } else {
-            startForeground(NOTIFICATION_ID, buildNotification(knownDeviceCount = null))
+            Log.d(TAG, "Background service launched")
+            startForeground(NOTIFICATION_ID, buildForegroundNotification(knownDeviceCount = null))
 
             TheApp.instance.permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _ ->
@@ -63,7 +68,7 @@ class BgScanService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-
+        Log.d(TAG, "Background service destroyed")
         TheApp.instance.activeWorkId = Optional.empty()
         handler.removeCallbacks(nextScanRunnable)
         notificationManager.cancel(NOTIFICATION_ID)
@@ -73,7 +78,51 @@ class BgScanService : Service() {
         return null
     }
 
-    private fun buildNotification(
+    private fun scan() {
+        TheApp.instance.bleScannerHelper.scan(
+            scanDurationMs = BLE_SCAN_DURATION_MS,
+            scanRestricted = !powerManager.isInteractive, // BLE scan is limited if device's screen is turned off
+            scanListener = object : BleScannerHelper.ScanListener {
+
+                override fun onFailure() {
+                    Toast.makeText(TheApp.instance, "Scan failed", Toast.LENGTH_SHORT).show()
+                    failureScanCounter++
+
+                    if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
+                        stopSelf()
+                    } else {
+                        scheduleNextScan()
+                    }
+                }
+
+                override fun onSuccess(batch: List<BleDevice>) {
+                    failureScanCounter = 0
+                    runBlocking {
+                        launch(Dispatchers.IO) {
+                            val result = TheApp.instance.devicesRepository.detectBatch(batch)
+                            handleScanResult(result)
+                            scheduleNextScan()
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    private fun handleScanResult(result: DevicesRepository.Result) {
+        Log.d(TAG, "Background scan result: known_devices_count=${result.knownDevicesCount}, wanted_devices_count=${result.wanted.count()}")
+
+        updateNotification(result.knownDevicesCount)
+        if (result.wanted.isNotEmpty()) {
+            notifyWantedFound(result.wanted)
+        }
+    }
+
+    private fun scheduleNextScan() {
+        handler.postDelayed(nextScanRunnable, BG_REPEAT_INTERVAL_MS)
+    }
+
+    private fun buildForegroundNotification(
         knownDeviceCount: Int?
     ): Notification {
         createServiceChannel()
@@ -118,43 +167,6 @@ class BgScanService : Service() {
             .build()
     }
 
-    private fun scan() {
-        TheApp.instance.bleScannerHelper.scan(
-            scanRestricted = !powerManager.isInteractive,
-            scanListener = object : BleScannerHelper.ScanListener {
-
-                override fun onFailure() {
-                    Toast.makeText(TheApp.instance, "Scan failed", Toast.LENGTH_SHORT).show()
-                    failureScanCounter++
-
-                    if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-                        stopSelf()
-                    } else {
-                        scheduleNextScan()
-                    }
-                }
-
-                override fun onSuccess(batch: List<BleDevice>) {
-                    failureScanCounter = 0
-                    runBlocking {
-                        launch(Dispatchers.IO) {
-                            val result = TheApp.instance.devicesRepository.detectBatch(batch)
-                            handleScanResult(result)
-                            scheduleNextScan()
-                        }
-                    }
-                }
-            }
-        )
-    }
-
-    private fun handleScanResult(result: DevicesRepository.Result) {
-        updateNotification(result.knownDevicesCount)
-        if (result.wanted.isNotEmpty()) {
-            notifyWantedFound(result.wanted)
-        }
-    }
-
     private fun notifyWantedFound(wantedDevices: Set<DeviceData>) {
         val title = if (wantedDevices.count() == 1) {
             val device = wantedDevices.first()
@@ -192,12 +204,8 @@ class BgScanService : Service() {
     }
 
     private fun updateNotification(knownDeviceCount: Int) {
-        val notification = buildNotification(knownDeviceCount)
+        val notification = buildForegroundNotification(knownDeviceCount)
         notificationManager.notify(NOTIFICATION_ID, notification)
-    }
-
-    private fun scheduleNextScan() {
-        handler.postDelayed(nextScanRunnable, BG_REPEAT_INTERVAL_MS)
     }
 
     private fun createServiceChannel() {
@@ -211,7 +219,7 @@ class BgScanService : Service() {
 
     private fun createDeviceFoundChannel() {
         val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL,
+            DEVICE_FOUND_CHANNEL,
             "Wanted device found",
             NotificationManager.IMPORTANCE_HIGH
         )
@@ -220,12 +228,13 @@ class BgScanService : Service() {
 
     companion object {
         private const val NOTIFICATION_CHANNEL = "background_scan"
-        private const val DEVICE_FOUND_CHANNEL = "device_found"
+        private const val DEVICE_FOUND_CHANNEL = "wanted_device_found"
         private const val NOTIFICATION_ID = 42
         private const val MAX_FAILURE_SCANS_TO_CLOSE = 5
         private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
 
-        private const val BG_REPEAT_INTERVAL_MS = 1000L * 60L
+        private const val BLE_SCAN_DURATION_MS = 5_000L // 5 sec
+        private const val BG_REPEAT_INTERVAL_MS = 30_000L // 30 sec
 
         private fun createCloseServiceIntent(context: Context): Intent {
             return Intent(context, BgScanService::class.java).apply {
