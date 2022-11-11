@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.TheApp
 import f.cking.software.domain.*
-import f.cking.software.service.BgScanWorker
+import f.cking.software.service.BgScanService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -77,9 +77,9 @@ class BleScanViewModel(
             permissions = PermissionHelper.BACKGROUND_LOCATION
         ) {
             if (TheApp.instance.activeWorkId.isPresent) {
-                BgScanWorker.stop(TheApp.instance)
+                BgScanService.stop(TheApp.instance)
             } else {
-                BgScanWorker.schedule(TheApp.instance)
+                BgScanService.schedule(TheApp.instance)
             }
         }
     }

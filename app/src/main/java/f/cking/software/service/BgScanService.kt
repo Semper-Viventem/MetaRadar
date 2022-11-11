@@ -1,18 +1,13 @@
 package f.cking.software.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.widget.Toast
-import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.core.app.NotificationCompat
-import androidx.work.*
-import com.google.common.util.concurrent.ListenableFuture
 import f.cking.software.R
 import f.cking.software.TheApp
 import f.cking.software.domain.BleDevice
@@ -24,56 +19,67 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
-@Deprecated("Use BgScanService")
-class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : ListenableWorker(appContext, workerParams) {
+
+class BgScanService : Service() {
 
     private val notificationManager: NotificationManager =
         TheApp.instance.getSystemService(NotificationManager::class.java)
 
-    lateinit var completer: CallbackToFutureAdapter.Completer<Result>
     private val handler = Handler(Looper.getMainLooper())
     private var failureScanCounter: Int = 0
     private val nextScanRunnable = Runnable {
         scan()
     }
 
-    override fun startWork(): ListenableFuture<Result> {
-       // TheApp.instance.activeWorkId = Optional.of(id)
-        setForegroundAsync(buildForegroundInfo())
+    override fun onCreate() {
+        super.onCreate()
 
-        return CallbackToFutureAdapter.getFuture { completer ->
-            this.completer = completer
+        TheApp.instance.activeWorkId = Optional.of(this)
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        if (intent != null && intent.action == ACTION_STOP_SERVICE) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+        } else {
+            startForeground(NOTIFICATION_ID, buildNotification(knownDeviceCount = null))
 
             TheApp.instance.permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _ ->
-                    complete(Result.failure())
+                    stopSelf()
                 },
                 onPermissionGranted = ::scan
             )
         }
+
+        return START_STICKY
     }
 
-    override fun onStopped() {
+    override fun onDestroy() {
+        super.onDestroy()
+
+        TheApp.instance.activeWorkId = Optional.empty()
         handler.removeCallbacks(nextScanRunnable)
         notificationManager.cancel(NOTIFICATION_ID)
-        complete(Result.failure())
-        super.onStopped()
     }
 
-    private fun buildForegroundInfo(): ForegroundInfo {
-        createChannel()
-
-        val notification = buildNotification(knownDeviceCount = null)
-
-        return ForegroundInfo(NOTIFICATION_ID, notification)
+    override fun onBind(p0: Intent?): IBinder? {
+        return null
     }
 
     private fun buildNotification(
         knownDeviceCount: Int?
     ): Notification {
+        createChannel()
 
-        val cancelIntent = WorkManager.getInstance(TheApp.instance)
-            .createCancelPendingIntent(id)
+        val cancelIntent = createCloseServiceIntent(this)
+        val cancelPendingIntent = PendingIntent.getService(
+            this,
+            0,
+            cancelIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val openAppIntent = Intent(TheApp.instance, MainActivity::class.java)
         val openAppPendingIntent = PendingIntent.getActivity(
@@ -97,7 +103,7 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
             .setOngoing(true)
             .setSmallIcon(R.drawable.ic_ble)
             .setContentIntent(openAppPendingIntent)
-            .addAction(R.drawable.ic_cancel, "Stop", cancelIntent)
+            .addAction(R.drawable.ic_cancel, "Stop", cancelPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOnlyAlertOnce(true)
             .setVibrate(null)
@@ -105,11 +111,6 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
-    }
-
-    private fun complete(result: Result) {
-        TheApp.instance.activeWorkId = Optional.empty()
-        completer.set(result)
     }
 
     private fun scan() {
@@ -121,7 +122,7 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
                     failureScanCounter++
 
                     if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-                        complete(Result.failure())
+                        stopSelf()
                     } else {
                         scheduleNextScan()
                     }
@@ -163,21 +164,24 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
         private const val NOTIFICATION_CHANNEL = "background_scan"
         private const val NOTIFICATION_ID = 42
         private const val MAX_FAILURE_SCANS_TO_CLOSE = 5
+        private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
 
         private const val BG_REPEAT_INTERVAL_MS = 1000L * 60L
 
+        private fun createCloseServiceIntent(context: Context): Intent {
+            return Intent(context, BgScanService::class.java).apply {
+                action = ACTION_STOP_SERVICE
+            }
+        }
+
         fun schedule(context: Context) {
-            WorkManager.getInstance(context)
-                .enqueue(
-                    OneTimeWorkRequest.Builder(BgScanWorker::class.java)
-                        .build()
-                )
+            val intent = Intent(context, BgScanService::class.java)
+            context.startForegroundService(intent)
         }
 
         fun stop(context: Context) {
             if (TheApp.instance.activeWorkId.isPresent) {
-                WorkManager.getInstance(context)
-                //    .cancelWorkById(TheApp.instance.activeWorkId.get())
+                context.startService(createCloseServiceIntent(context))
             }
         }
     }

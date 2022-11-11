@@ -9,6 +9,7 @@ import f.cking.software.data.AppDatabase
 import f.cking.software.domain.BleScannerHelper
 import f.cking.software.domain.DevicesRepository
 import f.cking.software.domain.PermissionHelper
+import f.cking.software.service.BgScanService
 import java.util.*
 
 class TheApp : Application() {
@@ -17,7 +18,7 @@ class TheApp : Application() {
     lateinit var permissionHelper: PermissionHelper
     lateinit var devicesRepository: DevicesRepository
     lateinit var bleScannerHelper: BleScannerHelper
-    var activeWorkId by mutableStateOf<Optional<UUID>>(Optional.empty())
+    var activeWorkId by mutableStateOf<Optional<BgScanService>>(Optional.empty())
 
     override fun onCreate() {
         super.onCreate()
