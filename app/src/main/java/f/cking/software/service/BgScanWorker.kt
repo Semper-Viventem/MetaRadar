@@ -127,6 +127,7 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
                 }
 
                 override fun onSuccess(batch: List<BleDevice>) {
+                    failureScanCounter = 0
                     runBlocking {
                         launch(Dispatchers.IO) {
                             val knownDeviceCount = TheApp.instance.devicesRepository.detectBatch(batch)
