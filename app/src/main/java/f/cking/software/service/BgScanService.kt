@@ -8,29 +8,33 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
 import f.cking.software.TheApp
-import f.cking.software.domain.BleDevice
-import f.cking.software.domain.BleScannerHelper
-import f.cking.software.domain.DeviceData
-import f.cking.software.domain.DevicesRepository
+import f.cking.software.domain.helpers.BleScannerHelper
+import f.cking.software.domain.helpers.PermissionHelper
+import f.cking.software.domain.model.BleScanDevice
+import f.cking.software.domain.model.DeviceData
+import f.cking.software.domain.repo.DevicesRepository
+import f.cking.software.domain.repo.SettingsRepository
 import f.cking.software.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.Math.random
-import java.util.*
 
 
 class BgScanService : Service() {
 
     private val TAG = "BgScanService"
 
-    private val notificationManager: NotificationManager =
-        TheApp.instance.getSystemService(NotificationManager::class.java)
+    private lateinit var permissionHelper: PermissionHelper
+    private lateinit var bleScannerHelper: BleScannerHelper
+    private lateinit var devicesRepository: DevicesRepository
+    private lateinit var settingsRepository: SettingsRepository
+
+    private val notificationManager = TheApp.instance.getSystemService(NotificationManager::class.java)
     private val powerManager = TheApp.instance.getSystemService(PowerManager::class.java)
 
     private val handler = Handler(Looper.getMainLooper())
@@ -42,7 +46,11 @@ class BgScanService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        TheApp.instance.activeWorkId = Optional.of(this)
+        TheApp.instance.backgroundScannerIsActive = true
+        bleScannerHelper = TheApp.instance.bleScannerHelper
+        permissionHelper = TheApp.instance.permissionHelper
+        devicesRepository = TheApp.instance.devicesRepository
+        settingsRepository = TheApp.instance.settingsRepository
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -51,11 +59,14 @@ class BgScanService : Service() {
             Log.d(TAG, "Background service close action handled")
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
+        } else if (intent != null && intent.action == ACTION_SCAN_NOW) {
+            Log.d(TAG, "Background service scan now command")
+            scan()
         } else {
             Log.d(TAG, "Background service launched")
             startForeground(NOTIFICATION_ID, buildForegroundNotification(knownDeviceCount = null))
 
-            TheApp.instance.permissionHelper.checkBlePermissions(
+            permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _ ->
                     stopSelf()
                 },
@@ -69,7 +80,8 @@ class BgScanService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "Background service destroyed")
-        TheApp.instance.activeWorkId = Optional.empty()
+        TheApp.instance.backgroundScannerIsActive = false
+        bleScannerHelper.stopScanning()
         handler.removeCallbacks(nextScanRunnable)
         notificationManager.cancel(NOTIFICATION_ID)
     }
@@ -79,13 +91,12 @@ class BgScanService : Service() {
     }
 
     private fun scan() {
-        TheApp.instance.bleScannerHelper.scan(
-            scanDurationMs = BLE_SCAN_DURATION_MS,
+        bleScannerHelper.scan(
+            scanDurationMs = settingsRepository.getScanDuration(),
             scanRestricted = !powerManager.isInteractive, // BLE scan is limited if device's screen is turned off
             scanListener = object : BleScannerHelper.ScanListener {
 
                 override fun onFailure() {
-                    Toast.makeText(TheApp.instance, "Scan failed", Toast.LENGTH_SHORT).show()
                     failureScanCounter++
 
                     if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
@@ -95,11 +106,11 @@ class BgScanService : Service() {
                     }
                 }
 
-                override fun onSuccess(batch: List<BleDevice>) {
+                override fun onSuccess(batch: List<BleScanDevice>) {
                     failureScanCounter = 0
                     runBlocking {
                         launch(Dispatchers.IO) {
-                            val result = TheApp.instance.devicesRepository.detectBatch(batch)
+                            val result = devicesRepository.detectBatch(batch)
                             handleScanResult(result)
                             scheduleNextScan()
                         }
@@ -110,7 +121,10 @@ class BgScanService : Service() {
     }
 
     private fun handleScanResult(result: DevicesRepository.Result) {
-        Log.d(TAG, "Background scan result: known_devices_count=${result.knownDevicesCount}, wanted_devices_count=${result.wanted.count()}")
+        Log.d(
+            TAG,
+            "Background scan result: known_devices_count=${result.knownDevicesCount}, wanted_devices_count=${result.wanted.count()}"
+        )
 
         updateNotification(result.knownDevicesCount)
         if (result.wanted.isNotEmpty()) {
@@ -119,7 +133,7 @@ class BgScanService : Service() {
     }
 
     private fun scheduleNextScan() {
-        handler.postDelayed(nextScanRunnable, BG_REPEAT_INTERVAL_MS)
+        handler.postDelayed(nextScanRunnable, settingsRepository.getScanInterval())
     }
 
     private fun buildForegroundNotification(
@@ -135,9 +149,9 @@ class BgScanService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val openAppIntent = Intent(TheApp.instance, MainActivity::class.java)
+        val openAppIntent = Intent(this, MainActivity::class.java)
         val openAppPendingIntent = PendingIntent.getActivity(
-            TheApp.instance,
+            this,
             0,
             openAppIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -151,7 +165,7 @@ class BgScanService : Service() {
             "There are no known devices around"
         }
 
-        return NotificationCompat.Builder(TheApp.instance, NOTIFICATION_CHANNEL)
+        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
             .setContentTitle("MetaRadar service")
             .setContentText(body)
             .setOngoing(true)
@@ -179,9 +193,9 @@ class BgScanService : Service() {
             "${device.buildDisplayName()}, last seen ${device.lastDetectionPeriod()} ago"
         }
 
-        val openAppIntent = Intent(TheApp.instance, MainActivity::class.java)
+        val openAppIntent = Intent(this, MainActivity::class.java)
         val openAppPendingIntent = PendingIntent.getActivity(
-            TheApp.instance,
+            this,
             0,
             openAppIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -189,7 +203,7 @@ class BgScanService : Service() {
 
         createDeviceFoundChannel()
 
-        val notification = NotificationCompat.Builder(TheApp.instance, DEVICE_FOUND_CHANNEL)
+        val notification = NotificationCompat.Builder(this, DEVICE_FOUND_CHANNEL)
             .setContentTitle(title)
             .setContentText(content)
             .setOngoing(true)
@@ -232,9 +246,7 @@ class BgScanService : Service() {
         private const val NOTIFICATION_ID = 42
         private const val MAX_FAILURE_SCANS_TO_CLOSE = 5
         private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
-
-        private const val BLE_SCAN_DURATION_MS = 5_000L // 5 sec
-        private const val BG_REPEAT_INTERVAL_MS = 15_000L // 15 sec
+        private const val ACTION_SCAN_NOW = "ble_scan_now"
 
         private fun createCloseServiceIntent(context: Context): Intent {
             return Intent(context, BgScanService::class.java).apply {
@@ -242,14 +254,25 @@ class BgScanService : Service() {
             }
         }
 
-        fun schedule(context: Context) {
+        fun start(context: Context) {
             val intent = Intent(context, BgScanService::class.java)
             context.startForegroundService(intent)
         }
 
         fun stop(context: Context) {
-            if (TheApp.instance.activeWorkId.isPresent) {
+            if (TheApp.instance.backgroundScannerIsActive) {
                 context.startService(createCloseServiceIntent(context))
+            }
+        }
+
+        fun scan(context: Context) {
+            if (TheApp.instance.backgroundScannerIsActive) {
+                val intent = Intent(context, BgScanService::class.java).apply {
+                    action = ACTION_SCAN_NOW
+                }
+                context.startService(intent)
+            } else {
+                start(context)
             }
         }
     }

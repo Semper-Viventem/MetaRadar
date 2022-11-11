@@ -6,11 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.room.Room
 import f.cking.software.data.AppDatabase
-import f.cking.software.domain.BleScannerHelper
-import f.cking.software.domain.DevicesRepository
-import f.cking.software.domain.PermissionHelper
-import f.cking.software.service.BgScanService
-import java.util.*
+import f.cking.software.domain.helpers.BleScannerHelper
+import f.cking.software.domain.helpers.PermissionHelper
+import f.cking.software.domain.repo.DevicesRepository
+import f.cking.software.domain.repo.SettingsRepository
 
 class TheApp : Application() {
 
@@ -18,7 +17,8 @@ class TheApp : Application() {
     lateinit var permissionHelper: PermissionHelper
     lateinit var devicesRepository: DevicesRepository
     lateinit var bleScannerHelper: BleScannerHelper
-    var activeWorkId by mutableStateOf<Optional<BgScanService>>(Optional.empty())
+    lateinit var settingsRepository: SettingsRepository
+    var backgroundScannerIsActive by mutableStateOf(false)
 
     override fun onCreate() {
         super.onCreate()
@@ -27,13 +27,17 @@ class TheApp : Application() {
     }
 
     private fun initSingletons() {
-        database = Room.databaseBuilder(this, AppDatabase::class.java, "app-database").build()
-        devicesRepository = DevicesRepository(database.deviceDao())
-        permissionHelper = PermissionHelper()
-        bleScannerHelper = BleScannerHelper(this)
+        database = Room.databaseBuilder(this, AppDatabase::class.java, DATABASE_NAME).build()
+        settingsRepository = SettingsRepository(getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE))
+        devicesRepository = DevicesRepository(database.deviceDao(), settingsRepository)
+        bleScannerHelper = BleScannerHelper(devicesRepository, this)
+        permissionHelper = PermissionHelper(this)
     }
 
     companion object {
         lateinit var instance: TheApp
+
+        private const val SHARED_PREF_NAME = "app-prefs"
+        private const val DATABASE_NAME = "app-database"
     }
 }

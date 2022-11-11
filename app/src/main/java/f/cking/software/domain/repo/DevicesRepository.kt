@@ -1,12 +1,17 @@
-package f.cking.software.domain
+package f.cking.software.domain.repo
 
 import f.cking.software.data.DeviceDao
+import f.cking.software.domain.model.BleScanDevice
+import f.cking.software.domain.model.DeviceData
+import f.cking.software.domain.toData
+import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class DevicesRepository(
     private val deviceDao: DeviceDao,
+    private val settingsRepository: SettingsRepository,
 ) {
 
     private val refs = hashMapOf<Int, Ref>()
@@ -29,7 +34,7 @@ class DevicesRepository(
     fun getDevices() = deviceDao.getAll().map { it.toDomain() }
 
     fun getKnownDevices(): List<DeviceData> {
-        return getDevices().filter { device -> device.isKnownDevice() }
+        return getDevices().filter { device -> device.isKnownDevice(settingsRepository.getKnownDevicePeriod()) }
     }
 
     fun changeFavorite(device: DeviceData) {
@@ -41,7 +46,7 @@ class DevicesRepository(
     /**
      * @return count of known devices (device lifetime > 1 hour)
      */
-    fun detectBatch(devices: List<BleDevice>): Result {
+    fun detectBatch(devices: List<BleScanDevice>): Result {
         val wantedDevices: MutableSet<DeviceData> = mutableSetOf()
         devices.forEach {
             detect(it)?.let { wantedDevices.add(it) }
@@ -64,9 +69,13 @@ class DevicesRepository(
     /**
      * @return Should return device if it's wanted
      */
-    private fun detect(device: BleDevice): DeviceData? {
+    private fun detect(device: BleScanDevice): DeviceData? {
         val existing = deviceDao.findByAddress(device.address)?.toDomain()
-        val isWanted = existing?.isInterestingForDetection(detectionTimeMs = device.scanTimeMs) ?: false
+        val isWanted = existing?.isInterestingForDetection(
+            detectionTimeMs = device.scanTimeMs,
+            knownDevicePeriodMs = settingsRepository.getKnownDevicePeriod(),
+            minTimeToDetectMs = settingsRepository.getWantedDevicePeriod(),
+        ) ?: false
 
         return if (existing != null) {
             val updated = updateExisting(existing, device)
@@ -82,10 +91,12 @@ class DevicesRepository(
     }
 
     private fun getKnownDevicesCount(addresses: List<String>): Int {
-        return deviceDao.findAllByAddresses(addresses).count { it.toDomain().isKnownDevice() }
+        return deviceDao.findAllByAddresses(addresses).count {
+            it.toDomain().isKnownDevice(settingsRepository.getKnownDevicePeriod())
+        }
     }
 
-    private fun createNew(device: BleDevice) {
+    private fun createNew(device: BleScanDevice) {
         val dataItem = DeviceData(
             address = device.address,
             name = device.name,
@@ -99,7 +110,7 @@ class DevicesRepository(
         deviceDao.insert(dataItem.toData())
     }
 
-    private fun updateExisting(existing: DeviceData, device: BleDevice): DeviceData {
+    private fun updateExisting(existing: DeviceData, device: BleScanDevice): DeviceData {
         val newData = existing.copy(
             detectCount = existing.detectCount + 1,
             lastDetectTimeMs = device.scanTimeMs,
@@ -108,7 +119,7 @@ class DevicesRepository(
         return newData
     }
 
-    private fun makeRelations(devices: List<BleDevice>) {
+    private fun makeRelations(devices: List<BleScanDevice>) {
         devices.forEachIndexed { i, first ->
             ((i + 1)..(devices.lastIndex)).forEach { j ->
                 val second = devices[j]
@@ -117,7 +128,7 @@ class DevicesRepository(
         }
     }
 
-    private fun findRef(first: BleDevice, second: BleDevice) {
+    private fun findRef(first: BleScanDevice, second: BleScanDevice) {
         val nodes = hashSetOf(first.address, second.address)
         val hash = (nodes.first() + nodes.last()).hashCode()
 

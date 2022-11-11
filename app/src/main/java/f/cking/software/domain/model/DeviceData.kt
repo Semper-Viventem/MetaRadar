@@ -1,4 +1,4 @@
-package f.cking.software.domain
+package f.cking.software.domain.model
 
 import f.cking.software.getTimePeriodStr
 
@@ -12,16 +12,17 @@ data class DeviceData(
     val favorite: Boolean
 ) {
 
-    fun isKnownDevice(): Boolean {
-        return lastDetectTimeMs - firstDetectTimeMs > KNOWN_DEVICE_PERIOD_MS
+    fun isKnownDevice(knownDevicePeriodMs: Long): Boolean {
+        return lastDetectTimeMs - firstDetectTimeMs > knownDevicePeriodMs
     }
 
     fun isInterestingForDetection(
         detectionTimeMs: Long,
-        minTimeToDetectMs: Long = MIN_TIME_TO_DETECT,
+        minTimeToDetectMs: Long,
+        knownDevicePeriodMs: Long,
         shouldBeFavorite: Boolean = true,
     ): Boolean {
-        return isKnownDevice()
+        return isKnownDevice(knownDevicePeriodMs)
                 && detectionTimeMs - lastDetectTimeMs >= minTimeToDetectMs
                 && ((shouldBeFavorite && favorite) || !shouldBeFavorite)
     }
@@ -36,10 +37,5 @@ data class DeviceData(
 
     fun lastDetectionPeriod(): String {
         return getTimePeriodStr(System.currentTimeMillis() - lastDetectTimeMs)
-    }
-
-    companion object {
-        private const val KNOWN_DEVICE_PERIOD_MS = 1000L * 60L * 60L // 1 hour
-        private const val MIN_TIME_TO_DETECT = 1000L * 60L * 60L // 1 hour
     }
 }

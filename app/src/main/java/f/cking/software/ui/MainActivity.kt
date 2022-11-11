@@ -5,22 +5,27 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.R
 import f.cking.software.TheApp
-import f.cking.software.domain.DeviceData
-import f.cking.software.domain.PermissionHelper
+import f.cking.software.domain.helpers.PermissionHelper
+import f.cking.software.domain.model.DeviceData
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         TheApp.instance.permissionHelper.setActivity(this)
 
         setContent {
-            Content()
+            Screen()
         }
     }
 
@@ -43,8 +48,6 @@ class MainActivity : AppCompatActivity() {
 
         val allPermissionsGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (requestCode == PermissionHelper.PERMISSIONS_REQUEST_CODE && allPermissionsGranted) {
-            viewModel.onScanButtonClick()
-        } else if (requestCode == PermissionHelper.PERMISSIONS_BACKGROUND_REQUEST_CODE && allPermissionsGranted) {
             viewModel.runBackgroundScanning()
         }
     }
@@ -59,47 +62,72 @@ class MainActivity : AppCompatActivity() {
         showBackground = true,
         showSystemUi = true,
     )
-    fun Content() {
+    fun Screen() {
         MaterialTheme() {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(16.dp)
-            ) {
-                List(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = { viewModel.runBackgroundScanning() },
-                        modifier = Modifier.height(56.dp),
-                    ) {
-                        val backgroundPresented = TheApp.instance.activeWorkId.isPresent
-                        Text(text = if (backgroundPresented) "Stop background" else "Background")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = { viewModel.onScanButtonClick() },
-                        enabled = !viewModel.scanStarted,
-                        modifier = Modifier.height(56.dp),
-                    ) {
-                        Text(text = "Scan", modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-                    }
-                    if (viewModel.scanStarted) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        CircularProgressIndicator(
-                            Modifier
-                                .width(24.dp)
-                                .height(24.dp)
+            Scaffold(
+                topBar = {
+                    TopBar()
+                },
+                content = { padding ->
+                    Content(padding)
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun TopBar() {
+        TopAppBar(
+            title = {
+                Text(text = resources.getString(R.string.app_name))
+            },
+            actions = {
+                if (viewModel.scanStarted) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                } else {
+                    IconButton(onClick = { viewModel.onScanButtonClick() }) {
+                        Image(
+                            modifier = Modifier
+                                .size(24.dp),
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "refresh",
+                            colorFilter = ColorFilter.tint(Color.White)
                         )
                     }
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun Content(paddingValues: PaddingValues) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(paddingValues)
+        ) {
+            List(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = { viewModel.runBackgroundScanning() },
+                    modifier = Modifier.height(56.dp),
+                ) {
+                    Text(text = if (TheApp.instance.backgroundScannerIsActive) "Stop background" else "Background")
                 }
             }
         }

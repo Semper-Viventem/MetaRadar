@@ -1,6 +1,7 @@
 package f.cking.software.domain
 
 import f.cking.software.data.DeviceEntity
+import f.cking.software.domain.model.DeviceData
 
 fun DeviceEntity.toDomain(): DeviceData {
     return DeviceData(
