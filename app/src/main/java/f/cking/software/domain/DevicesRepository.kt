@@ -8,9 +8,13 @@ class DevicesRepository(
 
     private val refs = hashMapOf<Int, Ref>()
 
-    fun detectBatch(devices: List<BleDevice>) {
+    /**
+     * @return count of known devices (device lifetime > 1 hour)
+     */
+    fun detectBatch(devices: List<BleDevice>): Int {
         devices.forEach { detect(it) }
         makeRelations(devices)
+        return getKnownDevicesCount(devices.map { it.address })
     }
 
     fun detect(device: BleDevice) {
@@ -21,6 +25,12 @@ class DevicesRepository(
         } else {
             createNew(device)
         }
+    }
+
+    private fun getKnownDevicesCount(addresses: List<String>): Int {
+        return deviceDao.findAllByAddresses(addresses).filter { device ->
+            device.lastDetectTimeMs - device.firstDetectTimeMs > KNOWN_DEVICE_PERIOD_MS
+        }.count()
     }
 
     fun makeRelations(devices: List<BleDevice>) {
@@ -76,4 +86,8 @@ class DevicesRepository(
         val second: String,
         val weight: Int,
     )
+
+    companion object {
+        private const val KNOWN_DEVICE_PERIOD_MS = 1000L * 60L * 60L // 1 hour
+    }
 }

@@ -11,6 +11,9 @@ interface DeviceDao {
     @Query("SELECT * FROM device WHERE address LIKE :address")
     fun findByAddress(address: String): DeviceEntity?
 
+    @Query("SELECT * FROM device WHERE address IN (:addresses)")
+    fun findAllByAddresses(addresses: List<String>): List<DeviceEntity>
+
     @Update
     fun update(deviceEntity: DeviceEntity)
 

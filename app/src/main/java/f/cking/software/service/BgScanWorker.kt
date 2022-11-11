@@ -62,12 +62,14 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
     private fun buildForegroundInfo(): ForegroundInfo {
         createChannel()
 
-        val notification = buildNotification()
+        val notification = buildNotification(knownDeviceCount = null)
 
         return ForegroundInfo(NOTIFICATION_ID, notification)
     }
 
-    private fun buildNotification(): Notification {
+    private fun buildNotification(
+        knownDeviceCount: Int?
+    ): Notification {
 
         val cancelIntent = WorkManager.getInstance(TheApp.instance)
             .createCancelPendingIntent(id)
@@ -80,13 +82,27 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val body = if (knownDeviceCount == null) {
+            "BLE scanner is started but there is no data yet"
+        } else if (knownDeviceCount > 0) {
+            "$knownDeviceCount known devices around."
+        } else {
+            "There are no known devices around"
+        }
+
         return NotificationCompat.Builder(TheApp.instance, NOTIFICATION_CHANNEL)
             .setContentTitle("MetaRadar service")
-            .setContentText("Scan BLE environment in background")
+            .setContentText(body)
             .setOngoing(true)
             .setSmallIcon(R.drawable.ic_ble)
             .setContentIntent(openAppPendingIntent)
-            .addAction(R.drawable.ic_cancel, "cancel", cancelIntent)
+            .addAction(R.drawable.ic_cancel, "Stop", cancelIntent)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setOnlyAlertOnce(true)
+            .setVibrate(null)
+            .setSound(null)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
     }
 
@@ -113,13 +129,19 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
                 override fun onSuccess(batch: List<BleDevice>) {
                     runBlocking {
                         launch(Dispatchers.IO) {
-                            TheApp.instance.devicesRepository.detectBatch(batch)
+                            val knownDeviceCount = TheApp.instance.devicesRepository.detectBatch(batch)
+                            updateNotification(knownDeviceCount)
                             scheduleNextScan()
                         }
                     }
                 }
             }
         )
+    }
+
+    private fun updateNotification(knownDeviceCount: Int) {
+        val notification = buildNotification(knownDeviceCount)
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
     private fun scheduleNextScan() {
@@ -130,7 +152,7 @@ class BgScanWorker(appContext: Context, workerParams: WorkerParameters) : Listen
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL,
             "Scan BLE in background",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_LOW
         )
         notificationManager.createNotificationChannel(channel)
     }
