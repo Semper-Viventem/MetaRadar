@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                         enabled = !viewModel.scanStarted,
                         modifier = Modifier.height(56.dp),
                     ) {
-                        Text(text = "scan", modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                        Text(text = "Scan", modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                     }
                     if (viewModel.scanStarted) {
                         Spacer(modifier = Modifier.width(8.dp))
