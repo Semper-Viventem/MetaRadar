@@ -5,12 +5,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -119,19 +119,22 @@ class MainActivity : AppCompatActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .clickable { viewModel.onDeviceClick(listData) }
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = listData.name ?: "N/A", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Row() {
+                    Text(text = listData.name ?: "N/A", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    if (listData.favorite) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(imageVector = Icons.Filled.Star, contentDescription = "Favorite")
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = listData.address)
                 Spacer(modifier = Modifier.height(4.dp))
 
-                val lifetimeMs = System.currentTimeMillis() - listData.firstDetectTimeMs
-                val lifetimeMin = lifetimeMs / 1000 / 60
-                val lastUpdateMs = System.currentTimeMillis() - listData.lastDetectTimeMs
-                val lastUpdateMin = lastUpdateMs / 1000 / 60
                 Text(
-                    text = "lifetime: $lifetimeMin min | last update: $lastUpdateMin min ago",
+                    text = "lifetime: ${listData.firstDetectionPeriod()} | last update: ${listData.lastDetectionPeriod()} ago",
                     fontWeight = FontWeight.Light
                 )
             }

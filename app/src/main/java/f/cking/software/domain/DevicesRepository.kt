@@ -32,6 +32,12 @@ class DevicesRepository(
         return getDevices().filter { device -> device.isKnownDevice() }
     }
 
+    fun changeFavorite(device: DeviceData) {
+        val new = device.copy(favorite = !device.favorite)
+        deviceDao.update(new.toData())
+        notifyListeners()
+    }
+
     /**
      * @return count of known devices (device lifetime > 1 hour)
      */

@@ -85,6 +85,12 @@ class BleScanViewModel(
         }
     }
 
+    fun onDeviceClick(device: DeviceData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            devicesRepository.changeFavorite(device)
+        }
+    }
+
     companion object {
         val factory = viewModelFactory {
             initializer {

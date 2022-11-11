@@ -12,6 +12,6 @@ fun getTimePeriodStr(timeMs: Long): String {
         hours > 1L -> "$hours hours"
         hours == 1L -> "$hours hour"
         min > 0 -> "$min min"
-        else -> "$sec ago"
+        else -> "$sec sec"
     }
 }
