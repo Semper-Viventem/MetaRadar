@@ -15,6 +15,14 @@ class SettingsRepository(
         return sharedPreferences.getLong(KEY_SCAN_INTERVAL, TheAppConfig.DEFAULT_SCAN_INTERVAL_MS)
     }
 
+    fun setScanRestrictedInterval(scanInterval: Long) {
+        sharedPreferences.edit().putLong(KEY_SCAN_RESTRICTED_INTERVAL, scanInterval).apply()
+    }
+
+    fun getScanRestrictedInterval(): Long {
+        return sharedPreferences.getLong(KEY_SCAN_RESTRICTED_INTERVAL, TheAppConfig.RESTRICTED_MODE_SCAN_INTERVAL_MS)
+    }
+
     fun setScanDuration(scanDuration: Long) {
         sharedPreferences.edit().putLong(KEY_SCAN_DURATION, scanDuration).apply()
     }
@@ -41,6 +49,7 @@ class SettingsRepository(
 
     companion object {
         private const val KEY_SCAN_INTERVAL = "key_scan_interval"
+        private const val KEY_SCAN_RESTRICTED_INTERVAL = "key_scan_restricted_interval"
         private const val KEY_SCAN_DURATION = "key_scan_duration"
         private const val KEY_KNOWN_PERIOD = "key_known_period"
         private const val KEY_WANTED_PERIOD = "key_wanted_period"

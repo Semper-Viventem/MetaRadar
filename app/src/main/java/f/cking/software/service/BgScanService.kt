@@ -92,8 +92,7 @@ class BgScanService : Service() {
 
     private fun scan() {
         bleScannerHelper.scan(
-            scanDurationMs = settingsRepository.getScanDuration(),
-            scanRestricted = !powerManager.isInteractive, // BLE scan is limited if device's screen is turned off
+            scanRestricted = isNonInteractiveMode(),
             scanListener = object : BleScannerHelper.ScanListener {
 
                 override fun onFailure() {
@@ -120,6 +119,13 @@ class BgScanService : Service() {
         )
     }
 
+    /**
+     * BLE scan is limited if device's screen is turned off
+     */
+    private fun isNonInteractiveMode(): Boolean {
+        return !powerManager.isInteractive
+    }
+
     private fun handleScanResult(result: DevicesRepository.Result) {
         Log.d(
             TAG,
@@ -133,7 +139,12 @@ class BgScanService : Service() {
     }
 
     private fun scheduleNextScan() {
-        handler.postDelayed(nextScanRunnable, settingsRepository.getScanInterval())
+        val interval = if (isNonInteractiveMode()) {
+            settingsRepository.getScanRestrictedInterval()
+        } else {
+            settingsRepository.getScanInterval()
+        }
+        handler.postDelayed(nextScanRunnable, interval)
     }
 
     private fun buildForegroundNotification(
