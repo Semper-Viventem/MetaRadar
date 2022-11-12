@@ -25,7 +25,12 @@ class MainViewModel(
 ) : ViewModel(), BleScannerHelper.ProgressListener {
 
     var scanStarted by mutableStateOf(false)
-    var currentTab by mutableStateOf(Tab.DEVICE_LIST)
+    var tabs by mutableStateOf(
+        listOf(
+            Tab(R.drawable.ic_list, "Device list", selected = true) { DeviceListScreen.Screen() },
+            Tab(R.drawable.ic_settings, "Settings", selected = false) { SettingsScreen.Screen() },
+        )
+    )
 
     init {
         bleScanner.addProgressListener(this)
@@ -41,6 +46,11 @@ class MainViewModel(
         checkPermissions {
             BgScanService.scan(TheApp.instance)
         }
+    }
+
+    fun onTabClick(tab: Tab) {
+        val list = tabs.map { it.copy(selected = it == tab) }
+        tabs = list
     }
 
     fun runBackgroundScanning() {
@@ -63,14 +73,12 @@ class MainViewModel(
         }
     }
 
-    enum class Tab(
+    data class Tab(
         @DrawableRes val iconRes: Int,
         val text: String,
-        val screen: @Composable () -> Unit
-    ) {
-        DEVICE_LIST(R.drawable.ic_list, "Device list", { DeviceListScreen.Screen() }),
-        SETTINGS(R.drawable.ic_settings, "Settings", { SettingsScreen.Screen() }),
-    }
+        val selected: Boolean,
+        val screen: @Composable () -> Unit,
+    )
 
     companion object {
         val factory = viewModelFactory {

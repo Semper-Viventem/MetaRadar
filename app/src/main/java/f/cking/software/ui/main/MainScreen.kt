@@ -39,7 +39,7 @@ object MainScreen {
                     TopBar(viewModel)
                 },
                 content = {
-                    viewModel.currentTab.screen()
+                    viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
                 },
                 floatingActionButtonPosition = FabPosition.Center,
                 floatingActionButton = {
@@ -59,13 +59,9 @@ object MainScreen {
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                TabButton(
-                    targetTab = MainViewModel.Tab.DEVICE_LIST,
-                    modifier = Modifier.weight(1f),
-                    viewModel = viewModel
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                TabButton(targetTab = MainViewModel.Tab.SETTINGS, modifier = Modifier.weight(1f), viewModel = viewModel)
+                viewModel.tabs.forEach { tab ->
+                    TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
+                }
             }
         }
     }
@@ -79,7 +75,7 @@ object MainScreen {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
-                .clickable { viewModel.currentTab = targetTab }
+                .clickable { viewModel.onTabClick(targetTab) }
         ) {
             Image(
                 painter = painterResource(id = targetTab.iconRes),
