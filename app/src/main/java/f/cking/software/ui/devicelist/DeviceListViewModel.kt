@@ -1,4 +1,4 @@
-package f.cking.software.ui
+package f.cking.software.ui.devicelist
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,27 +8,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.TheApp
-import f.cking.software.domain.helpers.BleScannerHelper
-import f.cking.software.domain.helpers.PermissionHelper
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.repo.DevicesRepository
-import f.cking.software.service.BgScanService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class BleScanViewModel(
-    private val permissionHelper: PermissionHelper,
+class DeviceListViewModel(
     private val devicesRepository: DevicesRepository,
-    private val bleScanner: BleScannerHelper,
-) : ViewModel(), BleScannerHelper.ProgressListener, DevicesRepository.OnDevicesUpdateListener {
+) : ViewModel(), DevicesRepository.OnDevicesUpdateListener {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
-    var scanStarted by mutableStateOf(false)
-
-    init {
-        devicesRepository.addListener(this)
-        bleScanner.addProgressListener(this)
-    }
 
     private val generalComparator = Comparator<DeviceData> { first, second ->
         when {
@@ -40,32 +29,13 @@ class BleScanViewModel(
         }
     }
 
-    override fun onScanProgressChanged(inProgress: Boolean) {
-        viewModelScope.launch(Dispatchers.Main) {
-            scanStarted = inProgress
-        }
+    init {
+        devicesRepository.addListener(this)
     }
 
     override fun onDevicesUpdate(devices: List<DeviceData>) {
         viewModelScope.launch(Dispatchers.Main) {
             devicesViewState = devices.sortedWith(generalComparator).reversed()
-        }
-    }
-
-    fun onScanButtonClick() {
-        checkPermissions {
-            BgScanService.scan(TheApp.instance)
-        }
-    }
-
-    fun runBackgroundScanning() {
-        checkPermissions {
-            permissionHelper.checkDozeModePermission()
-            if (TheApp.instance.backgroundScannerIsActive) {
-                BgScanService.stop(TheApp.instance)
-            } else {
-                BgScanService.start(TheApp.instance)
-            }
         }
     }
 
@@ -75,22 +45,11 @@ class BleScanViewModel(
         }
     }
 
-    private fun checkPermissions(granted: () -> Unit) {
-        permissionHelper.checkBlePermissions {
-            permissionHelper.checkBlePermissions(permissions = PermissionHelper.BACKGROUND_LOCATION) {
-                permissionHelper.checkDozeModePermission()
-                granted.invoke()
-            }
-        }
-    }
-
     companion object {
         val factory = viewModelFactory {
             initializer {
-                BleScanViewModel(
-                    permissionHelper = TheApp.instance.permissionHelper,
-                    devicesRepository = TheApp.instance.devicesRepository,
-                    bleScanner = TheApp.instance.bleScannerHelper
+                DeviceListViewModel(
+                    devicesRepository = TheApp.instance.devicesRepository
                 )
             }
         }

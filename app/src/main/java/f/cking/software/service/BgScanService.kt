@@ -17,7 +17,7 @@ import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.repo.DevicesRepository
 import f.cking.software.domain.repo.SettingsRepository
-import f.cking.software.ui.MainActivity
+import f.cking.software.ui.main.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
