@@ -3,6 +3,8 @@ package f.cking.software.domain.interactor
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.repo.DevicesRepository
 import f.cking.software.domain.repo.SettingsRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class ClearGarbageInteractor(
     private val devicesRepository: DevicesRepository,
@@ -10,12 +12,16 @@ class ClearGarbageInteractor(
     private val isKnownDeviceInteractor: IsKnownDeviceInteractor,
 ) {
 
-    fun execute() {
-        val devices = devicesRepository.getDevices()
-        devices.forEach { device ->
-            if (isGarbage(device)) {
-                devicesRepository.deleteDevice(device)
-            }
+    suspend fun execute(): Int {
+        return withContext(Dispatchers.Default) {
+            val devices = devicesRepository.getDevices()
+                .asSequence()
+                .filter { isGarbage(it) }
+                .map { it.address }
+                .toList()
+
+            devicesRepository.deleteAllByAddress(devices)
+            devices.count()
         }
     }
 
@@ -26,7 +32,7 @@ class ClearGarbageInteractor(
      */
     private fun isGarbage(device: DeviceData): Boolean {
         return !isKnownDeviceInteractor.execute(device)
-                && System.currentTimeMillis() - device.lastDetectTimeMs > settingsRepository.getGarbagingTIme()
+                && (System.currentTimeMillis() - device.lastDetectTimeMs) > settingsRepository.getGarbagingTIme()
                 && device.name == null
     }
 }

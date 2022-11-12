@@ -9,8 +9,7 @@ import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class DevicesRepository(
     appDatabase: AppDatabase,
@@ -19,44 +18,56 @@ class DevicesRepository(
     private val deviceDao: DeviceDao = appDatabase.deviceDao()
     private val allDevices = MutableStateFlow(emptyList<DeviceData>())
 
-    init {
-        notifyListeners()
+    suspend fun getDevices(): List<DeviceData> {
+        return withContext(Dispatchers.IO) {
+            deviceDao.getAll().map { it.toDomain() }
+        }
     }
 
-    fun getDevices() = deviceDao.getAll().map { it.toDomain() }
-    fun observeDevices(): StateFlow<List<DeviceData>> = allDevices
+    suspend fun observeDevices(): StateFlow<List<DeviceData>> {
+        return withContext(Dispatchers.IO) {
+            if (allDevices.value.isEmpty()) {
+                allDevices.emit(getDevices())
+            }
+            allDevices
+        }
+    }
 
-    fun saveScanBatch(devices: List<BleScanDevice>) {
+    suspend fun saveScanBatch(devices: List<BleScanDevice>) {
         devices.forEach { saveScanResult(it) }
         notifyListeners()
     }
 
-    fun changeFavorite(device: DeviceData) {
-        val new = device.copy(favorite = !device.favorite)
-        deviceDao.update(new.toData())
-        notifyListeners()
-    }
-
-    fun deleteDevice(device: DeviceData) {
-        deviceDao.delete(device.toData())
-        notifyListeners()
-    }
-
-    fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
-        return deviceDao.findAllByAddresses(addresses).map { it.toDomain() }
-    }
-
-    private fun notifyListeners() {
-        runBlocking {
-            launch(Dispatchers.IO) {
-                val data = getDevices()
-                allDevices.tryEmit(data)
-            }
+    suspend fun changeFavorite(device: DeviceData) {
+        withContext(Dispatchers.IO) {
+            val new = device.copy(favorite = !device.favorite)
+            deviceDao.update(new.toData())
+            notifyListeners()
         }
     }
 
-    private fun saveScanResult(device: BleScanDevice) {
-        val existing = deviceDao.findByAddress(device.address)?.toDomain()
+    suspend fun deleteAllByAddress(addresses: List<String>) {
+        withContext(Dispatchers.IO) {
+            deviceDao.deleteAllByAddress(addresses)
+            notifyListeners()
+        }
+    }
+
+    suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
+        return withContext(Dispatchers.IO) {
+            deviceDao.findAllByAddresses(addresses).map { it.toDomain() }
+        }
+    }
+
+    private suspend fun notifyListeners() {
+        val data = getDevices()
+        allDevices.emit(data)
+    }
+
+    private suspend fun saveScanResult(device: BleScanDevice) {
+        val existing = withContext(Dispatchers.IO) {
+            deviceDao.findByAddress(device.address)?.toDomain()
+        }
 
         if (existing != null) {
             updateExisting(existing, device)
@@ -65,7 +76,7 @@ class DevicesRepository(
         }
     }
 
-    private fun createNew(device: BleScanDevice) {
+    private suspend fun createNew(device: BleScanDevice) {
         val dataItem = DeviceData(
             address = device.address,
             name = device.name,
@@ -76,14 +87,19 @@ class DevicesRepository(
             favorite = false,
         )
 
-        deviceDao.insert(dataItem.toData())
+        withContext(Dispatchers.IO) {
+            deviceDao.insert(dataItem.toData())
+        }
     }
 
-    private fun updateExisting(existing: DeviceData, device: BleScanDevice) {
+    private suspend fun updateExisting(existing: DeviceData, device: BleScanDevice) {
         val newData = existing.copy(
             detectCount = existing.detectCount + 1,
             lastDetectTimeMs = device.scanTimeMs,
         )
-        deviceDao.update(newData.toData())
+
+        withContext(Dispatchers.IO) {
+            deviceDao.update(newData.toData())
+        }
     }
 }

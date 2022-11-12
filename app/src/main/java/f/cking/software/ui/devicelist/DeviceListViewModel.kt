@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.repo.DevicesRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DeviceListViewModel(
@@ -31,13 +30,13 @@ class DeviceListViewModel(
     }
 
     fun onDeviceClick(device: DeviceData) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             devicesRepository.changeFavorite(device)
         }
     }
 
     private fun observeDevices() {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             devicesRepository.observeDevices()
                 .collect { devices ->
                     devicesViewState = devices.sortedWith(generalComparator).reversed()

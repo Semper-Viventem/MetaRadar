@@ -20,6 +20,9 @@ interface DeviceDao {
     @Insert
     fun insert(deviceEntity: DeviceEntity)
 
-    @Delete
-    fun delete(deviceEntity: DeviceEntity)
+    @Query("DELETE FROM device WHERE address LIKE :address")
+    fun delete(address: String)
+
+    @Query("DELETE FROM device WHERE address IN (:addresses)")
+    fun deleteAllByAddress(addresses: List<String>)
 }

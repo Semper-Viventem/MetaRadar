@@ -10,6 +10,6 @@ object ViewModelModule {
     val module = module {
         viewModel { MainViewModel(get(), get(), get()) }
         viewModel { DeviceListViewModel(get()) }
-        viewModel { SettingsViewModel(get()) }
+        viewModel { SettingsViewModel(get(), get(), get()) }
     }
 }

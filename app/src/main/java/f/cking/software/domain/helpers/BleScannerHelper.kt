@@ -13,8 +13,7 @@ import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.repo.DevicesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class BleScannerHelper(
@@ -64,36 +63,34 @@ class BleScannerHelper(
     }
 
     @SuppressLint("MissingPermission")
-    fun scan(
+    suspend fun scan(
         scanRestricted: Boolean = false,
         scanDurationMs: Long,
         scanListener: ScanListener,
     ) {
-        runBlocking {
-            launch(Dispatchers.IO) {
-                Log.d(TAG, "Start BLE Scan. Restricted mode: $scanRestricted")
+        Log.d(TAG, "Start BLE Scan. Restricted mode: $scanRestricted")
 
-                if (inProgress.value) {
-                    Log.e(TAG, "BLE Scan failed because previous scan is not finished")
-                } else {
-                    this@BleScannerHelper.scanListener = scanListener
-                    batch.clear()
-                    handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, scanDurationMs)
-                    inProgress.tryEmit(true)
-                    currentScanTimeMs = System.currentTimeMillis()
+        if (inProgress.value) {
+            Log.e(TAG, "BLE Scan failed because previous scan is not finished")
+        } else {
+            this@BleScannerHelper.scanListener = scanListener
+            batch.clear()
+            handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, scanDurationMs)
+            inProgress.tryEmit(true)
+            currentScanTimeMs = System.currentTimeMillis()
 
-                    val scanFilters = if (scanRestricted) {
-                        getBGFilters() + getPopularServiceUUIDS()
-                    } else {
-                        listOf(ScanFilter.Builder().build())
-                    }
+            val scanFilters = if (scanRestricted) {
+                getBGFilters() + getPopularServiceUUIDS()
+            } else {
+                listOf(ScanFilter.Builder().build())
+            }
 
-                    val scanSettings = ScanSettings.Builder()
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                        .build()
+            val scanSettings = ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build()
 
-                    bluetoothScanner.startScan(scanFilters, scanSettings, callback)
-                }
+            withContext(Dispatchers.IO) {
+                bluetoothScanner.startScan(scanFilters, scanSettings, callback)
             }
         }
     }
@@ -106,7 +103,7 @@ class BleScannerHelper(
         }
     }
 
-    private fun getBGFilters(): List<ScanFilter> {
+    private suspend fun getBGFilters(): List<ScanFilter> {
         return getKnownDevicesInteractor.execute().map {
             ScanFilter.Builder()
                 .setDeviceAddress(it.address)

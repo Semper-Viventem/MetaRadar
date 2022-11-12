@@ -18,10 +18,8 @@ import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.repo.SettingsRepository
 import f.cking.software.ui.main.MainActivity
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import java.lang.Math.random
@@ -90,34 +88,38 @@ class BgScanService : Service() {
     }
 
     private fun scan() {
-        bleScannerHelper.scan(
-            scanRestricted = isNonInteractiveMode(),
-            scanDurationMs = settingsRepository.getScanDuration(),
-            scanListener = object : BleScannerHelper.ScanListener {
+        runBlocking {
+            bleScannerHelper.scan(
+                scanRestricted = isNonInteractiveMode(),
+                scanDurationMs = settingsRepository.getScanDuration(),
+                scanListener = object : BleScannerHelper.ScanListener {
 
-                override fun onFailure() {
-                    failureScanCounter++
+                    override fun onFailure() {
+                        failureScanCounter++
 
-                    if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-                        stopSelf()
-                    } else {
-                        scheduleNextScan()
-                    }
-                }
-
-                override fun onSuccess(batch: List<BleScanDevice>) {
-                    failureScanCounter = 0
-                    runBlocking {
-                        launch(Dispatchers.IO) {
-                            val analyseResult = analyseScanBatchInteractor.execute(batch)
-                            saveScanBatchInteractor.execute(batch)
-                            handleScanResult(analyseResult)
+                        if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
+                            stopSelf()
+                        } else {
                             scheduleNextScan()
                         }
                     }
+
+                    override fun onSuccess(batch: List<BleScanDevice>) {
+                        handleScanResult(batch)
+                    }
                 }
-            }
-        )
+            )
+        }
+    }
+
+    private fun handleScanResult(batch: List<BleScanDevice>) {
+        failureScanCounter = 0
+        runBlocking {
+            val analyseResult = analyseScanBatchInteractor.execute(batch)
+            saveScanBatchInteractor.execute(batch)
+            handleAnalysResult(analyseResult)
+            scheduleNextScan()
+        }
     }
 
     /**
@@ -127,7 +129,7 @@ class BgScanService : Service() {
         return !powerManager.isInteractive
     }
 
-    private fun handleScanResult(result: AnalyseScanBatchInteractor.Result) {
+    private fun handleAnalysResult(result: AnalyseScanBatchInteractor.Result) {
         Log.d(
             TAG,
             "Background scan result: known_devices_count=${result.knownDevicesCount}, wanted_devices_count=${result.wanted.count()}"
