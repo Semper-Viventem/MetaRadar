@@ -1,7 +1,5 @@
 # MetaRadar
 
---
-
 The app for BLE ether monitoring tracks your environment, finds some devices, makes relations between devices around you, and tracks devices' movements.
 
 ## Functionality
