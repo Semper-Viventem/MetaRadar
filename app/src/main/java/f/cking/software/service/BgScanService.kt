@@ -206,7 +206,6 @@ class BgScanService : Service() {
         val notification = NotificationCompat.Builder(this, DEVICE_FOUND_CHANNEL)
             .setContentTitle(title)
             .setContentText(content)
-            .setOngoing(true)
             .setSmallIcon(R.drawable.ic_ble)
             .setContentIntent(openAppPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

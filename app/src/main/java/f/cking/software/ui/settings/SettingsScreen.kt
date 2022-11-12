@@ -20,9 +20,7 @@ object SettingsScreen {
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center,
         ) {
-
             Text(text = "Settings")
-
         }
     }
 }
