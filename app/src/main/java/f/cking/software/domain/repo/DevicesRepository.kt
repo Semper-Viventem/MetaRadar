@@ -7,6 +7,8 @@ import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -15,23 +17,19 @@ class DevicesRepository(
 ) {
 
     private val deviceDao: DeviceDao = appDatabase.deviceDao()
+    private val allDevices = MutableStateFlow(emptyList<DeviceData>())
 
-    private var listeners: MutableSet<OnDevicesUpdateListener> = mutableSetOf()
-
-    fun addListener(listener: OnDevicesUpdateListener) {
-        listeners.add(listener)
-        runBlocking {
-            launch(Dispatchers.IO) {
-                listener.onDevicesUpdate(getDevices())
-            }
-        }
-    }
-
-    fun removeListener(listener: OnDevicesUpdateListener) {
-        listeners.remove(listener)
+    init {
+        notifyListeners()
     }
 
     fun getDevices() = deviceDao.getAll().map { it.toDomain() }
+    fun observeDevices(): StateFlow<List<DeviceData>> = allDevices
+
+    fun saveScanBatch(devices: List<BleScanDevice>) {
+        devices.forEach { saveScanResult(it) }
+        notifyListeners()
+    }
 
     fun changeFavorite(device: DeviceData) {
         val new = device.copy(favorite = !device.favorite)
@@ -44,18 +42,17 @@ class DevicesRepository(
         notifyListeners()
     }
 
-    fun saveScanBatch(devices: List<BleScanDevice>) {
-        devices.forEach { saveScanResult(it) }
-        notifyListeners()
-    }
-
     fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
         return deviceDao.findAllByAddresses(addresses).map { it.toDomain() }
     }
 
     private fun notifyListeners() {
-        val data = getDevices()
-        listeners.forEach { it.onDevicesUpdate(data) }
+        runBlocking {
+            launch(Dispatchers.IO) {
+                val data = getDevices()
+                allDevices.tryEmit(data)
+            }
+        }
     }
 
     private fun saveScanResult(device: BleScanDevice) {
@@ -88,9 +85,5 @@ class DevicesRepository(
             lastDetectTimeMs = device.scanTimeMs,
         )
         deviceDao.update(newData.toData())
-    }
-
-    interface OnDevicesUpdateListener {
-        fun onDevicesUpdate(devices: List<DeviceData>)
     }
 }

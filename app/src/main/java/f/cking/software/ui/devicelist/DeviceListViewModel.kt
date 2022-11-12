@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class DeviceListViewModel(
     private val devicesRepository: DevicesRepository,
-) : ViewModel(), DevicesRepository.OnDevicesUpdateListener {
+) : ViewModel() {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
 
@@ -27,18 +27,21 @@ class DeviceListViewModel(
     }
 
     init {
-        devicesRepository.addListener(this)
-    }
-
-    override fun onDevicesUpdate(devices: List<DeviceData>) {
-        viewModelScope.launch(Dispatchers.Main) {
-            devicesViewState = devices.sortedWith(generalComparator).reversed()
-        }
+        observeDevices()
     }
 
     fun onDeviceClick(device: DeviceData) {
         viewModelScope.launch(Dispatchers.IO) {
             devicesRepository.changeFavorite(device)
+        }
+    }
+
+    private fun observeDevices() {
+        viewModelScope.launch() {
+            devicesRepository.observeDevices()
+                .collect { devices ->
+                    devicesViewState = devices.sortedWith(generalComparator).reversed()
+                }
         }
     }
 }
