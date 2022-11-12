@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -14,10 +15,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "Main Activity"
 
     private val viewModel: BleScanViewModel by viewModels { BleScanViewModel.factory }
+    private var currentTab by mutableStateOf(Tab.DEVICE_LIST)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,22 +64,110 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    private enum class Tab(
+        @DrawableRes val iconRes: Int,
+        val text: String,
+    ) {
+        DEVICE_LIST(R.drawable.ic_list, "Device list"),
+        SETTINGS(R.drawable.ic_settings, "Settings"),
+    }
+
     @Composable
     @Preview(
         showBackground = true,
         showSystemUi = true,
     )
     fun Screen() {
-        MaterialTheme() {
+        MaterialTheme(
+            colors = MaterialTheme.colors.copy(
+                primary = colorResource(id = R.color.orange_500),
+                primaryVariant = colorResource(id = R.color.orange_700),
+                onPrimary = Color.White,
+                secondary = Color.Black,
+                secondaryVariant = Color.Black,
+                onSecondary = Color.White,
+            )
+        ) {
             Scaffold(
                 topBar = {
                     TopBar()
                 },
                 content = { padding ->
-                    Content(padding)
+                    when (currentTab) {
+                        Tab.DEVICE_LIST -> DeviceList(padding)
+                        Tab.SETTINGS -> Settings()
+                    }
+                },
+                floatingActionButtonPosition = FabPosition.Center,
+                floatingActionButton = {
+                    ScanFab()
+                },
+                bottomBar = {
+                    BottomNavigationBar()
                 }
             )
         }
+    }
+
+    @Composable
+    fun BottomNavigationBar() {
+        BottomAppBar {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                TabButton(targetTab = Tab.DEVICE_LIST, modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(16.dp))
+                TabButton(targetTab = Tab.SETTINGS, modifier = Modifier.weight(1f))
+            }
+        }
+    }
+
+    @Composable
+    private fun TabButton(
+        targetTab: Tab,
+        modifier: Modifier = Modifier,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .clickable { currentTab = targetTab }
+        ) {
+            Image(
+                painter = painterResource(id = targetTab.iconRes),
+                contentDescription = targetTab.text,
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier.size(32.dp),
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+        }
+    }
+
+    @Composable
+    fun ScanFab() {
+        val text: String
+        val icon: Int
+
+        if (TheApp.instance.backgroundScannerIsActive) {
+            text = "Stop"
+            icon = R.drawable.ic_cancel
+        } else {
+            text = "Scan"
+            icon = R.drawable.ic_ble
+        }
+
+        ExtendedFloatingActionButton(
+            text = { Text(text = text, fontWeight = FontWeight.Bold) },
+            onClick = { viewModel.runBackgroundScanning() },
+            icon = {
+                Image(
+                    painter = painterResource(id = icon),
+                    contentDescription = text,
+                    colorFilter = ColorFilter.tint(color = Color.White)
+                )
+            }
+        )
     }
 
     @Composable
@@ -106,7 +201,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun Content(paddingValues: PaddingValues) {
+    fun Settings() {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center,
+        ) {
+
+            Text(text = "Settings")
+
+        }
+    }
+
+    @Composable
+    fun DeviceList(paddingValues: PaddingValues) {
         Column(
             Modifier
                 .fillMaxWidth()
@@ -118,18 +227,6 @@ class MainActivity : AppCompatActivity() {
                     .weight(1f)
                     .fillMaxWidth()
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = { viewModel.runBackgroundScanning() },
-                    modifier = Modifier.height(56.dp),
-                ) {
-                    Text(text = if (TheApp.instance.backgroundScannerIsActive) "Stop background" else "Background")
-                }
-            }
         }
     }
 
