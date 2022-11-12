@@ -1,5 +1,6 @@
 package f.cking.software.ui.main
 
+import android.app.Application
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -7,24 +8,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.R
-import f.cking.software.TheApp
 import f.cking.software.domain.helpers.BleScannerHelper
 import f.cking.software.domain.helpers.PermissionHelper
 import f.cking.software.service.BgScanService
 import f.cking.software.ui.devicelist.DeviceListScreen
 import f.cking.software.ui.settings.SettingsScreen
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val permissionHelper: PermissionHelper,
+    private val appContext: Application,
     private val bleScanner: BleScannerHelper,
-) : ViewModel(), BleScannerHelper.ProgressListener {
+) : ViewModel() {
 
-    var scanStarted by mutableStateOf(false)
+    var scanStarted: Boolean by mutableStateOf(bleScanner.inProgress.value)
+    var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive.value)
+
     var tabs by mutableStateOf(
         listOf(
             Tab(R.drawable.ic_list, "Device list", selected = true) { DeviceListScreen.Screen() },
@@ -33,18 +33,13 @@ class MainViewModel(
     )
 
     init {
-        bleScanner.addProgressListener(this)
-    }
-
-    override fun onScanProgressChanged(inProgress: Boolean) {
-        viewModelScope.launch(Dispatchers.Main) {
-            scanStarted = inProgress
-        }
+        observeScanInProgress()
+        observeServiceIsLaunched()
     }
 
     fun onScanButtonClick() {
         checkPermissions {
-            BgScanService.scan(TheApp.instance)
+            BgScanService.scan(appContext)
         }
     }
 
@@ -56,11 +51,25 @@ class MainViewModel(
     fun runBackgroundScanning() {
         checkPermissions {
             permissionHelper.checkDozeModePermission()
-            if (TheApp.instance.backgroundScannerIsActive) {
-                BgScanService.stop(TheApp.instance)
+            if (BgScanService.isActive.value) {
+                BgScanService.stop(appContext)
             } else {
-                BgScanService.start(TheApp.instance)
+                BgScanService.start(appContext)
             }
+        }
+    }
+
+    private fun observeScanInProgress() {
+        viewModelScope.launch {
+            bleScanner.inProgress
+                .collect { scanStarted = it}
+        }
+    }
+
+    private fun observeServiceIsLaunched() {
+        viewModelScope.launch {
+            BgScanService.isActive
+                .collect { bgServiceIsActive = it }
         }
     }
 
@@ -79,15 +88,4 @@ class MainViewModel(
         val selected: Boolean,
         val screen: @Composable () -> Unit,
     )
-
-    companion object {
-        val factory = viewModelFactory {
-            initializer {
-                MainViewModel(
-                    permissionHelper = TheApp.instance.permissionHelper,
-                    bleScanner = TheApp.instance.bleScannerHelper
-                )
-            }
-        }
-    }
 }

@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
-import f.cking.software.TheApp
 
 object MainScreen {
 
@@ -93,7 +92,7 @@ object MainScreen {
         val text: String
         val icon: Int
 
-        if (TheApp.instance.backgroundScannerIsActive) {
+        if (viewModel.bgServiceIsActive) {
             text = "Stop"
             icon = R.drawable.ic_cancel
         } else {

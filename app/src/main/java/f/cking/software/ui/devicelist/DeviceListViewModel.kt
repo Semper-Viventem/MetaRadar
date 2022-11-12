@@ -5,9 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import f.cking.software.TheApp
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.repo.DevicesRepository
 import kotlinx.coroutines.Dispatchers
@@ -42,16 +39,6 @@ class DeviceListViewModel(
     fun onDeviceClick(device: DeviceData) {
         viewModelScope.launch(Dispatchers.IO) {
             devicesRepository.changeFavorite(device)
-        }
-    }
-
-    companion object {
-        val factory = viewModelFactory {
-            initializer {
-                DeviceListViewModel(
-                    devicesRepository = TheApp.instance.devicesRepository
-                )
-            }
         }
     }
 }

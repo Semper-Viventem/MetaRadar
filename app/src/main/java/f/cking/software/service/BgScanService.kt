@@ -10,18 +10,20 @@ import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
-import f.cking.software.TheApp
 import f.cking.software.domain.helpers.BleScannerHelper
 import f.cking.software.domain.helpers.PermissionHelper
+import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
+import f.cking.software.domain.interactor.SaveScanBatchInteractor
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
-import f.cking.software.domain.repo.DevicesRepository
 import f.cking.software.domain.repo.SettingsRepository
 import f.cking.software.ui.main.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.android.inject
 import java.lang.Math.random
 
 
@@ -29,13 +31,15 @@ class BgScanService : Service() {
 
     private val TAG = "BgScanService"
 
-    private lateinit var permissionHelper: PermissionHelper
-    private lateinit var bleScannerHelper: BleScannerHelper
-    private lateinit var devicesRepository: DevicesRepository
-    private lateinit var settingsRepository: SettingsRepository
+    private val permissionHelper: PermissionHelper by inject()
+    private val bleScannerHelper: BleScannerHelper by inject()
+    private val settingsRepository: SettingsRepository by inject()
 
-    private val notificationManager = TheApp.instance.getSystemService(NotificationManager::class.java)
-    private val powerManager = TheApp.instance.getSystemService(PowerManager::class.java)
+    private val saveScanBatchInteractor: SaveScanBatchInteractor by inject()
+    private val analyseScanBatchInteractor: AnalyseScanBatchInteractor by inject()
+
+    private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
+    private val powerManager by lazy { getSystemService(PowerManager::class.java) }
 
     private val handler = Handler(Looper.getMainLooper())
     private var failureScanCounter: Int = 0
@@ -45,12 +49,7 @@ class BgScanService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-
-        TheApp.instance.backgroundScannerIsActive = true
-        bleScannerHelper = TheApp.instance.bleScannerHelper
-        permissionHelper = TheApp.instance.permissionHelper
-        devicesRepository = TheApp.instance.devicesRepository
-        settingsRepository = TheApp.instance.settingsRepository
+        isActive.tryEmit(true)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -80,7 +79,7 @@ class BgScanService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "Background service destroyed")
-        TheApp.instance.backgroundScannerIsActive = false
+        isActive.tryEmit(false)
         bleScannerHelper.stopScanning()
         handler.removeCallbacks(nextScanRunnable)
         notificationManager.cancel(NOTIFICATION_ID)
@@ -93,6 +92,7 @@ class BgScanService : Service() {
     private fun scan() {
         bleScannerHelper.scan(
             scanRestricted = isNonInteractiveMode(),
+            scanDurationMs = settingsRepository.getScanDuration(),
             scanListener = object : BleScannerHelper.ScanListener {
 
                 override fun onFailure() {
@@ -109,8 +109,9 @@ class BgScanService : Service() {
                     failureScanCounter = 0
                     runBlocking {
                         launch(Dispatchers.IO) {
-                            val result = devicesRepository.detectBatch(batch)
-                            handleScanResult(result)
+                            val analyseResult = analyseScanBatchInteractor.execute(batch)
+                            saveScanBatchInteractor.execute(batch)
+                            handleScanResult(analyseResult)
                             scheduleNextScan()
                         }
                     }
@@ -126,7 +127,7 @@ class BgScanService : Service() {
         return !powerManager.isInteractive
     }
 
-    private fun handleScanResult(result: DevicesRepository.Result) {
+    private fun handleScanResult(result: AnalyseScanBatchInteractor.Result) {
         Log.d(
             TAG,
             "Background scan result: known_devices_count=${result.knownDevicesCount}, wanted_devices_count=${result.wanted.count()}"
@@ -258,6 +259,8 @@ class BgScanService : Service() {
         private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
         private const val ACTION_SCAN_NOW = "ble_scan_now"
 
+        var isActive = MutableStateFlow(false)
+
         private fun createCloseServiceIntent(context: Context): Intent {
             return Intent(context, BgScanService::class.java).apply {
                 action = ACTION_STOP_SERVICE
@@ -270,13 +273,13 @@ class BgScanService : Service() {
         }
 
         fun stop(context: Context) {
-            if (TheApp.instance.backgroundScannerIsActive) {
+            if (isActive.value) {
                 context.startService(createCloseServiceIntent(context))
             }
         }
 
         fun scan(context: Context) {
-            if (TheApp.instance.backgroundScannerIsActive) {
+            if (isActive.value) {
                 val intent = Intent(context, BgScanService::class.java).apply {
                     action = ACTION_SCAN_NOW
                 }

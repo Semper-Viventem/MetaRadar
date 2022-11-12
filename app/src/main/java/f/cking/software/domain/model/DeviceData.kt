@@ -12,21 +12,6 @@ data class DeviceData(
     val favorite: Boolean
 ) {
 
-    fun isKnownDevice(knownDevicePeriodMs: Long): Boolean {
-        return lastDetectTimeMs - firstDetectTimeMs > knownDevicePeriodMs
-    }
-
-    fun isInterestingForDetection(
-        detectionTimeMs: Long,
-        minTimeToDetectMs: Long,
-        knownDevicePeriodMs: Long,
-        shouldBeFavorite: Boolean = true,
-    ): Boolean {
-        return isKnownDevice(knownDevicePeriodMs)
-                && detectionTimeMs - lastDetectTimeMs >= minTimeToDetectMs
-                && ((shouldBeFavorite && favorite) || !shouldBeFavorite)
-    }
-
     fun buildDisplayName(): String {
         return if (!customName.isNullOrBlank()) customName else name ?: address
     }

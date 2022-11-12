@@ -1,5 +1,6 @@
 package f.cking.software.domain.repo
 
+import f.cking.software.data.AppDatabase
 import f.cking.software.data.DeviceDao
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
@@ -10,11 +11,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class DevicesRepository(
-    private val deviceDao: DeviceDao,
-    private val settingsRepository: SettingsRepository,
+    appDatabase: AppDatabase,
 ) {
 
-    private val refs = hashMapOf<Int, Ref>()
+    private val deviceDao: DeviceDao = appDatabase.deviceDao()
 
     private var listeners: MutableSet<OnDevicesUpdateListener> = mutableSetOf()
 
@@ -33,66 +33,38 @@ class DevicesRepository(
 
     fun getDevices() = deviceDao.getAll().map { it.toDomain() }
 
-    fun getKnownDevices(): List<DeviceData> {
-        return getDevices().filter { device -> device.isKnownDevice(settingsRepository.getKnownDevicePeriod()) }
-    }
-
     fun changeFavorite(device: DeviceData) {
         val new = device.copy(favorite = !device.favorite)
         deviceDao.update(new.toData())
         notifyListeners()
     }
 
-    /**
-     * @return count of known devices (device lifetime > 1 hour)
-     */
-    fun detectBatch(devices: List<BleScanDevice>): Result {
-        val wantedDevices: MutableSet<DeviceData> = mutableSetOf()
-        devices.forEach {
-            detect(it)?.let { wantedDevices.add(it) }
-        }
+    fun deleteDevice(device: DeviceData) {
+        deviceDao.delete(device.toData())
         notifyListeners()
-        val knownDeviceCount = getKnownDevicesCount(devices.map { it.address })
-        return Result(knownDeviceCount, wantedDevices)
     }
 
-    data class Result(
-        val knownDevicesCount: Int,
-        val wanted: Set<DeviceData>,
-    )
+    fun saveScanBatch(devices: List<BleScanDevice>) {
+        devices.forEach { saveScanResult(it) }
+        notifyListeners()
+    }
+
+    fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
+        return deviceDao.findAllByAddresses(addresses).map { it.toDomain() }
+    }
 
     private fun notifyListeners() {
         val data = getDevices()
         listeners.forEach { it.onDevicesUpdate(data) }
     }
 
-    /**
-     * @return Should return device if it's wanted
-     */
-    private fun detect(device: BleScanDevice): DeviceData? {
+    private fun saveScanResult(device: BleScanDevice) {
         val existing = deviceDao.findByAddress(device.address)?.toDomain()
-        val isWanted = existing?.isInterestingForDetection(
-            detectionTimeMs = device.scanTimeMs,
-            knownDevicePeriodMs = settingsRepository.getKnownDevicePeriod(),
-            minTimeToDetectMs = settingsRepository.getWantedDevicePeriod(),
-        ) ?: false
 
-        return if (existing != null) {
-            val updated = updateExisting(existing, device)
-            if (isWanted) {
-                updated
-            } else {
-                null
-            }
+        if (existing != null) {
+            updateExisting(existing, device)
         } else {
             createNew(device)
-            null
-        }
-    }
-
-    private fun getKnownDevicesCount(addresses: List<String>): Int {
-        return deviceDao.findAllByAddresses(addresses).count {
-            it.toDomain().isKnownDevice(settingsRepository.getKnownDevicePeriod())
         }
     }
 
@@ -110,44 +82,13 @@ class DevicesRepository(
         deviceDao.insert(dataItem.toData())
     }
 
-    private fun updateExisting(existing: DeviceData, device: BleScanDevice): DeviceData {
+    private fun updateExisting(existing: DeviceData, device: BleScanDevice) {
         val newData = existing.copy(
             detectCount = existing.detectCount + 1,
             lastDetectTimeMs = device.scanTimeMs,
         )
         deviceDao.update(newData.toData())
-        return newData
     }
-
-    private fun makeRelations(devices: List<BleScanDevice>) {
-        devices.forEachIndexed { i, first ->
-            ((i + 1)..(devices.lastIndex)).forEach { j ->
-                val second = devices[j]
-                findRef(first, second)
-            }
-        }
-    }
-
-    private fun findRef(first: BleScanDevice, second: BleScanDevice) {
-        val nodes = hashSetOf(first.address, second.address)
-        val hash = (nodes.first() + nodes.last()).hashCode()
-
-        val newRef = Ref(hash, first = nodes.first(), second = nodes.last(), weight = 1)
-        val existingRef = this.refs[hash]
-
-        if (existingRef != null) {
-            refs[hash] = existingRef.copy(weight = existingRef.weight + 1)
-        } else {
-            refs[hash] = newRef
-        }
-    }
-
-    data class Ref(
-        val refHash: Int,
-        val first: String,
-        val second: String,
-        val weight: Int,
-    )
 
     interface OnDevicesUpdateListener {
         fun onDevicesUpdate(devices: List<DeviceData>)

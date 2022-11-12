@@ -12,14 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import f.cking.software.domain.model.DeviceData
+import org.koin.androidx.compose.koinViewModel
 
 object DeviceListScreen {
 
     @Composable
     fun Screen() {
-        val viewModel: DeviceListViewModel = viewModel(factory = DeviceListViewModel.factory)
+        val viewModel: DeviceListViewModel = koinViewModel()
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()

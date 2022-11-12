@@ -59,6 +59,9 @@ grgit-gradle = "8d818b74b9"
 tangle = "0.15.1"
 work = "2.7.1"
 concurrent = "1.1.0"
+koin = "3.2.2"
+koin-android = "3.3.0"
+koin-android-compose = "3.3.0"
 
 # Testing
 junit = "4.12"
@@ -216,6 +219,11 @@ work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 
 concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrent" }
 concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrent" }
+
+koin = { module = "io.insert-koin:koin-core", version.ref = "koin"}
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-android"}
+koin-android-compat = { module = "io.insert-koin:koin-android-compat", version.ref = "koin-android"}
+koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-android-compose"}
 
 
 [plugins]

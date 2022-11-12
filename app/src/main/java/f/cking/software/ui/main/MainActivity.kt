@@ -3,21 +3,22 @@ package f.cking.software.ui.main
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import f.cking.software.TheApp
 import f.cking.software.domain.helpers.PermissionHelper
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "Main Activity"
 
-    private val mainViewModel: MainViewModel by viewModels { MainViewModel.factory }
+    private val mainViewModel: MainViewModel by viewModel()
+    private val permissionHelper: PermissionHelper by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        TheApp.instance.permissionHelper.setActivity(this)
+        permissionHelper.setActivity(this)
 
         setContent {
             MainScreen.Screen(mainViewModel)
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        TheApp.instance.permissionHelper.setActivity(null)
+        permissionHelper.setActivity(null)
         super.onDestroy()
     }
 

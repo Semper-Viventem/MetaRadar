@@ -7,13 +7,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 object SettingsScreen {
 
     @Composable
     fun Screen() {
-        val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.factory)
+        val viewModel: SettingsViewModel = koinViewModel()
         Box(
             modifier = Modifier
                 .fillMaxWidth()

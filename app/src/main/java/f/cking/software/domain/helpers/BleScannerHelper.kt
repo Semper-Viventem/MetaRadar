@@ -8,15 +8,18 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import f.cking.software.domain.interactor.GetKnownDevicesInteractor
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.repo.DevicesRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
 class BleScannerHelper(
     private val devicesRepository: DevicesRepository,
+    private val getKnownDevicesInteractor: GetKnownDevicesInteractor,
     appContext: Context,
 ) {
 
@@ -28,27 +31,13 @@ class BleScannerHelper(
     private var currentScanTimeMs: Long = System.currentTimeMillis()
     private val previouslyNoticedServicesUUIDs = mutableSetOf<String>()
 
-    private var inProgress: Boolean = false
-        set(value) {
-            field = value
-            progressListeners.forEach { it.onScanProgressChanged(field) }
-        }
+    var inProgress = MutableStateFlow(false)
 
     private var scanListener: ScanListener? = null
-    private var progressListeners: MutableSet<ProgressListener> = mutableSetOf()
 
     init {
         val bluetoothAdapter = appContext.getSystemService(BluetoothManager::class.java).adapter
         bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
-    }
-
-    fun addProgressListener(listener: ProgressListener) {
-        progressListeners.add(listener)
-        listener.onScanProgressChanged(inProgress)
-    }
-
-    fun removeProgressListener(listener: ProgressListener) {
-        progressListeners.remove(listener)
     }
 
     private val callback = object : ScanCallback() {
@@ -77,20 +66,20 @@ class BleScannerHelper(
     @SuppressLint("MissingPermission")
     fun scan(
         scanRestricted: Boolean = false,
-        scanDurationMs: Long = DEFAULT_SCAN_DURATION,
+        scanDurationMs: Long,
         scanListener: ScanListener,
     ) {
         runBlocking {
             launch(Dispatchers.IO) {
                 Log.d(TAG, "Start BLE Scan. Restricted mode: $scanRestricted")
 
-                if (inProgress) {
+                if (inProgress.value) {
                     Log.e(TAG, "BLE Scan failed because previous scan is not finished")
                 } else {
                     this@BleScannerHelper.scanListener = scanListener
                     batch.clear()
                     handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, scanDurationMs)
-                    inProgress = true
+                    inProgress.tryEmit(true)
                     currentScanTimeMs = System.currentTimeMillis()
 
                     val scanFilters = if (scanRestricted) {
@@ -118,7 +107,7 @@ class BleScannerHelper(
     }
 
     private fun getBGFilters(): List<ScanFilter> {
-        return devicesRepository.getKnownDevices().map {
+        return getKnownDevicesInteractor.execute().map {
             ScanFilter.Builder()
                 .setDeviceAddress(it.address)
                 .build()
@@ -131,7 +120,7 @@ class BleScannerHelper(
 
     @SuppressLint("MissingPermission")
     private fun cancelScanning(scanResult: ScanResultInternal) {
-        inProgress = false
+        inProgress.tryEmit(false)
         bluetoothScanner.stopScan(callback)
 
 
@@ -155,14 +144,9 @@ class BleScannerHelper(
         fun onFailure()
     }
 
-    interface ProgressListener {
-        fun onScanProgressChanged(inProgress: Boolean)
-    }
-
     private enum class ScanResultInternal { SUCCESS, FAILURE, CANCELED }
 
     companion object {
-        const val DEFAULT_SCAN_DURATION = 10_000L // 10 sec
         private val popularServicesUUID = setOf(
             "0000fe8f-0000-1000-8000-00805f9b34fb",
             "0000fe9f-0000-1000-8000-00805f9b34fb",

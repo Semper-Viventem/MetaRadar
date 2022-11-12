@@ -47,11 +47,20 @@ class SettingsRepository(
         return sharedPreferences.getLong(KEY_WANTED_PERIOD, TheAppConfig.DEFAULT_WANTED_PERIOD_MS)
     }
 
+    fun setGarbagingTime(time: Long) {
+        sharedPreferences.edit().putLong(KEY_GARBAGING_TIME, time).apply()
+    }
+
+    fun getGarbagingTIme(): Long {
+        return sharedPreferences.getLong(KEY_GARBAGING_TIME, TheAppConfig.DEVICE_GARBAGING_TIME)
+    }
+
     companion object {
         private const val KEY_SCAN_INTERVAL = "key_scan_interval"
         private const val KEY_SCAN_RESTRICTED_INTERVAL = "key_scan_restricted_interval"
         private const val KEY_SCAN_DURATION = "key_scan_duration"
         private const val KEY_KNOWN_PERIOD = "key_known_period"
         private const val KEY_WANTED_PERIOD = "key_wanted_period"
+        private const val KEY_GARBAGING_TIME = "key_garbaging_time"
     }
 }

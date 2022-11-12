@@ -60,6 +60,12 @@ dependencies {
     implementation(libs.concurrent.futures)
     implementation(libs.concurrent.futures.ktx)
 
+    // di
+    implementation(libs.koin)
+    implementation(libs.koin.android)
+    implementation(libs.koin.android.compat)
+    implementation(libs.koin.android.compose)
+
     // android jetpack
     implementation(libs.material)
     implementation(libs.lifecycle.viewmodel.ktx)
