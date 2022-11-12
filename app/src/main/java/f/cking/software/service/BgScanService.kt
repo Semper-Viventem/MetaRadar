@@ -247,7 +247,9 @@ class BgScanService : Service() {
             DEVICE_FOUND_CHANNEL,
             "Wanted device found",
             NotificationManager.IMPORTANCE_HIGH
-        )
+        ).apply {
+            enableVibration(true)
+        }
         notificationManager.createNotificationChannel(channel)
     }
 
