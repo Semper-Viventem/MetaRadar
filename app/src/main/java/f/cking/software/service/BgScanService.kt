@@ -10,13 +10,15 @@ import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
+import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.helpers.BleScannerHelper
 import f.cking.software.domain.helpers.PermissionHelper
 import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
+import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
 import f.cking.software.domain.interactor.SaveScanBatchInteractor
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
-import f.cking.software.domain.repo.SettingsRepository
+import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.main.MainActivity
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +37,7 @@ class BgScanService : Service() {
 
     private val saveScanBatchInteractor: SaveScanBatchInteractor by inject()
     private val analyseScanBatchInteractor: AnalyseScanBatchInteractor by inject()
+    private val checkProfileDetectionInteractor: CheckProfileDetectionInteractor by inject()
 
     private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
     private val powerManager by lazy { getSystemService(PowerManager::class.java) }
@@ -61,7 +64,7 @@ class BgScanService : Service() {
             scan()
         } else {
             Log.d(TAG, "Background service launched")
-            startForeground(NOTIFICATION_ID, buildForegroundNotification(knownDeviceCount = null))
+            startForeground(FOREGROUND_NOTIFICATION_ID, buildForegroundNotification(knownDeviceCount = null))
 
             permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _ ->
@@ -80,7 +83,7 @@ class BgScanService : Service() {
         isActive.tryEmit(false)
         bleScannerHelper.stopScanning()
         handler.removeCallbacks(nextScanRunnable)
-        notificationManager.cancel(NOTIFICATION_ID)
+        notificationManager.cancel(FOREGROUND_NOTIFICATION_ID)
     }
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -116,7 +119,9 @@ class BgScanService : Service() {
         failureScanCounter = 0
         runBlocking {
             val analyseResult = analyseScanBatchInteractor.execute(batch)
+            val profiles = checkProfileDetectionInteractor.execute(batch)
             saveScanBatchInteractor.execute(batch)
+            handleProfileCheckingResult(profiles)
             handleAnalysResult(analyseResult)
             scheduleNextScan()
         }
@@ -127,6 +132,12 @@ class BgScanService : Service() {
      */
     private fun isNonInteractiveMode(): Boolean {
         return !powerManager.isInteractive
+    }
+
+    private fun handleProfileCheckingResult(profiles: List<RadarProfile>) {
+        if (profiles.isNotEmpty()) {
+            notifyRadarProfile(profiles)
+        }
     }
 
     private fun handleAnalysResult(result: AnalyseScanBatchInteractor.Result) {
@@ -195,6 +206,40 @@ class BgScanService : Service() {
             .build()
     }
 
+    private fun notifyRadarProfile(profiles: List<RadarProfile>) {
+        val title = if (profiles.count() == 1) {
+            val profile = profiles.first()
+            "\"${profile.name}\" profile is near you!"
+        } else {
+            "${profiles.count()} profiles are near you!"
+        }
+
+        val content = profiles.joinToString(separator = ", ", postfix = " detected!") { it.name }
+
+        val openAppIntent = Intent(this, MainActivity::class.java)
+        val openAppPendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        createDeviceFoundChannel()
+
+        val notification = NotificationCompat.Builder(this, DEVICE_FOUND_CHANNEL)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setSmallIcon(R.drawable.ic_ble)
+            .setContentIntent(openAppPendingIntent)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setGroup(DEVICE_FOUND_GROUP)
+            .build()
+
+        notificationManager.notify(random().toInt(), notification)
+    }
+
     private fun notifyWantedFound(wantedDevices: Set<DeviceData>) {
         val title = if (wantedDevices.count() == 1) {
             val device = wantedDevices.first()
@@ -225,6 +270,7 @@ class BgScanService : Service() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setGroup(DEVICE_FOUND_GROUP)
             .build()
 
         notificationManager.notify(random().toInt(), notification)
@@ -232,7 +278,7 @@ class BgScanService : Service() {
 
     private fun updateNotification(knownDeviceCount: Int) {
         val notification = buildForegroundNotification(knownDeviceCount)
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification)
     }
 
     private fun createServiceChannel() {
@@ -258,8 +304,11 @@ class BgScanService : Service() {
     companion object {
         private const val NOTIFICATION_CHANNEL = "background_scan"
         private const val DEVICE_FOUND_CHANNEL = "wanted_device_found"
-        private const val NOTIFICATION_ID = 42
+        private const val DEVICE_FOUND_GROUP = "devices_found_group"
+
+        private const val FOREGROUND_NOTIFICATION_ID = 42
         private const val MAX_FAILURE_SCANS_TO_CLOSE = 5
+
         private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
         private const val ACTION_SCAN_NOW = "ble_scan_now"
 

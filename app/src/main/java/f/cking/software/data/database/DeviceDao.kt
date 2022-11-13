@@ -1,4 +1,4 @@
-package f.cking.software.data
+package f.cking.software.data.database
 
 import androidx.room.*
 

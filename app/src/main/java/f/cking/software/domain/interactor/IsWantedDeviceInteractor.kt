@@ -1,7 +1,7 @@
 package f.cking.software.domain.interactor
 
+import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.model.DeviceData
-import f.cking.software.domain.repo.SettingsRepository
 
 class IsWantedDeviceInteractor(
     private val settingsRepository: SettingsRepository,

@@ -1,7 +1,7 @@
 package f.cking.software.domain.interactor
 
+import f.cking.software.domain.helpers.BluetoothSIG
 import f.cking.software.domain.model.BleRecordFrame
-import f.cking.software.domain.model.BluetoothSIG
 import f.cking.software.domain.model.ManufacturerInfo
 
 class GetManufacturerInfoFromRawBleInteractor(

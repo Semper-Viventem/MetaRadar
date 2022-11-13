@@ -1,7 +1,7 @@
 package f.cking.software.domain.interactor
 
+import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.model.DeviceData
-import f.cking.software.domain.repo.DevicesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

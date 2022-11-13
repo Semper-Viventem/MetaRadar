@@ -8,9 +8,9 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.GetKnownDevicesInteractor
 import f.cking.software.domain.model.BleScanDevice
-import f.cking.software.domain.repo.DevicesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext

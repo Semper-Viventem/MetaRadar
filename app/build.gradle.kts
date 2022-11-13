@@ -3,6 +3,9 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
 }
+apply {
+    plugin("kotlinx-serialization")
+}
 
 android {
     compileSdkVersion(33)
@@ -53,6 +56,7 @@ dependencies {
     implementation(libs.ktx)
     implementation(libs.kotlin.coroutines)
     implementation(libs.kotlin.annotation.processing)
+    implementation(libs.kotlin.serialization.json)
 
     // android general
     implementation(libs.appcompat)

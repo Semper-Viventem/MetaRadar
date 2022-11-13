@@ -14,5 +14,7 @@ object InteractorsModule {
         factory { IsWantedDeviceInteractor(get(), get()) }
         factory { GetBleRecordFramesFromRawInteractor() }
         factory { GetManufacturerInfoFromRawBleInteractor(get()) }
+        factory { CheckProfileDetectionInteractor(get(), get(), get()) }
+        factory { BuildDeviceFromScanDataInteractor(get()) }
     }
 }

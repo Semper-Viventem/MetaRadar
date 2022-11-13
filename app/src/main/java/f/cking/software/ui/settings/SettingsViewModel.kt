@@ -7,8 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.ClearGarbageInteractor
-import f.cking.software.domain.repo.SettingsRepository
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(

@@ -1,7 +1,7 @@
-package f.cking.software.domain.repo
+package f.cking.software.data.repo
 
-import f.cking.software.data.AppDatabase
-import f.cking.software.data.DeviceDao
+import f.cking.software.data.database.AppDatabase
+import f.cking.software.data.database.DeviceDao
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain

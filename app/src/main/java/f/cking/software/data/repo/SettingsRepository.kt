@@ -1,4 +1,4 @@
-package f.cking.software.domain.repo
+package f.cking.software.data.repo
 
 import android.content.SharedPreferences
 import f.cking.software.TheAppConfig
