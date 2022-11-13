@@ -15,3 +15,8 @@ fun getTimePeriodStr(timeMs: Long): String {
         else -> "$sec sec"
     }
 }
+
+@ExperimentalUnsignedTypes // just to make it clear that the experimental unsigned types are used
+fun ByteArray.toHexUByteString() = asUByteArray().joinToString("") { it.toString(16).padStart(2, '0') }
+fun ByteArray.toHexString() = joinToString("") { it.toHexString() }
+fun Byte.toHexString() = "%02x".format(this)

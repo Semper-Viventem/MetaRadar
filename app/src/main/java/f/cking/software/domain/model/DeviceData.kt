@@ -7,9 +7,10 @@ data class DeviceData(
     val name: String?,
     val lastDetectTimeMs: Long,
     val firstDetectTimeMs: Long,
+    val manufacturerInfo: ManufacturerInfo?,
     val detectCount: Int,
     val customName: String?,
-    val favorite: Boolean
+    val favorite: Boolean,
 ) {
 
     fun buildDisplayName(): String {
@@ -22,5 +23,14 @@ data class DeviceData(
 
     fun lastDetectionPeriod(): String {
         return getTimePeriodStr(System.currentTimeMillis() - lastDetectTimeMs)
+    }
+
+    fun mergeWithNewDetected(new: DeviceData): DeviceData {
+        return this.copy(
+            detectCount = detectCount + 1,
+            lastDetectTimeMs = new.lastDetectTimeMs,
+            name = new.name,
+            manufacturerInfo = new.manufacturerInfo,
+        )
     }
 }

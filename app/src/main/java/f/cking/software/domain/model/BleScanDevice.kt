@@ -5,4 +5,5 @@ data class BleScanDevice(
     val name: String?,
     val bondState: Int,
     val scanTimeMs: Long,
+    val scanRecordRaw: ByteArray?,
 )

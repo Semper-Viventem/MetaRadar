@@ -37,8 +37,10 @@ object MainScreen {
                 topBar = {
                     TopBar(viewModel)
                 },
-                content = {
-                    viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
+                content = { paddings ->
+                    Box(modifier = Modifier.padding(paddings)) {
+                        viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
+                    }
                 },
                 floatingActionButtonPosition = FabPosition.Center,
                 floatingActionButton = {

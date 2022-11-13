@@ -46,7 +46,7 @@ object DeviceListScreen {
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = listData.address)
+                Text(text = listData.address + " " + listData.manufacturerInfo?.name.orEmpty())
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(

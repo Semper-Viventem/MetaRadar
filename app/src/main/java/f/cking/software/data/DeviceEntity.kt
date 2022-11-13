@@ -13,4 +13,6 @@ data class DeviceEntity(
     @ColumnInfo(name = "detect_count") val detectCount: Int,
     @ColumnInfo(name = "custom_name") val customName: String? = null,
     @ColumnInfo(name = "favorite") val favorite: Boolean = false,
+    @ColumnInfo(name = "manufacturer_id") val manufacturerId: Int? = null,
+    @ColumnInfo(name = "manufacturer_name") val manufacturerName: String? = null,
 )

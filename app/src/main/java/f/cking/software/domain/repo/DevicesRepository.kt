@@ -2,7 +2,6 @@ package f.cking.software.domain.repo
 
 import f.cking.software.data.AppDatabase
 import f.cking.software.data.DeviceDao
-import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
@@ -33,7 +32,7 @@ class DevicesRepository(
         }
     }
 
-    suspend fun saveScanBatch(devices: List<BleScanDevice>) {
+    suspend fun saveScanBatch(devices: List<DeviceData>) {
         devices.forEach { saveScanResult(it) }
         notifyListeners()
     }
@@ -64,7 +63,7 @@ class DevicesRepository(
         allDevices.emit(data)
     }
 
-    private suspend fun saveScanResult(device: BleScanDevice) {
+    private suspend fun saveScanResult(device: DeviceData) {
         val existing = withContext(Dispatchers.IO) {
             deviceDao.findByAddress(device.address)?.toDomain()
         }
@@ -76,30 +75,17 @@ class DevicesRepository(
         }
     }
 
-    private suspend fun createNew(device: BleScanDevice) {
-        val dataItem = DeviceData(
-            address = device.address,
-            name = device.name,
-            lastDetectTimeMs = device.scanTimeMs,
-            firstDetectTimeMs = device.scanTimeMs,
-            detectCount = 1,
-            customName = null,
-            favorite = false,
-        )
-
+    private suspend fun createNew(device: DeviceData) {
         withContext(Dispatchers.IO) {
-            deviceDao.insert(dataItem.toData())
+            deviceDao.insert(device.toData())
         }
     }
 
-    private suspend fun updateExisting(existing: DeviceData, device: BleScanDevice) {
-        val newData = existing.copy(
-            detectCount = existing.detectCount + 1,
-            lastDetectTimeMs = device.scanTimeMs,
-        )
+    private suspend fun updateExisting(existing: DeviceData, new: DeviceData) {
+        val updated = existing.mergeWithNewDetected(new)
 
         withContext(Dispatchers.IO) {
-            deviceDao.update(newData.toData())
+            deviceDao.update(updated.toData())
         }
     }
 }

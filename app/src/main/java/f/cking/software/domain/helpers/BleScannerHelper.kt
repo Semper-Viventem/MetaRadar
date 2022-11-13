@@ -50,6 +50,7 @@ class BleScannerHelper(
                 name = result.device.name,
                 bondState = result.device.bondState,
                 scanTimeMs = currentScanTimeMs,
+                scanRecordRaw = result.scanRecord?.bytes,
             )
 
             batch.add(device)
