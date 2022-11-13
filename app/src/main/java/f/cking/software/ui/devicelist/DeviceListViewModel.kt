@@ -18,9 +18,9 @@ class DeviceListViewModel(
     private val generalComparator = Comparator<DeviceData> { first, second ->
         when {
             first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
-            first.detectCount != second.detectCount -> first.detectCount.compareTo(second.detectCount)
             first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
-            first.firstDetectTimeMs != second.firstDetectTimeMs -> second.firstDetectTimeMs.compareTo(first.firstDetectTimeMs)
+            first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
+                first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
             else -> first.address.compareTo(second.address)
         }
     }

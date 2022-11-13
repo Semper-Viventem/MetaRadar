@@ -40,21 +40,27 @@ object DeviceListScreen {
             Column(modifier = Modifier.weight(1f)) {
                 Row() {
                     Text(text = listData.name ?: "N/A", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    if (listData.favorite) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(imageVector = Icons.Filled.Star, contentDescription = "Favorite")
-                    }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = listData.address + " " + listData.manufacturerInfo?.name.orEmpty())
+                listData.manufacturerInfo?.name?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = it)
+                }
                 Spacer(modifier = Modifier.height(4.dp))
-
+                Text(
+                    text = listData.address,
+                    fontWeight = FontWeight.Light
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "lifetime: ${listData.firstDetectionPeriod()} | last update: ${listData.lastDetectionPeriod()} ago",
                     fontWeight = FontWeight.Light
                 )
             }
-            Text(text = listData.detectCount.toString(), modifier = Modifier.padding(8.dp))
+            if (listData.favorite) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(imageVector = Icons.Filled.Star, contentDescription = "Favorite")
+                Spacer(modifier = Modifier.width(8.dp))
+            }
         }
     }
 }

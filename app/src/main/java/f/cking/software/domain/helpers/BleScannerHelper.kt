@@ -26,7 +26,7 @@ class BleScannerHelper(
 
     private var bluetoothScanner: BluetoothLeScanner
     private val handler: Handler = Handler(Looper.getMainLooper())
-    private val batch = mutableSetOf<BleScanDevice>()
+    private val batch = hashMapOf<String, BleScanDevice>()
     private var currentScanTimeMs: Long = System.currentTimeMillis()
     private val previouslyNoticedServicesUUIDs = mutableSetOf<String>()
 
@@ -48,12 +48,11 @@ class BleScannerHelper(
             val device = BleScanDevice(
                 address = result.device.address,
                 name = result.device.name,
-                bondState = result.device.bondState,
                 scanTimeMs = currentScanTimeMs,
                 scanRecordRaw = result.scanRecord?.bytes,
             )
 
-            batch.add(device)
+            batch.put(device.address, device)
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -125,7 +124,7 @@ class BleScannerHelper(
         when (scanResult) {
             ScanResultInternal.SUCCESS -> {
                 Log.d(TAG, "BLE Scan finished ${batch.count()} devices found")
-                scanListener?.onSuccess(batch.toList())
+                scanListener?.onSuccess(batch.values.toList())
             }
             ScanResultInternal.FAILURE -> {
                 scanListener?.onFailure()
