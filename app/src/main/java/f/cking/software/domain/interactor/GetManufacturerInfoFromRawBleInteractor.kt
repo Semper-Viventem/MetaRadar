@@ -4,7 +4,7 @@ import f.cking.software.domain.model.BleRecordFrame
 import f.cking.software.domain.model.BluetoothSIG
 import f.cking.software.domain.model.ManufacturerInfo
 
-class GetMonufacturerInfoFromRawBleInteractor(
+class GetManufacturerInfoFromRawBleInteractor(
     private val getBleRecordFramesFromRawInteractor: GetBleRecordFramesFromRawInteractor
 ) {
 
@@ -15,9 +15,20 @@ class GetMonufacturerInfoFromRawBleInteractor(
 
         return frame.data.takeIf { it.count() >= MIN_MANUFACTURER_ID_LENGTH }
             ?.let { data ->
-                val id = 0 or (data[1].toInt() shl 8) or data[0].toInt()
+                val id = decodeId(data[0], data[1])
                 BluetoothSIG.bluetoothSIG[id]?.let { name -> ManufacturerInfo(id, name) }
             }
+    }
+
+    private fun decodeId(firstByte: Byte, secondByte: Byte): Int {
+        val encoded: Int = (firstByte.toInt() shl 8) or secondByte.toInt()
+        val shiftValue = when {
+            encoded and 0x0fff == 0x0 -> 12
+            encoded and 0x00ff == 0x0 -> 8
+            encoded and 0x000f == 0x0 -> 4
+            else -> 0
+        }
+        return encoded shr shiftValue
     }
 
     companion object {

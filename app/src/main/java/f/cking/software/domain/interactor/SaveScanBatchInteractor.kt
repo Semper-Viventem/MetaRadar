@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 
 class SaveScanBatchInteractor(
     private val devicesRepository: DevicesRepository,
-    private val getMonufacturerInfoFromRawBleInteractor: GetMonufacturerInfoFromRawBleInteractor,
+    private val getManufacturerInfoFromRawBleInteractor: GetManufacturerInfoFromRawBleInteractor,
 ) {
 
     suspend fun execute(batch: List<BleScanDevice>) {
@@ -26,7 +26,7 @@ class SaveScanBatchInteractor(
             detectCount = 1,
             customName = null,
             favorite = false,
-            manufacturerInfo = scanData.scanRecordRaw?.let { getMonufacturerInfoFromRawBleInteractor.execute(it) },
+            manufacturerInfo = scanData.scanRecordRaw?.let { getManufacturerInfoFromRawBleInteractor.execute(it) },
         )
     }
 }

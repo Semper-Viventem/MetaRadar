@@ -13,6 +13,6 @@ object InteractorsModule {
         factory { SaveScanBatchInteractor(get(), get()) }
         factory { IsWantedDeviceInteractor(get(), get()) }
         factory { GetBleRecordFramesFromRawInteractor() }
-        factory { GetMonufacturerInfoFromRawBleInteractor(get()) }
+        factory { GetManufacturerInfoFromRawBleInteractor(get()) }
     }
 }
