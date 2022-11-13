@@ -7,6 +7,7 @@ The app for BLE ether monitoring tracks your environment, finds some devices, ma
 * ✅ Scan and save BLE ether;
 * ✅ Scan in background;
 * ✅ Exclude device with random BLE address;
+* ✅ Parse device manufacturer info;
 * ✅ Add detected devices in favorite;
 * ✅ Send notification when favorite device is near you;
 * Associate a device with a location;
