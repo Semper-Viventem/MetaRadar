@@ -9,8 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.domain.helpers.BleScannerHelper
-import f.cking.software.domain.helpers.PermissionHelper
+import f.cking.software.data.helpers.BleScannerHelper
+import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.service.BgScanService
 import f.cking.software.ui.devicelist.DeviceListScreen
 import f.cking.software.ui.radarprofile.RadarProfileScreen

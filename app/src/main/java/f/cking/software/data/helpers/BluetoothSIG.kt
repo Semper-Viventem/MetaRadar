@@ -1,4 +1,4 @@
-package f.cking.software.domain.helpers
+package f.cking.software.data.helpers
 
 object BluetoothSIG {
     val bluetoothSIG: Map<Int, String> = hashMapOf(

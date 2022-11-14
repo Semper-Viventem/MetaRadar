@@ -10,9 +10,9 @@ import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
+import f.cking.software.data.helpers.BleScannerHelper
+import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.SettingsRepository
-import f.cking.software.domain.helpers.BleScannerHelper
-import f.cking.software.domain.helpers.PermissionHelper
 import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
 import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
 import f.cking.software.domain.interactor.SaveScanBatchInteractor
@@ -24,7 +24,7 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
-import java.lang.Math.random
+import kotlin.random.Random
 
 
 class BgScanService : Service() {
@@ -237,7 +237,7 @@ class BgScanService : Service() {
             .setGroup(DEVICE_FOUND_GROUP)
             .build()
 
-        notificationManager.notify(random().toInt(), notification)
+        notificationManager.notify(Random.nextInt(), notification)
     }
 
     private fun notifyWantedFound(wantedDevices: Set<DeviceData>) {
@@ -273,7 +273,7 @@ class BgScanService : Service() {
             .setGroup(DEVICE_FOUND_GROUP)
             .build()
 
-        notificationManager.notify(random().toInt(), notification)
+        notificationManager.notify(Random.nextInt(), notification)
     }
 
     private fun updateNotification(knownDeviceCount: Int) {

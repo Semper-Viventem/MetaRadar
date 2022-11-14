@@ -4,7 +4,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import f.cking.software.domain.helpers.PermissionHelper
+import f.cking.software.data.helpers.PermissionHelper
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

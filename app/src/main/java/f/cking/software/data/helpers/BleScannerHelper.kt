@@ -1,4 +1,4 @@
-package f.cking.software.domain.helpers
+package f.cking.software.data.helpers
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager

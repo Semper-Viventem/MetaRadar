@@ -1,16 +1,16 @@
-package f.cking.software.di
+package f.cking.software.data
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import f.cking.software.data.database.AppDatabase
+import f.cking.software.data.helpers.BleScannerHelper
+import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.data.repo.SettingsRepository
-import f.cking.software.domain.helpers.BleScannerHelper
-import f.cking.software.domain.helpers.PermissionHelper
 import org.koin.dsl.module
 
-class SingletonsModule(
+class DataModule(
     private val sharedPreferencesName: String,
     private val appDatabaseName: String,
 ) {

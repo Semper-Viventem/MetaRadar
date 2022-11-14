@@ -1,7 +1,7 @@
 package f.cking.software
 
 import android.app.Application
-import f.cking.software.di.SingletonsModule
+import f.cking.software.data.DataModule
 import f.cking.software.domain.interactor.InteractorsModule
 import f.cking.software.ui.ViewModelModule
 import org.koin.android.ext.koin.androidContext
@@ -19,7 +19,7 @@ class TheApp : Application() {
         startKoin {
             androidContext(this@TheApp)
             modules(
-                SingletonsModule(SHARED_PREF_NAME, DATABASE_NAME).module,
+                DataModule(SHARED_PREF_NAME, DATABASE_NAME).module,
                 InteractorsModule.module,
                 ViewModelModule.module,
             )
