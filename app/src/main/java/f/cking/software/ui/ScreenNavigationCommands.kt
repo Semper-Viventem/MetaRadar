@@ -1,10 +1,12 @@
 package f.cking.software.ui
 
 import f.cking.software.common.navigation.AddToStackCommand
+import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.ui.main.MainScreen
 import f.cking.software.ui.profiledetails.ProfileDetailsScreen
 import f.cking.software.ui.selectfiltertype.FilterType
 import f.cking.software.ui.selectfiltertype.SelectFilterTypeScreen
+import f.cking.software.ui.selectmanufacturer.SelectManufacturerScreen
 
 object ScreenNavigationCommands {
 
@@ -14,9 +16,15 @@ object ScreenNavigationCommands {
         ProfileDetailsScreen.Screen(profileId = profileId)
     })
 
-    class OpenSelectTypeScreen(
-        onTypeSelected: (type: FilterType) -> Unit
+    class OpenSelectFilterTypeScreen(
+        onSelected: (type: FilterType) -> Unit
     ) : AddToStackCommand(screenFunction = {
-        SelectFilterTypeScreen.Screen(onTypeSelected = onTypeSelected)
+        SelectFilterTypeScreen.Screen(onSelected = onSelected)
+    })
+
+    class OpenSelectManufacturerScreen(
+        onSelected: (type: ManufacturerInfo) -> Unit
+    ) : AddToStackCommand(screenFunction = {
+        SelectManufacturerScreen.Screen(onSelected = onSelected)
     })
 }

@@ -10,10 +10,13 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.orNull
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.selectfiltertype.FilterType
 import org.koin.androidx.compose.koinViewModel
@@ -76,12 +79,22 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun CreateFilter(viewModel: ProfileDetailsViewModel) {
-        Button(onClick = {
-            viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
-                viewModel.filter = Optional.of(getFilterByType(type))
-            })
-        }) {
-            Text(text = "Create filter")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                onClick = {
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
+                        viewModel.filter = Optional.of(getFilterByType(type))
+                    })
+                },
+                content = {
+                    Text(text = "Create filter")
+                }
+            )
         }
     }
 
@@ -98,6 +111,11 @@ object ProfileDetailsScreen {
             is ProfileDetailsViewModel.UiFilterState.Name -> FilterName(filterState, onDeleteClick)
             is ProfileDetailsViewModel.UiFilterState.Address -> FilterAddress(filterState, onDeleteClick)
             is ProfileDetailsViewModel.UiFilterState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
+            is ProfileDetailsViewModel.UiFilterState.Manufacturer -> FilterManufacturer(
+                viewModel,
+                filterState,
+                onDeleteClick
+            )
             else -> {
                 // do nothing
             }
@@ -131,11 +149,37 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
     ) {
         FilterBase(title = "Address", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
-            Column {
-                TextField(value = filter.address, onValueChange = {
-                    filter.address = it
-                })
-            }
+            TextField(value = filter.address, onValueChange = {
+                filter.address = it
+            })
+        }
+    }
+
+    @Composable
+    private fun FilterManufacturer(
+        viewModel: ProfileDetailsViewModel,
+        filter: ProfileDetailsViewModel.UiFilterState.Manufacturer,
+        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+    ) {
+        FilterBase(title = "Manufacturer", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
+            val name: String? = filter.manufacturer.orNull()?.name
+            val placeholder: String? = if (name == null) "Select" else null
+            val focusManager = LocalFocusManager.current
+            TextField(
+                modifier = Modifier
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            viewModel.router.navigate(ScreenNavigationCommands.OpenSelectManufacturerScreen { manufacturer ->
+                                filter.manufacturer = Optional.of(manufacturer)
+                            })
+                            focusManager.clearFocus(true)
+                        }
+                    },
+                value = name ?: "",
+                onValueChange = {},
+                readOnly = true,
+                placeholder = { placeholder?.let { Text(text = it) } }
+            )
         }
     }
 
@@ -166,7 +210,7 @@ object ProfileDetailsScreen {
                 color = Color.Blue,
                 addText = "Add",
                 addClick = {
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
                         filter.filters = filter.filters + listOf(getFilterByType(type))
                     })
                 },
@@ -191,7 +235,7 @@ object ProfileDetailsScreen {
                 color = Color.Green,
                 addText = "Add",
                 addClick = {
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
                         filter.filters = filter.filters + listOf(getFilterByType(type))
                     })
                 },
@@ -217,7 +261,7 @@ object ProfileDetailsScreen {
                 color = Color.Black,
                 addText = buttonText,
                 addClick = {
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
                         filter.filter = Optional.of(getFilterByType(type))
                     })
                 },

@@ -1,5 +1,7 @@
 package f.cking.software
 
+import java.util.*
+
 fun getTimePeriodStr(timeMs: Long): String {
     val sec = timeMs / (1000L)
     val min = timeMs / (1000L * 60L)
@@ -20,3 +22,5 @@ fun getTimePeriodStr(timeMs: Long): String {
 fun ByteArray.toHexUByteString() = asUByteArray().joinToString("") { it.toString(16).padStart(2, '0') }
 fun ByteArray.toHexString() = joinToString("") { it.toHexString() }
 fun Byte.toHexString() = "%02x".format(this)
+fun Int.toHexString() = "%04x".format(this)
+fun <T> Optional<T>.orNull(): T? = if (isPresent) get() else null

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import f.cking.software.common.navigation.BackCommand
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.repo.RadarProfilesRepository
+import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
 import kotlinx.coroutines.launch
 import java.util.*
@@ -66,7 +67,7 @@ class ProfileDetailsViewModel(
         }
 
         class Manufacturer : UiFilterState() {
-            var manufacturerId: Optional<Int> by mutableStateOf(Optional.empty())
+            var manufacturer: Optional<ManufacturerInfo> by mutableStateOf(Optional.empty())
         }
 
         class IsFavorite : UiFilterState() {

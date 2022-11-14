@@ -1,4 +1,4 @@
-package f.cking.software.ui.selectfiltertype
+package f.cking.software.ui.selectmanufacturer
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,20 +12,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.domain.model.ManufacturerInfo
+import f.cking.software.toHexString
 import org.koin.androidx.compose.koinViewModel
 
-object SelectFilterTypeScreen {
+object SelectManufacturerScreen {
 
     @Composable
     fun Screen(
-        onSelected: (type: FilterType) -> Unit
+        onSelected: (type: ManufacturerInfo) -> Unit
     ) {
-        val viewModel: SelectFilterTypeViewModel = koinViewModel()
+        val viewModel: SelectManufacturerViewModel = koinViewModel()
         Scaffold(
             topBar = { AppBar(viewModel) },
             content = { paddings ->
                 LazyColumn(modifier = Modifier.padding(paddings)) {
-                    viewModel.types.forEach { type ->
+                    viewModel.manufacturers.forEach { type ->
                         item {
                             TypeItem(item = type) {
                                 onSelected.invoke(type)
@@ -39,10 +41,10 @@ object SelectFilterTypeScreen {
     }
 
     @Composable
-    private fun AppBar(viewModel: SelectFilterTypeViewModel) {
+    private fun AppBar(viewModel: SelectManufacturerViewModel) {
         TopAppBar(
             title = {
-                Text(text = "Select filter rype")
+                Text(text = "Select manufacturer")
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
@@ -53,7 +55,7 @@ object SelectFilterTypeScreen {
     }
 
     @Composable
-    private fun TypeItem(item: FilterType, onClickListener: () -> Unit) {
+    private fun TypeItem(item: ManufacturerInfo, onClickListener: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -61,7 +63,7 @@ object SelectFilterTypeScreen {
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                text = item.typeName,
+                text = item.name + " (0x${item.id.toHexString()})",
                 fontSize = 18.sp
             )
         }

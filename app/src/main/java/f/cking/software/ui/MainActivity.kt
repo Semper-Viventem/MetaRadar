@@ -13,6 +13,7 @@ import f.cking.software.common.navigation.NavRouter
 import f.cking.software.common.navigation.Navigator
 import f.cking.software.data.helpers.PermissionHelper
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private val permissionHelper: PermissionHelper by inject()
     private val router: NavRouter by inject()
 
-    private val navigator = Navigator(root = ScreenNavigationCommands.OpenMainScreen)
+    private val navigator: Navigator by inject(parameters = { parametersOf(ScreenNavigationCommands.OpenMainScreen) })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
