@@ -13,7 +13,7 @@ class RadarProfile(
 ) {
 
     @Serializable
-    sealed class Filter() {
+    sealed class Filter {
 
         abstract fun check(device: DeviceData): Boolean
 

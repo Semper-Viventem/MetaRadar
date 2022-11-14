@@ -11,6 +11,9 @@ interface RadarProfileDao {
     @Query("SELECT * FROM radar_profile")
     fun getAll(): List<RadarProfileEntity>
 
+    @Query("SELECT * FROM radar_profile WHERE id LIKE :id")
+    fun getById(id: Int): RadarProfileEntity?
+
     @Update
     fun update(radarProfile: RadarProfileEntity)
 

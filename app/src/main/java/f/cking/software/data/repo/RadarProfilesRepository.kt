@@ -19,6 +19,12 @@ class RadarProfilesRepository(
         }
     }
 
+    suspend fun getById(id: Int): RadarProfile?{
+        return withContext(Dispatchers.IO) {
+            dao.getById(id)?.toDomain()
+        }
+    }
+
     suspend fun saveProfile(profile: RadarProfile) {
         withContext(Dispatchers.IO) {
             dao.insert(profile.toData())
