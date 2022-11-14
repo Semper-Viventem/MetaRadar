@@ -38,7 +38,7 @@ object DeviceListScreen {
     }
 
     @Composable
-    fun Divider(visible: Boolean) {
+    private fun Divider(visible: Boolean) {
         val color = if (visible) Color.LightGray else Color.Transparent
         val height = if (visible) 1.dp else 0.dp
 
@@ -53,7 +53,7 @@ object DeviceListScreen {
     }
 
     @Composable
-    fun ListItem(listData: DeviceData, viewModel: DeviceListViewModel) {
+    private fun ListItem(listData: DeviceData, viewModel: DeviceListViewModel) {
         Box(modifier = Modifier
             .fillMaxWidth()
             .clickable { viewModel.onDeviceClick(listData) }

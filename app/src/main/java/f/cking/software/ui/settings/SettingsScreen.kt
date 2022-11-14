@@ -24,7 +24,7 @@ object SettingsScreen {
     }
 
     @Composable
-    fun ClearGarbageButton(viewModel: SettingsViewModel) {
+    private fun ClearGarbageButton(viewModel: SettingsViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

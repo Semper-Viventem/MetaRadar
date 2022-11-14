@@ -54,7 +54,7 @@ object MainScreen {
     }
 
     @Composable
-    fun BottomNavigationBar(viewModel: MainViewModel) {
+    private fun BottomNavigationBar(viewModel: MainViewModel) {
         BottomAppBar {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -78,19 +78,22 @@ object MainScreen {
             modifier = modifier
                 .clickable { viewModel.onTabClick(targetTab) }
         ) {
+            val icon = if (targetTab.selected) targetTab.selectedIconRes else targetTab.iconRes
+            val font = if (targetTab.selected) FontWeight.Bold else FontWeight.SemiBold
+
             Image(
-                painter = painterResource(id = targetTab.iconRes),
+                painter = painterResource(id = icon),
                 contentDescription = targetTab.text,
                 colorFilter = ColorFilter.tint(Color.White),
                 modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = Color.White)
         }
     }
 
     @Composable
-    fun ScanFab(viewModel: MainViewModel) {
+    private fun ScanFab(viewModel: MainViewModel) {
         val text: String
         val icon: Int
 
@@ -116,7 +119,7 @@ object MainScreen {
     }
 
     @Composable
-    fun TopBar(viewModel: MainViewModel) {
+    private fun TopBar(viewModel: MainViewModel) {
         TopAppBar(
             title = {
                 Text(text = stringResource(R.string.app_name))
