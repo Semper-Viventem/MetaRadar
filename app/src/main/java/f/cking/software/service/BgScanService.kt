@@ -67,7 +67,7 @@ class BgScanService : Service() {
             startForeground(FOREGROUND_NOTIFICATION_ID, buildForegroundNotification(knownDeviceCount = null))
 
             permissionHelper.checkBlePermissions(
-                onRequestPermissions = { _, _ ->
+                onRequestPermissions = { _, _, _ ->
                     stopSelf()
                 },
                 onPermissionGranted = ::scan

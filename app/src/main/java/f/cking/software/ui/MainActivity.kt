@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         val allPermissionsGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         if (requestCode == PermissionHelper.PERMISSIONS_REQUEST_CODE && allPermissionsGranted) {
-            // TODO
+            permissionHelper.pendingPermissionGranted()
         }
     }
 

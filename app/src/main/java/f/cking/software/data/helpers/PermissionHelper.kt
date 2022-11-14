@@ -17,9 +17,10 @@ class PermissionHelper(
 ) {
 
     private var activity: Activity? = null
+    private var pending: (() -> Unit)? = null
 
     fun checkBlePermissions(
-        onRequestPermissions: (permissions: Array<String>, permissionRequestCode: Int) -> Unit = ::requestPermissions,
+        onRequestPermissions: (permissions: Array<String>, permissionRequestCode: Int, pendingFun: () -> Unit) -> Unit = ::requestPermissions,
         permissions: Array<String> = BLE_PERMISSIONS,
         permissionRequestCode: Int = PERMISSIONS_REQUEST_CODE,
         onPermissionGranted: () -> Unit,
@@ -30,7 +31,7 @@ class PermissionHelper(
         if (allPermissionsGranted) {
             onPermissionGranted.invoke()
         } else {
-            onRequestPermissions.invoke(permissions, permissionRequestCode)
+            onRequestPermissions.invoke(permissions, permissionRequestCode, onPermissionGranted)
         }
     }
 
@@ -47,7 +48,17 @@ class PermissionHelper(
         }
     }
 
-    private fun requestPermissions(permissions: Array<String>, permissionRequestCode: Int) {
+    fun pendingPermissionGranted() {
+        pending?.invoke()
+        pending = null
+    }
+
+    private fun requestPermissions(
+        permissions: Array<String>,
+        permissionRequestCode: Int,
+        onPermissionGranted: () -> Unit
+    ) {
+        this.pending = onPermissionGranted
         ActivityCompat.requestPermissions(
             requireActivity(),
             permissions,
