@@ -3,7 +3,7 @@ package f.cking.software
 import android.app.Application
 import f.cking.software.data.DataModule
 import f.cking.software.domain.interactor.InteractorsModule
-import f.cking.software.ui.ViewModelModule
+import f.cking.software.ui.UiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -21,7 +21,7 @@ class TheApp : Application() {
             modules(
                 DataModule(SHARED_PREF_NAME, DATABASE_NAME).module,
                 InteractorsModule.module,
-                ViewModelModule.module,
+                UiModule.module,
             )
         }
     }

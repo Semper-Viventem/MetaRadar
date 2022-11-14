@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.common.navigation.BackCommand
+import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.RadarProfile
 import kotlinx.coroutines.launch
@@ -13,6 +15,7 @@ import java.util.*
 class ProfileDetailsViewModel(
     private val profileId: Optional<Int>,
     private val radarProfilesRepository: RadarProfilesRepository,
+    private val router: NavRouter,
 ) : ViewModel() {
 
     var name: String by mutableStateOf("")
@@ -76,7 +79,7 @@ class ProfileDetailsViewModel(
     }
 
     fun back() {
-
+        router.navigate(BackCommand)
     }
 
     sealed class UiFilterState {

@@ -11,46 +11,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
+import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
 
     @Composable
-    fun Screen(viewModel: MainViewModel) {
-        MaterialTheme(
-            colors = MaterialTheme.colors.copy(
-                primary = colorResource(id = R.color.orange_500),
-                primaryVariant = colorResource(id = R.color.orange_700),
-                onPrimary = Color.White,
-                secondary = Color.Black,
-                secondaryVariant = Color.Black,
-                onSecondary = Color.White,
-            )
-        ) {
-            Scaffold(
-                topBar = {
-                    TopBar(viewModel)
-                },
-                content = { paddings ->
-                    Box(modifier = Modifier.padding(paddings)) {
-                        viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
-                    }
-                },
-                floatingActionButtonPosition = FabPosition.Center,
-                floatingActionButton = {
-                    ScanFab(viewModel)
-                },
-                bottomBar = {
-                    BottomNavigationBar(viewModel)
+    fun Screen() {
+        val viewModel: MainViewModel = koinViewModel()
+        Scaffold(
+            topBar = {
+                TopBar(viewModel)
+            },
+            content = { paddings ->
+                Box(modifier = Modifier.padding(paddings)) {
+                    viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
                 }
-            )
-        }
+            },
+            floatingActionButtonPosition = FabPosition.Center,
+            floatingActionButton = {
+                ScanFab(viewModel)
+            },
+            bottomBar = {
+                BottomNavigationBar(viewModel)
+            }
+        )
     }
 
     @Composable

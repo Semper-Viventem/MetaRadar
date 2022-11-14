@@ -19,7 +19,7 @@ import f.cking.software.domain.interactor.SaveScanBatchInteractor
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.ui.main.MainActivity
+import f.cking.software.ui.MainActivity
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
