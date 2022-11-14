@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.ui.ScreenNavigationCommands
+import f.cking.software.ui.selectfiltertype.FilterType
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.*
@@ -74,7 +76,13 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun CreateFilter(viewModel: ProfileDetailsViewModel) {
-
+        Button(onClick = {
+            viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
+                viewModel.filter = Optional.of(getFilterByType(type))
+            })
+        }) {
+            Text(text = "Create filter")
+        }
     }
 
     @Composable
@@ -89,10 +97,10 @@ object ProfileDetailsScreen {
             is ProfileDetailsViewModel.UiFilterState.Not -> FilterNot(filterState, viewModel, onDeleteClick)
             is ProfileDetailsViewModel.UiFilterState.Name -> FilterName(filterState, onDeleteClick)
             is ProfileDetailsViewModel.UiFilterState.Address -> FilterAddress(filterState, onDeleteClick)
+            is ProfileDetailsViewModel.UiFilterState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
             else -> {
                 // do nothing
             }
-
         }
     }
 
@@ -138,7 +146,7 @@ object ProfileDetailsScreen {
     ) {
         FilterBase(title = "Is favorite", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Ignore case")
+                Text(text = "Is favorite")
                 Checkbox(checked = filter.favorite, onCheckedChange = {
                     filter.favorite = it
                 })
@@ -157,7 +165,11 @@ object ProfileDetailsScreen {
                 title = "All",
                 color = Color.Blue,
                 addText = "Add",
-                addClick = { /* */ },
+                addClick = {
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
+                        filter.filters = filter.filters + listOf(getFilterByType(type))
+                    })
+                },
                 onDeleteClick = { onDeleteClick.invoke(filter) }
             ) {
                 filter.filters.forEach {
@@ -178,7 +190,11 @@ object ProfileDetailsScreen {
                 title = "Any",
                 color = Color.Green,
                 addText = "Add",
-                addClick = { /* TODO */ },
+                addClick = {
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
+                        filter.filters = filter.filters + listOf(getFilterByType(type))
+                    })
+                },
                 onDeleteClick = { onDeleteClick.invoke(filter) }
             ) {
                 filter.filters.forEach {
@@ -195,11 +211,16 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
     ) {
         Row(Modifier.padding(horizontal = 8.dp)) {
+            val buttonText = if (filter.filter.isPresent) "Change" else "Set"
             FilterGroup(
                 title = "Not",
                 color = Color.Black,
-                addText = "Change",
-                addClick = { /* TODO */ },
+                addText = buttonText,
+                addClick = {
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectTypeScreen { type ->
+                        filter.filter = Optional.of(getFilterByType(type))
+                    })
+                },
                 onDeleteClick = { onDeleteClick.invoke(filter) }
             ) {
                 if (filter.filter.isPresent) {
@@ -260,6 +281,21 @@ object ProfileDetailsScreen {
                     }
                 }
             }
+        }
+    }
+
+    private fun getFilterByType(type: FilterType): ProfileDetailsViewModel.UiFilterState {
+        return when (type) {
+            FilterType.NAME -> ProfileDetailsViewModel.UiFilterState.Name()
+            FilterType.ADDRESS -> ProfileDetailsViewModel.UiFilterState.Address()
+            FilterType.BY_LAST_DETECTION -> ProfileDetailsViewModel.UiFilterState.LastDetectionInterval()
+            FilterType.BY_FIRST_DETECTION -> ProfileDetailsViewModel.UiFilterState.FirstDetectionInterval()
+            FilterType.BY_IS_FAVORITE -> ProfileDetailsViewModel.UiFilterState.IsFavorite()
+            FilterType.BY_MANUFACTURER -> ProfileDetailsViewModel.UiFilterState.Manufacturer()
+            FilterType.BY_LOGIC_ALL -> ProfileDetailsViewModel.UiFilterState.All()
+            FilterType.BY_LOGIC_ANY -> ProfileDetailsViewModel.UiFilterState.Any()
+            FilterType.BY_LOGIC_NOT -> ProfileDetailsViewModel.UiFilterState.Not()
+            FilterType.BY_MIN_DETECTION_TIME -> ProfileDetailsViewModel.UiFilterState.MinLostTime()
         }
     }
 }

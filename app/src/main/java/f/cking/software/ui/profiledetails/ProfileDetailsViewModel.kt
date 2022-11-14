@@ -15,7 +15,7 @@ import java.util.*
 class ProfileDetailsViewModel(
     private val profileId: Optional<Int>,
     private val radarProfilesRepository: RadarProfilesRepository,
-    private val router: NavRouter,
+    val router: NavRouter,
 ) : ViewModel() {
 
     var name: String by mutableStateOf("")
@@ -30,44 +30,6 @@ class ProfileDetailsViewModel(
                 loadExisting(profile)
             }
         }
-
-        filter = Optional.of(
-            UiFilterState.All().apply {
-                this.filters = listOf(
-                    UiFilterState.Any().apply {
-                        this.filters = listOf(
-                            UiFilterState.Name().apply {
-                                this.name = "Default name"
-                                this.ignoreCase = true
-                            },
-                            UiFilterState.Name().apply {
-                                this.name = ""
-                                this.ignoreCase = false
-                            },
-                            UiFilterState.Not().apply {
-                                this.filter = Optional.of(
-                                    UiFilterState.Name().apply {
-                                        name = "Not name"
-                                        ignoreCase = false
-                                    }
-                                )
-                            }
-                        )
-                    },
-                    UiFilterState.All().apply {
-                        this.filters = listOf()
-                    },
-                    UiFilterState.Not().apply {
-                        this.filter = Optional.of(
-                            UiFilterState.Name().apply {
-                                name = "Not name"
-                                ignoreCase = false
-                            }
-                        )
-                    }
-                )
-            }
-        )
     }
 
     private fun loadExisting(profile: RadarProfile?) {
