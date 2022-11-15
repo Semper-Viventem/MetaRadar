@@ -20,7 +20,7 @@ object UiModule {
         viewModel { DeviceListViewModel(get()) }
         viewModel { SettingsViewModel(get(), get(), get()) }
         viewModel { RadarProfileViewModel(get(), get()) }
-        viewModel { ProfileDetailsViewModel(it.get(), get(), get()) }
+        viewModel { ProfileDetailsViewModel(get(), get(), get()) }
         viewModel { SelectFilterTypeViewModel(get()) }
         viewModel { SelectManufacturerViewModel(get()) }
     }

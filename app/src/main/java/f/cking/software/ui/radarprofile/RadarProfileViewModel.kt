@@ -19,8 +19,13 @@ class RadarProfileViewModel(
     var profiles: List<RadarProfile> by mutableStateOf(emptyList())
 
     init {
+        observeProfiles()
+    }
+
+    private fun observeProfiles() {
         viewModelScope.launch {
-            profiles = radarProfilesRepository.getAllProfiles()
+            radarProfilesRepository.observeAllProfiles()
+                .collect { profiles = it }
         }
     }
 

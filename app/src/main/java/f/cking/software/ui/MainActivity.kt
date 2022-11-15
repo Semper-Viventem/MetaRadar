@@ -3,17 +3,20 @@ package f.cking.software.ui
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.R
 import f.cking.software.common.navigation.BackCommand
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.common.navigation.Navigator
 import f.cking.software.data.helpers.PermissionHelper
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,12 +24,13 @@ class MainActivity : AppCompatActivity() {
 
     private val permissionHelper: PermissionHelper by inject()
     private val router: NavRouter by inject()
-
-    private val navigator: Navigator by inject(parameters = { parametersOf(ScreenNavigationCommands.OpenMainScreen) })
+    private val viewModel: MainActivityViewModel by viewModels {
+        viewModelFactory { initializer { MainActivityViewModel() } }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        router.attachNavigator(navigator)
+        router.attachNavigator(viewModel.navigator)
 
         permissionHelper.setActivity(this)
 
@@ -41,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                     onSecondary = Color.White,
                 )
             ) {
-                val stack = navigator.stack
+                val stack = viewModel.navigator.stack
                 if (stack.isEmpty()) {
                     finish()
                 } else {
@@ -70,6 +74,10 @@ class MainActivity : AppCompatActivity() {
         permissionHelper.setActivity(null)
         router.detachNavigator()
         super.onDestroy()
+    }
+
+    private class MainActivityViewModel : ViewModel() {
+        val navigator: Navigator = Navigator(root = ScreenNavigationCommands.OpenMainScreen)
     }
 
 }

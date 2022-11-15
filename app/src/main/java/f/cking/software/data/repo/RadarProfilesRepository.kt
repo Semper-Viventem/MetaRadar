@@ -5,6 +5,8 @@ import f.cking.software.domain.model.RadarProfile
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 class RadarProfilesRepository(
@@ -12,6 +14,16 @@ class RadarProfilesRepository(
 ) {
 
     val dao = database.radarProfileDao()
+    private val allProfiles = MutableStateFlow(emptyList<RadarProfile>())
+
+    suspend fun observeAllProfiles(): StateFlow<List<RadarProfile>> {
+        return withContext(Dispatchers.IO) {
+            if (allProfiles.value.isEmpty()) {
+                notifyListeners()
+            }
+            allProfiles
+        }
+    }
 
     suspend fun getAllProfiles(): List<RadarProfile> {
         return withContext(Dispatchers.IO) {
@@ -28,12 +40,19 @@ class RadarProfilesRepository(
     suspend fun saveProfile(profile: RadarProfile) {
         withContext(Dispatchers.IO) {
             dao.insert(profile.toData())
+            notifyListeners()
         }
     }
 
     suspend fun deleteProfile(profileId: Int) {
         withContext(Dispatchers.IO) {
             dao.delete(profileId)
+            notifyListeners()
         }
+    }
+
+    private suspend fun notifyListeners() {
+        val data = getAllProfiles()
+        allProfiles.emit(data)
     }
 }

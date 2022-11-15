@@ -1,5 +1,6 @@
 package f.cking.software
 
+import java.time.*
 import java.util.*
 
 fun getTimePeriodStr(timeMs: Long): String {
@@ -24,3 +25,10 @@ fun ByteArray.toHexString() = joinToString("") { it.toHexString() }
 fun Byte.toHexString() = "%02x".format(this)
 fun Int.toHexString() = "%04x".format(this)
 fun <T> Optional<T>.orNull(): T? = if (isPresent) get() else null
+
+fun Long.toLocalDate() = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+fun Long.toLocalTime() = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalTime()
+fun timeFromDateTime(date: LocalDate, time: LocalTime): Long =
+    LocalDateTime.of(date, time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+fun LocalTime.toMilliseconds() = (hour * 60L * 60L * 1000L) + (minute * 60L * 1000L)

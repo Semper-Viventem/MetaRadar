@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [DeviceEntity::class, RadarProfileEntity::class],
-    version = 4,
+    version = 5,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDao(): DeviceDao
@@ -21,6 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(
                     MIGRATION_2_3,
                     MIGRATION_3_4,
+                    MIGRATION_4_5,
                 )
                 .build()
         }
@@ -33,6 +34,17 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_3_4 = migration(3, 4) {
             it.execSQL("CREATE TABLE `radar_profile` (" +
                     "`id` INTEGER NOT NULL, " +
+                    "`name` TEXT NOT NULL, " +
+                    "`description` TEXT DEFAULT NULL, " +
+                    "`is_active` INTEGER NOT NULL DEFAULT 1, " +
+                    "`detect_filter` TEXT DEFAULT NULL, " +
+                    "PRIMARY KEY(`id`));")
+        }
+
+        private val MIGRATION_4_5 = migration(4, 5) {
+            it.execSQL("DROP TABLE `radar_profile`;")
+            it.execSQL("CREATE TABLE `radar_profile` (" +
+                    "`id` INTEGER, " +
                     "`name` TEXT NOT NULL, " +
                     "`description` TEXT DEFAULT NULL, " +
                     "`is_active` INTEGER NOT NULL DEFAULT 1, " +

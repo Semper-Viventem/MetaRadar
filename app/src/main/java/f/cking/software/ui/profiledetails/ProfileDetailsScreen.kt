@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +24,6 @@ import f.cking.software.ui.ScreenNavigationCommands.OpenTimePickerDialog
 import f.cking.software.ui.profiledetails.ProfileDetailsViewModel.UiFilterState
 import f.cking.software.ui.selectfiltertype.FilterType
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -33,9 +33,8 @@ object ProfileDetailsScreen {
 
     @Composable
     fun Screen(profileId: Int?) {
-        val viewModel: ProfileDetailsViewModel = koinViewModel(parameters = {
-            parametersOf(Optional.ofNullable(profileId))
-        })
+        val viewModel: ProfileDetailsViewModel = koinViewModel()
+        viewModel.setId(profileId)
         Scaffold(
             modifier = Modifier
                 .fillMaxWidth()
@@ -57,9 +56,20 @@ object ProfileDetailsScreen {
             title = {
                 Text(text = "Radar profile")
             },
+            actions = {
+                if (viewModel.profileId.isPresent) {
+                    IconButton(onClick = { viewModel.onRemoveClick() }) {
+                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                IconButton(onClick = { viewModel.onSaveClick() }) {
+                    Icon(imageVector = Icons.Filled.Done, contentDescription = "Save", tint = Color.White)
+                }
+            },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
             }
         )
