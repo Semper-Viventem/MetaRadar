@@ -1,4 +1,4 @@
-package f.cking.software.ui.radarprofile
+package f.cking.software.ui.profileslist
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +11,7 @@ import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.ScreenNavigationCommands
 import kotlinx.coroutines.launch
 
-class RadarProfileViewModel(
+class ProfilesListViewModel(
     private val radarProfilesRepository: RadarProfilesRepository,
     private val router: NavRouter,
 ) : ViewModel() {
