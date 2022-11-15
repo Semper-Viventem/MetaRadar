@@ -7,7 +7,7 @@ enum class FilterType(val typeName: String) {
     BY_LAST_DETECTION("By last detection period"),
     BY_IS_FAVORITE("By is favorite"),
     BY_MANUFACTURER("By manufacturer"),
-    BY_MIN_DETECTION_TIME("By min detection time"),
+    BY_MIN_DETECTION_TIME("By min lost period"),
     BY_LOGIC_ANY("Logic OR filter"),
     BY_LOGIC_ALL("Logic AND filter"),
     BY_LOGIC_NOT("Logic NOT filter"),

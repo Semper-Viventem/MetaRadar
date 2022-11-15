@@ -81,6 +81,8 @@ dependencies {
     implementation(libs.compose.tooling)
     implementation(libs.lifecycle.compose)
     implementation(libs.compose.activity)
+    implementation(libs.compose.dialogs)
+    implementation(libs.compose.dialogs.datetime)
 
     // room
     implementation(libs.room.runtime)

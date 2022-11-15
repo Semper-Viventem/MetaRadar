@@ -11,6 +11,8 @@ import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.*
 
 class ProfileDetailsViewModel(
@@ -47,15 +49,16 @@ class ProfileDetailsViewModel(
 
     sealed class UiFilterState {
 
-        class LastDetectionInterval : UiFilterState() {
-            var from: Optional<Long> by mutableStateOf(Optional.empty())
-            var to: Optional<Long> by mutableStateOf(Optional.empty())
+        abstract class Interval : UiFilterState() {
+            var fromDate: Optional<LocalDate> by mutableStateOf(Optional.empty())
+            var fromTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
+            var toDate: Optional<LocalDate> by mutableStateOf(Optional.empty())
+            var toTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
         }
 
-        class FirstDetectionInterval : UiFilterState() {
-            var from: Optional<Long> by mutableStateOf(Optional.empty())
-            var to: Optional<Long> by mutableStateOf(Optional.empty())
-        }
+        class LastDetectionInterval : Interval()
+
+        class FirstDetectionInterval : Interval()
 
         class Name : UiFilterState() {
             var name: String by mutableStateOf("")
@@ -75,7 +78,7 @@ class ProfileDetailsViewModel(
         }
 
         class MinLostTime : UiFilterState() {
-            var minLostTime: Optional<Long> by mutableStateOf(Optional.empty())
+            var minLostTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
         }
 
         class Any : UiFilterState() {

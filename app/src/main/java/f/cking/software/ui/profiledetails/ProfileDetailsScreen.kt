@@ -6,21 +6,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.common.ClickableField
 import f.cking.software.orNull
 import f.cking.software.ui.ScreenNavigationCommands
+import f.cking.software.ui.ScreenNavigationCommands.OpenDatePickerDialog
+import f.cking.software.ui.ScreenNavigationCommands.OpenTimePickerDialog
+import f.cking.software.ui.profiledetails.ProfileDetailsViewModel.UiFilterState
 import f.cking.software.ui.selectfiltertype.FilterType
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 object ProfileDetailsScreen {
@@ -100,32 +104,44 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun Filter(
-        filterState: ProfileDetailsViewModel.UiFilterState,
+        filterState: UiFilterState,
         viewModel: ProfileDetailsViewModel,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         when (filterState) {
-            is ProfileDetailsViewModel.UiFilterState.All -> FilterAll(filterState, viewModel, onDeleteClick)
-            is ProfileDetailsViewModel.UiFilterState.Any -> FilterAny(filterState, viewModel, onDeleteClick)
-            is ProfileDetailsViewModel.UiFilterState.Not -> FilterNot(filterState, viewModel, onDeleteClick)
-            is ProfileDetailsViewModel.UiFilterState.Name -> FilterName(filterState, onDeleteClick)
-            is ProfileDetailsViewModel.UiFilterState.Address -> FilterAddress(filterState, onDeleteClick)
-            is ProfileDetailsViewModel.UiFilterState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
-            is ProfileDetailsViewModel.UiFilterState.Manufacturer -> FilterManufacturer(
+            is UiFilterState.All -> FilterAll(filterState, viewModel, onDeleteClick)
+            is UiFilterState.Any -> FilterAny(filterState, viewModel, onDeleteClick)
+            is UiFilterState.Not -> FilterNot(filterState, viewModel, onDeleteClick)
+            is UiFilterState.Name -> FilterName(filterState, onDeleteClick)
+            is UiFilterState.Address -> FilterAddress(filterState, onDeleteClick)
+            is UiFilterState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
+            is UiFilterState.Manufacturer -> FilterManufacturer(viewModel, filterState, onDeleteClick)
+            is UiFilterState.MinLostTime -> FilterMinLostPeriod(viewModel, filterState, onDeleteClick)
+            is UiFilterState.LastDetectionInterval -> FilterLastDetectionInterval(viewModel, filterState, onDeleteClick)
+            is UiFilterState.FirstDetectionInterval -> FilterFirstDetectionInterval(
                 viewModel,
                 filterState,
                 onDeleteClick
             )
-            else -> {
-                // do nothing
-            }
+            else -> FilterUnknown(filterState, onDeleteClick)
+        }
+    }
+
+    @Composable
+    private fun FilterUnknown(filter: UiFilterState, onDeleteClick: (child: UiFilterState) -> Unit) {
+        FilterBase(
+            title = "Unknown filter",
+            color = Color.Red,
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            Text(text = "Current filter is not supported by your app version")
         }
     }
 
     @Composable
     private fun FilterName(
-        filter: ProfileDetailsViewModel.UiFilterState.Name,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        filter: UiFilterState.Name,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(title = "Name", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             Column {
@@ -145,8 +161,8 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun FilterAddress(
-        filter: ProfileDetailsViewModel.UiFilterState.Address,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        filter: UiFilterState.Address,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(title = "Address", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             TextField(value = filter.address, onValueChange = {
@@ -158,35 +174,125 @@ object ProfileDetailsScreen {
     @Composable
     private fun FilterManufacturer(
         viewModel: ProfileDetailsViewModel,
-        filter: ProfileDetailsViewModel.UiFilterState.Manufacturer,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        filter: UiFilterState.Manufacturer,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(title = "Manufacturer", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             val name: String? = filter.manufacturer.orNull()?.name
             val placeholder: String? = if (name == null) "Select" else null
-            val focusManager = LocalFocusManager.current
-            TextField(
-                modifier = Modifier
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            viewModel.router.navigate(ScreenNavigationCommands.OpenSelectManufacturerScreen { manufacturer ->
-                                filter.manufacturer = Optional.of(manufacturer)
-                            })
-                            focusManager.clearFocus(true)
-                        }
-                    },
-                value = name ?: "",
-                onValueChange = {},
-                readOnly = true,
-                placeholder = { placeholder?.let { Text(text = it) } }
-            )
+
+            ClickableField(text = name, placeholder = placeholder) {
+                viewModel.router.navigate(ScreenNavigationCommands.OpenSelectManufacturerScreen { manufacturer ->
+                    filter.manufacturer = Optional.of(manufacturer)
+                })
+            }
         }
     }
 
     @Composable
+    private fun FilterMinLostPeriod(
+        viewModel: ProfileDetailsViewModel,
+        filter: UiFilterState.MinLostTime,
+        onDeleteClick: (child: UiFilterState) -> Unit,
+    ) {
+        FilterBase(
+            title = "Min lost period",
+            color = Color.Red,
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            val timeDialog = ScreenNavigationCommands.OpenTimePickerDialog { time ->
+                filter.minLostTime = Optional.of(time)
+            }
+
+            val text = filter.minLostTime.orNull()?.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+            ClickableField(text = text, placeholder = "Chose time") {
+                viewModel.router.navigate(timeDialog)
+            }
+        }
+    }
+
+    @Composable
+    private fun FilterFirstDetectionInterval(
+        viewModel: ProfileDetailsViewModel,
+        filter: UiFilterState.FirstDetectionInterval,
+        onDeleteClick: (child: UiFilterState) -> Unit,
+    ) {
+        FilterBase(
+            title = "First detection interval",
+            color = Color.Red,
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            TimeInterval(viewModel = viewModel, filter = filter)
+        }
+    }
+
+    @Composable
+    private fun FilterLastDetectionInterval(
+        viewModel: ProfileDetailsViewModel,
+        filter: UiFilterState.LastDetectionInterval,
+        onDeleteClick: (child: UiFilterState) -> Unit,
+    ) {
+        FilterBase(
+            title = "Last detection interval",
+            color = Color.Red,
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            TimeInterval(viewModel = viewModel, filter = filter)
+        }
+    }
+
+    @Composable
+    private fun TimeInterval(viewModel: ProfileDetailsViewModel, filter: UiFilterState.Interval) {
+
+        val dateFormat = "dd MMM yyyy"
+        val timeFormat = "HH:mm"
+
+        val fromDateStr: String? = filter.fromDate.orNull()?.format(DateTimeFormatter.ofPattern(dateFormat))
+        val fromTimeStr: String? = filter.fromTime.orNull()?.format(DateTimeFormatter.ofPattern(timeFormat))
+        val toDateStr: String? = filter.toDate.orNull()?.format(DateTimeFormatter.ofPattern(dateFormat))
+        val toTimeStr: String? = filter.toTime.orNull()?.format(DateTimeFormatter.ofPattern(timeFormat))
+
+        val fromDateDialog = OpenDatePickerDialog { date -> filter.fromDate = Optional.of(date) }
+        val fromTimeDialog = OpenTimePickerDialog { date -> filter.fromTime = Optional.of(date) }
+        val toDateDialog = OpenDatePickerDialog { date -> filter.toDate = Optional.of(date) }
+        val toTimeDialog = OpenTimePickerDialog { date -> filter.toTime = Optional.of(date) }
+
+        val router = viewModel.router
+        Column {
+            Row {
+                ClickableField(text = fromDateStr, placeholder = "From date") { router.navigate(fromDateDialog) }
+                Spacer(modifier = Modifier.width(2.dp))
+                ClickableField(text = fromTimeStr, placeholder = "From time") { router.navigate(fromTimeDialog) }
+                Spacer(modifier = Modifier.width(2.dp))
+                ClearIcon {
+                    filter.fromDate = Optional.empty()
+                    filter.fromTime = Optional.empty()
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Row {
+                ClickableField(text = toDateStr, placeholder = "To date") { router.navigate(toDateDialog) }
+                Spacer(modifier = Modifier.width(2.dp))
+                ClickableField(text = toTimeStr, placeholder = "To time") { router.navigate(toTimeDialog) }
+                Spacer(modifier = Modifier.width(2.dp))
+                ClearIcon {
+                    filter.toDate = Optional.empty()
+                    filter.toDate = Optional.empty()
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ClearIcon(action: () -> Unit) {
+        IconButton(onClick = action) { Icon(imageVector = Icons.Filled.Clear, contentDescription = "Clear") }
+    }
+
+    @Composable
     private fun FilterIsFavorite(
-        filter: ProfileDetailsViewModel.UiFilterState.IsFavorite,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        filter: UiFilterState.IsFavorite,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(title = "Is favorite", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -200,9 +306,9 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun FilterAll(
-        filter: ProfileDetailsViewModel.UiFilterState.All,
+        filter: UiFilterState.All,
         viewModel: ProfileDetailsViewModel,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         Row(Modifier.padding(horizontal = 8.dp)) {
             FilterGroup(
@@ -225,9 +331,9 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun FilterAny(
-        filter: ProfileDetailsViewModel.UiFilterState.Any,
+        filter: UiFilterState.Any,
         viewModel: ProfileDetailsViewModel,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         Row(Modifier.padding(horizontal = 8.dp)) {
             FilterGroup(
@@ -250,9 +356,9 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun FilterNot(
-        filter: ProfileDetailsViewModel.UiFilterState.Not,
+        filter: UiFilterState.Not,
         viewModel: ProfileDetailsViewModel,
-        onDeleteClick: (child: ProfileDetailsViewModel.UiFilterState) -> Unit,
+        onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         Row(Modifier.padding(horizontal = 8.dp)) {
             val buttonText = if (filter.filter.isPresent) "Change" else "Set"
@@ -328,18 +434,18 @@ object ProfileDetailsScreen {
         }
     }
 
-    private fun getFilterByType(type: FilterType): ProfileDetailsViewModel.UiFilterState {
+    private fun getFilterByType(type: FilterType): UiFilterState {
         return when (type) {
-            FilterType.NAME -> ProfileDetailsViewModel.UiFilterState.Name()
-            FilterType.ADDRESS -> ProfileDetailsViewModel.UiFilterState.Address()
-            FilterType.BY_LAST_DETECTION -> ProfileDetailsViewModel.UiFilterState.LastDetectionInterval()
-            FilterType.BY_FIRST_DETECTION -> ProfileDetailsViewModel.UiFilterState.FirstDetectionInterval()
-            FilterType.BY_IS_FAVORITE -> ProfileDetailsViewModel.UiFilterState.IsFavorite()
-            FilterType.BY_MANUFACTURER -> ProfileDetailsViewModel.UiFilterState.Manufacturer()
-            FilterType.BY_LOGIC_ALL -> ProfileDetailsViewModel.UiFilterState.All()
-            FilterType.BY_LOGIC_ANY -> ProfileDetailsViewModel.UiFilterState.Any()
-            FilterType.BY_LOGIC_NOT -> ProfileDetailsViewModel.UiFilterState.Not()
-            FilterType.BY_MIN_DETECTION_TIME -> ProfileDetailsViewModel.UiFilterState.MinLostTime()
+            FilterType.NAME -> UiFilterState.Name()
+            FilterType.ADDRESS -> UiFilterState.Address()
+            FilterType.BY_LAST_DETECTION -> UiFilterState.LastDetectionInterval()
+            FilterType.BY_FIRST_DETECTION -> UiFilterState.FirstDetectionInterval()
+            FilterType.BY_IS_FAVORITE -> UiFilterState.IsFavorite()
+            FilterType.BY_MANUFACTURER -> UiFilterState.Manufacturer()
+            FilterType.BY_LOGIC_ALL -> UiFilterState.All()
+            FilterType.BY_LOGIC_ANY -> UiFilterState.Any()
+            FilterType.BY_LOGIC_NOT -> UiFilterState.Not()
+            FilterType.BY_MIN_DETECTION_TIME -> UiFilterState.MinLostTime()
         }
     }
 }
