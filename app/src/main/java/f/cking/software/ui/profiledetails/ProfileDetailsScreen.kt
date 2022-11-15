@@ -68,6 +68,8 @@ object ProfileDetailsScreen {
     @Composable
     private fun Content(viewModel: ProfileDetailsViewModel) {
         LazyColumn(Modifier.fillMaxWidth()) {
+            item { Header(viewModel) }
+
             val filter = viewModel.filter
             if (filter.isPresent) {
                 item {
@@ -79,6 +81,32 @@ object ProfileDetailsScreen {
                 }
             } else {
                 item { CreateFilter(viewModel = viewModel) }
+            }
+        }
+    }
+
+    @Composable
+    private fun Header(viewModel: ProfileDetailsViewModel) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+
+            TextField(
+                value = viewModel.name,
+                onValueChange = { viewModel.name = it },
+                placeholder = { Text(text = "Name") })
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = viewModel.description,
+                onValueChange = { viewModel.description = it },
+                placeholder = { Text(text = "Description (optional)") })
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Is active")
+                Spacer(modifier = Modifier.width(8.dp))
+                Switch(checked = viewModel.isActive, onCheckedChange = { viewModel.isActive = it })
             }
         }
     }
