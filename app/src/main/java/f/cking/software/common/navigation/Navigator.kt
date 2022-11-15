@@ -11,6 +11,7 @@ class Navigator(
 
     var stack: List<@Composable () -> Unit> by mutableStateOf(emptyList())
 
+
     init {
         root?.let { handle(it) }
     }
@@ -18,12 +19,18 @@ class Navigator(
     fun handle(command: NavigationCommand) {
         when (command) {
             is BackCommand -> handleBack()
-            is AddToStackCommand -> handleAddToStackCommand(command)
+            is AddToStackCommand -> handleAddToStackCommand(command.screenFunction)
+            is DialogCommand -> handleAddToStackCommand {
+                val dialog = command.dialogProvider.invoke {
+                    handleBack()
+                }
+                dialog.show()
+            }
         }
     }
 
-    private fun handleAddToStackCommand(command: AddToStackCommand) {
-        stack = stack + listOf(command.screenFunction)
+    private fun handleAddToStackCommand(screen: @Composable () -> Unit) {
+        stack = stack + listOf(screen)
     }
 
     private fun handleBack() {

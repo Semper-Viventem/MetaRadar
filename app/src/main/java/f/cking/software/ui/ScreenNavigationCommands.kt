@@ -1,6 +1,7 @@
 package f.cking.software.ui
 
 import f.cking.software.common.navigation.AddToStackCommand
+import f.cking.software.common.navigation.DialogCommand
 import f.cking.software.common.rememberDateDialog
 import f.cking.software.common.rememberTimeDialog
 import f.cking.software.domain.model.ManufacturerInfo
@@ -35,16 +36,14 @@ object ScreenNavigationCommands {
     class OpenDatePickerDialog(
         initialDate: LocalDate = LocalDate.now(),
         onSelected: (localDate: LocalDate) -> Unit
-    ) : AddToStackCommand(screenFunction = {
-        val dialog = rememberDateDialog(initialDate = initialDate, dateResult = onSelected)
-        dialog.show()
+    ) : DialogCommand(dialogProvider = {
+        rememberDateDialog(initialDate = initialDate, dateResult = onSelected, it)
     })
 
     class OpenTimePickerDialog(
         initialTime: LocalTime = LocalTime.now(),
         onSelected: (localDate: LocalTime) -> Unit
-    ) : AddToStackCommand(screenFunction = {
-        val dialog = rememberTimeDialog(initialTime = initialTime, dateResult = onSelected)
-        dialog.show()
+    ) : DialogCommand(dialogProvider = {
+        rememberTimeDialog(initialTime = initialTime, dateResult = onSelected, it)
     })
 }
