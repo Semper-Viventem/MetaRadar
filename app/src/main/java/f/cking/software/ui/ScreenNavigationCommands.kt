@@ -33,16 +33,18 @@ object ScreenNavigationCommands {
     })
 
     class OpenDatePickerDialog(
+        initialDate: LocalDate = LocalDate.now(),
         onSelected: (localDate: LocalDate) -> Unit
     ) : AddToStackCommand(screenFunction = {
-        val dialog = rememberDateDialog(dateResult = onSelected)
+        val dialog = rememberDateDialog(initialDate = initialDate, dateResult = onSelected)
         dialog.show()
     })
 
     class OpenTimePickerDialog(
+        initialTime: LocalTime = LocalTime.now(),
         onSelected: (localDate: LocalTime) -> Unit
     ) : AddToStackCommand(screenFunction = {
-        val dialog = rememberTimeDialog(dateResult = onSelected)
+        val dialog = rememberTimeDialog(initialTime = initialTime, dateResult = onSelected)
         dialog.show()
     })
 }

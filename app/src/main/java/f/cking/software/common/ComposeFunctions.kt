@@ -15,7 +15,10 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun rememberDateDialog(dateResult: (date: LocalDate) -> Unit): MaterialDialogState {
+fun rememberDateDialog(
+    initialDate: LocalDate = LocalDate.now(),
+    dateResult: (date: LocalDate) -> Unit
+): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
     MaterialDialog(
         dialogState = dialogState,
@@ -24,7 +27,7 @@ fun rememberDateDialog(dateResult: (date: LocalDate) -> Unit): MaterialDialogSta
             negativeButton("Cancel")
         }
     ) {
-        datepicker { localDate ->
+        datepicker(initialDate = initialDate) { localDate ->
             dateResult.invoke(localDate)
         }
     }
@@ -32,7 +35,10 @@ fun rememberDateDialog(dateResult: (date: LocalDate) -> Unit): MaterialDialogSta
 }
 
 @Composable
-fun rememberTimeDialog(dateResult: (date: LocalTime) -> Unit): MaterialDialogState {
+fun rememberTimeDialog(
+    initialTime: LocalTime = LocalTime.now(),
+    dateResult: (date: LocalTime) -> Unit
+): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
     MaterialDialog(
         dialogState = dialogState,
@@ -41,7 +47,7 @@ fun rememberTimeDialog(dateResult: (date: LocalTime) -> Unit): MaterialDialogSta
             negativeButton("Cancel")
         }
     ) {
-        timepicker(is24HourClock = true) { localDate ->
+        timepicker(is24HourClock = true, initialTime = initialTime) { localDate ->
             dateResult.invoke(localDate)
         }
     }

@@ -24,6 +24,8 @@ import f.cking.software.ui.profiledetails.ProfileDetailsViewModel.UiFilterState
 import f.cking.software.ui.selectfiltertype.FilterType
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -200,7 +202,8 @@ object ProfileDetailsScreen {
             color = Color.Red,
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            val timeDialog = ScreenNavigationCommands.OpenTimePickerDialog { time ->
+            val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
+            val timeDialog = OpenTimePickerDialog(defaultTime) { time ->
                 filter.minLostTime = Optional.of(time)
             }
 
@@ -253,10 +256,18 @@ object ProfileDetailsScreen {
         val toDateStr: String? = filter.toDate.orNull()?.format(DateTimeFormatter.ofPattern(dateFormat))
         val toTimeStr: String? = filter.toTime.orNull()?.format(DateTimeFormatter.ofPattern(timeFormat))
 
-        val fromDateDialog = OpenDatePickerDialog { date -> filter.fromDate = Optional.of(date) }
-        val fromTimeDialog = OpenTimePickerDialog { date -> filter.fromTime = Optional.of(date) }
-        val toDateDialog = OpenDatePickerDialog { date -> filter.toDate = Optional.of(date) }
-        val toTimeDialog = OpenTimePickerDialog { date -> filter.toTime = Optional.of(date) }
+        val fromDateDialog = OpenDatePickerDialog(filter.fromDate.orNull() ?: LocalDate.now()) { date ->
+            filter.fromDate = Optional.of(date)
+        }
+        val fromTimeDialog = OpenTimePickerDialog(filter.fromTime.orNull() ?: LocalTime.now()) { date ->
+            filter.fromTime = Optional.of(date)
+        }
+        val toDateDialog = OpenDatePickerDialog(filter.toDate.orNull() ?: LocalDate.now()) { date ->
+            filter.toDate = Optional.of(date)
+        }
+        val toTimeDialog = OpenTimePickerDialog(filter.toTime.orNull() ?: LocalTime.now()) { date ->
+            filter.toTime = Optional.of(date)
+        }
 
         val router = viewModel.router
         Column {
