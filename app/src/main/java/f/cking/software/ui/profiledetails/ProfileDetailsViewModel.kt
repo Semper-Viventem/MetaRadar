@@ -77,7 +77,7 @@ class ProfileDetailsViewModel(
         if (profileId.isPresent) {
             viewModelScope.launch {
                 radarProfilesRepository.deleteProfile(profileId.get())
-                Toast.makeText(appContext, "/'$name/' profile removed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(appContext, "'$name' profile removed", Toast.LENGTH_SHORT).show()
                 back()
             }
         } else {

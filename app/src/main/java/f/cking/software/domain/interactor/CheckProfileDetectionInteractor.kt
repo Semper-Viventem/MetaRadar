@@ -3,6 +3,7 @@ package f.cking.software.domain.interactor
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.BleScanDevice
+import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.RadarProfile
 
 class CheckProfileDetectionInteractor(
@@ -11,7 +12,7 @@ class CheckProfileDetectionInteractor(
     private val buildDeviceFromScanDataInteractor: BuildDeviceFromScanDataInteractor,
 ) {
 
-    suspend fun execute(batch: List<BleScanDevice>): List<RadarProfile> {
+    suspend fun execute(batch: List<BleScanDevice>): List<ProfileResult> {
         val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address })
         val foundDevices = batch.mapNotNull { found ->
             found.takeIf { existingDevices.none { existing -> found.address == existing.address } }?.let {
@@ -20,8 +21,19 @@ class CheckProfileDetectionInteractor(
         }
         val devices = existingDevices + foundDevices
         val allProfiles = radarProfilesRepository.getAllProfiles()
-        return allProfiles.filter { profile ->
-            profile.isActive && devices.any { profile.detectFilter?.check(it) == true }
+
+        return allProfiles.mapNotNull { profile ->
+            val matchedDevice = devices.filter { profile.detectFilter?.check(it) == true }
+            if (matchedDevice.isNotEmpty()) {
+                ProfileResult(profile, matchedDevice)
+            } else {
+                null
+            }
         }
     }
+
+    data class ProfileResult(
+        val profile: RadarProfile,
+        val matched: List<DeviceData>,
+    )
 }

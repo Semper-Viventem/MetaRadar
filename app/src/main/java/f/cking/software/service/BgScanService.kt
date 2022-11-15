@@ -17,8 +17,6 @@ import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
 import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
 import f.cking.software.domain.interactor.SaveScanBatchInteractor
 import f.cking.software.domain.model.BleScanDevice
-import f.cking.software.domain.model.DeviceData
-import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.MainActivity
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +35,6 @@ class BgScanService : Service() {
 
     private val saveScanBatchInteractor: SaveScanBatchInteractor by inject()
     private val analyseScanBatchInteractor: AnalyseScanBatchInteractor by inject()
-    private val checkProfileDetectionInteractor: CheckProfileDetectionInteractor by inject()
 
     private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
     private val powerManager by lazy { getSystemService(PowerManager::class.java) }
@@ -119,9 +116,7 @@ class BgScanService : Service() {
         failureScanCounter = 0
         runBlocking {
             val analyseResult = analyseScanBatchInteractor.execute(batch)
-            val profiles = checkProfileDetectionInteractor.execute(batch)
             saveScanBatchInteractor.execute(batch)
-            handleProfileCheckingResult(profiles)
             handleAnalysResult(analyseResult)
             scheduleNextScan()
         }
@@ -134,7 +129,7 @@ class BgScanService : Service() {
         return !powerManager.isInteractive
     }
 
-    private fun handleProfileCheckingResult(profiles: List<RadarProfile>) {
+    private fun handleProfileCheckingResult(profiles: List<CheckProfileDetectionInteractor.ProfileResult>) {
         if (profiles.isNotEmpty()) {
             notifyRadarProfile(profiles)
         }
@@ -143,13 +138,11 @@ class BgScanService : Service() {
     private fun handleAnalysResult(result: AnalyseScanBatchInteractor.Result) {
         Log.d(
             TAG,
-            "Background scan result: known_devices_count=${result.knownDevicesCount}, wanted_devices_count=${result.wanted.count()}"
+            "Background scan result: known_devices_count=${result.knownDevicesCount}, matched_profiles=${result.matchedProfiles.count()}"
         )
 
         updateNotification(result.knownDevicesCount)
-        if (result.wanted.isNotEmpty()) {
-            notifyWantedFound(result.wanted)
-        }
+        handleProfileCheckingResult(result.matchedProfiles)
     }
 
     private fun scheduleNextScan() {
@@ -206,15 +199,16 @@ class BgScanService : Service() {
             .build()
     }
 
-    private fun notifyRadarProfile(profiles: List<RadarProfile>) {
+    private fun notifyRadarProfile(profiles: List<CheckProfileDetectionInteractor.ProfileResult>) {
         val title = if (profiles.count() == 1) {
             val profile = profiles.first()
-            "\"${profile.name}\" profile is near you!"
+            "\"${profile.profile.name}\" profile is near you!"
         } else {
             "${profiles.count()} profiles are near you!"
         }
 
-        val content = profiles.joinToString(separator = ", ", postfix = " detected!") { it.name }
+        val content = profiles.flatMap { it.matched }
+            .joinToString(separator = ", ", postfix = " devices matched!.") { it.buildDisplayName() }
 
         val openAppIntent = Intent(this, MainActivity::class.java)
         val openAppPendingIntent = PendingIntent.getActivity(
@@ -235,42 +229,7 @@ class BgScanService : Service() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setGroup(DEVICE_FOUND_GROUP)
-            .build()
-
-        notificationManager.notify(Random.nextInt(), notification)
-    }
-
-    private fun notifyWantedFound(wantedDevices: Set<DeviceData>) {
-        val title = if (wantedDevices.count() == 1) {
-            val device = wantedDevices.first()
-            "\"${device.buildDisplayName()}\" device is near you!"
-        } else {
-            "${wantedDevices.count()} wanted devices are near you!"
-        }
-
-        val content = wantedDevices.joinToString(",\n", postfix = ".") { device ->
-            "${device.buildDisplayName()}, last seen ${device.lastDetectionPeriod()} ago"
-        }
-
-        val openAppIntent = Intent(this, MainActivity::class.java)
-        val openAppPendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            openAppIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        createDeviceFoundChannel()
-
-        val notification = NotificationCompat.Builder(this, DEVICE_FOUND_CHANNEL)
-            .setContentTitle(title)
-            .setContentText(content)
-            .setSmallIcon(R.drawable.ic_ble)
-            .setContentIntent(openAppPendingIntent)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setGroup(DEVICE_FOUND_GROUP)
+            .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_ALL)
             .build()
 
         notificationManager.notify(Random.nextInt(), notification)
