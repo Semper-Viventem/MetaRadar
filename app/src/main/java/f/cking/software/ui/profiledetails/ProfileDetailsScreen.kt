@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -153,7 +150,7 @@ object ProfileDetailsScreen {
             is UiFilterState.Any -> FilterAny(filterState, viewModel, onDeleteClick)
             is UiFilterState.Not -> FilterNot(filterState, viewModel, onDeleteClick)
             is UiFilterState.Name -> FilterName(filterState, onDeleteClick)
-            is UiFilterState.Address -> FilterAddress(filterState, onDeleteClick)
+            is UiFilterState.Address -> FilterAddress(viewModel, filterState, onDeleteClick)
             is UiFilterState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
             is UiFilterState.Manufacturer -> FilterManufacturer(viewModel, filterState, onDeleteClick)
             is UiFilterState.MinLostTime -> FilterMinLostPeriod(viewModel, filterState, onDeleteClick)
@@ -185,9 +182,9 @@ object ProfileDetailsScreen {
     ) {
         FilterBase(title = "Name", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             Column {
-                TextField(value = filter.name, onValueChange = {
+                TextField(value = filter.name, singleLine = true, onValueChange = {
                     filter.name = it
-                })
+                }, placeholder = { Text(text = "Device name") })
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Ignore case")
@@ -201,13 +198,24 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun FilterAddress(
+        viewModel: ProfileDetailsViewModel,
         filter: UiFilterState.Address,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(title = "Address", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
-            TextField(value = filter.address, onValueChange = {
-                filter.address = it
-            })
+            Row {
+                TextField(value = filter.address, singleLine = true, onValueChange = {
+                    filter.address = it.uppercase()
+                }, placeholder = { Text(text = "00:00:00:00:00:00") })
+                Spacer(modifier = Modifier.width(4.dp))
+                IconButton(onClick = {
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectDeviceScreen { device ->
+                        filter.address = device.address
+                    })
+                }) {
+                    Icon(imageVector = Icons.Filled.List, contentDescription = "Select device", tint = Color.Black)
+                }
+            }
         }
     }
 
