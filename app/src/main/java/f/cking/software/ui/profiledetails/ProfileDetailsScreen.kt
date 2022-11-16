@@ -1,8 +1,10 @@
 package f.cking.software.ui.profiledetails
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -10,9 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.R
 import f.cking.software.common.ClickableField
 import f.cking.software.orNull
 import f.cking.software.ui.ScreenNavigationCommands
@@ -168,7 +172,7 @@ object ProfileDetailsScreen {
     private fun FilterUnknown(filter: UiFilterState, onDeleteClick: (child: UiFilterState) -> Unit) {
         FilterBase(
             title = "Unknown filter",
-            color = Color.Red,
+            color = colorResource(R.color.filter_unknown),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             Text(text = "Current filter is not supported by your app version")
@@ -180,7 +184,11 @@ object ProfileDetailsScreen {
         filter: UiFilterState.Name,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        FilterBase(title = "Name", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
+        FilterBase(
+            title = "Name",
+            color = colorResource(R.color.filter_name),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
             Column {
                 TextField(value = filter.name, singleLine = true, onValueChange = {
                     filter.name = it
@@ -202,7 +210,11 @@ object ProfileDetailsScreen {
         filter: UiFilterState.Address,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        FilterBase(title = "Address", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
+        FilterBase(
+            title = "Address",
+            color = colorResource(R.color.filter_address),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
             Row {
                 TextField(value = filter.address, singleLine = true, onValueChange = {
                     filter.address = it.uppercase()
@@ -225,7 +237,10 @@ object ProfileDetailsScreen {
         filter: UiFilterState.Manufacturer,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        FilterBase(title = "Manufacturer", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
+        FilterBase(
+            title = "Manufacturer",
+            color = colorResource(R.color.filter_manufacturer),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             val name: String? = filter.manufacturer.orNull()?.name
             val placeholder: String? = if (name == null) "Select" else null
 
@@ -245,7 +260,7 @@ object ProfileDetailsScreen {
     ) {
         FilterBase(
             title = "Min lost period",
-            color = Color.Red,
+            color = colorResource(R.color.filter_lost_time),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
@@ -269,7 +284,7 @@ object ProfileDetailsScreen {
     ) {
         FilterBase(
             title = "First detection interval",
-            color = Color.Red,
+            color = colorResource(R.color.filter_first_seen),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             TimeInterval(viewModel = viewModel, filter = filter)
@@ -284,7 +299,7 @@ object ProfileDetailsScreen {
     ) {
         FilterBase(
             title = "Last detection interval",
-            color = Color.Red,
+            color = colorResource(R.color.filter_last_seen),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             TimeInterval(viewModel = viewModel, filter = filter)
@@ -315,12 +330,22 @@ object ProfileDetailsScreen {
             filter.toTime = Optional.of(date)
         }
 
+        val dateWidth = 150.dp
+        val timeWidth = 150.dp
         val router = viewModel.router
         Column {
             Row {
-                ClickableField(text = fromDateStr, placeholder = "From date") { router.navigate(fromDateDialog) }
+                ClickableField(
+                    modifier = Modifier.width(dateWidth),
+                    text = fromDateStr,
+                    placeholder = "From date"
+                ) { router.navigate(fromDateDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
-                ClickableField(text = fromTimeStr, placeholder = "From time") { router.navigate(fromTimeDialog) }
+                ClickableField(
+                    modifier = Modifier.width(timeWidth),
+                    text = fromTimeStr,
+                    placeholder = "From time"
+                ) { router.navigate(fromTimeDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
                     filter.fromDate = Optional.empty()
@@ -329,9 +354,17 @@ object ProfileDetailsScreen {
             }
             Spacer(modifier = Modifier.height(4.dp))
             Row {
-                ClickableField(text = toDateStr, placeholder = "To date") { router.navigate(toDateDialog) }
+                ClickableField(
+                    modifier = Modifier.width(dateWidth),
+                    text = toDateStr,
+                    placeholder = "To date"
+                ) { router.navigate(toDateDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
-                ClickableField(text = toTimeStr, placeholder = "To time") { router.navigate(toTimeDialog) }
+                ClickableField(
+                    modifier = Modifier.width(timeWidth),
+                    text = toTimeStr,
+                    placeholder = "To time"
+                ) { router.navigate(toTimeDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
                     filter.toDate = Optional.empty()
@@ -351,7 +384,11 @@ object ProfileDetailsScreen {
         filter: UiFilterState.IsFavorite,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        FilterBase(title = "Is favorite", color = Color.Red, onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
+        FilterBase(
+            title = "Is favorite",
+            color = colorResource(R.color.filter_is_favorite),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Is favorite")
                 Checkbox(checked = filter.favorite, onCheckedChange = {
@@ -367,21 +404,20 @@ object ProfileDetailsScreen {
         viewModel: ProfileDetailsViewModel,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        Row(Modifier.padding(horizontal = 8.dp)) {
-            FilterGroup(
-                title = "All",
-                color = Color.Blue,
-                addText = "Add",
-                addClick = {
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                        filter.filters = filter.filters + listOf(getFilterByType(type))
-                    })
-                },
-                onDeleteClick = { onDeleteClick.invoke(filter) }
-            ) {
-                filter.filters.forEach {
-                    Filter(filterState = it, viewModel = viewModel, onDeleteClick = filter::delete)
-                }
+        FilterGroup(
+            title = "All",
+            color = colorResource(R.color.filter_all),
+            addText = "Add",
+            addClick = {
+                viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
+                    filter.filters = filter.filters + listOf(getFilterByType(type))
+                })
+            },
+            onDeleteClick = { onDeleteClick.invoke(filter) }
+        ) {
+            filter.filters.forEach {
+                Filter(filterState = it, viewModel = viewModel, onDeleteClick = filter::delete)
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -392,21 +428,20 @@ object ProfileDetailsScreen {
         viewModel: ProfileDetailsViewModel,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        Row(Modifier.padding(horizontal = 8.dp)) {
-            FilterGroup(
-                title = "Any",
-                color = Color.Green,
-                addText = "Add",
-                addClick = {
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                        filter.filters = filter.filters + listOf(getFilterByType(type))
-                    })
-                },
-                onDeleteClick = { onDeleteClick.invoke(filter) }
-            ) {
-                filter.filters.forEach {
-                    Filter(filterState = it, viewModel = viewModel, onDeleteClick = filter::delete)
-                }
+        FilterGroup(
+            title = "Any",
+            color = colorResource(R.color.filter_any),
+            addText = "Add",
+            addClick = {
+                viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
+                    filter.filters = filter.filters + listOf(getFilterByType(type))
+                })
+            },
+            onDeleteClick = { onDeleteClick.invoke(filter) }
+        ) {
+            filter.filters.forEach {
+                Filter(filterState = it, viewModel = viewModel, onDeleteClick = filter::delete)
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -417,26 +452,25 @@ object ProfileDetailsScreen {
         viewModel: ProfileDetailsViewModel,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        Row(Modifier.padding(horizontal = 8.dp)) {
-            val buttonText = if (filter.filter.isPresent) "Change" else "Set"
-            FilterGroup(
-                title = "Not",
-                color = Color.Black,
-                addText = buttonText,
-                addClick = {
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                        filter.filter = Optional.of(getFilterByType(type))
-                    })
-                },
-                onDeleteClick = { onDeleteClick.invoke(filter) }
-            ) {
-                if (filter.filter.isPresent) {
-                    Filter(filter.filter.get(), viewModel, onDeleteClick = filter::delete)
-                }
+        val buttonText = if (filter.filter.isPresent) "Change" else "Set"
+        FilterGroup(
+            title = "Not",
+            color = colorResource(R.color.filter_not),
+            addText = buttonText,
+            addClick = {
+                viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
+                    filter.filter = Optional.of(getFilterByType(type))
+                })
+            },
+            onDeleteClick = { onDeleteClick.invoke(filter) }
+        ) {
+            if (filter.filter.isPresent) {
+                Filter(filter.filter.get(), viewModel, onDeleteClick = filter::delete)
             }
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterBase(
         title: String,
@@ -444,18 +478,24 @@ object ProfileDetailsScreen {
         onDeleteButtonClick: () -> Unit,
         content: @Composable () -> Unit,
     ) {
-        Column(Modifier.padding(horizontal = 4.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = title, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = color)
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = onDeleteButtonClick) {
-                    Icon(
-                        Icons.Filled.Delete,
-                        contentDescription = "Delete",
-                        modifier = Modifier.size(24.dp),
-                        tint = color
-                    )
+        Column(
+            Modifier
+                .padding(horizontal = 4.dp)
+                .border(border = BorderStroke(2.dp, color), shape = RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            Chip(
+                onClick = onDeleteButtonClick,
+                colors = ChipDefaults.chipColors(
+                    backgroundColor = color,
+                    contentColor = Color.Black,
+                    leadingIconContentColor = Color.Black
+                ),
+                leadingIcon = {
+                    Icon(Icons.Filled.Delete, contentDescription = "Delete", modifier = Modifier.size(24.dp))
                 }
+            ) {
+                Text(text = title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
             Spacer(modifier = Modifier.height(4.dp))
             content.invoke()
@@ -472,20 +512,11 @@ object ProfileDetailsScreen {
         content: @Composable () -> Unit
     ) {
         FilterBase(title = title, color = color, onDeleteClick) {
-            Row(Modifier.height(IntrinsicSize.Min)) {
-                Box(
-                    modifier = Modifier
-                        .width(8.dp)
-                        .fillMaxHeight()
-                        .background(color)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Column {
-                    content.invoke()
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Button(onClick = addClick) {
-                        Text(text = addText)
-                    }
+            Column {
+                content.invoke()
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(onClick = addClick) {
+                    Text(text = addText)
                 }
             }
         }
