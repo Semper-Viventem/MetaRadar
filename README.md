@@ -10,7 +10,7 @@ The app for BLE ether monitoring tracks your environment, finds some devices, ma
 * ✅ Parse device manufacturer info;
 * ✅ Add detected devices in favorite;
 * ✅ Make search profile based on device characteristics with flexible configurable filters;
-* ✅ Send notification when favorite device is near you;
+* ✅ Send notification when search profile was detected near you;
 * Associate a device with a location;
 * Store device movement history based on location;
 * Send a notification if an unknown device (devices group) is moving with you for a long time.
