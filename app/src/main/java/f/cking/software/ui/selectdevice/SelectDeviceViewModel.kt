@@ -17,6 +17,7 @@ class SelectDeviceViewModel(
 ) : ViewModel() {
 
     var devices: List<DeviceData> by mutableStateOf(emptyList())
+    var searchStr: String by mutableStateOf("")
 
     init {
         viewModelScope.launch {
