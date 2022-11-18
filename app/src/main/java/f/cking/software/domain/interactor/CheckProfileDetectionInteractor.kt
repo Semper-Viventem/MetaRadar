@@ -16,13 +16,13 @@ class CheckProfileDetectionInteractor(
 
     suspend fun execute(batch: List<BleScanDevice>): List<ProfileResult> {
         return withContext(Dispatchers.Default) {
-            val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address })
-            val foundDevices = batch.mapNotNull { found ->
-                found.takeIf { existingDevices.none { existing -> found.address == existing.address } }?.let {
-                    buildDeviceFromScanDataInteractor.execute(it)
-                }
+            val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address }, withAirdropInfo = false)
+
+            val devices = batch.map { found ->
+                val mappedFound = buildDeviceFromScanDataInteractor.execute(found)
+                val existing = existingDevices.firstOrNull { it.address == found.address }
+                existing?.copy(manufacturerInfo = mappedFound.manufacturerInfo) ?: mappedFound
             }
-            val devices = existingDevices + foundDevices
             val allProfiles = radarProfilesRepository.getAllProfiles()
 
             allProfiles.mapNotNull { profile ->

@@ -26,7 +26,7 @@ class DevicesRepository(
                 if (withAirdropInfo) {
                     it.toDomainWithAirDrop()
                 } else {
-                    it.toDomain(null)
+                    it.toDomain(appleAirDrop = null)
                 }
             }
         }
@@ -72,9 +72,15 @@ class DevicesRepository(
         }
     }
 
-    suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
+    suspend fun getAllByAddresses(addresses: List<String>, withAirdropInfo: Boolean): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            deviceDao.findAllByAddresses(addresses).map { it.toDomainWithAirDrop() }
+            deviceDao.findAllByAddresses(addresses).map { device ->
+                if (withAirdropInfo) {
+                    device.toDomainWithAirDrop()
+                } else {
+                    device.toDomain(appleAirDrop = null)
+                }
+            }
         }
     }
 
