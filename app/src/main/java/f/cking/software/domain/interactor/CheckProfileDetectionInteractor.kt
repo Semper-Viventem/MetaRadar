@@ -16,7 +16,7 @@ class CheckProfileDetectionInteractor(
 
     suspend fun execute(batch: List<BleScanDevice>): List<ProfileResult> {
         return withContext(Dispatchers.Default) {
-            val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address }, withAirdropInfo = false)
+            val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address })
 
             val devices = batch.map { found ->
                 val mappedFound = buildDeviceFromScanDataInteractor.execute(found)

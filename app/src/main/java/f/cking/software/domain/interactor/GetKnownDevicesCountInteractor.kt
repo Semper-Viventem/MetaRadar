@@ -11,7 +11,7 @@ class GetKnownDevicesCountInteractor(
 
     suspend fun execute(batchAddresses: List<String>): Int {
         return withContext(Dispatchers.Default) {
-            devicesRepository.getAllByAddresses(batchAddresses, withAirdropInfo = false)
+            devicesRepository.getAllByAddresses(batchAddresses)
                 .count(isKnownDeviceInteractor::execute)
         }
     }

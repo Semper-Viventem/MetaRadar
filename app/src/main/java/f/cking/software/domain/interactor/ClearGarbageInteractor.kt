@@ -14,7 +14,7 @@ class ClearGarbageInteractor(
 
     suspend fun execute(): Int {
         return withContext(Dispatchers.Default) {
-            val devices = devicesRepository.getDevices(withAirdropInfo = false)
+            val devices = devicesRepository.getDevices()
                 .asSequence()
                 .filter { isGarbage(it) }
                 .map { it.address }

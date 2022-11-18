@@ -21,7 +21,7 @@ class SelectDeviceViewModel(
 
     init {
         viewModelScope.launch {
-            devices = devicesRepository.getDevices(withAirdropInfo = false)
+            devices = devicesRepository.getDevices()
         }
     }
 

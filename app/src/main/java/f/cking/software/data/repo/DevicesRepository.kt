@@ -20,15 +20,9 @@ class DevicesRepository(
     private val appleContactsDao = appDatabase.appleContactDao()
     private val allDevices = MutableStateFlow(emptyList<DeviceData>())
 
-    suspend fun getDevices(withAirdropInfo: Boolean): List<DeviceData> {
+    suspend fun getDevices(): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            deviceDao.getAll().map {
-                if (withAirdropInfo) {
-                    it.toDomainWithAirDrop()
-                } else {
-                    it.toDomain(appleAirDrop = null)
-                }
-            }
+            deviceDao.getAll().toDomainWithAirDrop()
         }
     }
 
@@ -72,15 +66,9 @@ class DevicesRepository(
         }
     }
 
-    suspend fun getAllByAddresses(addresses: List<String>, withAirdropInfo: Boolean): List<DeviceData> {
+    suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            deviceDao.findAllByAddresses(addresses).map { device ->
-                if (withAirdropInfo) {
-                    device.toDomainWithAirDrop()
-                } else {
-                    device.toDomain(appleAirDrop = null)
-                }
-            }
+            deviceDao.findAllByAddresses(addresses).toDomainWithAirDrop()
         }
     }
 
@@ -94,7 +82,7 @@ class DevicesRepository(
     }
 
     private suspend fun notifyListeners() {
-        val data = getDevices(true)
+        val data = getDevices()
         allDevices.emit(data)
     }
 
@@ -103,7 +91,19 @@ class DevicesRepository(
         return existing?.mergeWithNewDetected(device) ?: device
     }
 
-    private suspend fun DeviceEntity.toDomainWithAirDrop(): DeviceData {
-        return toDomain(getAirdropByKnownAddress(address))
+    private suspend fun List<DeviceEntity>.toDomainWithAirDrop(): List<DeviceData> {
+        val allRelatedContacts = appleContactsDao.getByAddresses(map { it.address })
+        return map { device ->
+
+
+            val airdrop = allRelatedContacts.asSequence()
+                .filter { it.associatedAddress == device.address }
+                .map { it.toDomain() }
+                .toList()
+                .takeIf { it.isNotEmpty() }
+                ?.let { AppleAirDrop(it) }
+
+            device.toDomain(airdrop)
+        }
     }
 }
