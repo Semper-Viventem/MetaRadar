@@ -87,13 +87,6 @@ class DevicesRepository(
         }
     }
 
-    suspend fun saveAppleAirDrop(appleAirDrop: AppleAirDrop, associatedAddress: String, lastUpdateTime: Long) {
-        withContext(Dispatchers.IO) {
-            val mapped = appleAirDrop.contacts.map { it.toData(associatedAddress, lastUpdateTime) }
-            appleContactsDao.insertAll(mapped)
-        }
-    }
-
     private suspend fun notifyListeners() {
         val data = getDevices(true)
         allDevices.emit(data)
@@ -101,7 +94,6 @@ class DevicesRepository(
 
     private fun mergeWithExisting(device: DeviceData): DeviceData {
         val existing: DeviceData? = deviceDao.findByAddress(device.address)?.toDomain(appleAirDrop = null)
-
         return existing?.mergeWithNewDetected(device) ?: device
     }
 
