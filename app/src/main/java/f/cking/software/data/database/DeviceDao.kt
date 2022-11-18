@@ -17,6 +17,9 @@ interface DeviceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(deviceEntity: DeviceEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(devices: List<DeviceEntity>)
+
     @Query("DELETE FROM device WHERE address LIKE :address")
     fun delete(address: String)
 

@@ -19,4 +19,7 @@ interface AppleContactDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(contact: AppleContactEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(contacts: List<AppleContactEntity>)
 }

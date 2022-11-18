@@ -20,9 +20,15 @@ class DevicesRepository(
     private val appleContactsDao = appDatabase.appleContactDao()
     private val allDevices = MutableStateFlow(emptyList<DeviceData>())
 
-    suspend fun getDevices(): List<DeviceData> {
+    suspend fun getDevices(withAirdropInfo: Boolean): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            deviceDao.getAll().map { it.toDomainWithAirDrop() }
+            deviceDao.getAll().map {
+                if (withAirdropInfo) {
+                    it.toDomainWithAirDrop()
+                } else {
+                    it.toDomain(null)
+                }
+            }
         }
     }
 
@@ -36,14 +42,19 @@ class DevicesRepository(
     }
 
     suspend fun saveScanBatch(devices: List<DeviceData>) {
-        devices.forEach { device ->
-            saveDevice(device)
-            device.manufacturerInfo?.airdrop?.let { airdrop ->
-                saveAppleAirDrop(airdrop, device.address, device.lastDetectTimeMs)
+        withContext(Dispatchers.IO) {
+            val airdrops = devices.flatMap { device ->
+                device.manufacturerInfo?.airdrop?.contacts
+                    ?.map { it.toData(device.address, device.lastDetectTimeMs) } ?: emptyList()
             }
 
+            val mappedDevices = devices.map { mergeWithExisting(it).toData() }
+
+            deviceDao.insertAll(mappedDevices)
+            appleContactsDao.insertAll(airdrops)
+
+            notifyListeners()
         }
-        notifyListeners()
     }
 
     suspend fun changeFavorite(device: DeviceData) {
@@ -78,28 +89,20 @@ class DevicesRepository(
 
     suspend fun saveAppleAirDrop(appleAirDrop: AppleAirDrop, associatedAddress: String, lastUpdateTime: Long) {
         withContext(Dispatchers.IO) {
-            appleAirDrop.contacts.forEach { appleContactsDao.insert(it.toData(associatedAddress, lastUpdateTime)) }
+            val mapped = appleAirDrop.contacts.map { it.toData(associatedAddress, lastUpdateTime) }
+            appleContactsDao.insertAll(mapped)
         }
     }
 
     private suspend fun notifyListeners() {
-        val data = getDevices()
+        val data = getDevices(true)
         allDevices.emit(data)
     }
 
-    private suspend fun saveDevice(device: DeviceData) {
-        val existing: DeviceData? = withContext(Dispatchers.IO) {
-            deviceDao.findByAddress(device.address)?.toDomainWithAirDrop()
-        }
+    private fun mergeWithExisting(device: DeviceData): DeviceData {
+        val existing: DeviceData? = deviceDao.findByAddress(device.address)?.toDomain(appleAirDrop = null)
 
-        withContext(Dispatchers.IO) {
-            if (existing != null) {
-                val updated = existing.mergeWithNewDetected(device)
-                deviceDao.insert(updated.toData())
-            } else {
-                deviceDao.insert(device.toData())
-            }
-        }
+        return existing?.mergeWithNewDetected(device) ?: device
     }
 
     private suspend fun DeviceEntity.toDomainWithAirDrop(): DeviceData {

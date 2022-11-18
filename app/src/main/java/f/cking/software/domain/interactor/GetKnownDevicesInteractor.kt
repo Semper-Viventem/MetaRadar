@@ -12,7 +12,8 @@ class GetKnownDevicesInteractor(
 
     suspend fun execute(): List<DeviceData> {
         return withContext(Dispatchers.Default) {
-            devicesRepository.getDevices().filter { device -> isKnownDeviceInteractor.execute(device) }
+            devicesRepository.getDevices(withAirdropInfo = false)
+                .filter { device -> isKnownDeviceInteractor.execute(device) }
         }
     }
 }
