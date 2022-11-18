@@ -23,13 +23,15 @@ class CheckProfileDetectionInteractor(
         val allProfiles = radarProfilesRepository.getAllProfiles()
 
         return allProfiles.mapNotNull { profile ->
-            val matchedDevice = devices.filter { profile.detectFilter?.check(it) == true }
-            if (matchedDevice.isNotEmpty()) {
-                ProfileResult(profile, matchedDevice)
-            } else {
-                null
-            }
+            checkProfile(profile, devices)
         }
+    }
+
+    private fun checkProfile(profile: RadarProfile, devices: List<DeviceData>): ProfileResult? {
+        return profile.takeIf { it.isActive }
+            ?.let { devices.filter { profile.detectFilter?.check(it) == true } }
+            ?.takeIf { matched -> matched.isNotEmpty() }
+            ?.let { matched -> ProfileResult(profile, matched) }
     }
 
     data class ProfileResult(
