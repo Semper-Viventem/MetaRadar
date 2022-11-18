@@ -11,7 +11,7 @@ class SaveScanBatchInteractor(
 ) {
 
     suspend fun execute(batch: List<BleScanDevice>) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             devicesRepository.saveScanBatch(batch.map { buildDeviceFromScanDataInteractor.execute(it) })
         }
     }

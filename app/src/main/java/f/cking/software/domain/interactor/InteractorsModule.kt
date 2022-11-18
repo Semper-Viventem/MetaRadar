@@ -12,8 +12,9 @@ object InteractorsModule {
         factory { IsKnownDeviceInteractor(get()) }
         factory { SaveScanBatchInteractor(get(), get()) }
         factory { GetBleRecordFramesFromRawInteractor() }
-        factory { GetManufacturerInfoFromRawBleInteractor(get()) }
+        factory { GetManufacturerInfoFromRawBleInteractor(get(), get()) }
         factory { CheckProfileDetectionInteractor(get(), get(), get()) }
         factory { BuildDeviceFromScanDataInteractor(get()) }
+        factory { GetAirdropInfoFromBleFrame() }
     }
 }

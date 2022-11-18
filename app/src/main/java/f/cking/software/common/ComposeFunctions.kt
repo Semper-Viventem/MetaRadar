@@ -20,6 +20,7 @@ import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.toHexString
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -114,6 +115,10 @@ fun DeviceListItem(
                 device.manufacturerInfo?.name?.let {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = it)
+                }
+                device.manufacturerInfo?.airdrop?.let { airdrop ->
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = airdrop.contacts.joinToString { "0x${it.sha256.toHexString().uppercase()}" })
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(

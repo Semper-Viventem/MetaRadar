@@ -159,7 +159,8 @@ class ProfileDetailsViewModel(
                         Optional.of(
                             ManufacturerInfo(
                                 from.manufacturerId,
-                                it
+                                it,
+                                null,
                             )
                         )
                     }

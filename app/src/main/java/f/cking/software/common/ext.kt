@@ -32,3 +32,7 @@ fun timeFromDateTime(date: LocalDate, time: LocalTime): Long =
     LocalDateTime.of(date, time).atZone(ZoneId.of("GMT")).toInstant().toEpochMilli()
 
 fun LocalTime.toMilliseconds() = (hour * 60L * 60L * 1000L) + (minute * 60L * 1000L)
+
+fun concatTwoBytes(firstByte: Byte, secondByte: Byte): Int {
+    return (firstByte.toUByte().toInt() shl 8) or secondByte.toUByte().toInt()
+}

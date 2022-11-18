@@ -13,7 +13,7 @@ class SelectManufacturerViewModel(
 ) : ViewModel() {
 
     val manufacturers by mutableStateOf(
-        BluetoothSIG.bluetoothSIG.map { ManufacturerInfo(it.key, it.value) }
+        BluetoothSIG.bluetoothSIG.map { ManufacturerInfo(it.key, it.value, airdrop = null) }
     )
 
     fun back() {

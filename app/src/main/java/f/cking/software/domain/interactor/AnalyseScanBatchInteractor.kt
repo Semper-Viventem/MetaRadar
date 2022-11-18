@@ -14,7 +14,6 @@ class AnalyseScanBatchInteractor(
             if (batch.isEmpty()) {
                 Result(knownDevicesCount = 0, matchedProfiles = emptyList())
             } else {
-                val scanTime = batch.first().scanTimeMs
                 val addresses = batch.map { it.address }
                 val knownCount = getKnownDevicesCountInteractor.execute(addresses)
                 val matchedProfiles = checkProfileDetectionInteractor.execute(batch)

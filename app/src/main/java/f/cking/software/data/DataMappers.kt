@@ -1,7 +1,9 @@
 package f.cking.software.domain
 
+import f.cking.software.data.database.AppleContactEntity
 import f.cking.software.data.database.DeviceEntity
 import f.cking.software.data.database.RadarProfileEntity
+import f.cking.software.domain.model.AppleAirDrop
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
@@ -9,7 +11,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-fun DeviceEntity.toDomain(): DeviceData {
+fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
     return DeviceData(
         address = address,
         name = name,
@@ -18,7 +20,9 @@ fun DeviceEntity.toDomain(): DeviceData {
         detectCount = detectCount,
         customName = customName,
         favorite = favorite,
-        manufacturerInfo = manufacturerId?.let { id -> manufacturerName?.let { name -> ManufacturerInfo(id, name) } },
+        manufacturerInfo = manufacturerId?.let { id ->
+            manufacturerName?.let { name -> ManufacturerInfo(id, name, appleAirDrop) }
+        },
     )
 }
 
@@ -54,4 +58,12 @@ fun RadarProfileEntity.toDomain(): RadarProfile {
         isActive = isActive,
         detectFilter = detectFilter?.let { Json.decodeFromString(detectFilter) }
     )
+}
+
+fun AppleAirDrop.AppleContact.toData(associatedAddress: String, lastSeenTime: Long): AppleContactEntity {
+    return AppleContactEntity(sha256, associatedAddress, lastSeenTime)
+}
+
+fun AppleContactEntity.toDomain(): AppleAirDrop.AppleContact {
+    return AppleAirDrop.AppleContact(sha256)
 }

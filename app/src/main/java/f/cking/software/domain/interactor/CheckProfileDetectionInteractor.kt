@@ -5,6 +5,8 @@ import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.RadarProfile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class CheckProfileDetectionInteractor(
     private val devicesRepository: DevicesRepository,
@@ -13,17 +15,19 @@ class CheckProfileDetectionInteractor(
 ) {
 
     suspend fun execute(batch: List<BleScanDevice>): List<ProfileResult> {
-        val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address })
-        val foundDevices = batch.mapNotNull { found ->
-            found.takeIf { existingDevices.none { existing -> found.address == existing.address } }?.let {
-                buildDeviceFromScanDataInteractor.execute(it)
+        return withContext(Dispatchers.Default) {
+            val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address })
+            val foundDevices = batch.mapNotNull { found ->
+                found.takeIf { existingDevices.none { existing -> found.address == existing.address } }?.let {
+                    buildDeviceFromScanDataInteractor.execute(it)
+                }
             }
-        }
-        val devices = existingDevices + foundDevices
-        val allProfiles = radarProfilesRepository.getAllProfiles()
+            val devices = existingDevices + foundDevices
+            val allProfiles = radarProfilesRepository.getAllProfiles()
 
-        return allProfiles.mapNotNull { profile ->
-            checkProfile(profile, devices)
+            allProfiles.mapNotNull { profile ->
+                checkProfile(profile, devices)
+            }
         }
     }
 

@@ -2,6 +2,8 @@ package f.cking.software.data.repo
 
 import f.cking.software.data.database.AppDatabase
 import f.cking.software.data.database.DeviceDao
+import f.cking.software.data.database.DeviceEntity
+import f.cking.software.domain.model.AppleAirDrop
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
@@ -15,11 +17,12 @@ class DevicesRepository(
 ) {
 
     private val deviceDao: DeviceDao = appDatabase.deviceDao()
+    private val appleContactsDao = appDatabase.appleContactDao()
     private val allDevices = MutableStateFlow(emptyList<DeviceData>())
 
     suspend fun getDevices(): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            deviceDao.getAll().map { it.toDomain() }
+            deviceDao.getAll().map { it.toDomainWithAirDrop() }
         }
     }
 
@@ -33,14 +36,20 @@ class DevicesRepository(
     }
 
     suspend fun saveScanBatch(devices: List<DeviceData>) {
-        devices.forEach { saveScanResult(it) }
+        devices.forEach { device ->
+            saveDevice(device)
+            device.manufacturerInfo?.airdrop?.let { airdrop ->
+                saveAppleAirDrop(airdrop, device.address, device.lastDetectTimeMs)
+            }
+
+        }
         notifyListeners()
     }
 
     suspend fun changeFavorite(device: DeviceData) {
         withContext(Dispatchers.IO) {
             val new = device.copy(favorite = !device.favorite)
-            deviceDao.update(new.toData())
+            deviceDao.insert(new.toData())
             notifyListeners()
         }
     }
@@ -54,7 +63,22 @@ class DevicesRepository(
 
     suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            deviceDao.findAllByAddresses(addresses).map { it.toDomain() }
+            deviceDao.findAllByAddresses(addresses).map { it.toDomainWithAirDrop() }
+        }
+    }
+
+    suspend fun getAirdropByKnownAddress(address: String): AppleAirDrop? {
+        return withContext(Dispatchers.IO) {
+            appleContactsDao.getByAddress(address)
+                .map { it.toDomain() }
+                .takeIf { it.isNotEmpty() }
+                ?.let { AppleAirDrop(it) }
+        }
+    }
+
+    suspend fun saveAppleAirDrop(appleAirDrop: AppleAirDrop, associatedAddress: String, lastUpdateTime: Long) {
+        withContext(Dispatchers.IO) {
+            appleAirDrop.contacts.forEach { appleContactsDao.insert(it.toData(associatedAddress, lastUpdateTime)) }
         }
     }
 
@@ -63,29 +87,22 @@ class DevicesRepository(
         allDevices.emit(data)
     }
 
-    private suspend fun saveScanResult(device: DeviceData) {
-        val existing = withContext(Dispatchers.IO) {
-            deviceDao.findByAddress(device.address)?.toDomain()
+    private suspend fun saveDevice(device: DeviceData) {
+        val existing: DeviceData? = withContext(Dispatchers.IO) {
+            deviceDao.findByAddress(device.address)?.toDomainWithAirDrop()
         }
 
-        if (existing != null) {
-            updateExisting(existing, device)
-        } else {
-            createNew(device)
+        withContext(Dispatchers.IO) {
+            if (existing != null) {
+                val updated = existing.mergeWithNewDetected(device)
+                deviceDao.insert(updated.toData())
+            } else {
+                deviceDao.insert(device.toData())
+            }
         }
     }
 
-    private suspend fun createNew(device: DeviceData) {
-        withContext(Dispatchers.IO) {
-            deviceDao.insert(device.toData())
-        }
-    }
-
-    private suspend fun updateExisting(existing: DeviceData, new: DeviceData) {
-        val updated = existing.mergeWithNewDetected(new)
-
-        withContext(Dispatchers.IO) {
-            deviceDao.update(updated.toData())
-        }
+    private suspend fun DeviceEntity.toDomainWithAirDrop(): DeviceData {
+        return toDomain(getAirdropByKnownAddress(address))
     }
 }

@@ -1,11 +1,14 @@
 package f.cking.software.domain.interactor
 
+import f.cking.software.concatTwoBytes
 import f.cking.software.data.helpers.BluetoothSIG
+import f.cking.software.domain.model.AppleAirDrop
 import f.cking.software.domain.model.BleRecordFrame
 import f.cking.software.domain.model.ManufacturerInfo
 
 class GetManufacturerInfoFromRawBleInteractor(
-    private val getBleRecordFramesFromRawInteractor: GetBleRecordFramesFromRawInteractor
+    private val getBleRecordFramesFromRawInteractor: GetBleRecordFramesFromRawInteractor,
+    private val getAirdropInfoFromBleFrame: GetAirdropInfoFromBleFrame,
 ) {
 
     fun execute(raw: ByteArray): ManufacturerInfo? {
@@ -16,12 +19,25 @@ class GetManufacturerInfoFromRawBleInteractor(
         return frame.data.takeIf { it.count() >= MIN_MANUFACTURER_ID_LENGTH }
             ?.let { data ->
                 val id = decodeId(data[0], data[1])
-                BluetoothSIG.bluetoothSIG[id]?.let { name -> ManufacturerInfo(id, name) }
+                BluetoothSIG.bluetoothSIG[id]?.let { name ->
+                    ManufacturerInfo(id, name, checkAirdrop(frame, id))
+                }
             }
     }
 
+    private fun checkAirdrop(
+        frame: BleRecordFrame,
+        manufacturerId: Int,
+    ): AppleAirDrop? {
+        return if (manufacturerId == ManufacturerInfo.APPLE_ID) {
+            getAirdropInfoFromBleFrame.execute(frame)
+        } else {
+            null
+        }
+    }
+
     private fun decodeId(firstByte: Byte, secondByte: Byte): Int {
-        val encoded: Int = (firstByte.toInt() shl 8) or secondByte.toInt()
+        val encoded: Int = concatTwoBytes(firstByte, secondByte)
         val shiftValue = when {
             encoded and 0x0fff == 0x0 -> 12
             encoded and 0x00ff == 0x0 -> 8
