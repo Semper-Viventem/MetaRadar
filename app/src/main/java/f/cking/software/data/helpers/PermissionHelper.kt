@@ -44,7 +44,7 @@ class PermissionHelper(
                 action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
                 data = Uri.parse("package:${context.packageName}")
             }
-            context.startActivity(intent)
+            requireActivity().startActivity(intent)
         }
     }
 
@@ -83,7 +83,14 @@ class PermissionHelper(
         const val PERMISSIONS_REQUEST_CODE = 1000
 
         val BACKGROUND_LOCATION = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        val BLE_PERMISSIONS: Array<String> = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+        val BLE_PERMISSIONS: Array<String> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT,
