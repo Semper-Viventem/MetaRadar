@@ -61,9 +61,18 @@ fun RadarProfileEntity.toDomain(): RadarProfile {
 }
 
 fun AppleAirDrop.AppleContact.toData(associatedAddress: String): AppleContactEntity {
-    return AppleContactEntity(sha256, associatedAddress, lastDetectionTimeMs, firstDetectionTimeMs)
+    return AppleContactEntity(
+        sha256,
+        associatedAddress,
+        lastDetectTimeMs = lastDetectionTimeMs,
+        firstDetectTimeMs = firstDetectionTimeMs
+    )
 }
 
 fun AppleContactEntity.toDomain(): AppleAirDrop.AppleContact {
-    return AppleAirDrop.AppleContact(sha256, lastDetectTimeMs, firstDetectTimeMs)
+    return AppleAirDrop.AppleContact(
+        sha256,
+        lastDetectionTimeMs = lastDetectTimeMs,
+        firstDetectionTimeMs = firstDetectTimeMs
+    )
 }
