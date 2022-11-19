@@ -1,6 +1,6 @@
 # MetaRadar
 
-The app for BLE ether monitoring tracks your environment, finds some devices, makes relations between devices around you, and tracks devices' movements.
+A tool for monitoring BLE environments. Scans the BLE ether in background, notifies you if the device you are looking for is near you or if some unknown device has been following you for too long. Able to distinguish manufacturers. Explore Apple Airdrop packages and detect airdrops from with known phone/email. Build a device movement map based on the scanned BLE broadcast. Flexible filter settings for the radar.
 
 ## Functionality
 
