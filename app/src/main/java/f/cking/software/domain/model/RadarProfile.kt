@@ -78,9 +78,20 @@ class RadarProfile(
         data class AppleAirdropContact(
             val contactStr: String,
             val airdropShaFormat: Int,
+            val minLostTime: Long? = null,
         ) : Filter() {
+
             override fun check(device: DeviceData): Boolean {
-                return device.manufacturerInfo?.airdrop?.contacts?.any { it.sha256 == airdropShaFormat } == true
+                return device.manufacturerInfo?.airdrop?.contacts?.any { contact ->
+                    contact.sha256 == airdropShaFormat && checkMinLostTime(contact)
+                } == true
+            }
+
+            private fun checkMinLostTime(contact: AppleAirDrop.AppleContact): Boolean {
+                return minLostTime?.let {
+                    (contact.firstDetectionTimeMs == contact.lastDetectionTimeMs)
+                            || (System.currentTimeMillis() - contact.lastDetectionTimeMs >= it)
+                } ?: true
             }
         }
 

@@ -11,7 +11,7 @@ class GetManufacturerInfoFromRawBleInteractor(
     private val getAirdropInfoFromBleFrame: GetAirdropInfoFromBleFrame,
 ) {
 
-    fun execute(raw: ByteArray): ManufacturerInfo? {
+    fun execute(raw: ByteArray, detectionTimeMs: Long): ManufacturerInfo? {
         val frame: BleRecordFrame = getBleRecordFramesFromRawInteractor.execute(raw).firstOrNull {
             it.type == TYPE_MANUFACTURER_INFO
         } ?: return null
@@ -20,7 +20,7 @@ class GetManufacturerInfoFromRawBleInteractor(
             ?.let { data ->
                 val id = decodeId(data[0], data[1])
                 BluetoothSIG.bluetoothSIG[id]?.let { name ->
-                    ManufacturerInfo(id, name, checkAirdrop(frame, id))
+                    ManufacturerInfo(id, name, checkAirdrop(frame, id, detectionTimeMs))
                 }
             }
     }
@@ -28,9 +28,10 @@ class GetManufacturerInfoFromRawBleInteractor(
     private fun checkAirdrop(
         frame: BleRecordFrame,
         manufacturerId: Int,
+        detectionTimeMs: Long,
     ): AppleAirDrop? {
         return if (manufacturerId == ManufacturerInfo.APPLE_ID) {
-            getAirdropInfoFromBleFrame.execute(frame)
+            getAirdropInfoFromBleFrame.execute(frame, detectionTimeMs)
         } else {
             null
         }

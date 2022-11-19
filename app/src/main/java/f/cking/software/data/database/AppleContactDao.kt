@@ -14,6 +14,9 @@ interface AppleContactDao {
     @Query("SELECT * FROM apple_contacts WHERE associated_address LIKE :address")
     fun getByAddress(address: String): List<AppleContactEntity>
 
+    @Query("SELECT * FROM apple_contacts WHERE sha_256 IN (:sha)")
+    fun getBySHA(sha: List<Int>): List<AppleContactEntity>
+
     @Query("SELECT * FROM apple_contacts WHERE associated_address IN (:addresses)")
     fun getByAddresses(addresses: List<String>): List<AppleContactEntity>
 

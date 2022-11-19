@@ -155,7 +155,7 @@ object ProfileDetailsScreen {
             is UiFilterState.Not -> FilterNot(filterState, viewModel, onDeleteClick)
             is UiFilterState.Name -> FilterName(filterState, onDeleteClick)
             is UiFilterState.Address -> FilterAddress(viewModel, filterState, onDeleteClick)
-            is UiFilterState.AppleAirdropContact -> FilterAirdropContact(filterState, onDeleteClick)
+            is UiFilterState.AppleAirdropContact -> FilterAirdropContact(viewModel, filterState, onDeleteClick)
             is UiFilterState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
             is UiFilterState.Manufacturer -> FilterManufacturer(viewModel, filterState, onDeleteClick)
             is UiFilterState.MinLostTime -> FilterMinLostPeriod(viewModel, filterState, onDeleteClick)
@@ -207,6 +207,7 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun FilterAirdropContact(
+        viewModel: ProfileDetailsViewModel,
         filter: UiFilterState.AppleAirdropContact,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
@@ -219,6 +220,28 @@ object ProfileDetailsScreen {
                 TextField(value = filter.contactString, singleLine = true, onValueChange = {
                     filter.contactString = it.lowercase()
                 }, placeholder = { Text(text = "email/phone") })
+
+                val text = filter.minLostTime.orNull()?.format(DateTimeFormatter.ofPattern("HH:mm"))
+                val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
+                val timeDialog = OpenTimePickerDialog(defaultTime) { time ->
+                    filter.minLostTime = Optional.of(time)
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Row {
+                    ClickableField(text = text, placeholder = "Min lost period") {
+                        viewModel.router.navigate(timeDialog)
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    ClearIcon {
+                        filter.minLostTime = Optional.empty()
+                    }
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Airdrop cannot be linked to a specific device because Apple changes BLE addresses every 15 minutes. To select the min lost period you should use this field.",
+                    fontWeight = FontWeight.Light,
+                )
             }
         }
     }

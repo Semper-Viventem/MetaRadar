@@ -37,16 +37,8 @@ class DevicesRepository(
 
     suspend fun saveScanBatch(devices: List<DeviceData>) {
         withContext(Dispatchers.IO) {
-            val airdrops = devices.flatMap { device ->
-                device.manufacturerInfo?.airdrop?.contacts
-                    ?.map { it.toData(device.address, device.lastDetectTimeMs) } ?: emptyList()
-            }
-
-            val mappedDevices = devices.map { mergeWithExisting(it).toData() }
-
-            deviceDao.insertAll(mappedDevices)
-            appleContactsDao.insertAll(airdrops)
-
+            saveDevices(devices)
+            saveContacts(devices)
             notifyListeners()
         }
     }
@@ -81,20 +73,58 @@ class DevicesRepository(
         }
     }
 
+    suspend fun getAllBySHA(sha: List<Int>): List<AppleAirDrop.AppleContact> {
+        return withContext(Dispatchers.IO) {
+            appleContactsDao.getBySHA(sha).map { it.toDomain() }
+        }
+    }
+
+    private suspend fun saveDevices(devices: List<DeviceData>) {
+        withContext(Dispatchers.IO) {
+            val mappedDevices = mergeWithExistingDevices(devices).map { it.toData() }
+            deviceDao.insertAll(mappedDevices)
+        }
+    }
+
+    private suspend fun saveContacts(devices: List<DeviceData>) {
+        withContext(Dispatchers.IO) {
+            val addressesMap = devices.flatMap { device ->
+                device.manufacturerInfo?.airdrop?.contacts?.map { it.sha256 to device.address } ?: emptyList()
+            }.toMap()
+            val mergedContacts =
+                mergeWithExisting(devices.flatMap { it.manufacturerInfo?.airdrop?.contacts ?: emptyList() })
+            val mappedContacts =
+                mergedContacts.mapNotNull { contact -> addressesMap[contact.sha256]?.let { contact.toData(it) } }
+            appleContactsDao.insertAll(mappedContacts)
+        }
+    }
+
     private suspend fun notifyListeners() {
         val data = getDevices()
         allDevices.emit(data)
     }
 
-    private fun mergeWithExisting(device: DeviceData): DeviceData {
-        val existing: DeviceData? = deviceDao.findByAddress(device.address)?.toDomain(appleAirDrop = null)
-        return existing?.mergeWithNewDetected(device) ?: device
+    private suspend fun mergeWithExistingDevices(devices: List<DeviceData>): List<DeviceData> {
+        val existingDevices = getAllByAddresses(devices.map { it.address })
+        return devices.map { device ->
+            val existing = existingDevices.firstOrNull { it.address == device.address }
+            existing?.mergeWithNewDetected(device) ?: device
+        }
+    }
+
+    private suspend fun mergeWithExisting(
+        contacts: List<AppleAirDrop.AppleContact>,
+    ): List<AppleAirDrop.AppleContact> {
+        val existingContacts = getAllBySHA(contacts.map { it.sha256 })
+        return contacts.map { contact ->
+            val existing = existingContacts.firstOrNull { it.sha256 == contact.sha256 }
+            existing?.mergeWithNewContact(contact) ?: contact
+        }
     }
 
     private suspend fun List<DeviceEntity>.toDomainWithAirDrop(): List<DeviceData> {
         val allRelatedContacts = appleContactsDao.getByAddresses(map { it.address })
         return map { device ->
-
 
             val airdrop = allRelatedContacts.asSequence()
                 .filter { it.associatedAddress == device.address }

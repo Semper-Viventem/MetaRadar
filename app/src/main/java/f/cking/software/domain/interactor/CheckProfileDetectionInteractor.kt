@@ -2,9 +2,7 @@ package f.cking.software.domain.interactor
 
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.RadarProfilesRepository
-import f.cking.software.domain.model.BleScanDevice
-import f.cking.software.domain.model.DeviceData
-import f.cking.software.domain.model.RadarProfile
+import f.cking.software.domain.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -21,7 +19,7 @@ class CheckProfileDetectionInteractor(
             val devices = batch.map { found ->
                 val mappedFound = buildDeviceFromScanDataInteractor.execute(found)
                 val existing = existingDevices.firstOrNull { it.address == found.address }
-                existing?.copy(manufacturerInfo = mappedFound.manufacturerInfo) ?: mappedFound
+                existing?.copy(manufacturerInfo = mapManufacturerInfo(mappedFound.manufacturerInfo)) ?: mappedFound
             }
             val allProfiles = radarProfilesRepository.getAllProfiles()
 
@@ -29,6 +27,16 @@ class CheckProfileDetectionInteractor(
                 checkProfile(profile, devices)
             }
         }
+    }
+
+    private suspend fun mapManufacturerInfo(found: ManufacturerInfo?): ManufacturerInfo? {
+        val airdrop = found?.airdrop ?: return found
+        val existingContacts = devicesRepository.getAllBySHA(airdrop.contacts.map { it.sha256 })
+        val mergedContacts = airdrop.contacts.map { contact ->
+            val existing = existingContacts.firstOrNull { it.sha256 == contact.sha256 }
+            existing ?: contact
+        }
+        return found.copy(airdrop = AppleAirDrop(mergedContacts))
     }
 
     private fun checkProfile(profile: RadarProfile, devices: List<DeviceData>): ProfileResult? {

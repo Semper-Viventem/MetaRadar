@@ -143,6 +143,7 @@ class ProfileDetailsViewModel(
             is UiFilterState.AppleAirdropContact -> RadarProfile.Filter.AppleAirdropContact(
                 contactStr = from.contactString.trim(),
                 airdropShaFormat = SHA256.fromStringAirdrop(from.contactString),
+                minLostTime = from.minLostTime.orNull()?.toMilliseconds()
             )
             is UiFilterState.Unknown, is UiFilterState.Interval -> throw IllegalArgumentException("Unsupported type: ${from::class.java}")
         }
@@ -207,6 +208,7 @@ class ProfileDetailsViewModel(
             }
             is RadarProfile.Filter.AppleAirdropContact -> UiFilterState.AppleAirdropContact().apply {
                 this.contactString = from.contactStr
+                this.minLostTime = Optional.ofNullable(from.minLostTime?.toLocalTime())
             }
         }
     }
@@ -309,6 +311,7 @@ class ProfileDetailsViewModel(
 
         class AppleAirdropContact() : UiFilterState() {
             var contactString: String by mutableStateOf("")
+            var minLostTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
 
             override fun isCorrect(): Boolean {
                 return contactString.isNotBlank()

@@ -8,5 +8,11 @@ data class AppleAirDrop(
      */
     data class AppleContact(
         val sha256: Int, // only first 2 bytes of sha(contact)
-    )
+        val lastDetectionTimeMs: Long,
+        val firstDetectionTimeMs: Long,
+    ) {
+        fun mergeWithNewContact(new: AppleContact): AppleContact {
+            return new.copy(firstDetectionTimeMs = firstDetectionTimeMs)
+        }
+    }
 }

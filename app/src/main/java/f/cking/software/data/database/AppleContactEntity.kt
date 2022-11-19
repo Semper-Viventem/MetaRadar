@@ -8,5 +8,6 @@ import androidx.room.PrimaryKey
 data class AppleContactEntity(
     @PrimaryKey @ColumnInfo(name = "sha_256") val sha256: Int,
     @ColumnInfo(name = "associated_address") val associatedAddress: String,
+    @ColumnInfo(name = "first_detect_time_ms") val firstDetectTimeMs: Long,
     @ColumnInfo(name = "last_detect_time_ms") val lastDetectTimeMs: Long,
 )

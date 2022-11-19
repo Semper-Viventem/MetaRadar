@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [DeviceEntity::class, RadarProfileEntity::class, AppleContactEntity::class],
-    version = 6,
+    version = 7,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDao(): DeviceDao
@@ -23,7 +23,8 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_2_3,
                     MIGRATION_3_4,
                     MIGRATION_4_5,
-                    MIGRATION_5_6
+                    MIGRATION_5_6,
+                    MIGRATION_6_7,
                 )
                 .build()
         }
@@ -63,6 +64,18 @@ abstract class AppDatabase : RoomDatabase() {
                 "CREATE TABLE `apple_contacts` (" +
                         "`sha_256` INTEGER NOT NULL, " +
                         "`associated_address` TEXT NOT NULL, " +
+                        "`last_detect_time_ms` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`sha_256`));"
+            )
+        }
+
+        private val MIGRATION_6_7 = migration(6, 7) {
+            it.execSQL("DROP TABLE `apple_contacts`;")
+            it.execSQL(
+                "CREATE TABLE `apple_contacts` (" +
+                        "`sha_256` INTEGER NOT NULL, " +
+                        "`associated_address` TEXT NOT NULL, " +
+                        "`first_detect_time_ms` INTEGER NOT NULL, " +
                         "`last_detect_time_ms` INTEGER NOT NULL, " +
                         "PRIMARY KEY(`sha_256`));"
             )
