@@ -88,10 +88,9 @@ class RadarProfile(
             }
 
             private fun checkMinLostTime(contact: AppleAirDrop.AppleContact): Boolean {
-                return minLostTime?.let {
-                    (contact.firstDetectionTimeMs == contact.lastDetectionTimeMs)
-                            || (System.currentTimeMillis() - contact.lastDetectionTimeMs >= it)
-                } ?: true
+                return minLostTime == null
+                        || (contact.firstDetectionTimeMs == contact.lastDetectionTimeMs)
+                        || (System.currentTimeMillis() - contact.lastDetectionTimeMs >= minLostTime)
             }
         }
 
