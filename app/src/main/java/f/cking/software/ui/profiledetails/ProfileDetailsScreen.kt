@@ -155,6 +155,7 @@ object ProfileDetailsScreen {
             is UiFilterState.Not -> FilterNot(filterState, viewModel, onDeleteClick)
             is UiFilterState.Name -> FilterName(filterState, onDeleteClick)
             is UiFilterState.Address -> FilterAddress(viewModel, filterState, onDeleteClick)
+            is UiFilterState.AppleAirdropContact -> FilterAirdropContact(filterState, onDeleteClick)
             is UiFilterState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
             is UiFilterState.Manufacturer -> FilterManufacturer(viewModel, filterState, onDeleteClick)
             is UiFilterState.MinLostTime -> FilterMinLostPeriod(viewModel, filterState, onDeleteClick)
@@ -200,6 +201,24 @@ object ProfileDetailsScreen {
                         filter.ignoreCase = it
                     })
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun FilterAirdropContact(
+        filter: UiFilterState.AppleAirdropContact,
+        onDeleteClick: (child: UiFilterState) -> Unit,
+    ) {
+        FilterBase(
+            title = "Airdrop contact",
+            color = colorResource(R.color.filter_airdrop_contact),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            Column {
+                TextField(value = filter.contactString, singleLine = true, onValueChange = {
+                    filter.contactString = it.lowercase()
+                }, placeholder = { Text(text = "email/phone") })
             }
         }
     }
@@ -534,6 +553,7 @@ object ProfileDetailsScreen {
             FilterType.BY_LOGIC_ANY -> UiFilterState.Any()
             FilterType.BY_LOGIC_NOT -> UiFilterState.Not()
             FilterType.BY_MIN_DETECTION_TIME -> UiFilterState.MinLostTime()
+            FilterType.AIRDROP_CONTACT -> UiFilterState.AppleAirdropContact()
         }
     }
 }

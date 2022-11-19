@@ -1,5 +1,6 @@
 package f.cking.software
 
+import java.security.MessageDigest
 import java.time.*
 import java.util.*
 
@@ -35,4 +36,28 @@ fun LocalTime.toMilliseconds() = (hour * 60L * 60L * 1000L) + (minute * 60L * 10
 
 fun concatTwoBytes(firstByte: Byte, secondByte: Byte): Int {
     return (firstByte.toUByte().toInt() shl 8) or secondByte.toUByte().toInt()
+}
+
+val String.sha256: ByteArray
+    get() {
+        val digest = MessageDigest.getInstance("SHA-256")
+        val bytes = this.toByteArray()
+        digest.update(bytes, 0, bytes.size)
+        return digest.digest()
+    }
+
+object SHA256 {
+    private val digest = MessageDigest.getInstance("SHA-256")
+
+    fun fromString(string: String): ByteArray {
+        val bytes = string.toByteArray()
+        digest.update(bytes, 0, bytes.size)
+        return digest.digest().apply {
+            digest.reset()
+        }
+    }
+
+    fun fromStringAirdrop(string: String): Int {
+        return fromString(string).let { concatTwoBytes(it[0], it[1]) }
+    }
 }

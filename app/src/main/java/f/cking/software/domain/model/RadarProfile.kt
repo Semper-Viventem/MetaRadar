@@ -74,6 +74,17 @@ class RadarProfile(
         }
 
         @Serializable
+        @SerialName("airdrop_contact")
+        data class AppleAirdropContact(
+            val contactStr: String,
+            val airdropShaFormat: Int,
+        ) : Filter() {
+            override fun check(device: DeviceData): Boolean {
+                return device.manufacturerInfo?.airdrop?.contacts?.any { it.sha256 == airdropShaFormat } == true
+            }
+        }
+
+        @Serializable
         @SerialName("any")
         data class Any(val filters: List<Filter>) : Filter() {
             override fun check(device: DeviceData): Boolean {

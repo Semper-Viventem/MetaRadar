@@ -22,5 +22,6 @@
     <color name="filter_first_seen">#EF9A9A</color>
     <color name="filter_lost_time">#90CAF9</color>
     <color name="filter_is_favorite">#FFCC80</color>
+    <color name="filter_airdrop_contact">#CE93D8</color>
     <color name="filter_unknown">#E6EE9C</color>
 </resources>
