@@ -6,7 +6,6 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.os.ParcelUuid
 import android.util.Log
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.GetKnownDevicesInteractor
@@ -28,7 +27,7 @@ class BleScannerHelper(
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val batch = hashMapOf<String, BleScanDevice>()
     private var currentScanTimeMs: Long = System.currentTimeMillis()
-    private val previouslyNoticedServicesUUIDs = mutableSetOf<String>()
+    private val bleFiltersProvider = BleFiltersProvider(getKnownDevicesInteractor)
 
     var inProgress = MutableStateFlow(false)
 
@@ -44,7 +43,7 @@ class BleScannerHelper(
         @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
-            result.scanRecord?.serviceUuids?.map { previouslyNoticedServicesUUIDs.add(it.uuid.toString()) }
+            result.scanRecord?.serviceUuids?.map { bleFiltersProvider.previouslyNoticedServicesUUIDs.add(it.uuid.toString()) }
             val device = BleScanDevice(
                 address = result.device.address,
                 name = result.device.name,
@@ -80,7 +79,10 @@ class BleScannerHelper(
             currentScanTimeMs = System.currentTimeMillis()
 
             val scanFilters = if (scanRestricted) {
-                getBGFilters() + getPopularServiceUUIDS()
+                bleFiltersProvider.getBGFilters() +
+                        bleFiltersProvider.getPopularServiceUUIDS() +
+                        bleFiltersProvider.getAdvertisingTypeFilter() +
+                        bleFiltersProvider.getManufacturerFilter()
             } else {
                 listOf(ScanFilter.Builder().build())
             }
@@ -92,22 +94,6 @@ class BleScannerHelper(
             withContext(Dispatchers.IO) {
                 bluetoothScanner.startScan(scanFilters, scanSettings, callback)
             }
-        }
-    }
-
-    private fun getPopularServiceUUIDS(): List<ScanFilter> {
-        return (popularServicesUUID + previouslyNoticedServicesUUIDs).map { uuid ->
-            ScanFilter.Builder()
-                .setServiceUuid(ParcelUuid.fromString(uuid))
-                .build()
-        }
-    }
-
-    private suspend fun getBGFilters(): List<ScanFilter> {
-        return getKnownDevicesInteractor.execute().map {
-            ScanFilter.Builder()
-                .setDeviceAddress(it.address)
-                .build()
         }
     }
 
@@ -143,12 +129,4 @@ class BleScannerHelper(
 
     private enum class ScanResultInternal { SUCCESS, FAILURE, CANCELED }
 
-    companion object {
-        private val popularServicesUUID = setOf(
-            "0000fe8f-0000-1000-8000-00805f9b34fb",
-            "0000fe9f-0000-1000-8000-00805f9b34fb",
-            "0000feb8-0000-1000-8000-00805f9b34fb",
-            "0000fd5a-0000-1000-8000-00805f9b34fb",
-        )
-    }
 }
