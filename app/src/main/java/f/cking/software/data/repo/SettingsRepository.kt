@@ -2,6 +2,10 @@ package f.cking.software.data.repo
 
 import android.content.SharedPreferences
 import f.cking.software.TheAppConfig
+import f.cking.software.domain.model.RadarProfile
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class SettingsRepository(
     private val sharedPreferences: SharedPreferences,
@@ -51,8 +55,26 @@ class SettingsRepository(
         sharedPreferences.edit().putLong(KEY_GARBAGING_TIME, time).apply()
     }
 
-    fun getGarbagingTIme(): Long {
+    fun getGarbagingTime(): Long {
         return sharedPreferences.getLong(KEY_GARBAGING_TIME, TheAppConfig.DEVICE_GARBAGING_TIME)
+    }
+
+    fun setFollowingTurnedOn(value: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_IS_FOLLOWING_DETECTION_TURNED_ON, value).apply()
+    }
+
+    fun isFollowingTurnedOn(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IS_FOLLOWING_DETECTION_TURNED_ON, false)
+    }
+
+    fun getFollowingExcludingFilter(): RadarProfile.Filter? {
+        val str = sharedPreferences.getString(KEY_EXCLUDE_FOLLOWING, null)
+        return str?.let { Json.decodeFromString(it) }
+    }
+
+    fun setFollowingExcludingFilter(filter: RadarProfile.Filter?) {
+        val str = filter?.let { Json.encodeToString(it) }
+        sharedPreferences.edit().putString(KEY_EXCLUDE_FOLLOWING, str).apply()
     }
 
     companion object {
@@ -62,5 +84,7 @@ class SettingsRepository(
         private const val KEY_KNOWN_PERIOD = "key_known_period"
         private const val KEY_WANTED_PERIOD = "key_wanted_period"
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"
+        private const val KEY_EXCLUDE_FOLLOWING = "key_excluding_from_following_filter"
+        private const val KEY_IS_FOLLOWING_DETECTION_TURNED_ON = "key_is_following_detection_turned_on"
     }
 }

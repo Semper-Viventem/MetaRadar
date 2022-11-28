@@ -10,14 +10,15 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-fun Location.toDomain(): LocationModel {
+fun Location.toDomain(time: Long): LocationModel {
     return LocationModel(
         lat = this.latitude,
         lng = this.longitude,
+        time = time,
     )
 }
 
-fun LocationModel.toData(time: Long): LocationEntity {
+fun LocationModel.toData(): LocationEntity {
     return LocationEntity(
         time = time,
         lat = lat,
@@ -26,7 +27,7 @@ fun LocationModel.toData(time: Long): LocationEntity {
 }
 
 fun LocationEntity.toDomain(): LocationModel {
-    return LocationModel(lat, lng)
+    return LocationModel(lat, lng, time)
 }
 
 fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {

@@ -14,15 +14,15 @@ class LocationRepository(
 
     val locationDao = appDatabase.locationDao()
 
-    suspend fun saveLocation(location: LocationModel, time: Long, detectedAddresses: List<String>) {
+    suspend fun saveLocation(location: LocationModel, detectedAddresses: List<String>) {
         withContext(Dispatchers.IO) {
-            locationDao.saveLocation(location.toData(time))
-            val addresses = detectedAddresses.map { DeviceToLocationEntity(deviceAddress = it, locationTime = time) }
+            locationDao.saveLocation(location.toData())
+            val addresses = detectedAddresses.map { DeviceToLocationEntity(deviceAddress = it, locationTime = location.time) }
             locationDao.saveLocationToDevice(addresses)
         }
     }
 
-    suspend fun getAllAddressesForDevice(deviceAddress: String): List<LocationModel> {
+    suspend fun getAllLocationsByAddress(deviceAddress: String): List<LocationModel> {
         return withContext(Dispatchers.IO) {
             locationDao.getAllLocationsByDeviceAddress(deviceAddress).map { it.toDomain() }
         }
