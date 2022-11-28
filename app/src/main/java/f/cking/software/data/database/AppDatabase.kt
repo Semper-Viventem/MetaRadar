@@ -8,13 +8,20 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [DeviceEntity::class, RadarProfileEntity::class, AppleContactEntity::class],
+    entities = [
+        DeviceEntity::class,
+        RadarProfileEntity::class,
+        AppleContactEntity::class,
+        LocationEntity::class,
+        DeviceToLocationEntity::class
+    ],
     version = 7,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDao(): DeviceDao
     abstract fun radarProfileDao(): RadarProfileDao
     abstract fun appleContactDao(): AppleContactDao
+    abstract fun locationDao(): LocationDao
 
     companion object {
         fun build(context: Context, name: String): AppDatabase {

@@ -1,15 +1,33 @@
 package f.cking.software.domain
 
+import android.location.Location
 import f.cking.software.data.database.AppleContactEntity
 import f.cking.software.data.database.DeviceEntity
+import f.cking.software.data.database.LocationEntity
 import f.cking.software.data.database.RadarProfileEntity
-import f.cking.software.domain.model.AppleAirDrop
-import f.cking.software.domain.model.DeviceData
-import f.cking.software.domain.model.ManufacturerInfo
-import f.cking.software.domain.model.RadarProfile
+import f.cking.software.domain.model.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
+fun Location.toDomain(): LocationModel {
+    return LocationModel(
+        lat = this.latitude,
+        lng = this.longitude,
+    )
+}
+
+fun LocationModel.toData(time: Long): LocationEntity {
+    return LocationEntity(
+        time = time,
+        lat = lat,
+        lng = lng,
+    )
+}
+
+fun LocationEntity.toDomain(): LocationModel {
+    return LocationModel(lat, lng)
+}
 
 fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
     return DeviceData(
