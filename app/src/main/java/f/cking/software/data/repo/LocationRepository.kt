@@ -17,7 +17,7 @@ class LocationRepository(
     suspend fun saveLocation(location: LocationModel, time: Long, detectedAddresses: List<String>) {
         withContext(Dispatchers.IO) {
             locationDao.saveLocation(location.toData(time))
-            val addresses = detectedAddresses.map { DeviceToLocationEntity(it, time) }
+            val addresses = detectedAddresses.map { DeviceToLocationEntity(deviceAddress = it, locationTime = time) }
             locationDao.saveLocationToDevice(addresses)
         }
     }

@@ -1,6 +1,7 @@
 package f.cking.software.data.database
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -13,9 +14,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         RadarProfileEntity::class,
         AppleContactEntity::class,
         LocationEntity::class,
-        DeviceToLocationEntity::class
+        DeviceToLocationEntity::class,
     ],
-    version = 7,
+    autoMigrations = [
+        AutoMigration(from = 7, to = 8)
+    ],
+    exportSchema = true,
+    version = 8,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDao(): DeviceDao
