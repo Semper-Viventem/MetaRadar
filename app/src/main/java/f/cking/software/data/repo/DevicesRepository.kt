@@ -64,6 +64,12 @@ class DevicesRepository(
         }
     }
 
+    suspend fun getDeviceByAddress(address: String): DeviceData? {
+        return withContext(Dispatchers.IO) {
+            deviceDao.findByAddress(address)?.toDomainWithAirDrop()
+        }
+    }
+
     suspend fun getAirdropByKnownAddress(address: String): AppleAirDrop? {
         return withContext(Dispatchers.IO) {
             appleContactsDao.getByAddress(address)
@@ -122,18 +128,27 @@ class DevicesRepository(
         }
     }
 
+    private suspend fun DeviceEntity.toDomainWithAirDrop(): DeviceData {
+        return withContext(Dispatchers.IO) {
+            val contacts = appleContactsDao.getByAddress(address)
+            toDomain(AppleAirDrop(contacts.map { it.toDomain() }))
+        }
+    }
+
     private suspend fun List<DeviceEntity>.toDomainWithAirDrop(): List<DeviceData> {
-        val allRelatedContacts = appleContactsDao.getByAddresses(map { it.address })
-        return map { device ->
+        return withContext(Dispatchers.IO) {
+            val allRelatedContacts = appleContactsDao.getByAddresses(map { it.address })
+            map { device ->
 
-            val airdrop = allRelatedContacts.asSequence()
-                .filter { it.associatedAddress == device.address }
-                .map { it.toDomain() }
-                .toList()
-                .takeIf { it.isNotEmpty() }
-                ?.let { AppleAirDrop(it) }
+                val airdrop = allRelatedContacts.asSequence()
+                    .filter { it.associatedAddress == device.address }
+                    .map { it.toDomain() }
+                    .toList()
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { AppleAirDrop(it) }
 
-            device.toDomain(airdrop)
+                device.toDomain(airdrop)
+            }
         }
     }
 }

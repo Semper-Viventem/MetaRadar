@@ -1,6 +1,7 @@
 package f.cking.software.ui
 
 import f.cking.software.common.navigation.NavRouter
+import f.cking.software.ui.devicedetails.DeviceDetailsViewModel
 import f.cking.software.ui.devicelist.DeviceListViewModel
 import f.cking.software.ui.main.MainViewModel
 import f.cking.software.ui.profiledetails.ProfileDetailsViewModel
@@ -16,12 +17,13 @@ object UiModule {
     val module = module {
         single { NavRouter() }
         viewModel { MainViewModel(get(), get(), get()) }
-        viewModel { DeviceListViewModel(get()) }
+        viewModel { DeviceListViewModel(get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get()) }
         viewModel { ProfilesListViewModel(get(), get()) }
         viewModel { ProfileDetailsViewModel(get(), get(), get()) }
         viewModel { SelectFilterTypeViewModel(get()) }
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
+        viewModel { DeviceDetailsViewModel(get(), get()) }
     }
 }

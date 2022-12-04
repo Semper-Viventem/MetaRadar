@@ -6,6 +6,7 @@ import f.cking.software.common.rememberDateDialog
 import f.cking.software.common.rememberTimeDialog
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
+import f.cking.software.ui.devicedetails.DeviceDetailsScreen
 import f.cking.software.ui.main.MainScreen
 import f.cking.software.ui.profiledetails.ProfileDetailsScreen
 import f.cking.software.ui.selectdevice.SelectDeviceScreen
@@ -53,5 +54,9 @@ object ScreenNavigationCommands {
         onSelected: (localDate: LocalTime) -> Unit
     ) : DialogCommand(dialogProvider = {
         rememberTimeDialog(initialTime = initialTime, dateResult = onSelected, it)
+    })
+
+    class OpenDeviceDetailsScreen(val address: String) : AddToStackCommand(screenFunction = {
+        DeviceDetailsScreen.Screen(address = address)
     })
 }

@@ -5,12 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.ui.ScreenNavigationCommands
 import kotlinx.coroutines.launch
 
 class DeviceListViewModel(
     private val devicesRepository: DevicesRepository,
+    private val router: NavRouter,
 ) : ViewModel() {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
@@ -30,9 +33,7 @@ class DeviceListViewModel(
     }
 
     fun onDeviceClick(device: DeviceData) {
-        viewModelScope.launch {
-            devicesRepository.changeFavorite(device)
-        }
+        router.navigate(ScreenNavigationCommands.OpenDeviceDetailsScreen(device.address))
     }
 
     private fun observeDevices() {
