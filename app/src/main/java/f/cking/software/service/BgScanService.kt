@@ -11,6 +11,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
 import f.cking.software.data.helpers.BleScannerHelper
+import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
@@ -32,6 +33,7 @@ class BgScanService : Service() {
     private val permissionHelper: PermissionHelper by inject()
     private val bleScannerHelper: BleScannerHelper by inject()
     private val settingsRepository: SettingsRepository by inject()
+    private val locationProvider: LocationProvider by inject()
 
     private val saveScanBatchInteractor: SaveScanBatchInteractor by inject()
     private val analyseScanBatchInteractor: AnalyseScanBatchInteractor by inject()
@@ -62,6 +64,7 @@ class BgScanService : Service() {
         } else {
             Log.d(TAG, "Background service launched")
             startForeground(FOREGROUND_NOTIFICATION_ID, buildForegroundNotification(knownDeviceCount = null))
+            locationProvider.startLocationLeastening()
 
             permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _, _ ->
@@ -79,6 +82,7 @@ class BgScanService : Service() {
         Log.d(TAG, "Background service destroyed")
         isActive.tryEmit(false)
         bleScannerHelper.stopScanning()
+        locationProvider.stopLocationListening()
         handler.removeCallbacks(nextScanRunnable)
         notificationManager.cancel(FOREGROUND_NOTIFICATION_ID)
     }

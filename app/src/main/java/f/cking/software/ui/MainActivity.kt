@@ -1,5 +1,6 @@
 package f.cking.software.ui
 
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import f.cking.software.common.navigation.NavRouter
 import f.cking.software.common.navigation.Navigator
 import f.cking.software.data.helpers.PermissionHelper
 import org.koin.android.ext.android.inject
+import org.osmdroid.config.Configuration
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,12 +26,15 @@ class MainActivity : AppCompatActivity() {
 
     private val permissionHelper: PermissionHelper by inject()
     private val router: NavRouter by inject()
+    private val sharedPreferences: SharedPreferences by inject()
     private val viewModel: MainActivityViewModel by viewModels {
         viewModelFactory { initializer { MainActivityViewModel() } }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Configuration.getInstance().load(this, sharedPreferences)
+
         router.attachNavigator(viewModel.navigator)
 
         permissionHelper.setActivity(this)

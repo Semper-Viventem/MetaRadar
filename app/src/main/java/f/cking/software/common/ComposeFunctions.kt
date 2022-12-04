@@ -8,19 +8,28 @@ import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.toHexString
+import org.osmdroid.views.MapView
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -138,4 +147,59 @@ fun DeviceListItem(
             }
         }
     }
+}
+
+@Composable
+fun rememberMapViewWithLifecycle(): MapView {
+    val context = LocalContext.current
+    val mapView = remember {
+        MapView(context).apply {
+            id = R.id.layout_map
+            clipToOutline = true
+        }
+    }
+
+    // Makes MapView follow the lifecycle of this composable
+    val lifecycleObserver = rememberMapLifecycleObserver(mapView)
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        lifecycle.addObserver(lifecycleObserver)
+        onDispose {
+            lifecycle.removeObserver(lifecycleObserver)
+        }
+    }
+
+    return mapView
+}
+
+@Composable
+fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
+    remember(mapView) {
+        LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                else -> {}
+            }
+        }
+    }
+
+/**
+ * A composable Google Map.
+ * @author Arnau Mora
+ * @since 20211230
+ * @param modifier Modifiers to apply to the map.
+ * @param onLoad This will get called once the map has been loaded.
+ */
+@Composable
+fun MapView(
+    modifier: Modifier = Modifier,
+    onLoad: ((map: MapView) -> Unit)? = null
+) {
+    val mapViewState = rememberMapViewWithLifecycle()
+
+    AndroidView(
+        { mapViewState },
+        modifier
+    ) { mapView -> onLoad?.invoke(mapView) }
 }

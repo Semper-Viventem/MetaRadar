@@ -56,6 +56,12 @@ android {
     }
 }
 
+repositories {
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+}
+
 dependencies {
 
     // kotlin
@@ -97,6 +103,9 @@ dependencies {
 
     // di
     implementation(libs.dagger)
+
+    // Map
+    implementation(libs.map)
 
     // tests
     testImplementation(libs.junit)

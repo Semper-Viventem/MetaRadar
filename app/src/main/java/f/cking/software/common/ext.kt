@@ -1,5 +1,7 @@
 package f.cking.software
 
+import android.content.Context
+import android.util.TypedValue
 import java.security.MessageDigest
 import java.time.*
 import java.util.*
@@ -61,3 +63,5 @@ object SHA256 {
         return fromString(string).let { concatTwoBytes(it[0], it[1]) }
     }
 }
+
+fun Context.dpToPx(value: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()

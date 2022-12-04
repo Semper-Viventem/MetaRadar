@@ -18,7 +18,8 @@ class DataModule(
 ) {
     val module = module {
         single { BleScannerHelper(get(), get(), get()) }
-        single { SettingsRepository(get<Context>().getSharedPreferences(sharedPreferencesName, MODE_PRIVATE)) }
+        single { get<Context>().getSharedPreferences(sharedPreferencesName, MODE_PRIVATE) }
+        single { SettingsRepository(get()) }
         single { AppDatabase.build(get(), appDatabaseName) }
         single { DevicesRepository(get()) }
         single { PermissionHelper(get()) }

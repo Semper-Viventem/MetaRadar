@@ -6,6 +6,7 @@ import f.cking.software.data.repo.LocationRepository
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 class SaveScanBatchInteractor(
@@ -18,7 +19,7 @@ class SaveScanBatchInteractor(
     suspend fun execute(batch: List<BleScanDevice>) {
         withContext(Dispatchers.Default) {
             devicesRepository.saveScanBatch(batch.map { buildDeviceFromScanDataInteractor.execute(it) })
-            val location = locationProvider.lastKnownLocation()
+            val location = locationProvider.observeLocation().firstOrNull()
             val detectTime = batch.firstOrNull()?.scanTimeMs
             if (location != null && detectTime != null) {
                 locationRepository.saveLocation(location.toDomain(detectTime), batch.map { it.address })

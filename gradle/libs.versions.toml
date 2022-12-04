@@ -70,6 +70,8 @@ mockito = "4.0.0"
 roboelectric = "4.9"
 mockk = "1.13.2"
 
+map = "6.1.14"
+
 [libraries]
 # Gradle - Core
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "android-gradle" }
@@ -227,6 +229,8 @@ koin = { module = "io.insert-koin:koin-core", version.ref = "koin"}
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-android"}
 koin-android-compat = { module = "io.insert-koin:koin-android-compat", version.ref = "koin-android"}
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-android-compose"}
+
+map = { module = "org.osmdroid:osmdroid-android", version.ref = "map" }
 
 
 [plugins]

@@ -24,6 +24,6 @@ object UiModule {
         viewModel { SelectFilterTypeViewModel(get()) }
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
-        viewModel { DeviceDetailsViewModel(get(), get()) }
+        viewModel { DeviceDetailsViewModel(get(), get(), get()) }
     }
 }

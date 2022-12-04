@@ -1,7 +1,6 @@
 package f.cking.software.ui.devicedetails
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -14,10 +13,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.setPadding
 import f.cking.software.R
+import f.cking.software.common.MapView
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.dpToPx
 import f.cking.software.orNull
 import org.koin.androidx.compose.koinViewModel
+import org.osmdroid.util.BoundingBox
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
 
 object DeviceDetailsScreen {
 
@@ -26,6 +31,7 @@ object DeviceDetailsScreen {
         val viewModel: DeviceDetailsViewModel = koinViewModel()
         viewModel.loadDevice(address)
         val deviceData = viewModel.deviceState
+
         Scaffold(
             modifier = Modifier
                 .fillMaxWidth()
@@ -34,9 +40,7 @@ object DeviceDetailsScreen {
                 AppBar(viewModel = viewModel, deviceData.orNull())
             },
             content = {
-                Box(modifier = Modifier.padding(it)) {
-                    Content(viewModel, deviceData.orNull())
-                }
+                Content(modifier = Modifier.padding(it), viewModel = viewModel, deviceData = deviceData.orNull())
             }
         )
     }
@@ -69,42 +73,48 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun Content(viewModel: DeviceDetailsViewModel, deviceData: DeviceData?) {
+    private fun Content(modifier: Modifier, viewModel: DeviceDetailsViewModel, deviceData: DeviceData?) {
         if (deviceData != null) {
-            DeviceContent(viewModel = viewModel, deviceData = deviceData)
+            DeviceDetails(viewModel = viewModel, deviceData = deviceData)
         } else {
             Progress()
         }
     }
 
     @Composable
-    private fun Progress() {
+    private fun Progress(modifier: Modifier = Modifier) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center,
         ) {
-
             CircularProgressIndicator()
         }
     }
 
     @Composable
-    private fun DeviceContent(viewModel: DeviceDetailsViewModel, deviceData: DeviceData) {
-        LazyColumn(
+    private fun DeviceDetails(viewModel: DeviceDetailsViewModel, deviceData: DeviceData) {
+        Column(
             modifier = Modifier
+                .fillMaxHeight()
                 .fillMaxWidth()
-                .fillMaxHeight(),
-            content = {
-                item { Header(viewModel = viewModel, deviceData = deviceData) }
-            }
-        )
+        ) {
+            Map(modifier = Modifier.weight(1f), viewModel = viewModel)
+            DeviceContent(deviceData = deviceData)
+        }
     }
 
     @Composable
-    private fun Header(viewModel: DeviceDetailsViewModel, deviceData: DeviceData) {
-        Column(modifier = Modifier.padding(16.dp)) {
+    private fun DeviceContent(
+        modifier: Modifier = Modifier,
+        deviceData: DeviceData
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
             Text(text = deviceData.buildDisplayName(), fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -133,6 +143,28 @@ object DeviceDetailsScreen {
             Text(text = "Last detection", fontWeight = FontWeight.Light)
             Text(text = deviceData.lastDetectionPeriod() + " ago", fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    @Composable
+    private fun Map(modifier: Modifier = Modifier, viewModel: DeviceDetailsViewModel) {
+        val points = viewModel.points
+        MapView(
+            modifier = modifier
+                .fillMaxWidth()
+        ) { map ->
+            map.setMultiTouchControls(true)
+            map.setPadding(map.context.dpToPx(16f))
+            map.overlays.clear()
+            val geoPoints = points.map { GeoPoint(it.lat, it.lng) }
+            geoPoints.forEach {
+                val marker = Marker(map).apply {
+                    position = it
+                }
+                map.overlays.add(marker)
+            }
+            map.zoomToBoundingBox(BoundingBox.fromGeoPoints(geoPoints), false, 0, 18.0, 300L)
+            map.invalidate()
         }
     }
 }
