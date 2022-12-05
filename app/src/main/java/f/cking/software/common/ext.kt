@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.TypedValue
 import java.security.MessageDigest
 import java.time.*
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 fun getTimePeriodStr(timeMs: Long): String {
@@ -33,6 +34,10 @@ fun Long.toLocalDate() = Instant.ofEpochMilli(this).atZone(ZoneId.of("GMT")).toL
 fun Long.toLocalTime() = Instant.ofEpochMilli(this).atZone(ZoneId.of("GMT")).toLocalTime()
 fun timeFromDateTime(date: LocalDate, time: LocalTime): Long =
     LocalDateTime.of(date, time).atZone(ZoneId.of("GMT")).toInstant().toEpochMilli()
+
+fun Long.dateTimeStringFormat(format: String): String {
+    return LocalDateTime.of(toLocalDate(), toLocalTime()).format(DateTimeFormatter.ofPattern(format))
+}
 
 fun LocalTime.toMilliseconds() = (hour * 60L * 60L * 1000L) + (minute * 60L * 1000L)
 
@@ -64,4 +69,5 @@ object SHA256 {
     }
 }
 
-fun Context.dpToPx(value: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
+fun Context.dpToPx(value: Float): Int =
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()

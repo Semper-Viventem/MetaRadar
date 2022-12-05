@@ -13,11 +13,10 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.setPadding
 import f.cking.software.R
 import f.cking.software.common.MapView
+import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.DeviceData
-import f.cking.software.dpToPx
 import f.cking.software.orNull
 import org.koin.androidx.compose.koinViewModel
 import org.osmdroid.util.BoundingBox
@@ -154,16 +153,15 @@ object DeviceDetailsScreen {
                 .fillMaxWidth()
         ) { map ->
             map.setMultiTouchControls(true)
-            map.setPadding(map.context.dpToPx(16f))
             map.overlays.clear()
-            val geoPoints = points.map { GeoPoint(it.lat, it.lng) }
-            geoPoints.forEach {
-                val marker = Marker(map).apply {
-                    position = it
+            val markers = points.map { location ->
+                Marker(map).apply {
+                    position = GeoPoint(location.lat, location.lng)
+                    title = location.time.dateTimeStringFormat("dd.MM.yy HH:mm")
+                    map.overlays.add(this)
                 }
-                map.overlays.add(marker)
             }
-            map.zoomToBoundingBox(BoundingBox.fromGeoPoints(geoPoints), false, 0, 18.0, 300L)
+            map.zoomToBoundingBox(BoundingBox.fromGeoPoints(markers.map { it.position }), false, 0, 18.0, 300L)
             map.invalidate()
         }
     }
