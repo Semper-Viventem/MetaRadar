@@ -78,7 +78,7 @@ class LocationProvider(
     class GpsProviderIsNotEnabledException : IllegalStateException("GPS provider is not enabled")
 
     companion object {
-        private const val SMALLEST_DISPLACEMENT_METERS = 1f
+        private const val SMALLEST_DISPLACEMENT_METERS = 5f
         private const val INTERVAL_MS = 10_000L
     }
 }
