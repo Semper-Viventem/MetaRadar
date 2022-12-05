@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.ClearGarbageInteractor
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     private val clearGarbageInteractor: ClearGarbageInteractor,
+    private val locationRepository: LocationRepository,
     private val context: Application,
 ) : ViewModel() {
 
@@ -24,6 +26,15 @@ class SettingsViewModel(
             garbageRemovingInProgress = true
             val garbageCount = clearGarbageInteractor.execute()
             Toast.makeText(context, "Cleared $garbageCount garbage devices", Toast.LENGTH_SHORT).show()
+            garbageRemovingInProgress = false
+        }
+    }
+
+    fun onClearLocationsClick() {
+        viewModelScope.launch {
+            garbageRemovingInProgress = true
+            locationRepository.removeAllLocations()
+            Toast.makeText(context, "Location history was removed", Toast.LENGTH_SHORT).show()
             garbageRemovingInProgress = false
         }
     }

@@ -17,7 +17,8 @@ class LocationRepository(
     suspend fun saveLocation(location: LocationModel, detectedAddresses: List<String>) {
         withContext(Dispatchers.IO) {
             locationDao.saveLocation(location.toData())
-            val addresses = detectedAddresses.map { DeviceToLocationEntity(deviceAddress = it, locationTime = location.time) }
+            val addresses =
+                detectedAddresses.map { DeviceToLocationEntity(deviceAddress = it, locationTime = location.time) }
             locationDao.saveLocationToDevice(addresses)
         }
     }
@@ -25,6 +26,13 @@ class LocationRepository(
     suspend fun getAllLocationsByAddress(deviceAddress: String): List<LocationModel> {
         return withContext(Dispatchers.IO) {
             locationDao.getAllLocationsByDeviceAddress(deviceAddress).map { it.toDomain() }
+        }
+    }
+
+    suspend fun removeAllLocations() {
+        withContext(Dispatchers.IO) {
+            locationDao.removeAllLocations()
+            locationDao.removeAllDeviceToLocation()
         }
     }
 }

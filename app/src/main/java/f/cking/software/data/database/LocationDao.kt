@@ -17,4 +17,10 @@ interface LocationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveLocationToDevice(deviceToLocationEntity: List<DeviceToLocationEntity>)
 
+    @Query("DELETE FROM location")
+    fun removeAllLocations()
+
+    @Query("DELETE FROM device_to_location")
+    fun removeAllDeviceToLocation()
+
 }
