@@ -24,4 +24,6 @@
     <color name="filter_is_favorite">#FFCC80</color>
     <color name="filter_airdrop_contact">#CE93D8</color>
     <color name="filter_unknown">#E6EE9C</color>
+
+    <color name="green_600">#43A047</color>
 </resources>

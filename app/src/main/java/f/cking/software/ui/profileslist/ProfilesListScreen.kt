@@ -4,12 +4,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.R
 import f.cking.software.domain.model.RadarProfile
 import org.koin.androidx.compose.koinViewModel
 
@@ -54,14 +61,27 @@ object ProfilesListScreen {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = profile.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                profile.description?.let {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = it)
-                }
+                Text(text = profile.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
                 Spacer(modifier = Modifier.height(4.dp))
                 val activeText = if (profile.isActive) "Is active" else "Is NOT active"
-                Text(text = activeText, fontWeight = FontWeight.Light)
+                val color = if (profile.isActive) colorResource(id = R.color.green_600) else Color.DarkGray
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        modifier = Modifier.size(12.dp),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_circle),
+                        tint = color,
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = activeText, fontWeight = FontWeight.Bold, color = color)
+                }
+
+                val description = profile.description
+                if (!description.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = description)
+                }
             }
         }
     }
