@@ -13,8 +13,8 @@ A tool for analyzing the BLE environments. Scans the BLE ether in background, no
 * ✅ Send notification when search profile was detected near you;
 * ✅ Decode and save Apple Airdrop data from nearest devices;
 * ✅ Support Airdrop contacts data filter for the search profile;
-* Associate a device with a location;
-* Store device movement history based on location;
+* ✅ Associate a device with a location;
+* ✅ Store device movement history based on location;
 * Send a notification if an unknown device (devices group) is moving with you for a long time.
 * Associate devices with each other if they are often detected and lost together;
 * Make some statistic based on analysed ether.
