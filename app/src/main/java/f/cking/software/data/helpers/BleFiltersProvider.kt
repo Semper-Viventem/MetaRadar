@@ -1,8 +1,6 @@
 package f.cking.software.data.helpers
 
 import android.bluetooth.le.ScanFilter
-import android.bluetooth.le.ScanRecord
-import android.os.Build
 import android.os.ParcelUuid
 import f.cking.software.domain.interactor.GetKnownDevicesInteractor
 import f.cking.software.domain.model.ManufacturerInfo
@@ -18,21 +16,6 @@ class BleFiltersProvider(
             ScanFilter.Builder()
                 .setServiceUuid(ParcelUuid.fromString(uuid))
                 .build()
-        }
-    }
-
-    fun getAdvertisingTypeFilter(): List<ScanFilter> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            listOf(
-                ScanFilter.Builder()
-                    .setAdvertisingDataType(ScanRecord.DATA_TYPE_ADVERTISING_INTERVAL)
-                    .build(),
-                ScanFilter.Builder()
-                    .setAdvertisingDataType(ScanRecord.DATA_TYPE_ADVERTISING_INTERVAL_LONG)
-                    .build()
-            )
-        } else {
-            emptyList()
         }
     }
 

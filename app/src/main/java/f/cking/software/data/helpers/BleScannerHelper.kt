@@ -74,14 +74,13 @@ class BleScannerHelper(
         } else {
             this@BleScannerHelper.scanListener = scanListener
             batch.clear()
-            handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, scanDurationMs)
+
             inProgress.tryEmit(true)
             currentScanTimeMs = System.currentTimeMillis()
 
             val scanFilters = if (scanRestricted) {
                 bleFiltersProvider.getBGFilters() +
                         bleFiltersProvider.getPopularServiceUUIDS() +
-                        bleFiltersProvider.getAdvertisingTypeFilter() +
                         bleFiltersProvider.getManufacturerFilter()
             } else {
                 listOf(ScanFilter.Builder().build())
@@ -93,6 +92,7 @@ class BleScannerHelper(
 
             withContext(Dispatchers.IO) {
                 bluetoothScanner.startScan(scanFilters, scanSettings, callback)
+                handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, scanDurationMs)
             }
         }
     }
