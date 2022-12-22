@@ -165,7 +165,42 @@ object ProfileDetailsScreen {
                 filterState,
                 onDeleteClick
             )
-            else -> FilterUnknown(filterState, onDeleteClick)
+            is UiFilterState.IsFollowing -> FilterIsFollowing(filterState, viewModel, onDeleteClick)
+            is UiFilterState.Unknown, is UiFilterState.Interval -> FilterUnknown(filterState, onDeleteClick)
+        }
+    }
+
+    @Composable
+    private fun FilterIsFollowing(
+        filter: UiFilterState.IsFollowing,
+        viewModel: ProfileDetailsViewModel,
+        onDeleteClick: (child: UiFilterState) -> Unit,
+    ) {
+        FilterBase(
+            title = "Is following me",
+            color = colorResource(R.color.filter_is_following),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            val followingDuration = OpenTimePickerDialog(filter.followingDurationMs) { time ->
+                filter.followingDurationMs = time
+            }
+
+            val followingInterval = OpenTimePickerDialog(filter.followingDetectionIntervalMs) { time ->
+                filter.followingDetectionIntervalMs = time
+            }
+
+            val followingDurationText = filter.followingDurationMs.format(DateTimeFormatter.ofPattern("HH:mm"))
+            val followingIntervalText = filter.followingDetectionIntervalMs.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+            Column {
+                ClickableField(text = followingDurationText, placeholder = "Min following duration") {
+                    viewModel.router.navigate(followingDuration)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                ClickableField(text = followingIntervalText, placeholder = "Min interval to detect") {
+                    viewModel.router.navigate(followingInterval)
+                }
+            }
         }
     }
 
@@ -577,6 +612,7 @@ object ProfileDetailsScreen {
             FilterType.BY_LOGIC_NOT -> UiFilterState.Not()
             FilterType.BY_MIN_DETECTION_TIME -> UiFilterState.MinLostTime()
             FilterType.AIRDROP_CONTACT -> UiFilterState.AppleAirdropContact()
+            FilterType.IS_FOLLOWING -> UiFilterState.IsFollowing()
         }
     }
 }

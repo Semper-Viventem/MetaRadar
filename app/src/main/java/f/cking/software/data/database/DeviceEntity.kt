@@ -15,4 +15,5 @@ data class DeviceEntity(
     @ColumnInfo(name = "favorite") val favorite: Boolean = false,
     @ColumnInfo(name = "manufacturer_id") val manufacturerId: Int? = null,
     @ColumnInfo(name = "manufacturer_name") val manufacturerName: String? = null,
+    @ColumnInfo(name = "last_following_detection_ms") val lastFollowingDetectionMs: Long? = null,
 )

@@ -42,6 +42,7 @@ fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
         manufacturerInfo = manufacturerId?.let { id ->
             manufacturerName?.let { name -> ManufacturerInfo(id, name, appleAirDrop) }
         },
+        lastFollowingDetectionTimeMs = lastFollowingDetectionMs,
     )
 }
 
@@ -55,7 +56,8 @@ fun DeviceData.toData(): DeviceEntity {
         customName = customName,
         favorite = favorite,
         manufacturerId = manufacturerInfo?.id,
-        manufacturerName = manufacturerInfo?.name
+        manufacturerName = manufacturerInfo?.name,
+        lastFollowingDetectionMs = lastFollowingDetectionTimeMs,
     )
 }
 

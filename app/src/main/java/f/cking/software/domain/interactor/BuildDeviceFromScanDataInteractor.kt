@@ -22,6 +22,7 @@ class BuildDeviceFromScanDataInteractor(
                     scanData.scanTimeMs
                 )
             },
+            lastFollowingDetectionTimeMs = null,
         )
     }
 }

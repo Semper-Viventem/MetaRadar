@@ -9,6 +9,7 @@ enum class FilterType(val typeName: String) {
     BY_MANUFACTURER("By manufacturer"),
     BY_MIN_DETECTION_TIME("By min lost period"),
     AIRDROP_CONTACT("Apple airdrop contact"),
+    IS_FOLLOWING("Device is following me"),
     BY_LOGIC_ANY("Logic OR filter"),
     BY_LOGIC_ALL("Logic AND filter"),
     BY_LOGIC_NOT("Logic NOT filter"),

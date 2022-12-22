@@ -1,16 +1,28 @@
 package f.cking.software.domain.interactor
 
 import f.cking.software.data.repo.LocationRepository
+import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 
-class CheckDeviceIsFollowing(
+class CheckDeviceIsFollowingInteractor(
     private val locationRepository: LocationRepository,
 ) {
 
-    suspend fun execute(deviceAddress: String): Boolean {
+    suspend fun execute(
+        deviceData: DeviceData,
+        minFollowingDuration: Long,
+        followingDetectionInterval: Long,
+    ): Boolean {
         val currentTime = System.currentTimeMillis()
-        val lastLocations = locationRepository.getAllLocationsByAddress(deviceAddress)
-            .filter { currentTime - it.time <= FOLLOWING_DETECTION_TIME_MS }
+
+        if (deviceData.lastFollowingDetectionTimeMs != null
+            && currentTime - deviceData.lastFollowingDetectionTimeMs < followingDetectionInterval
+        ) {
+            return false
+        }
+
+        val lastLocations = locationRepository.getAllLocationsByAddress(deviceData.address)
+            .filter { currentTime - it.time <= minFollowingDuration }
 
         if (lastLocations.isEmpty()) return false
 
@@ -32,7 +44,6 @@ class CheckDeviceIsFollowing(
     }
 
     companion object {
-        private const val FOLLOWING_DETECTION_TIME_MS = 15L * 60L * 1000L // 15 min
         private const val MIN_DISTANCE_BY_ALL_SEGMENTS_M = 300
         private const val MIN_DISTANCE_BETWEEN_FIRST_AND_LAST = 300
     }

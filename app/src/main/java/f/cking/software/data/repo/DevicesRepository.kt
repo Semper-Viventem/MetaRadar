@@ -51,6 +51,14 @@ class DevicesRepository(
         }
     }
 
+    suspend fun saveFollowingDetection(device: DeviceData, detectionTime: Long) {
+        withContext(Dispatchers.IO) {
+            val new = device.copy(lastFollowingDetectionTimeMs = detectionTime)
+            deviceDao.insert(new.toData())
+            notifyListeners()
+        }
+    }
+
     suspend fun deleteAllByAddress(addresses: List<String>) {
         withContext(Dispatchers.IO) {
             deviceDao.deleteAllByAddress(addresses)

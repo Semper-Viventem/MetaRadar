@@ -15,63 +15,33 @@ class RadarProfile(
     @Serializable
     sealed class Filter {
 
-        abstract fun check(device: DeviceData): Boolean
-
         @Serializable
         @SerialName("last_detection_interval")
-        data class LastDetectionInterval(val from: Long, val to: Long) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return device.lastDetectTimeMs in from..to
-            }
-        }
+        data class LastDetectionInterval(val from: Long, val to: Long) : Filter()
 
         @Serializable
         @SerialName("first_detection_interval")
-        data class FirstDetectionInterval(val from: Long, val to: Long) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return device.firstDetectTimeMs in from..to
-            }
-        }
+        data class FirstDetectionInterval(val from: Long, val to: Long) : Filter()
 
         @Serializable
         @SerialName("name")
-        data class Name(val name: String, val ignoreCase: Boolean) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return device.name != null && device.name.contains(name, ignoreCase = ignoreCase)
-            }
-        }
+        data class Name(val name: String, val ignoreCase: Boolean) : Filter()
 
         @Serializable
         @SerialName("address")
-        data class Address(val address: String) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return device.address == address
-            }
-        }
+        data class Address(val address: String) : Filter()
 
         @Serializable
         @SerialName("manufacturer")
-        data class Manufacturer(val manufacturerId: Int) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return device.manufacturerInfo?.id?.let { it == manufacturerId } ?: false
-            }
-        }
+        data class Manufacturer(val manufacturerId: Int) : Filter()
 
         @Serializable
         @SerialName("is_favorite")
-        data class IsFavorite(val favorite: Boolean) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return device.favorite == favorite
-            }
-        }
+        data class IsFavorite(val favorite: Boolean) : Filter()
 
         @Serializable
         @SerialName("min_lost_time")
-        data class MinLostTime(val minLostTime: Long) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return System.currentTimeMillis() - device.lastDetectTimeMs >= minLostTime
-            }
-        }
+        data class MinLostTime(val minLostTime: Long) : Filter()
 
         @Serializable
         @SerialName("airdrop_contact")
@@ -79,44 +49,25 @@ class RadarProfile(
             val contactStr: String,
             val airdropShaFormat: Int,
             val minLostTime: Long? = null,
-        ) : Filter() {
+        ) : Filter()
 
-            override fun check(device: DeviceData): Boolean {
-                return device.manufacturerInfo?.airdrop?.contacts?.any { contact ->
-                    contact.sha256 == airdropShaFormat && checkMinLostTime(contact)
-                } == true
-            }
-
-            private fun checkMinLostTime(contact: AppleAirDrop.AppleContact): Boolean {
-                val currentTime = System.currentTimeMillis()
-                return minLostTime == null
-                        || (contact.firstDetectionTimeMs == contact.lastDetectionTimeMs)
-                        || (currentTime - contact.lastDetectionTimeMs >= minLostTime)
-            }
-        }
+        @Serializable
+        @SerialName("is_following")
+        data class IsFollowing(
+            val followingDurationMs: Long,
+            val followingDetectionIntervalMs: Long,
+        ) : Filter()
 
         @Serializable
         @SerialName("any")
-        data class Any(val filters: List<Filter>) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return filters.any { it.check(device) }
-            }
-        }
+        data class Any(val filters: List<Filter>) : Filter()
 
         @Serializable
         @SerialName("all")
-        data class All(val filters: List<Filter>) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return filters.all { it.check(device) }
-            }
-        }
+        data class All(val filters: List<Filter>) : Filter()
 
         @Serializable
         @SerialName("not")
-        data class Not(val filter: Filter) : Filter() {
-            override fun check(device: DeviceData): Boolean {
-                return !filter.check(device)
-            }
-        }
+        data class Not(val filter: Filter) : Filter()
     }
 }

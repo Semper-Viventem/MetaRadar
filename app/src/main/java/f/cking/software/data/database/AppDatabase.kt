@@ -20,7 +20,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         AutoMigration(from = 7, to = 8)
     ],
     exportSchema = true,
-    version = 8,
+    version = 9,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDao(): DeviceDao
@@ -37,6 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_4_5,
                     MIGRATION_5_6,
                     MIGRATION_6_7,
+                    MIGRATION_8_9,
                 )
                 .build()
         }
@@ -91,6 +92,10 @@ abstract class AppDatabase : RoomDatabase() {
                         "`last_detect_time_ms` INTEGER NOT NULL, " +
                         "PRIMARY KEY(`sha_256`));"
             )
+        }
+
+        private val MIGRATION_8_9 = migration(8, 9) {
+            it.execSQL("ALTER TABLE device ADD COLUMN last_following_detection_ms INTEGER DEFAULT NULL;")
         }
 
         private fun migration(

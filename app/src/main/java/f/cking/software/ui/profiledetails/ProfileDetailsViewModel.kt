@@ -145,6 +145,10 @@ class ProfileDetailsViewModel(
                 airdropShaFormat = SHA256.fromStringAirdrop(from.contactString),
                 minLostTime = from.minLostTime.orNull()?.toMilliseconds()
             )
+            is UiFilterState.IsFollowing -> RadarProfile.Filter.IsFollowing(
+                followingDurationMs = from.followingDurationMs.toMilliseconds(),
+                followingDetectionIntervalMs = from.followingDetectionIntervalMs.toMilliseconds(),
+            )
             is UiFilterState.Unknown, is UiFilterState.Interval -> throw IllegalArgumentException("Unsupported type: ${from::class.java}")
         }
     }
@@ -209,6 +213,10 @@ class ProfileDetailsViewModel(
             is RadarProfile.Filter.AppleAirdropContact -> UiFilterState.AppleAirdropContact().apply {
                 this.contactString = from.contactStr
                 this.minLostTime = Optional.ofNullable(from.minLostTime?.toLocalTime())
+            }
+            is RadarProfile.Filter.IsFollowing -> UiFilterState.IsFollowing().apply {
+                this.followingDurationMs = from.followingDurationMs.toLocalTime()
+                this.followingDetectionIntervalMs = from.followingDetectionIntervalMs.toLocalTime()
             }
         }
     }
@@ -315,6 +323,15 @@ class ProfileDetailsViewModel(
 
             override fun isCorrect(): Boolean {
                 return contactString.isNotBlank()
+            }
+        }
+
+        class IsFollowing() : UiFilterState() {
+            var followingDurationMs: LocalTime by mutableStateOf(TheAppConfig.MIN_FOLLOWING_DURATION_TIME_MS.toLocalTime())
+            var followingDetectionIntervalMs: LocalTime by mutableStateOf(TheAppConfig.MIN_FOLLOWING_INTERVAL_TIME_MS.toLocalTime())
+
+            override fun isCorrect(): Boolean {
+                return true
             }
         }
 

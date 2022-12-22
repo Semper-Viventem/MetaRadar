@@ -2,6 +2,7 @@ package f.cking.software.domain.interactor
 
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.RadarProfilesRepository
+import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -10,6 +11,7 @@ class CheckProfileDetectionInteractor(
     private val devicesRepository: DevicesRepository,
     private val radarProfilesRepository: RadarProfilesRepository,
     private val buildDeviceFromScanDataInteractor: BuildDeviceFromScanDataInteractor,
+    private val filterChecker: FilterCheckerImpl,
 ) {
 
     suspend fun execute(batch: List<BleScanDevice>): List<ProfileResult> {
@@ -39,9 +41,9 @@ class CheckProfileDetectionInteractor(
         return found.copy(airdrop = AppleAirDrop(mergedContacts))
     }
 
-    private fun checkProfile(profile: RadarProfile, devices: List<DeviceData>): ProfileResult? {
+    private suspend fun checkProfile(profile: RadarProfile, devices: List<DeviceData>): ProfileResult? {
         return profile.takeIf { it.isActive }
-            ?.let { devices.filter { profile.detectFilter?.check(it) == true } }
+            ?.let { devices.filter { device -> profile.detectFilter?.let { filterChecker.check(device, it) } == true } }
             ?.takeIf { matched -> matched.isNotEmpty() }
             ?.let { matched -> ProfileResult(profile, matched) }
     }
