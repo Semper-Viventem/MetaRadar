@@ -151,7 +151,6 @@ class DevicesRepository(
             }
 
             map { device ->
-
                 val airdrop = allRelatedContacts.asSequence()
                     .filter { it.associatedAddress == device.address }
                     .map { it.toDomain() }

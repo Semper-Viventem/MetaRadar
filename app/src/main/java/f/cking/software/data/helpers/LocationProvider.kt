@@ -17,26 +17,27 @@ class LocationProvider(
 
     private val TAG = "LocationProvider"
 
-    private val locationState = MutableStateFlow<Location?>(null)
+    private val locationState = MutableStateFlow<LocationHandle?>(null)
 
     private val locationManager: LocationManager? =
         context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
     private val locationListener = LocationListenerCompat {
         Log.d(TAG, "New location: lat=${it.latitude}, lng=${it.longitude}")
-        locationState.tryEmit(it)
+        locationState.tryEmit(LocationHandle(it, System.currentTimeMillis()))
     }
 
     fun isLocationAvailable(): Boolean {
         return locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) ?: false
     }
 
-    fun observeLocation(): Flow<Location?> {
+    fun observeLocation(): Flow<LocationHandle?> {
         return locationState
     }
 
     @SuppressLint("MissingPermission")
-    fun lastKnownLocation(): Location? {
+    fun lastKnownLocation(): LocationHandle? {
         return locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            ?.let { LocationHandle(it, System.currentTimeMillis()) }
     }
 
     @SuppressLint("MissingPermission")
@@ -71,6 +72,10 @@ class LocationProvider(
         locationManager?.removeUpdates(locationListener)
     }
 
+    data class LocationHandle(
+        val location: Location,
+        val emitTime: Long,
+    )
 
     class LocationManagerIsNotAvailableException :
         IllegalStateException("Location manager is not available for this device")
