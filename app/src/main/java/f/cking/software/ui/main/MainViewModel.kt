@@ -13,6 +13,7 @@ import f.cking.software.data.helpers.BleScannerHelper
 import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.service.BgScanService
 import f.cking.software.ui.devicelist.DeviceListScreen
+import f.cking.software.ui.journal.JournalScreen
 import f.cking.software.ui.profileslist.ProfilesListScreen
 import f.cking.software.ui.settings.SettingsScreen
 import kotlinx.coroutines.launch
@@ -32,19 +33,25 @@ class MainViewModel(
                 iconRes = R.drawable.ic_home_outline,
                 selectedIconRes = R.drawable.ic_home,
                 text = "Device list",
-                selected = true
+                selected = true,
             ) { DeviceListScreen.Screen() },
             Tab(
                 iconRes = R.drawable.ic_search_outline,
                 selectedIconRes = R.drawable.ic_search,
                 text = "Radar profiles",
-                selected = false
+                selected = false,
             ) { ProfilesListScreen.Screen() },
+            Tab(
+                iconRes = R.drawable.ic_journal_outline,
+                selectedIconRes = R.drawable.ic_journal,
+                text = "Journal",
+                selected = false,
+            ) { JournalScreen.Screen() },
             Tab(
                 iconRes = R.drawable.ic_settings_outline,
                 selectedIconRes = R.drawable.ic_settings,
                 text = "Settings",
-                selected = false
+                selected = false,
             ) { SettingsScreen.Screen() },
         )
     )

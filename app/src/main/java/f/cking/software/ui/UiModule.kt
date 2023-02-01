@@ -3,6 +3,7 @@ package f.cking.software.ui
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.ui.devicedetails.DeviceDetailsViewModel
 import f.cking.software.ui.devicelist.DeviceListViewModel
+import f.cking.software.ui.journal.JournalViewModel
 import f.cking.software.ui.main.MainViewModel
 import f.cking.software.ui.profiledetails.ProfileDetailsViewModel
 import f.cking.software.ui.profileslist.ProfilesListViewModel
@@ -25,5 +26,6 @@ object UiModule {
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
         viewModel { DeviceDetailsViewModel(get(), get(), get()) }
+        viewModel { JournalViewModel(get(), get(), get(), get()) }
     }
 }
