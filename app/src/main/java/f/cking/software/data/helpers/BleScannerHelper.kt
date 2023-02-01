@@ -57,7 +57,7 @@ class BleScannerHelper(
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
             Log.e(TAG, "BLE Scan failed with error: $errorCode")
-            cancelScanning(ScanResultInternal.FAILURE)
+            cancelScanning(ScanResultInternal.Failure(errorCode))
         }
     }
 
@@ -92,13 +92,13 @@ class BleScannerHelper(
 
             withContext(Dispatchers.IO) {
                 bluetoothScanner.startScan(scanFilters, scanSettings, callback)
-                handler.postDelayed({ cancelScanning(ScanResultInternal.SUCCESS) }, scanDurationMs)
+                handler.postDelayed({ cancelScanning(ScanResultInternal.Success) }, scanDurationMs)
             }
         }
     }
 
     fun stopScanning() {
-        cancelScanning(ScanResultInternal.CANCELED)
+        cancelScanning(ScanResultInternal.Canceled)
     }
 
     @SuppressLint("MissingPermission")
@@ -108,14 +108,14 @@ class BleScannerHelper(
 
 
         when (scanResult) {
-            ScanResultInternal.SUCCESS -> {
+            is ScanResultInternal.Success -> {
                 Log.d(TAG, "BLE Scan finished ${batch.count()} devices found")
                 scanListener?.onSuccess(batch.values.toList())
             }
-            ScanResultInternal.FAILURE -> {
-                scanListener?.onFailure()
+            is ScanResultInternal.Failure -> {
+                scanListener?.onFailure(BLEScanFailure(scanResult.errorCode))
             }
-            ScanResultInternal.CANCELED -> {
+            is ScanResultInternal.Canceled -> {
                 // do nothing
             }
         }
@@ -124,9 +124,18 @@ class BleScannerHelper(
 
     interface ScanListener {
         fun onSuccess(batch: List<BleScanDevice>)
-        fun onFailure()
+        fun onFailure(exception: Exception)
     }
 
-    private enum class ScanResultInternal { SUCCESS, FAILURE, CANCELED }
+    private sealed interface ScanResultInternal {
+
+        object Success : ScanResultInternal
+
+        data class Failure(val errorCode: Int) : ScanResultInternal
+
+        object Canceled : ScanResultInternal
+    }
+
+    class BLEScanFailure(errorCode: Int): RuntimeException("BLE Scan failed with error code: $errorCode")
 
 }

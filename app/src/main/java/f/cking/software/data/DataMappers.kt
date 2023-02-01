@@ -1,10 +1,7 @@
 package f.cking.software.domain
 
 import android.location.Location
-import f.cking.software.data.database.AppleContactEntity
-import f.cking.software.data.database.DeviceEntity
-import f.cking.software.data.database.LocationEntity
-import f.cking.software.data.database.RadarProfileEntity
+import f.cking.software.data.database.*
 import f.cking.software.domain.model.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -95,5 +92,21 @@ fun AppleContactEntity.toDomain(): AppleAirDrop.AppleContact {
         sha256,
         lastDetectionTimeMs = lastDetectTimeMs,
         firstDetectionTimeMs = firstDetectTimeMs
+    )
+}
+
+fun JournalEntryEntity.toDomain(): JournalEntry {
+    return JournalEntry(
+        id = id,
+        timestamp = timestamp,
+        report = Json.decodeFromString(report),
+    )
+}
+
+fun JournalEntry.toData(): JournalEntryEntity {
+    return JournalEntryEntity(
+        id = id,
+        timestamp = timestamp,
+        report = Json.encodeToString(report),
     )
 }

@@ -3,6 +3,7 @@ package f.cking.software.domain.model
 import android.location.Location
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class LocationModel(
     val lat: Double,
     val lng: Double,

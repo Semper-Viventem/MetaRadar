@@ -16,12 +16,13 @@ import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
 import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
+import f.cking.software.domain.interactor.SaveReportInteractor
 import f.cking.software.domain.interactor.SaveScanBatchInteractor
 import f.cking.software.domain.model.BleScanDevice
+import f.cking.software.domain.model.JournalEntry
 import f.cking.software.ui.MainActivity
-import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import kotlin.random.Random
 
@@ -37,6 +38,7 @@ class BgScanService : Service() {
 
     private val saveScanBatchInteractor: SaveScanBatchInteractor by inject()
     private val analyseScanBatchInteractor: AnalyseScanBatchInteractor by inject()
+    private val saveReportInteractor: SaveReportInteractor by inject()
 
     private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
     private val powerManager by lazy { getSystemService(PowerManager::class.java) }
@@ -46,6 +48,26 @@ class BgScanService : Service() {
     private val nextScanRunnable = Runnable {
         scan()
     }
+
+    private val bleListener = object : BleScannerHelper.ScanListener {
+        override fun onFailure(exception: Exception) {
+            failureScanCounter++
+
+            reportError(exception)
+            if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
+                reportError(RuntimeException("Stop service after $MAX_FAILURE_SCANS_TO_CLOSE exceptions"))
+                stopSelf()
+            } else {
+                scheduleNextScan()
+            }
+        }
+
+        override fun onSuccess(batch: List<BleScanDevice>) {
+            handleScanResult(batch)
+        }
+    }
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun onCreate() {
         super.onCreate()
@@ -68,6 +90,7 @@ class BgScanService : Service() {
 
             permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _, _ ->
+                    reportError(IllegalStateException("BLE Service is started but permissins are not granted"))
                     stopSelf()
                 },
                 onPermissionGranted = ::scan
@@ -80,6 +103,7 @@ class BgScanService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "Background service destroyed")
+        scope.cancel()
         isActive.tryEmit(false)
         bleScannerHelper.stopScanning()
         locationProvider.stopLocationListening()
@@ -92,37 +116,36 @@ class BgScanService : Service() {
     }
 
     private fun scan() {
-        runBlocking {
+        scope.launch {
             bleScannerHelper.scan(
                 scanRestricted = isNonInteractiveMode(),
                 scanDurationMs = settingsRepository.getScanDuration(),
-                scanListener = object : BleScannerHelper.ScanListener {
-
-                    override fun onFailure() {
-                        failureScanCounter++
-
-                        if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-                            stopSelf()
-                        } else {
-                            scheduleNextScan()
-                        }
-                    }
-
-                    override fun onSuccess(batch: List<BleScanDevice>) {
-                        handleScanResult(batch)
-                    }
-                }
+                scanListener = bleListener,
             )
         }
     }
 
     private fun handleScanResult(batch: List<BleScanDevice>) {
-        failureScanCounter = 0
-        runBlocking {
-            val analyseResult = analyseScanBatchInteractor.execute(batch)
-            saveScanBatchInteractor.execute(batch)
-            handleAnalysResult(analyseResult)
-            scheduleNextScan()
+        scope.launch {
+            try {
+                val analyseResult = analyseScanBatchInteractor.execute(batch)
+                withContext(Dispatchers.Default) {
+                    saveScanBatchInteractor.execute(batch)
+                }
+                withContext(Dispatchers.Main) {
+                    handleAnalysResult(analyseResult)
+                }
+                scheduleNextScan()
+                failureScanCounter = 0
+            } catch (exception: Throwable) {
+                reportError(exception)
+
+                failureScanCounter++
+                if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
+                    reportError(RuntimeException("Stop service after $MAX_FAILURE_SCANS_TO_CLOSE exceptions"))
+                    stopSelf()
+                }
+            }
         }
     }
 
@@ -264,13 +287,24 @@ class BgScanService : Service() {
         notificationManager.createNotificationChannel(channel)
     }
 
+    private fun reportError(error: Throwable) {
+        Log.e(TAG, error.message.orEmpty() ,error)
+        scope.launch {
+            val report = JournalEntry.Report.Error(
+                title = "[BLE Service Error]: ${error.message ?: error::class.java}",
+                stackTrace = error.stackTraceToString(),
+            )
+            saveReportInteractor.execute(report)
+        }
+    }
+
     companion object {
         private const val NOTIFICATION_CHANNEL = "background_scan"
         private const val DEVICE_FOUND_CHANNEL = "wanted_device_found"
         private const val DEVICE_FOUND_GROUP = "devices_found_group"
 
         private const val FOREGROUND_NOTIFICATION_ID = 42
-        private const val MAX_FAILURE_SCANS_TO_CLOSE = 5
+        private const val MAX_FAILURE_SCANS_TO_CLOSE = 10
 
         private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
         private const val ACTION_SCAN_NOW = "ble_scan_now"

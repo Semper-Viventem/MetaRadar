@@ -14,10 +14,11 @@ object InteractorsModule {
         factory { SaveScanBatchInteractor(get(), get(), get(), get()) }
         factory { GetBleRecordFramesFromRawInteractor() }
         factory { GetManufacturerInfoFromRawBleInteractor(get(), get()) }
-        factory { CheckProfileDetectionInteractor(get(), get(), get(), get()) }
+        factory { CheckProfileDetectionInteractor(get(), get(), get(), get(), get(), get()) }
         factory { BuildDeviceFromScanDataInteractor(get()) }
         factory { GetAirdropInfoFromBleFrame() }
         factory { FilterCheckerImpl(get(), get()) }
         factory { CheckDeviceIsFollowingInteractor(get()) }
+        factory { SaveReportInteractor(get()) }
     }
 }

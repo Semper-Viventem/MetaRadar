@@ -15,18 +15,22 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         AppleContactEntity::class,
         LocationEntity::class,
         DeviceToLocationEntity::class,
+        JournalEntryEntity::class,
     ],
     autoMigrations = [
-        AutoMigration(from = 7, to = 8)
+        AutoMigration(from = 7, to = 8),
+        AutoMigration(from = 9, to = 10),
     ],
     exportSchema = true,
-    version = 9,
+    version = 10,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDao(): DeviceDao
     abstract fun radarProfileDao(): RadarProfileDao
     abstract fun appleContactDao(): AppleContactDao
     abstract fun locationDao(): LocationDao
+
+    abstract fun journalDao(): JournalDao
 
     companion object {
         fun build(context: Context, name: String): AppDatabase {

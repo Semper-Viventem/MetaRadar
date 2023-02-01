@@ -1,9 +1,11 @@
 package f.cking.software.domain.interactor
 
+import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.*
+import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -12,6 +14,8 @@ class CheckProfileDetectionInteractor(
     private val radarProfilesRepository: RadarProfilesRepository,
     private val buildDeviceFromScanDataInteractor: BuildDeviceFromScanDataInteractor,
     private val filterChecker: FilterCheckerImpl,
+    private val saveReportInteractor: SaveReportInteractor,
+    private val locationProvider: LocationProvider,
 ) {
 
     suspend fun execute(batch: List<BleScanDevice>): List<ProfileResult> {
@@ -25,9 +29,13 @@ class CheckProfileDetectionInteractor(
             }
             val allProfiles = radarProfilesRepository.getAllProfiles()
 
-            allProfiles.mapNotNull { profile ->
+            val result = allProfiles.mapNotNull { profile ->
                 checkProfile(profile, devices)
             }
+
+            result.forEach { saveReport(it) }
+
+            result
         }
     }
 
@@ -46,6 +54,18 @@ class CheckProfileDetectionInteractor(
             ?.let { devices.filter { device -> profile.detectFilter?.let { filterChecker.check(device, it) } == true } }
             ?.takeIf { matched -> matched.isNotEmpty() }
             ?.let { matched -> ProfileResult(profile, matched) }
+    }
+
+    private suspend fun saveReport(result: ProfileResult) {
+        val locationModel = locationProvider.lastKnownLocation()
+
+        val report = JournalEntry.Report.ProfileReport(
+            profileId = result.profile.id ?: return,
+            deviceAddresses = result.matched.map { it.address },
+            locationModel = locationModel?.location?.toDomain(System.currentTimeMillis()),
+        )
+
+        saveReportInteractor.execute(report)
     }
 
     data class ProfileResult(

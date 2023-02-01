@@ -27,11 +27,10 @@ class DevicesRepository(
     }
 
     suspend fun observeDevices(): StateFlow<List<DeviceData>> {
-        return withContext(Dispatchers.IO) {
+        return allDevices.apply {
             if (allDevices.value.isEmpty()) {
                 notifyListeners()
             }
-            allDevices
         }
     }
 
