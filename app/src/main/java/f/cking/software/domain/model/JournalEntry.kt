@@ -21,7 +21,7 @@ data class JournalEntry(
         ) : Report()
 
         @Serializable
-        @SerialName("profile_report")
+        @SerialName("error_report")
         data class Error(
             val title: String,
             val stackTrace: String,

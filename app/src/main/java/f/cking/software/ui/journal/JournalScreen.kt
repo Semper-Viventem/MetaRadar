@@ -5,7 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +47,15 @@ object JournalScreen {
                 Text(text = uiModel.title, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = uiModel.subtitle, fontWeight = FontWeight.Normal)
+                var isExpanded by remember { mutableStateOf(false) }
+                Text(
+                    modifier = Modifier.clickable {
+                        isExpanded = !isExpanded
+                    },
+                    text = uiModel.subtitle,
+                    fontWeight = FontWeight.Normal,
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 5
+                )
             }
         }
     }

@@ -51,15 +51,7 @@ class BgScanService : Service() {
 
     private val bleListener = object : BleScannerHelper.ScanListener {
         override fun onFailure(exception: Exception) {
-            failureScanCounter++
-
-            reportError(exception)
-            if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-                reportError(RuntimeException("Stop service after $MAX_FAILURE_SCANS_TO_CLOSE exceptions"))
-                stopSelf()
-            } else {
-                scheduleNextScan()
-            }
+            handleError(exception)
         }
 
         override fun onSuccess(batch: List<BleScanDevice>) {
@@ -72,6 +64,18 @@ class BgScanService : Service() {
     override fun onCreate() {
         super.onCreate()
         isActive.tryEmit(true)
+    }
+
+    private fun handleError(exception: Throwable) {
+        failureScanCounter++
+
+        reportError(exception)
+        if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
+            reportError(RuntimeException("Stop service after $MAX_FAILURE_SCANS_TO_CLOSE exceptions"))
+            stopSelf()
+        } else {
+            scheduleNextScan()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -138,13 +142,7 @@ class BgScanService : Service() {
                 scheduleNextScan()
                 failureScanCounter = 0
             } catch (exception: Throwable) {
-                reportError(exception)
-
-                failureScanCounter++
-                if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-                    reportError(RuntimeException("Stop service after $MAX_FAILURE_SCANS_TO_CLOSE exceptions"))
-                    stopSelf()
-                }
+                handleError(exception)
             }
         }
     }
@@ -288,7 +286,7 @@ class BgScanService : Service() {
     }
 
     private fun reportError(error: Throwable) {
-        Log.e(TAG, error.message.orEmpty() ,error)
+        Log.e(TAG, error.message.orEmpty(), error)
         scope.launch {
             val report = JournalEntry.Report.Error(
                 title = "[BLE Service Error]: ${error.message ?: error::class.java}",

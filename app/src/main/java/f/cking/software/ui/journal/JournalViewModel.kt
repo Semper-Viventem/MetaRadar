@@ -35,20 +35,20 @@ class JournalViewModel(
     private fun observeJournal() {
         viewModelScope.launch {
             journalRepository.observe()
-                .collect { update -> journal = update.sortedBy { it.timestamp }.map { map(it) } }
+                .collect { update -> journal = update.sortedBy { it.timestamp }.reversed().map { map(it) } }
         }
     }
 
     private suspend fun map(from: JournalEntry): JournalEntryUiModel {
         return JournalEntryUiModel(
-            dateTime = from.timestamp.dateTimeStringFormat("dd Mth yyyy, HH:MM"),
+            dateTime = from.timestamp.dateTimeStringFormat("dd MMM yyyy, HH:MM"),
             color = when (from.report) {
                 is JournalEntry.Report.Error -> R.color.error_background
                 is JournalEntry.Report.ProfileReport -> R.color.profile_report_background
             },
             title = when (from.report) {
                 is JournalEntry.Report.Error -> from.report.title
-                is JournalEntry.Report.ProfileReport -> getProfileName(from.report.profileId)
+                is JournalEntry.Report.ProfileReport -> "Profile detected: \"${getProfileName(from.report.profileId)}\""
             },
             subtitle = when (from.report) {
                 is JournalEntry.Report.Error -> from.report.stackTrace
