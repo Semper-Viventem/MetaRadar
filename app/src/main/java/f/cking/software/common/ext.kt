@@ -30,13 +30,14 @@ fun Byte.toHexString() = "%02x".format(this)
 fun Int.toHexString() = "%04x".format(this)
 fun <T> Optional<T>.orNull(): T? = if (isPresent) get() else null
 
-fun Long.toLocalDate() = Instant.ofEpochMilli(this).atZone(ZoneId.of("GMT")).toLocalDate()
-fun Long.toLocalTime() = Instant.ofEpochMilli(this).atZone(ZoneId.of("GMT")).toLocalTime()
+fun Long.toLocalDate(timeZone: ZoneId = ZoneId.of("GMT")) = Instant.ofEpochMilli(this).atZone(timeZone).toLocalDate()
+fun Long.toLocalTime(timeZone: ZoneId = ZoneId.of("GMT")) = Instant.ofEpochMilli(this).atZone(timeZone).toLocalTime()
 fun timeFromDateTime(date: LocalDate, time: LocalTime): Long =
-    LocalDateTime.of(date, time).atZone(ZoneId.of("GMT")).toInstant().toEpochMilli()
+    LocalDateTime.of(date, time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
 fun Long.dateTimeStringFormat(format: String): String {
-    return LocalDateTime.of(toLocalDate(), toLocalTime()).format(DateTimeFormatter.ofPattern(format))
+    return LocalDateTime.of(toLocalDate(ZoneId.systemDefault()), toLocalTime(ZoneId.systemDefault()))
+        .format(DateTimeFormatter.ofPattern(format))
 }
 
 fun LocalTime.toMilliseconds() = (hour * 60L * 60L * 1000L) + (minute * 60L * 1000L)

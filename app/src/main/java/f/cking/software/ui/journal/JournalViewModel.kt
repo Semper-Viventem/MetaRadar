@@ -41,7 +41,7 @@ class JournalViewModel(
 
     private suspend fun map(from: JournalEntry): JournalEntryUiModel {
         return JournalEntryUiModel(
-            dateTime = from.timestamp.dateTimeStringFormat("dd MMM yyyy, HH:MM"),
+            dateTime = from.timestamp.dateTimeStringFormat("dd MMM yyyy, HH:mm"),
             color = when (from.report) {
                 is JournalEntry.Report.Error -> R.color.error_background
                 is JournalEntry.Report.ProfileReport -> R.color.profile_report_background
