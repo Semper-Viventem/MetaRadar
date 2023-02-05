@@ -145,7 +145,7 @@ class DevicesRepository(
     private suspend fun List<DeviceEntity>.toDomainWithAirDrop(): List<DeviceData> {
         return withContext(Dispatchers.IO) {
 
-            val allRelatedContacts = splitToBatches(MAX_SQL_VARIABLES).flatMap { batch ->
+            val allRelatedContacts = splitToBatches().flatMap { batch ->
                 appleContactsDao.getByAddresses(batch.map { it.address })
             }
 
@@ -162,15 +162,19 @@ class DevicesRepository(
         }
     }
 
-    private fun <T> List<T>.splitToBatches(batchSize: Int): List<List<T>> {
+    private fun <T> List<T>.splitToBatches(batchSize: Int = MAX_SQL_VARIABLES): List<List<T>> {
+        if (size <= batchSize) return listOf(this)
+
         val result = mutableListOf<List<T>>()
         var fromIndex = 0
+
         do {
             val rangeEnd = fromIndex + batchSize
             val toIndex = if (rangeEnd <= lastIndex) rangeEnd else lastIndex
             result.add(this.subList(fromIndex, toIndex))
             fromIndex = toIndex + 1
         } while (fromIndex < lastIndex)
+
         return result
     }
 

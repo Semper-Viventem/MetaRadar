@@ -70,8 +70,9 @@ class BgScanService : Service() {
         failureScanCounter++
 
         reportError(exception)
+
         if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-            reportError(RuntimeException("Stop service after $MAX_FAILURE_SCANS_TO_CLOSE exceptions"))
+            reportError(RuntimeException("Ble Scan service was stopped after $MAX_FAILURE_SCANS_TO_CLOSE errors"))
             stopSelf()
         } else {
             scheduleNextScan()
