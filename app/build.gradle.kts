@@ -95,6 +95,7 @@ dependencies {
     implementation(libs.compose.activity)
     implementation(libs.compose.dialogs)
     implementation(libs.compose.dialogs.datetime)
+    implementation(libs.compose.flow.row)
 
     // room
     implementation(libs.room.runtime)

@@ -13,6 +13,7 @@ import f.cking.software.data.repo.JournalRepository
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.JournalEntry
+import f.cking.software.ui.ScreenNavigationCommands
 import kotlinx.coroutines.launch
 
 class JournalViewModel(
@@ -29,48 +30,83 @@ class JournalViewModel(
     }
 
     fun onEntryClick(journalEntry: JournalEntry) {
+        // do nothing
+    }
 
+    fun onJournalListItemClick(payload: String) {
+        router.navigate(ScreenNavigationCommands.OpenDeviceDetailsScreen(payload))
     }
 
     private fun observeJournal() {
         viewModelScope.launch {
             journalRepository.observe()
-                .collect { update -> journal = update.sortedBy { it.timestamp }.reversed().map { map(it) } }
+                .collect { update ->
+                    journal = update.sortedBy { it.timestamp }.reversed().map { map(it) }
+                }
         }
     }
 
     private suspend fun map(from: JournalEntry): JournalEntryUiModel {
+        return when(from.report) {
+            is JournalEntry.Report.Error -> mapReportError(from, from.report)
+            is JournalEntry.Report.ProfileReport -> mapReportProfile(from, from.report)
+        }
+    }
+
+    private fun mapReportError(
+        journalEntry: JournalEntry,
+        report: JournalEntry.Report.Error,
+    ): JournalEntryUiModel {
         return JournalEntryUiModel(
-            dateTime = from.timestamp.dateTimeStringFormat("dd MMM yyyy, HH:mm"),
-            color = when (from.report) {
-                is JournalEntry.Report.Error -> R.color.error_background
-                is JournalEntry.Report.ProfileReport -> R.color.profile_report_background
-            },
-            title = when (from.report) {
-                is JournalEntry.Report.Error -> from.report.title
-                is JournalEntry.Report.ProfileReport -> "Profile detected: \"${getProfileName(from.report.profileId)}\""
-            },
-            subtitle = when (from.report) {
-                is JournalEntry.Report.Error -> from.report.stackTrace
-                is JournalEntry.Report.ProfileReport -> getDeviceNameByAddresses(from.report.deviceAddresses)
-            },
-            journalEntry = from,
+            dateTime = journalEntry.timestamp.formattedDate(),
+            color = R.color.error_background,
+            title = report.title,
+            subtitle = report.stackTrace,
+            journalEntry = journalEntry,
+            items = null,
         )
     }
+
+    private suspend fun mapReportProfile(
+        journalEntry: JournalEntry,
+        report: JournalEntry.Report.ProfileReport,
+    ): JournalEntryUiModel {
+        return JournalEntryUiModel(
+            dateTime = journalEntry.timestamp.formattedDate(),
+            color = R.color.profile_report_background,
+            title = "Profile detected: \"${getProfileName(report.profileId)}\"",
+            subtitle = null,
+            journalEntry = journalEntry,
+            items = mapListItems(report.deviceAddresses),
+        )
+    }
+
+    private fun Long.formattedDate() = dateTimeStringFormat("dd MMM yyyy, HH:mm")
 
     private suspend fun getProfileName(id: Int): String {
         return profileRepository.getById(id)?.name ?: "UNKNOWN"
     }
 
-    private suspend fun getDeviceNameByAddresses(addresses: List<String>): String {
-        return devicesRepository.getAllByAddresses(addresses).joinToString { it.buildDisplayName() }
+    private suspend fun mapListItems(addresses: List<String>): List<JournalEntryUiModel.ListItemUiModel> {
+        return devicesRepository.getAllByAddresses(addresses).map { device ->
+            JournalEntryUiModel.ListItemUiModel(
+                displayName = device.buildDisplayName(),
+                payload = device.address,
+            )
+        }
     }
 
     data class JournalEntryUiModel(
         val dateTime: String,
         @ColorRes val color: Int,
         val title: String,
-        val subtitle: String,
+        val subtitle: String?,
+        val items: List<ListItemUiModel>?,
         val journalEntry: JournalEntry,
-    )
+    ) {
+        data class ListItemUiModel(
+            val displayName: String,
+            val payload: String,
+        )
+    }
 }

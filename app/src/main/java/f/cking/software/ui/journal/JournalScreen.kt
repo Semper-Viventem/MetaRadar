@@ -4,9 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,6 +31,7 @@ object JournalScreen {
         }
     }
 
+    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
     @Composable
     fun JournalEntry(uiModel: JournalViewModel.JournalEntryUiModel, viewModel: JournalViewModel) {
         Box(
@@ -48,14 +53,34 @@ object JournalScreen {
 
                 Spacer(modifier = Modifier.height(4.dp))
                 var isExpanded by remember { mutableStateOf(false) }
-                Text(
-                    modifier = Modifier.clickable {
-                        isExpanded = !isExpanded
-                    },
-                    text = uiModel.subtitle,
-                    fontWeight = FontWeight.Normal,
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 5
-                )
+
+                uiModel.subtitle?.let { subtitle ->
+                    Text(
+                        modifier = Modifier.clickable {
+                            isExpanded = !isExpanded
+                        },
+                        text = uiModel.subtitle,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 5
+                    )
+                }
+
+                uiModel.items?.takeIf { it.isNotEmpty() }?.let { items ->
+                    FlowRow {
+                        items.forEach { item ->
+                            Chip(
+                                onClick = { viewModel.onJournalListItemClick(item.payload) },
+                                colors = ChipDefaults.chipColors(
+                                    backgroundColor = Color.LightGray,
+                                    contentColor = Color.Black,
+                                    leadingIconContentColor = Color.Black
+                                ),
+                            ) {
+                                Text(text = item.displayName)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
