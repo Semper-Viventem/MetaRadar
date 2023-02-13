@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.flowlayout.FlowRow
+import f.cking.software.common.Divider
 import org.koin.androidx.compose.koinViewModel
 
 object JournalScreen {
@@ -27,7 +29,10 @@ object JournalScreen {
                 .fillMaxHeight()
         ) {
 
-            viewModel.journal.map { item { JournalEntry(uiModel = it, viewModel) } }
+            viewModel.journal.map {
+                item { JournalEntry(uiModel = it, viewModel) }
+                item { Divider() }
+            }
         }
     }
 
@@ -45,12 +50,11 @@ object JournalScreen {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(modifier = Modifier.weight(1f), text = uiModel.title, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin)
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = uiModel.title, fontWeight = FontWeight.Bold)
-
                 Spacer(modifier = Modifier.height(4.dp))
                 var isExpanded by remember { mutableStateOf(false) }
 
@@ -66,7 +70,9 @@ object JournalScreen {
                 }
 
                 uiModel.items?.takeIf { it.isNotEmpty() }?.let { items ->
-                    FlowRow {
+                    FlowRow(
+                        mainAxisSpacing = 8.dp,
+                    ) {
                         items.forEach { item ->
                             Chip(
                                 onClick = { viewModel.onJournalListItemClick(item.payload) },

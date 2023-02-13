@@ -1,5 +1,6 @@
 package f.cking.software.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
@@ -12,6 +13,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -116,7 +118,7 @@ fun DeviceListItem(
             .fillMaxWidth()
             .clickable { onClick.invoke() },
     ) {
-        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Row() {
                     Text(text = device.name ?: "N/A", fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -202,4 +204,16 @@ fun MapView(
         { mapViewState },
         modifier
     ) { mapView -> onLoad?.invoke(mapView) }
+}
+
+@Composable
+fun Divider() {
+    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Box(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(Color.LightGray)
+        )
+    }
 }

@@ -12,7 +12,7 @@ protobuf-jvm = "0.12.0-0.3.0"
 compose = "1.2.1"
 compose-wear = "1.0.2"
 compose-compiler = "1.3.2"
-compose-accompanist = "0.25.1"
+compose-accompanist = "0.28.0"
 compose-constraint = "1.0.1"
 compose-navigation = "2.5.2"
 horologist = "0.1.13"
@@ -63,7 +63,6 @@ koin = "3.2.2"
 koin-android = "3.3.0"
 koin-android-compose = "3.3.0"
 compose-dialogs = "0.9.0"
-compose-flow-row = "0.29.1-alpha"
 
 # Testing
 junit = "4.12"
@@ -108,7 +107,7 @@ compose-foundation = { module = "androidx.compose.foundation:foundation", versio
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-dialogs = { module = "io.github.vanpra.compose-material-dialogs:core", version.ref = "compose-dialogs"}
 compose-dialogs-datetime = { module = "io.github.vanpra.compose-material-dialogs:datetime", version.ref = "compose-dialogs"}
-compose-flow-row = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "compose-flow-row"}
+compose-flow-row = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "compose-accompanist"}
 
 # UI - Wear
 compose-wear-material = { module = "androidx.wear.compose:compose-material", version.ref = "compose-wear" }
