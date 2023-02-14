@@ -21,7 +21,7 @@ class DataModule(
         single { DevicesRepository(get()) }
         single { PermissionHelper(get()) }
         single { RadarProfilesRepository(get()) }
-        single { LocationProvider(get(), get()) }
+        single { LocationProvider(get(), get(), get()) }
         single { LocationRepository(get()) }
         single { JournalRepository(get()) }
     }

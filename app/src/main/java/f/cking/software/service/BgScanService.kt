@@ -95,7 +95,7 @@ class BgScanService : Service() {
                 FOREGROUND_NOTIFICATION_ID,
                 buildForegroundNotification(knownDeviceCount = null)
             )
-            locationProvider.startLocationLeastening()
+            locationProvider.startLocationFetching()
 
             permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _, _ ->

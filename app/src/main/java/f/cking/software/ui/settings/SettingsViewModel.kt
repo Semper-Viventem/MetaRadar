@@ -24,12 +24,18 @@ class SettingsViewModel(
     var garbageRemovingInProgress: Boolean by mutableStateOf(false)
     var locationRemovingInProgress: Boolean by mutableStateOf(false)
     var useGpsLocationOnly: Boolean by mutableStateOf(settingsRepository.getUseGpsLocationOnly())
+    var locationData: LocationProvider.LocationHandle? by mutableStateOf(null)
+
+    init {
+        observeLocationData()
+    }
 
     fun onRemoveGarbageClick() {
         viewModelScope.launch {
             garbageRemovingInProgress = true
             val garbageCount = clearGarbageInteractor.execute()
-            Toast.makeText(context, "Cleared $garbageCount garbage devices", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Cleared $garbageCount garbage devices", Toast.LENGTH_SHORT)
+                .show()
             garbageRemovingInProgress = false
         }
     }
@@ -52,8 +58,17 @@ class SettingsViewModel(
             // restart location provider
             if (locationProvider.isActive()) {
                 locationProvider.stopLocationListening()
-                locationProvider.startLocationLeastening()
+                locationProvider.startLocationFetching()
             }
+        }
+    }
+
+    private fun observeLocationData() {
+        viewModelScope.launch {
+            locationProvider.observeLocation()
+                .collect { locationHandle ->
+                    locationData = locationHandle
+                }
         }
     }
 }

@@ -1,7 +1,10 @@
 package f.cking.software.ui.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Switch
@@ -11,7 +14,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import f.cking.software.dateTimeStringFormat
 import org.koin.androidx.compose.koinViewModel
 
 object SettingsScreen {
@@ -29,8 +35,42 @@ object SettingsScreen {
             ClearGarbageButton(viewModel)
             Spacer(modifier = Modifier.height(16.dp))
             ClearLocationsButton(viewModel)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            LocationInfo(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
             UseGpsLocationOnly(viewModel)
+        }
+    }
+
+    @Composable
+    private fun LocationInfo(viewModel: SettingsViewModel) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = Color.LightGray,
+                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                    )
+                    .padding(8.dp)
+            ) {
+                val locationData = viewModel.locationData
+                if (locationData == null) {
+                    Text(text = "No location data yet")
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = "Location fetches only if the scanner is started", fontWeight = FontWeight.Light)
+                } else {
+                    Text(text = "Last location update time: ${locationData.emitTime.dateTimeStringFormat("HH:mm")}")
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = "lat: ${locationData.location.latitude}", fontWeight = FontWeight.Light)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(text = "lng: ${locationData.location.longitude}", fontWeight = FontWeight.Light)
+                }
+            }
         }
     }
 
