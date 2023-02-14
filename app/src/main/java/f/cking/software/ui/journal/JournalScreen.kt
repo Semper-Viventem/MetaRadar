@@ -36,7 +36,7 @@ object JournalScreen {
         }
     }
 
-    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun JournalEntry(uiModel: JournalViewModel.JournalEntryUiModel, viewModel: JournalViewModel) {
         Box(
