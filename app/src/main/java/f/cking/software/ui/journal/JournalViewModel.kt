@@ -1,5 +1,7 @@
 package f.cking.software.ui.journal
 
+import android.app.Application
+import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +23,7 @@ class JournalViewModel(
     private val profileRepository: RadarProfilesRepository,
     private val devicesRepository: DevicesRepository,
     private val router: NavRouter,
+    private val context: Application,
 ) : ViewModel() {
 
     var journal: List<JournalEntryUiModel> by mutableStateOf(emptyList())
@@ -33,8 +36,12 @@ class JournalViewModel(
         // do nothing
     }
 
-    fun onJournalListItemClick(payload: String) {
-        router.navigate(ScreenNavigationCommands.OpenDeviceDetailsScreen(payload))
+    fun onJournalListItemClick(payload: String?) {
+        if (payload != null) {
+            router.navigate(ScreenNavigationCommands.OpenDeviceDetailsScreen(payload))
+        } else {
+            Toast.makeText(context, "Such device was removed from the database", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun observeJournal() {
@@ -47,7 +54,7 @@ class JournalViewModel(
     }
 
     private suspend fun map(from: JournalEntry): JournalEntryUiModel {
-        return when(from.report) {
+        return when (from.report) {
             is JournalEntry.Report.Error -> mapReportError(from, from.report)
             is JournalEntry.Report.ProfileReport -> mapReportProfile(from, from.report)
         }
@@ -88,10 +95,12 @@ class JournalViewModel(
     }
 
     private suspend fun mapListItems(addresses: List<String>): List<JournalEntryUiModel.ListItemUiModel> {
-        return devicesRepository.getAllByAddresses(addresses).map { device ->
+        val matchedDevices = devicesRepository.getAllByAddresses(addresses)
+        return addresses.map { address ->
+            val device = matchedDevices.firstOrNull { it.address == address }
             JournalEntryUiModel.ListItemUiModel(
-                displayName = device.buildDisplayName(),
-                payload = device.address,
+                displayName = device?.buildDisplayName() ?: "$address (removed)",
+                payload = device?.address,
             )
         }
     }
@@ -106,7 +115,7 @@ class JournalViewModel(
     ) {
         data class ListItemUiModel(
             val displayName: String,
-            val payload: String,
+            val payload: String?,
         )
     }
 }

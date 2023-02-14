@@ -26,6 +26,6 @@ object UiModule {
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
         viewModel { DeviceDetailsViewModel(get(), get(), get()) }
-        viewModel { JournalViewModel(get(), get(), get(), get()) }
+        viewModel { JournalViewModel(get(), get(), get(), get(), get()) }
     }
 }
