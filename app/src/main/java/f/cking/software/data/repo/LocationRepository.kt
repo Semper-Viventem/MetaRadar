@@ -35,4 +35,10 @@ class LocationRepository(
             locationDao.removeAllDeviceToLocation()
         }
     }
+
+    suspend fun removeDeviceLocationsByAddresses(addresses: List<String>) {
+        withContext(Dispatchers.IO) {
+            locationDao.removeDeviceLocationsByAddresses(addresses)
+        }
+    }
 }

@@ -23,4 +23,6 @@ interface LocationDao {
     @Query("DELETE FROM device_to_location")
     fun removeAllDeviceToLocation()
 
+    @Query("DELETE FROM device_to_location WHERE device_address IN (:addresses)")
+    fun removeDeviceLocationsByAddresses(addresses: List<String>)
 }

@@ -1,6 +1,7 @@
 package f.cking.software.domain.interactor
 
 import f.cking.software.data.repo.DevicesRepository
+import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.model.DeviceData
 import kotlinx.coroutines.Dispatchers
@@ -9,6 +10,7 @@ import kotlinx.coroutines.withContext
 class ClearGarbageInteractor(
     private val devicesRepository: DevicesRepository,
     private val settingsRepository: SettingsRepository,
+    private val locationRepository: LocationRepository,
     private val isKnownDeviceInteractor: IsKnownDeviceInteractor,
 ) {
 
@@ -21,6 +23,7 @@ class ClearGarbageInteractor(
                 .toList()
 
             devicesRepository.deleteAllByAddress(devices)
+            locationRepository.removeDeviceLocationsByAddresses(devices)
             devices.count()
         }
     }

@@ -7,7 +7,7 @@ object InteractorsModule {
 
     val module = module {
         factory { AnalyseScanBatchInteractor(get(), get()) }
-        factory { ClearGarbageInteractor(get(), get(), get()) }
+        factory { ClearGarbageInteractor(get(), get(), get(), get()) }
         factory { GetKnownDevicesCountInteractor(get(), get()) }
         factory { GetKnownDevicesInteractor(get(), get()) }
         factory { IsKnownDeviceInteractor() }
