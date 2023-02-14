@@ -45,6 +45,7 @@ class BgScanService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var failureScanCounter: Int = 0
+    private var locationDisabledWasReported: Boolean = false
     private val nextScanRunnable = Runnable {
         scan()
     }
@@ -90,7 +91,10 @@ class BgScanService : Service() {
             scan()
         } else {
             Log.d(TAG, "Background service launched")
-            startForeground(FOREGROUND_NOTIFICATION_ID, buildForegroundNotification(knownDeviceCount = null))
+            startForeground(
+                FOREGROUND_NOTIFICATION_ID,
+                buildForegroundNotification(knownDeviceCount = null)
+            )
             locationProvider.startLocationLeastening()
 
             permissionHelper.checkBlePermissions(
@@ -131,6 +135,14 @@ class BgScanService : Service() {
     }
 
     private fun handleScanResult(batch: List<BleScanDevice>) {
+
+        if (batch.isEmpty() && !locationProvider.isLocationAvailable() && !locationDisabledWasReported) {
+            reportError(IllegalStateException("The BLE scanner did not return anything. This may happen if geolocation is turned off at the system level. Location access is required to work with BLE on Android."))
+            locationDisabledWasReported = true
+        } else if (batch.isNotEmpty()) {
+            locationDisabledWasReported = false
+        }
+
         scope.launch {
             try {
                 val analyseResult = analyseScanBatchInteractor.execute(batch)
@@ -234,7 +246,10 @@ class BgScanService : Service() {
         }
 
         val content = profiles.flatMap { it.matched }
-            .joinToString(separator = ", ", postfix = " devices matched!.") { it.buildDisplayName() }
+            .joinToString(
+                separator = ", ",
+                postfix = " devices matched!."
+            ) { it.buildDisplayName() }
 
         val openAppIntent = Intent(this, MainActivity::class.java)
         val openAppPendingIntent = PendingIntent.getActivity(

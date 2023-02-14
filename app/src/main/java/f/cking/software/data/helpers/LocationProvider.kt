@@ -5,14 +5,16 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
-import android.os.Looper
 import android.util.Log
 import androidx.core.location.LocationListenerCompat
+import f.cking.software.data.repo.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 
 class LocationProvider(
-    private val context: Context
+    private val context: Context,
+    private val settingsRepository: SettingsRepository,
 ) {
 
     private val TAG = "LocationProvider"
@@ -26,18 +28,26 @@ class LocationProvider(
         locationState.tryEmit(LocationHandle(it, System.currentTimeMillis()))
     }
 
+    private var isActive: Boolean = false
+
     fun isLocationAvailable(): Boolean {
-        return locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) ?: false
+        return (locationManager?.isProviderEnabled(provider())
+            ?: false) && (locationManager?.isLocationEnabled ?: false)
+    }
+
+    fun isActive(): Boolean {
+        return isActive
     }
 
     fun observeLocation(): Flow<LocationHandle?> {
         return locationState
     }
 
-    @SuppressLint("MissingPermission")
-    fun lastKnownLocation(): LocationHandle? {
-        return locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            ?.let { LocationHandle(it, System.currentTimeMillis()) }
+    suspend fun getFreshLocation(): Location? {
+        return observeLocation()
+            .firstOrNull()
+            ?.takeIf { it.isFresh() }
+            ?.location
     }
 
     @SuppressLint("MissingPermission")
@@ -45,24 +55,16 @@ class LocationProvider(
         if (!isLocationAvailable() || locationManager == null) {
             throw LocationManagerIsNotAvailableException()
         }
-        val isGpsProviderEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isGpsProviderEnabled = locationManager.isProviderEnabled(provider())
 
         if (isGpsProviderEnabled) {
-            locationState.tryEmit(lastKnownLocation())
-
-            val provider = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                LocationManager.FUSED_PROVIDER
-            } else {
-                LocationManager.GPS_PROVIDER
-            }
-
             locationManager.requestLocationUpdates(
-                provider,
+                provider(),
                 INTERVAL_MS,
                 SMALLEST_DISPLACEMENT_METERS,
                 locationListener,
-                Looper.getMainLooper()
             )
+            isActive = true
         } else {
             throw GpsProviderIsNotEnabledException()
         }
@@ -70,6 +72,19 @@ class LocationProvider(
 
     fun stopLocationListening() {
         locationManager?.removeUpdates(locationListener)
+        isActive = false
+    }
+
+    private fun provider(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !settingsRepository.getUseGpsLocationOnly()) {
+            LocationManager.FUSED_PROVIDER
+        } else {
+            LocationManager.GPS_PROVIDER
+        }
+    }
+
+    private fun LocationHandle.isFresh(): Boolean {
+        return System.currentTimeMillis() - this.emitTime < ALLOWED_LOCATION_LIVETIME_MS
     }
 
     data class LocationHandle(
@@ -83,7 +98,8 @@ class LocationProvider(
     class GpsProviderIsNotEnabledException : IllegalStateException("GPS provider is not enabled")
 
     companion object {
-        private const val SMALLEST_DISPLACEMENT_METERS = 5f
+        private const val SMALLEST_DISPLACEMENT_METERS = 3f
         private const val INTERVAL_MS = 10_000L
+        private const val ALLOWED_LOCATION_LIVETIME_MS = 2L * 60L * 1000L // 2 min
     }
 }

@@ -57,12 +57,12 @@ class CheckProfileDetectionInteractor(
     }
 
     private suspend fun saveReport(result: ProfileResult) {
-        val locationModel = locationProvider.lastKnownLocation()
+        val locationModel = locationProvider.getFreshLocation()
 
         val report = JournalEntry.Report.ProfileReport(
             profileId = result.profile.id ?: return,
             deviceAddresses = result.matched.map { it.address },
-            locationModel = locationModel?.location?.toDomain(System.currentTimeMillis()),
+            locationModel = locationModel?.toDomain(System.currentTimeMillis()),
         )
 
         saveReportInteractor.execute(report)
