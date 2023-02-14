@@ -22,6 +22,9 @@
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature android:name="android.hardware.location.network" />
+
     <application
         android:name=".TheApp"
         android:allowBackup="true"
