@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         permissionHelper.setActivity(this)
 
         setContent {
+            val focusManager = LocalFocusManager.current
             MaterialTheme(
                 colors = MaterialTheme.colors.copy(
                     primary = colorResource(id = R.color.orange_500),
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
                 if (stack.isEmpty()) {
                     finish()
                 } else {
+                    focusManager.clearFocus(true)
                     stack.forEach { screen ->
                         screen()
                     }

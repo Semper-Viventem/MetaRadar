@@ -18,7 +18,7 @@ object UiModule {
     val module = module {
         single { NavRouter() }
         viewModel { MainViewModel(get(), get(), get()) }
-        viewModel { DeviceListViewModel(get(), get()) }
+        viewModel { DeviceListViewModel(get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get(), get(), get()) }
         viewModel { ProfilesListViewModel(get(), get()) }
         viewModel { ProfileDetailsViewModel(get(), get(), get()) }
