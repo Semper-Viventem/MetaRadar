@@ -115,7 +115,10 @@ class LocationProvider(
             locationManager?.getCurrentLocation(
                 provider(),
                 LocationRequest.Builder(INTERVAL_MS)
-                    .setQuality(LocationRequest.QUALITY_HIGH_ACCURACY).build(),
+                    .setDurationMillis(LOCATION_REQUEST_MAX_DURATION_MILLS)
+                    .setMaxUpdateDelayMillis(LOCATION_REQUEST_MAX_DURATION_MILLS)
+                    .setQuality(LocationRequest.QUALITY_HIGH_ACCURACY)
+                    .build(),
                 cancellationSignal,
                 context.mainExecutor,
                 consumer
@@ -173,6 +176,7 @@ class LocationProvider(
 
     companion object {
         private const val INTERVAL_MS = 10_000L
+        private const val LOCATION_REQUEST_MAX_DURATION_MILLS = 30_000L
         private const val ALLOWED_LOCATION_LIVETIME_MS = 2L * 60L * 1000L // 2 min
     }
 }
