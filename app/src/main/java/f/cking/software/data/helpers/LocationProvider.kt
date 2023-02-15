@@ -34,17 +34,21 @@ class LocationProvider(
     private val locationManager: LocationManager? =
         context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
 
-    private val consumer = Consumer<Location?> {
+    private val consumer = Consumer<Location?> { newLocation ->
         val provider = provider()
-        if (it != null) {
-            Log.d(
-                TAG,
-                "New location: lat=${it.latitude}, lng=${it.longitude} (provider: $provider)"
-            )
-            locationState.tryEmit(LocationHandle(it, System.currentTimeMillis()))
-        } else {
+
+        if (newLocation == null) {
             Log.d(TAG, "Empty location emitted  (provider: $provider)")
+            return@Consumer
         }
+
+        if (!newLocation.isRelevant(locationState.value?.location)) {
+            Log.d(TAG, "Irrelevant location has emitted (provider: $provider)")
+            return@Consumer
+        }
+
+        Log.d(TAG, "New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
+        locationState.tryEmit(LocationHandle(newLocation, System.currentTimeMillis()))
         scheduleNextRequest()
     }
 
@@ -166,6 +170,13 @@ class LocationProvider(
         return System.currentTimeMillis() - this.emitTime < ALLOWED_LOCATION_LIVETIME_MS
     }
 
+    private fun Location.isRelevant(oldLocation: Location?): Boolean {
+        return oldLocation == null
+                || ((latitude != oldLocation.longitude || longitude != oldLocation.longitude)
+                && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && elapsedRealtimeAgeMillis <= ALLOWED_LOCATION_LIVETIME_MS)
+                && accuracy <= MAX_ALLOWED_ACCURACY_METERS)
+    }
+
     data class LocationHandle(
         val location: Location,
         val emitTime: Long,
@@ -177,6 +188,7 @@ class LocationProvider(
     companion object {
         private const val INTERVAL_MS = 10_000L
         private const val LOCATION_REQUEST_MAX_DURATION_MILLS = 30_000L
+        private const val MAX_ALLOWED_ACCURACY_METERS = 50F
         private const val ALLOWED_LOCATION_LIVETIME_MS = 2L * 60L * 1000L // 2 min
     }
 }

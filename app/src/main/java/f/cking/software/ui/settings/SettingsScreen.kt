@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import f.cking.software.dateTimeStringFormat
 import org.koin.androidx.compose.koinViewModel
 
@@ -62,13 +63,28 @@ object SettingsScreen {
                 if (locationData == null) {
                     Text(text = "No location data yet")
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Location fetches only if the scanner is started", fontWeight = FontWeight.Light)
+                    Text(
+                        text = "Location fetches only if the scanner is started",
+                        fontWeight = FontWeight.Light
+                    )
                 } else {
-                    Text(text = "Last location update time: ${locationData.emitTime.dateTimeStringFormat("HH:mm")}")
+                    Text(
+                        text = "Last location update time: ${
+                            locationData.emitTime.dateTimeStringFormat(
+                                "HH:mm"
+                            )
+                        }"
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "lat: ${locationData.location.latitude}", fontWeight = FontWeight.Light)
+                    Text(
+                        text = "lat: ${locationData.location.latitude}",
+                        fontWeight = FontWeight.Light
+                    )
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text(text = "lng: ${locationData.location.longitude}", fontWeight = FontWeight.Light)
+                    Text(
+                        text = "lng: ${locationData.location.longitude}",
+                        fontWeight = FontWeight.Light
+                    )
                 }
             }
         }
@@ -132,10 +148,17 @@ object SettingsScreen {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(
+                Column(
                     modifier = Modifier.weight(1f),
-                    text = "Use GPS location only instead of fused location (Higher accuracy, higher battery consumption)"
-                )
+                ) {
+                    Text(text = "Use GPS location only instead of fused location")
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "No heuristic bullshit, good old GPS, the data is more true. Requires good GPS signal. Higher battery consumption.",
+                        fontWeight = FontWeight.Light,
+                        fontSize = 12.sp,
+                    )
+                }
                 Spacer(modifier = Modifier.width(4.dp))
                 Switch(
                     checked = viewModel.useGpsLocationOnly,
