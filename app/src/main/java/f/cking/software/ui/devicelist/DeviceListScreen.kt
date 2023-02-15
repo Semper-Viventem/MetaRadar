@@ -156,13 +156,23 @@ object DeviceListScreen {
                 onValueChange = { viewModel.onSearchInput(it) },
                 placeholder = { Text(text = "Search query", fontWeight = FontWeight.Light) },
                 trailingIcon = {
-                    Icon(
-                        Icons.Filled.Close,
-                        contentDescription = "Close search",
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable { viewModel.onSearchInput("") }
-                    )
+                    if (viewModel.searchQuery.isNullOrBlank()) {
+                        Icon(
+                            Icons.Filled.Delete,
+                            contentDescription = "Close search",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable { viewModel.onOpenSearchClick() }
+                        )
+                    } else {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "Clear search",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable { viewModel.onSearchInput("") }
+                        )
+                    }
                 }
             )
             LaunchedEffect(Unit) {
