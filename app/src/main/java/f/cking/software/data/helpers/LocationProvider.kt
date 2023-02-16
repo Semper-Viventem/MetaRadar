@@ -35,6 +35,8 @@ class LocationProvider(
         context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
 
     private val consumer = Consumer<Location?> { newLocation ->
+        scheduleNextRequest()
+
         val provider = provider()
 
         if (newLocation == null) {
@@ -49,7 +51,6 @@ class LocationProvider(
 
         Log.d(TAG, "New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
         locationState.tryEmit(LocationHandle(newLocation, System.currentTimeMillis()))
-        scheduleNextRequest()
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -71,9 +72,14 @@ class LocationProvider(
         }
     }
 
+    private val restartServiceRunnable = Runnable {
+        stopLocationListening()
+        startLocationFetching()
+    }
+
     fun isLocationAvailable(): Boolean {
-        return (locationManager?.isProviderEnabled(provider())
-            ?: false) && (locationManager?.isLocationEnabled ?: false)
+        return (locationManager?.isProviderEnabled(provider()) ?: false)
+                && (locationManager?.isLocationEnabled ?: false)
     }
 
     fun isActive(): Boolean {
@@ -104,6 +110,7 @@ class LocationProvider(
         locationManager?.removeUpdates(locationListener)
         cancellationSignal.cancel()
         handler.removeCallbacks(nextLocationRequest)
+        handler.removeCallbacks(restartServiceRunnable)
         isActive = false
         scope.cancel()
     }
@@ -141,6 +148,8 @@ class LocationProvider(
                 context.mainLooper,
             )
         }
+
+        scheduleServiceRestart()
     }
 
     private fun provider(): String {
@@ -153,6 +162,16 @@ class LocationProvider(
 
     private fun scheduleNextRequest() {
         handler.postDelayed(nextLocationRequest, INTERVAL_MS)
+    }
+
+    /**
+     * Schedule location fetching restart
+     * In case if LocationManager doesn't respond for a long time
+     * It's better to reschedule location request manually
+     */
+    private fun scheduleServiceRestart() {
+        handler.removeCallbacks(restartServiceRunnable)
+        handler.postDelayed(restartServiceRunnable, RESTART_SERVICE_TIMER)
     }
 
     private fun reportError(error: Throwable) {
@@ -188,7 +207,8 @@ class LocationProvider(
     companion object {
         private const val INTERVAL_MS = 10_000L
         private const val LOCATION_REQUEST_MAX_DURATION_MILLS = 30_000L
-        private const val MAX_ALLOWED_ACCURACY_METERS = 50F
+        private const val MAX_ALLOWED_ACCURACY_METERS = 100F
         private const val ALLOWED_LOCATION_LIVETIME_MS = 2L * 60L * 1000L // 2 min
+        private const val RESTART_SERVICE_TIMER = 10L * 60L * 1000L // 10 min
     }
 }
