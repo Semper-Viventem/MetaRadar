@@ -29,9 +29,13 @@ class LocationRepository(
         }
     }
 
-    suspend fun getAllLocationsByAddress(deviceAddress: String): List<LocationModel> {
+    suspend fun getAllLocationsByAddress(
+        deviceAddress: String,
+        fromTime: Long = 0
+    ): List<LocationModel> {
         return withContext(Dispatchers.IO) {
-            locationDao.getAllLocationsByDeviceAddress(deviceAddress).map { it.toDomain() }
+            locationDao.getAllLocationsByDeviceAddress(deviceAddress, fromTime)
+                .map { it.toDomain() }
         }
     }
 

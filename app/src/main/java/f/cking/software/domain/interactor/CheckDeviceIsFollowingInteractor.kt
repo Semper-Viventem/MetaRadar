@@ -21,8 +21,10 @@ class CheckDeviceIsFollowingInteractor(
 
         if (lifeTimeIsShort || wasDetectedRecently) return false
 
-        val lastLocations = locationRepository.getAllLocationsByAddress(deviceData.address)
-            .filter { currentTime - it.time <= minFollowingDuration }
+        val lastLocations = locationRepository.getAllLocationsByAddress(
+            deviceAddress = deviceData.address,
+            fromTime = currentTime - minFollowingDuration
+        )
 
         if (lastLocations.isEmpty()) return false
 
