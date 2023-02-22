@@ -72,3 +72,19 @@ object SHA256 {
 
 fun Context.dpToPx(value: Float): Int =
     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
+
+fun <T> List<T>.splitToBatches(batchSize: Int): List<List<T>> {
+    if (size <= batchSize) return listOf(this)
+
+    val result = mutableListOf<List<T>>()
+    var fromIndex = 0
+
+    do {
+        val rangeEnd = fromIndex + batchSize
+        val toIndex = if (rangeEnd <= lastIndex) rangeEnd else lastIndex
+        result.add(this.subList(fromIndex, toIndex))
+        fromIndex = toIndex + 1
+    } while (fromIndex < lastIndex)
+
+    return result
+}

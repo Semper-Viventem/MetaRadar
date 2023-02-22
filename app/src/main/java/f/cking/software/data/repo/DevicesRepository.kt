@@ -1,12 +1,14 @@
 package f.cking.software.data.repo
 
 import f.cking.software.data.database.AppDatabase
+import f.cking.software.data.database.DatabaseUtils
 import f.cking.software.data.database.DeviceDao
 import f.cking.software.data.database.DeviceEntity
 import f.cking.software.domain.model.AppleAirDrop
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
+import f.cking.software.splitToBatches
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,14 +62,18 @@ class DevicesRepository(
 
     suspend fun deleteAllByAddress(addresses: List<String>) {
         withContext(Dispatchers.IO) {
-            deviceDao.deleteAllByAddress(addresses)
+            addresses.splitToBatches(DatabaseUtils.MAX_SQL_VARIABLES).forEach { addressesBatch ->
+                deviceDao.deleteAllByAddress(addressesBatch)
+            }
             notifyListeners()
         }
     }
 
     suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            deviceDao.findAllByAddresses(addresses).toDomainWithAirDrop()
+            addresses.splitToBatches(DatabaseUtils.MAX_SQL_VARIABLES).flatMap {
+                deviceDao.findAllByAddresses(addresses).toDomainWithAirDrop()
+            }
         }
     }
 
@@ -102,12 +108,17 @@ class DevicesRepository(
     private suspend fun saveContacts(devices: List<DeviceData>) {
         withContext(Dispatchers.IO) {
             val addressesMap = devices.flatMap { device ->
-                device.manufacturerInfo?.airdrop?.contacts?.map { it.sha256 to device.address } ?: emptyList()
+                device.manufacturerInfo?.airdrop?.contacts?.map { it.sha256 to device.address }
+                    ?: emptyList()
             }.toMap()
             val mergedContacts =
-                mergeWithExisting(devices.flatMap { it.manufacturerInfo?.airdrop?.contacts ?: emptyList() })
+                mergeWithExisting(devices.flatMap {
+                    it.manufacturerInfo?.airdrop?.contacts ?: emptyList()
+                })
             val mappedContacts =
-                mergedContacts.mapNotNull { contact -> addressesMap[contact.sha256]?.let { contact.toData(it) } }
+                mergedContacts.mapNotNull { contact ->
+                    addressesMap[contact.sha256]?.let { contact.toData(it) }
+                }
             appleContactsDao.insertAll(mappedContacts)
         }
     }
@@ -145,9 +156,10 @@ class DevicesRepository(
     private suspend fun List<DeviceEntity>.toDomainWithAirDrop(): List<DeviceData> {
         return withContext(Dispatchers.IO) {
 
-            val allRelatedContacts = splitToBatches().flatMap { batch ->
-                appleContactsDao.getByAddresses(batch.map { it.address })
-            }
+            val allRelatedContacts =
+                splitToBatches(DatabaseUtils.MAX_SQL_VARIABLES).flatMap { batch ->
+                    appleContactsDao.getByAddresses(batch.map { it.address })
+                }
 
             map { device ->
                 val airdrop = allRelatedContacts.asSequence()
@@ -160,25 +172,5 @@ class DevicesRepository(
                 device.toDomain(airdrop)
             }
         }
-    }
-
-    private fun <T> List<T>.splitToBatches(batchSize: Int = MAX_SQL_VARIABLES): List<List<T>> {
-        if (size <= batchSize) return listOf(this)
-
-        val result = mutableListOf<List<T>>()
-        var fromIndex = 0
-
-        do {
-            val rangeEnd = fromIndex + batchSize
-            val toIndex = if (rangeEnd <= lastIndex) rangeEnd else lastIndex
-            result.add(this.subList(fromIndex, toIndex))
-            fromIndex = toIndex + 1
-        } while (fromIndex < lastIndex)
-
-        return result
-    }
-
-    companion object {
-        private const val MAX_SQL_VARIABLES = 999
     }
 }
