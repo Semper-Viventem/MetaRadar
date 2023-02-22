@@ -52,6 +52,7 @@ class DeviceDetailsViewModel(
     private fun observeLocation() {
         permissionHelper.checkBlePermissions {
             viewModelScope.launch {
+                locationProvider.fetchOnce()
                 locationProvider.observeLocation()
                     .collect { location ->
                         currentLocation = location?.location?.toDomain(System.currentTimeMillis())
@@ -76,9 +77,9 @@ class DeviceDetailsViewModel(
             selectHistoryPeriodSelected(prev!!, address, autotunePeriod = false)
         } else if (shouldStepNext) {
             selectHistoryPeriodSelected(nextStep!!, address, autotunePeriod)
-        } else if (fetched.isNotEmpty()) {
-            points = fetched
         }
+
+        points = fetched
     }
 
     fun selectHistoryPeriodSelected(

@@ -35,7 +35,10 @@ class LocationProvider(
         context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
 
     private val consumer = Consumer<Location?> { newLocation ->
-        scheduleNextRequest()
+
+        if (isActive) {
+            scheduleNextRequest()
+        }
 
         val provider = provider()
 
@@ -49,7 +52,10 @@ class LocationProvider(
             return@Consumer
         }
 
-        Log.d(TAG, "New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
+        Log.d(
+            TAG,
+            "New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)"
+        )
         locationState.tryEmit(LocationHandle(newLocation, System.currentTimeMillis()))
     }
 
@@ -65,7 +71,7 @@ class LocationProvider(
     private val handler = Handler(Looper.getMainLooper())
     private val nextLocationRequest = Runnable {
         try {
-            fetchLocation()
+            fetchLocation(withRestartSchedule = true)
         } catch (error: Throwable) {
             reportError(error)
             scheduleNextRequest()
@@ -102,7 +108,7 @@ class LocationProvider(
         if (!isLocationAvailable()) {
             throw LocationManagerIsNotAvailableException()
         }
-        fetchLocation()
+        fetchLocation(withRestartSchedule = true)
         isActive = true
     }
 
@@ -115,8 +121,17 @@ class LocationProvider(
         scope.cancel()
     }
 
+    fun fetchOnce() {
+        if (isActive) {
+            stopLocationListening()
+            startLocationFetching()
+        } else {
+            fetchLocation(withRestartSchedule = false)
+        }
+    }
+
     @SuppressLint("MissingPermission")
-    private fun fetchLocation() {
+    private fun fetchLocation(withRestartSchedule: Boolean) {
         if (!cancellationSignal.isCanceled) {
             cancellationSignal.cancel()
         }
@@ -149,7 +164,9 @@ class LocationProvider(
             )
         }
 
-        scheduleServiceRestart()
+        if (withRestartSchedule) {
+            scheduleServiceRestart()
+        }
     }
 
     private fun provider(): String {

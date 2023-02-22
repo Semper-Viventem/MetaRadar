@@ -274,6 +274,7 @@ object DeviceDetailsScreen {
                 map.setMultiTouchControls(true)
                 map.overlays.clear()
                 map.minZoomLevel = MIN_MAP_ZOOM
+                map.maxZoomLevel = MAX_MAP_ZOOM
 
                 if (points.isNotEmpty()) {
                     val markers = points.map { location ->
@@ -293,7 +294,8 @@ object DeviceDetailsScreen {
                 } else {
                     val location = viewModel.currentLocation
                     if (location != null) {
-                        map.controller.animateTo(GeoPoint(location.lat, location.lng), DEFAULT_MAP_ZOOM, MAP_NO_ANIMATION)
+                        val animationSpeed = if (map.isCenter()) MAP_NO_ANIMATION else MAP_ANIMATION
+                        map.controller.animateTo(GeoPoint(location.lat, location.lng), DEFAULT_MAP_ZOOM, animationSpeed)
                     }  else {
                         map.controller.setZoom(MIN_MAP_ZOOM)
                     }
@@ -317,7 +319,7 @@ object DeviceDetailsScreen {
 
 
     private const val MAP_ANIMATION = 300L
-    private const val MAP_NO_ANIMATION = 300L
+    private const val MAP_NO_ANIMATION = 0L
     private const val DEFAULT_MAP_ZOOM = 15.0
     private const val MAX_MAP_ZOOM = 18.0
     private const val MIN_MAP_ZOOM = 3.0
