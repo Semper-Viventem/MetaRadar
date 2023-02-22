@@ -26,7 +26,7 @@ class DeviceDetailsViewModel(
 
     var deviceState: DeviceData? by mutableStateOf(null)
     var points: List<LocationModel> by mutableStateOf(emptyList())
-    var historyPeriod: HistoryPeriod by mutableStateOf(HistoryPeriod.DAY)
+    var historyPeriod: HistoryPeriod by mutableStateOf(DEFAULT_HISTORY_PERIOD)
     var currentLocation: LocationModel? by mutableStateOf(null)
 
     fun setAddress(address: String) {
@@ -45,7 +45,7 @@ class DeviceDetailsViewModel(
             back()
         } else {
             deviceState = device
-            refreshLocationHistory(address)
+            refreshLocationHistory(address, autotunePeriod = true)
         }
     }
 
@@ -60,15 +60,35 @@ class DeviceDetailsViewModel(
         }
     }
 
-    private suspend fun refreshLocationHistory(address: String) {
+    private suspend fun refreshLocationHistory(address: String, autotunePeriod: Boolean) {
         val fromTime = System.currentTimeMillis() - historyPeriod.periodMills
-        points = locationRepository.getAllLocationsByAddress(address, fromTime = fromTime)
+        val fetched = locationRepository.getAllLocationsByAddress(address, fromTime = fromTime)
+        val nextStep = historyPeriod.next()
+        val prev = historyPeriod.previous()
+
+        val shouldStepBack = autotunePeriod
+                && fetched.size > MAX_POINTS_FOR_AUTO_UPGRADE_PERIOD
+                && prev != null
+
+        val shouldStepNext = autotunePeriod && fetched.isEmpty() && nextStep != null
+
+        if (shouldStepBack) {
+            selectHistoryPeriodSelected(prev!!, address, autotunePeriod = false)
+        } else if (shouldStepNext) {
+            selectHistoryPeriodSelected(nextStep!!, address, autotunePeriod)
+        } else if (fetched.isNotEmpty()) {
+            points = fetched
+        }
     }
 
-    fun selectHistoryPeriodSelected(newHistoryPeriod: HistoryPeriod, device: DeviceData) {
+    fun selectHistoryPeriodSelected(
+        newHistoryPeriod: HistoryPeriod,
+        address: String,
+        autotunePeriod: Boolean
+    ) {
         viewModelScope.launch {
             historyPeriod = newHistoryPeriod
-            refreshLocationHistory(device.address)
+            refreshLocationHistory(address, autotunePeriod = autotunePeriod)
         }
     }
 
@@ -83,11 +103,23 @@ class DeviceDetailsViewModel(
         router.navigate(BackCommand)
     }
 
-    enum class HistoryPeriod(val periodMills: Long, val displayName: String) {
+    enum class HistoryPeriod(
+        val periodMills: Long,
+        val displayName: String,
+    ) {
+
         DAY(HISTORY_PERIOD_DAY, displayName = "Day"),
         WEEK(HISTORY_PERIOD_WEEK, displayName = "Week"),
         MONTH(HISTORY_PERIOD_MONTH, displayName = "Month"),
-        ALL(HISTORY_PERIOD_LONG, displayName = "All time"),
+        ALL(HISTORY_PERIOD_LONG, displayName = "All time");
+
+        fun next(): HistoryPeriod? {
+            return HistoryPeriod.values().getOrNull(ordinal + 1)
+        }
+
+        fun previous(): HistoryPeriod? {
+            return HistoryPeriod.values().getOrNull(ordinal - 1)
+        }
     }
 
     companion object {
@@ -95,5 +127,7 @@ class DeviceDetailsViewModel(
         private const val HISTORY_PERIOD_WEEK = 7 * 24 * 60 * 60 * 1000L // 1 week
         private const val HISTORY_PERIOD_MONTH = 31 * 24 * 60 * 60 * 1000L // 1 month
         private const val HISTORY_PERIOD_LONG = Long.MAX_VALUE
+        private const val MAX_POINTS_FOR_AUTO_UPGRADE_PERIOD = 20_000
+        private val DEFAULT_HISTORY_PERIOD = HistoryPeriod.DAY
     }
 }

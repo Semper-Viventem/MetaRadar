@@ -192,21 +192,28 @@ object DeviceDetailsScreen {
             AlertDialog(
                 onDismissRequest = { expanded.value = false },
                 title = {
-                    Text("Change location history", fontSize = 20.sp, fontWeight = FontWeight.Black)
+                    Text("Change location history period", fontSize = 20.sp, fontWeight = FontWeight.Black)
                 },
                 buttons = {
                     Column(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         DeviceDetailsViewModel.HistoryPeriod.values().forEach { period ->
+                            val isSelected = viewModel.historyPeriod == period
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                    viewModel.selectHistoryPeriodSelected(period, deviceData)
+                                    viewModel.selectHistoryPeriodSelected(period, deviceData.address, autotunePeriod = false)
                                     expanded.value = false
-                                }
+                                },
+                                enabled = !isSelected,
                             ) {
-                                Text(text = period.displayName)
+                                val text = if (isSelected) {
+                                    "${period.displayName} (selected)"
+                                } else {
+                                    period.displayName
+                                }
+                                Text(text = text)
                             }
                         }
                     }

@@ -111,12 +111,10 @@ class DevicesRepository(
                 device.manufacturerInfo?.airdrop?.contacts?.map { it.sha256 to device.address }
                     ?: emptyList()
             }.toMap()
-            val mergedContacts =
-                mergeWithExisting(devices.flatMap {
+            val mergedContacts = mergeWithExisting(devices.flatMap {
                     it.manufacturerInfo?.airdrop?.contacts ?: emptyList()
                 })
-            val mappedContacts =
-                mergedContacts.mapNotNull { contact ->
+            val mappedContacts = mergedContacts.mapNotNull { contact ->
                     addressesMap[contact.sha256]?.let { contact.toData(it) }
                 }
             appleContactsDao.insertAll(mappedContacts)
