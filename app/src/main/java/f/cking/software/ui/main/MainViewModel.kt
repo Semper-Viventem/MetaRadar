@@ -74,7 +74,6 @@ class MainViewModel(
 
     fun runBackgroundScanning() {
         checkPermissions {
-            permissionHelper.checkDozeModePermission()
             if (BgScanService.isActive.value) {
                 BgScanService.stop(appContext)
             } else {

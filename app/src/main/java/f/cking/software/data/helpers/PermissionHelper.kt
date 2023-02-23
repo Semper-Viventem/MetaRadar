@@ -47,9 +47,11 @@ class PermissionHelper(
         }
     }
 
-    fun pendingPermissionGranted() {
-        pending?.invoke()
-        pending = null
+    fun onPermissionGranted(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        val allPermissionsGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (requestCode == PERMISSIONS_REQUEST_CODE && allPermissionsGranted) {
+            pending?.invoke()
+        }
     }
 
     private fun requestPermissions(
