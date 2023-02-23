@@ -62,7 +62,7 @@ class DevicesRepository(
 
     suspend fun deleteAllByAddress(addresses: List<String>) {
         withContext(Dispatchers.IO) {
-            addresses.splitToBatches(DatabaseUtils.MAX_SQL_VARIABLES).forEach { addressesBatch ->
+            addresses.splitToBatches(DatabaseUtils.getMaxSQLVariablesNumber()).forEach { addressesBatch ->
                 deviceDao.deleteAllByAddress(addressesBatch)
             }
             notifyListeners()
@@ -71,7 +71,7 @@ class DevicesRepository(
 
     suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
         return withContext(Dispatchers.IO) {
-            addresses.splitToBatches(DatabaseUtils.MAX_SQL_VARIABLES).flatMap {
+            addresses.splitToBatches(DatabaseUtils.getMaxSQLVariablesNumber()).flatMap {
                 deviceDao.findAllByAddresses(addresses).toDomainWithAirDrop()
             }
         }
@@ -155,7 +155,7 @@ class DevicesRepository(
         return withContext(Dispatchers.IO) {
 
             val allRelatedContacts =
-                splitToBatches(DatabaseUtils.MAX_SQL_VARIABLES).flatMap { batch ->
+                splitToBatches(DatabaseUtils.getMaxSQLVariablesNumber()).flatMap { batch ->
                     appleContactsDao.getByAddresses(batch.map { it.address })
                 }
 

@@ -48,7 +48,7 @@ class LocationRepository(
 
     suspend fun removeDeviceLocationsByAddresses(addresses: List<String>) {
         withContext(Dispatchers.IO) {
-            addresses.splitToBatches(DatabaseUtils.MAX_SQL_VARIABLES).forEach { addressesBatch ->
+            addresses.splitToBatches(DatabaseUtils.getMaxSQLVariablesNumber()).forEach { addressesBatch ->
                 locationDao.removeDeviceLocationsByAddresses(addresses)
             }
         }
