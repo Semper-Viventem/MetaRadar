@@ -12,10 +12,7 @@ import androidx.lifecycle.viewModelScope
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
-import f.cking.software.domain.interactor.BackupDatabaseInteractor
-import f.cking.software.domain.interactor.ClearGarbageInteractor
-import f.cking.software.domain.interactor.SaveReportInteractor
-import f.cking.software.domain.interactor.filterchecker.CreateBackupFileInteractor
+import f.cking.software.domain.interactor.*
 import f.cking.software.domain.model.JournalEntry
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -29,6 +26,8 @@ class SettingsViewModel(
     private val backupDatabaseInteractor: BackupDatabaseInteractor,
     private val saveReportInteractor: SaveReportInteractor,
     private val createBackupFileInteractor: CreateBackupFileInteractor,
+    private val selectBackupFileInteractor: SelectBackupFileInteractor,
+    private val restoreDatabaseInteractor: RestoreDatabaseInteractor,
 ) : ViewModel() {
 
     private val TAG = "SettingsViewModel"
@@ -92,12 +91,40 @@ class SettingsViewModel(
         }
     }
 
+    fun onRestoreDBClick() {
+        viewModelScope.launch {
+            selectBackupFileInteractor.execute()
+                .catch { reportError(it) }
+                .collect { uri ->
+                    if (uri != null) {
+                        restoreFrom(uri)
+                    } else {
+                        toast("File wasn't selected")
+                    }
+                }
+        }
+    }
+
     private fun observeLocationData() {
         viewModelScope.launch {
             locationProvider.observeLocation()
                 .collect { locationHandle ->
                     locationData = locationHandle
                 }
+        }
+    }
+
+    private fun restoreFrom(uri: Uri) {
+        viewModelScope.launch {
+            backupDbInProgress = true
+            try {
+                restoreDatabaseInteractor.execute(uri)
+            } catch (e: Throwable) {
+                toast("Cannot restore database. See report in the Journal")
+                reportError(e)
+            }
+            backupDbInProgress = false
+            toast("Database was restored from backup")
         }
     }
 

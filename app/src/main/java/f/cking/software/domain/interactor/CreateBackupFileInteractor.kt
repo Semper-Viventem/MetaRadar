@@ -1,4 +1,4 @@
-package f.cking.software.domain.interactor.filterchecker
+package f.cking.software.domain.interactor
 
 import android.content.Context
 import android.net.Uri

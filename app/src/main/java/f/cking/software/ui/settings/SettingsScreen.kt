@@ -44,6 +44,8 @@ object SettingsScreen {
             UseGpsLocationOnly(viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             BackupDB(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            RestoreDB(viewModel = viewModel)
         }
     }
 
@@ -104,6 +106,37 @@ object SettingsScreen {
             enabled = !viewModel.garbageRemovingInProgress
         ) {
             Text(text = "Clear garbage")
+        }
+    }
+
+    @Composable
+    private fun RestoreDB(viewModel: SettingsViewModel) {
+        val dialogState = rememberMaterialDialogState()
+
+        MaterialDialog(
+            dialogState = dialogState,
+            buttons = {
+                negativeButton(text = "Cancel") { dialogState.hide() }
+                positiveButton(text = "Confirm") {
+                    dialogState.hide()
+                    viewModel.onRestoreDBClick()
+                }
+            },
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(text = "Restore database from file?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = "The current database will be overwritten, data will be lost")
+            }
+        }
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            onClick = { dialogState.show() },
+            enabled = !viewModel.backupDbInProgress
+        ) {
+            Text(text = "Restore database")
         }
     }
 

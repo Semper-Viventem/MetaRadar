@@ -18,7 +18,10 @@ class IntentHelper(private val activityProvider: ActivityProvider) {
     }
 
     fun selectFile(onResult: (filePath: Uri?) -> Unit) {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        }
         activityProvider.requireActivity().startActivityForResult(intent, ACTIVITY_RESULT_SELECT_FILE)
         pendingConsumers[ACTIVITY_RESULT_SELECT_FILE] = onResult
     }
@@ -40,14 +43,6 @@ class IntentHelper(private val activityProvider: ActivityProvider) {
         } else {
             consumer?.invoke(null)
         }
-    }
-
-    fun restartTheApp() {
-        val ctx = activityProvider.requireActivity()
-        val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)
-        intent!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        ctx.startActivity(intent)
-        System.exit(0)
     }
 
     companion object {

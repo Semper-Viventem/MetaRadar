@@ -108,6 +108,8 @@ dependencies {
     // Map
     implementation(libs.map)
 
+    implementation(libs.process.phoenix)
+
     // tests
     testImplementation(libs.junit)
     androidTestImplementation("androidx.test.ext:junit:1.1.4")

@@ -1,6 +1,5 @@
 package f.cking.software.domain.interactor
 
-import f.cking.software.domain.interactor.filterchecker.CreateBackupFileInteractor
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import org.koin.dsl.module
 
@@ -23,5 +22,7 @@ object InteractorsModule {
         factory { SaveReportInteractor(get()) }
         factory { BackupDatabaseInteractor(get(), get()) }
         factory { CreateBackupFileInteractor(get(), get()) }
+        factory { SelectBackupFileInteractor(get(), get()) }
+        factory { RestoreDatabaseInteractor(get(), get(), get()) }
     }
 }

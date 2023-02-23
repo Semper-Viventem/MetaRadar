@@ -63,6 +63,7 @@ koin = "3.2.2"
 koin-android = "3.3.0"
 koin-android-compose = "3.3.0"
 compose-dialogs = "0.9.0"
+process-phoenix = "2.1.2"
 
 # Testing
 junit = "4.12"
@@ -230,6 +231,8 @@ koin = { module = "io.insert-koin:koin-core", version.ref = "koin"}
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-android"}
 koin-android-compat = { module = "io.insert-koin:koin-android-compat", version.ref = "koin-android"}
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-android-compose"}
+
+process-phoenix = { module = "com.jakewharton:process-phoenix", version.ref = "process-phoenix"}
 
 map = { module = "org.osmdroid:osmdroid-android", version.ref = "map" }
 

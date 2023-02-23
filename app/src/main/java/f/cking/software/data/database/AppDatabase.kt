@@ -12,7 +12,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 
 @Database(
     entities = [
@@ -34,8 +33,6 @@ abstract class AppDatabase : RoomDatabase() {
 
     private val TAG = "AppDatabase"
 
-    lateinit var databaseName: String
-
     abstract fun deviceDao(): DeviceDao
     abstract fun radarProfileDao(): RadarProfileDao
     abstract fun appleContactDao(): AppleContactDao
@@ -46,29 +43,49 @@ abstract class AppDatabase : RoomDatabase() {
     suspend fun backupDatabase(toUri: Uri, context: Context) {
         Log.i(TAG, "Backup DB to file: ${toUri}")
         withContext(Dispatchers.IO) {
-            val dbFile = File(context.getDatabasePath(databaseName).toString())
+            val dbFile = File(context.getDatabasePath(openHelper.databaseName).toString())
             if (!dbFile.exists()) {
                 throw IllegalStateException("The database file doesn't exist")
             }
-            context.contentResolver.openFileDescriptor(toUri, "w")?.use { target ->
-                FileOutputStream(target.fileDescriptor).use { outputStream ->
-                    outputStream.write(dbFile.readBytes())
-                }
+            context.contentResolver.openOutputStream(toUri)?.use { outputStream ->
+                outputStream.write(dbFile.readBytes())
             }
         }
     }
 
-    suspend fun restoreDatabase(fromFile: File, context: Context) {
+    suspend fun restoreDatabase(fromUri: Uri, context: Context) {
         withContext(Dispatchers.IO) {
-            val dbFile = File(context.getDatabasePath(databaseName).toString())
-            if (!dbFile.exists()) {
-                dbFile.createNewFile()
+            close()
+
+            val contentResolver = context.contentResolver
+            val tmpDatabaseName = openHelper.databaseName + "_tmp"
+            val dbFile = File(context.getDatabasePath(openHelper.databaseName).toString())
+            val tmpFile = File(context.getDatabasePath(tmpDatabaseName).toString())
+
+            if (!tmpFile.exists()) {
+                tmpFile.createNewFile()
             }
-            if (!fromFile.exists()) {
-                throw IllegalArgumentException("The backup file doesn't exist (${fromFile.path})")
+
+            contentResolver.openInputStream(fromUri).use { inputStream ->
+                inputStream?.copyTo(tmpFile.outputStream()) ?: throw RuntimeException("Cannot open file")
             }
-            fromFile.copyTo(dbFile, overwrite = true)
+
+            try {
+                testDatabase(tmpDatabaseName, context)
+            } catch (e: Throwable) {
+                tmpFile.delete()
+                throw IllegalStateException("Cannot restore database from selected file")
+            }
+
+            tmpFile.renameTo(dbFile)
+            tmpFile.delete()
         }
+    }
+
+    private fun testDatabase(name: String, context: Context) {
+        val testDb = build(context, name)
+        testDb.openHelper.writableDatabase.isDatabaseIntegrityOk
+        testDb.close()
     }
 
     companion object {
@@ -83,9 +100,6 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_8_9,
                 )
                 .build()
-                .apply {
-                    databaseName = name
-                }
         }
 
         private val MIGRATION_2_3 = migration(2, 3) {

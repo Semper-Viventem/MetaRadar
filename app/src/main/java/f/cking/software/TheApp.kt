@@ -6,6 +6,7 @@ import f.cking.software.domain.interactor.InteractorsModule
 import f.cking.software.ui.UiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 
 class TheApp : Application() {
 
@@ -24,6 +25,11 @@ class TheApp : Application() {
                 UiModule.module,
             )
         }
+    }
+
+    fun restartKoin() {
+        stopKoin()
+        initDi()
     }
 
     companion object {
