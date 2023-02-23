@@ -1,5 +1,6 @@
 package f.cking.software.ui
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -17,6 +18,8 @@ import f.cking.software.R
 import f.cking.software.common.navigation.BackCommand
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.common.navigation.Navigator
+import f.cking.software.data.helpers.ActivityProvider
+import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.PermissionHelper
 import org.koin.android.ext.android.inject
 import org.osmdroid.config.Configuration
@@ -26,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "Main Activity"
 
     private val permissionHelper: PermissionHelper by inject()
+    private val intentHelper: IntentHelper by inject()
+    private val activityProvider: ActivityProvider by inject()
     private val router: NavRouter by inject()
     private val sharedPreferences: SharedPreferences by inject()
     private val viewModel: MainActivityViewModel by viewModels {
@@ -38,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         router.attachNavigator(viewModel.navigator)
 
-        permissionHelper.setActivity(this)
+        activityProvider.setActivity(this)
 
         setContent {
             val focusManager = LocalFocusManager.current
@@ -74,12 +79,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        intentHelper.handleActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onBackPressed() {
         router.navigate(BackCommand)
     }
 
     override fun onDestroy() {
-        permissionHelper.setActivity(null)
+        activityProvider.setActivity(null)
         router.detachNavigator()
         super.onDestroy()
     }

@@ -1,6 +1,8 @@
 package f.cking.software.ui.settings
 
 import android.app.Application
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +12,12 @@ import androidx.lifecycle.viewModelScope
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
+import f.cking.software.domain.interactor.BackupDatabaseInteractor
 import f.cking.software.domain.interactor.ClearGarbageInteractor
+import f.cking.software.domain.interactor.SaveReportInteractor
+import f.cking.software.domain.interactor.filterchecker.CreateBackupFileInteractor
+import f.cking.software.domain.model.JournalEntry
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -19,10 +26,16 @@ class SettingsViewModel(
     private val locationRepository: LocationRepository,
     private val locationProvider: LocationProvider,
     private val context: Application,
+    private val backupDatabaseInteractor: BackupDatabaseInteractor,
+    private val saveReportInteractor: SaveReportInteractor,
+    private val createBackupFileInteractor: CreateBackupFileInteractor,
 ) : ViewModel() {
+
+    private val TAG = "SettingsViewModel"
 
     var garbageRemovingInProgress: Boolean by mutableStateOf(false)
     var locationRemovingInProgress: Boolean by mutableStateOf(false)
+    var backupDbInProgress: Boolean by mutableStateOf(false)
     var useGpsLocationOnly: Boolean by mutableStateOf(settingsRepository.getUseGpsLocationOnly())
     var locationData: LocationProvider.LocationHandle? by mutableStateOf(null)
 
@@ -34,8 +47,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             garbageRemovingInProgress = true
             val garbageCount = clearGarbageInteractor.execute()
-            Toast.makeText(context, "Cleared $garbageCount garbage devices", Toast.LENGTH_SHORT)
-                .show()
+            toast("Cleared $garbageCount garbage devices")
             garbageRemovingInProgress = false
         }
     }
@@ -44,7 +56,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             locationRemovingInProgress = true
             locationRepository.removeAllLocations()
-            Toast.makeText(context, "Location history was removed", Toast.LENGTH_SHORT).show()
+            toast("Location history was removed")
             locationRemovingInProgress = false
         }
     }
@@ -63,12 +75,58 @@ class SettingsViewModel(
         }
     }
 
+    fun onBackupDBClick() {
+        viewModelScope.launch {
+            createBackupFileInteractor.execute()
+                .catch {
+                    toast("Backup has failed. See report in the Journal")
+                    reportError(it)
+                }
+                .collect { uri ->
+                    if (uri != null) {
+                        backupFileTo(uri)
+                    } else {
+                        toast("Directory wasn't selected")
+                    }
+                }
+        }
+    }
+
     private fun observeLocationData() {
         viewModelScope.launch {
             locationProvider.observeLocation()
                 .collect { locationHandle ->
                     locationData = locationHandle
                 }
+        }
+    }
+
+    private fun backupFileTo(uri: Uri) {
+        viewModelScope.launch {
+            backupDbInProgress = true
+            try {
+                backupDatabaseInteractor.execute(uri)
+            } catch (e: Throwable) {
+                toast("Backup has failed. See report in the Journal")
+                reportError(e)
+            }
+            backupDbInProgress = false
+            toast("Backup has succeeded")
+        }
+    }
+
+    private fun toast(text: String) {
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun reportError(error: Throwable) {
+        Log.e(TAG, "Settings error", error)
+        viewModelScope.launch {
+            val report = JournalEntry.Report.Error(
+                title = "[Settings]: ${error.message ?: error::class.java}",
+                stackTrace = error.stackTraceToString(),
+            )
+            saveReportInteractor.execute(report)
         }
     }
 }

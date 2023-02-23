@@ -3,9 +3,7 @@ package f.cking.software.data
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import f.cking.software.data.database.AppDatabase
-import f.cking.software.data.helpers.BleScannerHelper
-import f.cking.software.data.helpers.LocationProvider
-import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.data.helpers.*
 import f.cking.software.data.repo.*
 import org.koin.dsl.module
 
@@ -19,7 +17,9 @@ class DataModule(
         single { SettingsRepository(get()) }
         single { AppDatabase.build(get(), appDatabaseName) }
         single { DevicesRepository(get()) }
-        single { PermissionHelper(get()) }
+        single { PermissionHelper(get(), get()) }
+        single { ActivityProvider() }
+        single { IntentHelper(get()) }
         single { RadarProfilesRepository(get()) }
         single { LocationProvider(get(), get(), get()) }
         single { LocationRepository(get()) }

@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.dateTimeStringFormat
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,6 +42,8 @@ object SettingsScreen {
             LocationInfo(viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             UseGpsLocationOnly(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            BackupDB(viewModel = viewModel)
         }
     }
 
@@ -100,6 +104,37 @@ object SettingsScreen {
             enabled = !viewModel.garbageRemovingInProgress
         ) {
             Text(text = "Clear garbage")
+        }
+    }
+
+    @Composable
+    private fun BackupDB(viewModel: SettingsViewModel) {
+        val dialogState = rememberMaterialDialogState()
+
+        MaterialDialog(
+            dialogState = dialogState,
+            buttons = {
+                negativeButton(text = "Cancel") { dialogState.hide() }
+                positiveButton(text = "Confirm") {
+                    dialogState.hide()
+                    viewModel.onBackupDBClick()
+                }
+            },
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(text = "Save database to devise storage?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = "The database contains your location history. Please handle it with care, this is your sensitive data")
+            }
+        }
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            onClick = { dialogState.show() },
+            enabled = !viewModel.backupDbInProgress
+        ) {
+            Text(text = "Backup database")
         }
     }
 

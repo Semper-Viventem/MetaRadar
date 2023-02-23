@@ -2,7 +2,6 @@ package f.cking.software.data.helpers
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,9 +13,9 @@ import androidx.core.app.ActivityCompat
 
 class PermissionHelper(
     private val context: Context,
+    private val activityProvider: ActivityProvider,
 ) {
 
-    private var activity: Activity? = null
     private var pending: (() -> Unit)? = null
 
     fun checkBlePermissions(
@@ -44,7 +43,7 @@ class PermissionHelper(
                 action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
                 data = Uri.parse("package:${context.packageName}")
             }
-            requireActivity().startActivity(intent)
+            activityProvider.requireActivity().startActivity(intent)
         }
     }
 
@@ -60,7 +59,7 @@ class PermissionHelper(
     ) {
         this.pending = onPermissionGranted
         ActivityCompat.requestPermissions(
-            requireActivity(),
+            activityProvider.requireActivity(),
             permissions,
             permissionRequestCode
         )
@@ -71,12 +70,6 @@ class PermissionHelper(
             context,
             permission
         ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requireActivity(): Activity = activity ?: throw IllegalStateException("Activity is not attached!")
-
-    fun setActivity(activity: Activity?) {
-        this.activity = activity
     }
 
     companion object {

@@ -1,12 +1,18 @@
 package f.cking.software.data.database
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 @Database(
     entities = [
@@ -25,12 +31,45 @@ import androidx.sqlite.db.SupportSQLiteDatabase
     version = 10,
 )
 abstract class AppDatabase : RoomDatabase() {
+
+    private val TAG = "AppDatabase"
+
+    lateinit var databaseName: String
+
     abstract fun deviceDao(): DeviceDao
     abstract fun radarProfileDao(): RadarProfileDao
     abstract fun appleContactDao(): AppleContactDao
     abstract fun locationDao(): LocationDao
 
     abstract fun journalDao(): JournalDao
+
+    suspend fun backupDatabase(toUri: Uri, context: Context) {
+        Log.i(TAG, "Backup DB to file: ${toUri}")
+        withContext(Dispatchers.IO) {
+            val dbFile = File(context.getDatabasePath(databaseName).toString())
+            if (!dbFile.exists()) {
+                throw IllegalStateException("The database file doesn't exist")
+            }
+            context.contentResolver.openFileDescriptor(toUri, "w")?.use { target ->
+                FileOutputStream(target.fileDescriptor).use { outputStream ->
+                    outputStream.write(dbFile.readBytes())
+                }
+            }
+        }
+    }
+
+    suspend fun restoreDatabase(fromFile: File, context: Context) {
+        withContext(Dispatchers.IO) {
+            val dbFile = File(context.getDatabasePath(databaseName).toString())
+            if (!dbFile.exists()) {
+                dbFile.createNewFile()
+            }
+            if (!fromFile.exists()) {
+                throw IllegalArgumentException("The backup file doesn't exist (${fromFile.path})")
+            }
+            fromFile.copyTo(dbFile, overwrite = true)
+        }
+    }
 
     companion object {
         fun build(context: Context, name: String): AppDatabase {
@@ -44,6 +83,9 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_8_9,
                 )
                 .build()
+                .apply {
+                    databaseName = name
+                }
         }
 
         private val MIGRATION_2_3 = migration(2, 3) {
