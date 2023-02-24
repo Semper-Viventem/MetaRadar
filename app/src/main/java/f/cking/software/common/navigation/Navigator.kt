@@ -19,7 +19,7 @@ class Navigator(
     fun handle(command: NavigationCommand) {
         when (command) {
             is BackCommand -> handleBack()
-            is AddToStackCommand -> handleAddToStackCommand(command.screenFunction)
+            is AddToStackCommand -> handleAddToStackCommand { command.screenFunction(command.key)}
             is DialogCommand -> handleAddToStackCommand {
                 val dialog = command.dialogProvider.invoke {
                     handleBack()

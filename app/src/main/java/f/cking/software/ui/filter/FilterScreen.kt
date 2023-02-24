@@ -21,13 +21,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.ClickableField
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.dateTimeFormat
 import f.cking.software.orNull
 import f.cking.software.ui.ScreenNavigationCommands
-import f.cking.software.ui.selectfiltertype.FilterType
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -55,23 +55,6 @@ object FilterScreen {
             is FilterUiState.FirstDetectionInterval -> FilterFirstDetectionInterval(router, filterState, onDeleteClick)
             is FilterUiState.IsFollowing -> FilterIsFollowing(filterState, router, onDeleteClick)
             is FilterUiState.Unknown, is FilterUiState.Interval -> FilterUnknown(filterState, onDeleteClick)
-        }
-    }
-
-    fun getFilterByType(type: FilterType): FilterUiState {
-        return when (type) {
-            FilterType.NAME -> FilterUiState.Name()
-            FilterType.ADDRESS -> FilterUiState.Address()
-            FilterType.BY_LAST_DETECTION -> FilterUiState.LastDetectionInterval()
-            FilterType.BY_FIRST_DETECTION -> FilterUiState.FirstDetectionInterval()
-            FilterType.BY_IS_FAVORITE -> FilterUiState.IsFavorite()
-            FilterType.BY_MANUFACTURER -> FilterUiState.Manufacturer()
-            FilterType.BY_LOGIC_ALL -> FilterUiState.All()
-            FilterType.BY_LOGIC_ANY -> FilterUiState.Any()
-            FilterType.BY_LOGIC_NOT -> FilterUiState.Not()
-            FilterType.BY_MIN_DETECTION_TIME -> FilterUiState.MinLostTime()
-            FilterType.AIRDROP_CONTACT -> FilterUiState.AppleAirdropContact()
-            FilterType.IS_FOLLOWING -> FilterUiState.IsFollowing()
         }
     }
 
@@ -416,15 +399,16 @@ object FilterScreen {
         router: NavRouter,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
+        val selectFilterDialog = rememberMaterialDialogState()
+        SelectFilterTypeScreen.Dialog(selectFilterDialog) { newFilter ->
+            filter.filters = filter.filters + listOf(newFilter)
+        }
+
         FilterGroup(
             title = stringResource(R.string.filter_all_of),
             color = colorResource(R.color.filter_all),
             addText = stringResource(R.string.add_filter),
-            addClick = {
-                router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                    filter.filters = filter.filters + listOf(getFilterByType(type))
-                })
-            },
+            addClick = { selectFilterDialog.show() },
             onDeleteClick = { onDeleteClick.invoke(filter) }
         ) {
             filter.filters.forEach {
@@ -440,15 +424,16 @@ object FilterScreen {
         router: NavRouter,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
+        val selectFilterDialog = rememberMaterialDialogState()
+        SelectFilterTypeScreen.Dialog(selectFilterDialog) { newFilter ->
+            filter.filters = filter.filters + listOf(newFilter)
+        }
+
         FilterGroup(
             title = stringResource(R.string.filter_any_of),
             color = colorResource(R.color.filter_any),
             addText = stringResource(R.string.add_filter),
-            addClick = {
-                router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                    filter.filters = filter.filters + listOf(getFilterByType(type))
-                })
-            },
+            addClick = { selectFilterDialog.show() },
             onDeleteClick = { onDeleteClick.invoke(filter) }
         ) {
             filter.filters.forEach {
@@ -465,6 +450,11 @@ object FilterScreen {
         router: NavRouter,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
+        val selectFilterDialog = rememberMaterialDialogState()
+        SelectFilterTypeScreen.Dialog(selectFilterDialog) { newFilter ->
+            filter.filter = Optional.of(newFilter)
+        }
+
         FilterBase(
             title = stringResource(R.string.filter_not),
             color = colorResource(R.color.filter_not),
@@ -474,11 +464,7 @@ object FilterScreen {
                 Filter(filter.filter.get(), router = router, onDeleteClick = filter::delete)
             } else {
                 Chip(
-                    onClick = {
-                        router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                            filter.filter = Optional.of(getFilterByType(type))
-                        })
-                    },
+                    onClick = { selectFilterDialog.show() },
                     colors = ChipDefaults.chipColors(
                         backgroundColor = colorResource(R.color.filter_not),
                         contentColor = Color.Black,

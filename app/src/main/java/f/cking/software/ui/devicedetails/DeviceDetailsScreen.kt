@@ -28,6 +28,7 @@ import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.dpToPx
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -36,9 +37,8 @@ import org.osmdroid.views.overlay.Marker
 object DeviceDetailsScreen {
 
     @Composable
-    fun Screen(address: String) {
-        val viewModel: DeviceDetailsViewModel = koinViewModel()
-        viewModel.setAddress(address)
+    fun Screen(address: String,key: String) {
+        val viewModel: DeviceDetailsViewModel = koinViewModel(key = key) { parametersOf(address) }
 
         Scaffold(
             modifier = Modifier

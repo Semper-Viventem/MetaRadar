@@ -8,7 +8,6 @@ import f.cking.software.ui.main.MainViewModel
 import f.cking.software.ui.profiledetails.ProfileDetailsViewModel
 import f.cking.software.ui.profileslist.ProfilesListViewModel
 import f.cking.software.ui.selectdevice.SelectDeviceViewModel
-import f.cking.software.ui.selectfiltertype.SelectFilterTypeViewModel
 import f.cking.software.ui.selectmanufacturer.SelectManufacturerViewModel
 import f.cking.software.ui.settings.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -21,11 +20,10 @@ object UiModule {
         viewModel { DeviceListViewModel(get(), get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { ProfilesListViewModel(get(), get()) }
-        viewModel { ProfileDetailsViewModel(get(), get(), get()) }
-        viewModel { SelectFilterTypeViewModel(get()) }
+        viewModel { ProfileDetailsViewModel(profileId = it[0], get(), get(), get()) }
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
-        viewModel { DeviceDetailsViewModel(get(), get(), get(), get(), get()) }
+        viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get()) }
         viewModel { JournalViewModel(get(), get(), get(), get(), get()) }
     }
 }

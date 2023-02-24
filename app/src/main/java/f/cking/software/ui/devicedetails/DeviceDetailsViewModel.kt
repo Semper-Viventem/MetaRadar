@@ -17,6 +17,7 @@ import f.cking.software.domain.toDomain
 import kotlinx.coroutines.launch
 
 class DeviceDetailsViewModel(
+    private val address: String,
     private val router: NavRouter,
     private val devicesRepository: DevicesRepository,
     private val locationRepository: LocationRepository,
@@ -29,11 +30,8 @@ class DeviceDetailsViewModel(
     var historyPeriod: HistoryPeriod by mutableStateOf(DEFAULT_HISTORY_PERIOD)
     var currentLocation: LocationModel? by mutableStateOf(null)
 
-    fun setAddress(address: String) {
+    init {
         viewModelScope.launch {
-            deviceState = null
-            points = emptyList()
-            historyPeriod = HistoryPeriod.DAY
             observeLocation()
             loadDevice(address)
         }

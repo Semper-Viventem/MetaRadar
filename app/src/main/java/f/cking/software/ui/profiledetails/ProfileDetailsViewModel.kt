@@ -12,53 +12,41 @@ import f.cking.software.common.navigation.BackCommand
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.orNull
 import f.cking.software.ui.filter.FilterUiMapper
 import f.cking.software.ui.filter.FilterUiState
 import kotlinx.coroutines.launch
-import java.util.*
 
 class ProfileDetailsViewModel(
-    private val radarProfilesRepository: RadarProfilesRepository,
+    val profileId: Int?,
     val router: NavRouter,
-    val context: Application,
+    private val radarProfilesRepository: RadarProfilesRepository,
+    private val context: Application,
 ) : ViewModel() {
 
-    var profileId: Optional<Int> by mutableStateOf(Optional.empty())
     var originalProfile: RadarProfile? = null
-
     var name: String by mutableStateOf("")
     var description: String by mutableStateOf("")
     var isActive: Boolean by mutableStateOf(true)
     var filter: FilterUiState? by mutableStateOf(null)
 
     init {
-        initProfile(profileId.orNull())
-    }
-
-    fun setId(id: Int?) {
-        profileId = Optional.ofNullable(id)
-        name = ""
-        description = ""
-        isActive = true
-        filter = null
-        initProfile(id)
+        if (profileId != null) {
+            loadProfile(profileId)
+        }
     }
 
     fun onIsActiveClick() {
         isActive = !isActive
     }
 
-    private fun initProfile(id: Int?) {
-        if (id != null) {
-            viewModelScope.launch {
-                val profile = radarProfilesRepository.getById(id = id)
-                loadExisting(profile)
-            }
+    private fun loadProfile(id: Int) {
+        viewModelScope.launch {
+            val profile = radarProfilesRepository.getById(id = id)
+            handleProfile(profile)
         }
     }
 
-    private fun loadExisting(profile: RadarProfile?) {
+    private fun handleProfile(profile: RadarProfile?) {
         if (profile != null) {
             originalProfile = profile
             name = profile.name
@@ -79,9 +67,9 @@ class ProfileDetailsViewModel(
     }
 
     fun onRemoveClick() {
-        if (profileId.isPresent) {
+        if (profileId != null) {
             viewModelScope.launch {
-                radarProfilesRepository.deleteProfile(profileId.get())
+                radarProfilesRepository.deleteProfile(profileId!!)
                 Toast.makeText(context, context.getString(R.string.profile_has_been_removed), Toast.LENGTH_SHORT).show()
                 back()
             }
@@ -99,7 +87,7 @@ class ProfileDetailsViewModel(
 
     fun buildProfile(): RadarProfile {
         return RadarProfile(
-            id = profileId.orNull(),
+            id = profileId,
             name = name,
             description = description,
             isActive = isActive,

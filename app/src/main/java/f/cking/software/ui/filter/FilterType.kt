@@ -1,4 +1,4 @@
-package f.cking.software.ui.selectfiltertype
+package f.cking.software.ui.filter
 
 import androidx.annotation.StringRes
 import f.cking.software.R

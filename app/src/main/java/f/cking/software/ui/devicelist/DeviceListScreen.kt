@@ -27,11 +27,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.DeviceListItem
 import f.cking.software.common.Divider
 import f.cking.software.ui.ScreenNavigationCommands
-import f.cking.software.ui.filter.FilterScreen
+import f.cking.software.ui.filter.SelectFilterTypeScreen
 import org.koin.androidx.compose.koinViewModel
 
 object DeviceListScreen {
@@ -122,6 +123,20 @@ object DeviceListScreen {
 
         val filterName = stringResource(R.string.custom_filter)
 
+        val selectFilterDialog = rememberMaterialDialogState()
+        SelectFilterTypeScreen.Dialog(selectFilterDialog) { initialFilter ->
+            viewModel.router.navigate(ScreenNavigationCommands.OpenCreateFilterScreen(
+                initialFilterState = initialFilter,
+                router = viewModel.router,
+            ) { filter ->
+                val filterHolder = DeviceListViewModel.FilterHolder(
+                    displayName = filterName,
+                    filter = filter,
+                )
+                viewModel.onFilterClick(filterHolder)
+            })
+        }
+
         Chip(
             colors = ChipDefaults.chipColors(
                 backgroundColor = Color.LightGray,
@@ -131,20 +146,7 @@ object DeviceListScreen {
             leadingIcon = {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
             },
-            onClick = {
-                viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { initialFilter ->
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenCreateFilterScreen(
-                        initialFilterState = FilterScreen.getFilterByType(initialFilter),
-                        router = viewModel.router,
-                    ) { filter ->
-                        val filterHolder = DeviceListViewModel.FilterHolder(
-                            displayName = filterName,
-                            filter = filter,
-                        )
-                        viewModel.onFilterClick(filterHolder)
-                    })
-                })
-            },
+            onClick = { selectFilterDialog.show() },
         ) {
             Text(text = stringResource(R.string.add_filter))
         }

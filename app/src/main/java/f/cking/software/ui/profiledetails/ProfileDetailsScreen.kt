@@ -19,16 +19,16 @@ import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.FilterScreen
+import f.cking.software.ui.filter.SelectFilterTypeScreen
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 object ProfileDetailsScreen {
 
     @Composable
-    fun Screen(profileId: Int?) {
-        val viewModel: ProfileDetailsViewModel = koinViewModel()
-        viewModel.setId(profileId)
+    fun Screen(profileId: Int?, key: String) {
+        val viewModel: ProfileDetailsViewModel = koinViewModel(key = key) { parametersOf(profileId) }
         Scaffold(
             modifier = Modifier
                 .fillMaxWidth()
@@ -84,7 +84,7 @@ object ProfileDetailsScreen {
                 Text(text = stringResource(R.string.radar_profile_title))
             },
             actions = {
-                if (viewModel.profileId.isPresent) {
+                if (viewModel.profileId != null) {
                     IconButton(onClick = { deleteDialog.show() }) {
                         Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), tint = Color.White)
                     }
@@ -175,11 +175,15 @@ object ProfileDetailsScreen {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
+
+            val selectFilterDialog = rememberMaterialDialogState()
+            SelectFilterTypeScreen.Dialog(selectFilterDialog) { filter ->
+                viewModel.filter = filter
+            }
+
             Button(
                 onClick = {
-                    viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                        viewModel.filter = FilterScreen.getFilterByType(type)
-                    })
+                    selectFilterDialog.show()
                 },
                 content = {
                     Text(text = stringResource(R.string.add_filter))
