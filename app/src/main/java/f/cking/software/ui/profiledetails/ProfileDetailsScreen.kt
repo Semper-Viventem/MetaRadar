@@ -96,7 +96,7 @@ object ProfileDetailsScreen {
             },
             navigationIcon = {
                 IconButton(onClick = {
-                    if (viewModel.originalProfile != null && viewModel.originalProfile != viewModel.buildProfile()) {
+                    if (viewModel.checkUnsavedChanges()) {
                         discardChangesDialog.show()
                     } else {
                         viewModel.back()

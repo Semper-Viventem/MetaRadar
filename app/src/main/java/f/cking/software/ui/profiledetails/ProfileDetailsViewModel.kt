@@ -32,6 +32,8 @@ class ProfileDetailsViewModel(
     init {
         if (profileId != null) {
             loadProfile(profileId)
+        } else {
+            handleProfile(EMPTY_PROFILE)
         }
     }
 
@@ -39,23 +41,12 @@ class ProfileDetailsViewModel(
         isActive = !isActive
     }
 
-    private fun loadProfile(id: Int) {
-        viewModelScope.launch {
-            val profile = radarProfilesRepository.getById(id = id)
-            handleProfile(profile)
-        }
+    fun checkUnsavedChanges(): Boolean {
+        return (originalProfile != null && originalProfile != buildProfile()) || (originalProfile == null && buildProfile() != EMPTY_PROFILE)
     }
 
-    private fun handleProfile(profile: RadarProfile?) {
-        if (profile != null) {
-            originalProfile = profile
-            name = profile.name
-            description = profile.description.orEmpty()
-            isActive = profile.isActive
-            filter = profile.detectFilter?.let(FilterUiMapper::mapToUi)
-        } else {
-            back()
-        }
+    fun back() {
+        router.navigate(BackCommand)
     }
 
     fun onSaveClick() {
@@ -69,13 +60,33 @@ class ProfileDetailsViewModel(
     fun onRemoveClick() {
         if (profileId != null) {
             viewModelScope.launch {
-                radarProfilesRepository.deleteProfile(profileId!!)
+                radarProfilesRepository.deleteProfile(profileId)
                 Toast.makeText(context, context.getString(R.string.profile_has_been_removed), Toast.LENGTH_SHORT).show()
                 back()
             }
         } else {
             back()
         }
+    }
+
+    private fun loadProfile(id: Int) {
+        viewModelScope.launch {
+            val profile = radarProfilesRepository.getById(id = id)
+            originalProfile = profile
+            if (profile != null) {
+                handleProfile(profile)
+            } else {
+                back()
+            }
+        }
+    }
+
+    private fun handleProfile(profile: RadarProfile) {
+        name = profile.name
+        description = profile.description.orEmpty()
+        isActive = profile.isActive
+        filter = profile.detectFilter?.let(FilterUiMapper::mapToUi)
+
     }
 
     private fun saveProfile() {
@@ -85,7 +96,7 @@ class ProfileDetailsViewModel(
         }
     }
 
-    fun buildProfile(): RadarProfile {
+    private fun buildProfile(): RadarProfile {
         return RadarProfile(
             id = profileId,
             name = name,
@@ -95,7 +106,13 @@ class ProfileDetailsViewModel(
         )
     }
 
-    fun back() {
-        router.navigate(BackCommand)
+    companion object {
+        private val EMPTY_PROFILE = RadarProfile(
+            id = null,
+            name = "",
+            description = "",
+            isActive = true,
+            detectFilter = null,
+        )
     }
 }
