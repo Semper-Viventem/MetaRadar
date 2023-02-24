@@ -11,17 +11,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.MapView
 import f.cking.software.dateTimeStringFormat
@@ -186,44 +187,42 @@ object DeviceDetailsScreen {
         deviceData: DeviceData,
         viewModel: DeviceDetailsViewModel,
     ) {
-        val expanded = remember { mutableStateOf(false) }
-
-        if (expanded.value) {
-            AlertDialog(
-                onDismissRequest = { expanded.value = false },
-                title = {
-                    Text("Change location history period", fontSize = 20.sp, fontWeight = FontWeight.Black)
-                },
-                buttons = {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
+        val dialog = rememberMaterialDialogState()
+        MaterialDialog(
+            dialogState = dialog,
+            buttons = {
+                negativeButton(stringResource(R.string.cancel)) { dialog.hide() }
+            },
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Change location history period", fontSize = 20.sp, fontWeight = FontWeight.Black)
+                Spacer(Modifier.height(8.dp))
+                DeviceDetailsViewModel.HistoryPeriod.values().forEach { period ->
+                    val isSelected = viewModel.historyPeriod == period
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            viewModel.selectHistoryPeriodSelected(period, deviceData.address, autotunePeriod = false)
+                            dialog.hide()
+                        },
+                        enabled = !isSelected,
                     ) {
-                        DeviceDetailsViewModel.HistoryPeriod.values().forEach { period ->
-                            val isSelected = viewModel.historyPeriod == period
-                            Button(
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    viewModel.selectHistoryPeriodSelected(period, deviceData.address, autotunePeriod = false)
-                                    expanded.value = false
-                                },
-                                enabled = !isSelected,
-                            ) {
-                                val text = if (isSelected) {
-                                    "${period.displayName} (selected)"
-                                } else {
-                                    period.displayName
-                                }
-                                Text(text = text)
-                            }
+                        val text = if (isSelected) {
+                            "${period.displayName} (selected)"
+                        } else {
+                            period.displayName
                         }
+                        Text(text = text)
                     }
-                },
-            )
+                }
+            }
         }
 
         Box(
             modifier = Modifier
-                .clickable { expanded.value = !expanded.value }
+                .clickable { dialog.show() }
                 .fillMaxWidth()
                 .background(
                     color = Color.LightGray,
