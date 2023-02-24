@@ -6,6 +6,10 @@
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="select">Select</string>
+    <string name="clear">Clear</string>
 
     <!-- Settings -->
     <string name="no_location_data_yet">No location data yet</string>
@@ -49,4 +53,37 @@
     <string name="filter_any_of">ANY of</string>
     <string name="filter_all_of">All of</string>
     <string name="filter_not">Not</string>
+
+    <!-- Profiles list -->
+    <string name="create_new">Create new</string>
+    <string name="profile_is_active">Is active</string>
+    <string name="profile_is_not_active">Is NOT active</string>
+
+    <!-- Profile details -->
+    <string name="radar_profile_title">Radar profile</string>
+    <string name="name">Name</string>
+    <string name="description">Description (optional)</string>
+    <string name="is_active">Is active</string>
+    <string name="add_filter">Add filter</string>
+    <string name="filter_unknown">Unknown filter</string>
+    <string name="min_following_duration">Min following duration</string>
+    <string name="min_interval_to_detect">Min interval to detect</string>
+    <string name="time_placeholder">HH:MM</string>
+    <string name="filter_unknown_title">Current filter is not supported by your app version</string>
+    <string name="placeholder_device_name">Device name</string>
+    <string name="ignore_case">Ignore case</string>
+    <string name="placeholder_airdrope_contact">email/phone</string>
+    <string name="airdrop_min_lost_period">Min lost period</string>
+    <string name="airdrop_issue_description">Airdrop cannot be linked to a specific device because Apple changes BLE addresses every 15 minutes. To select the min lost period you should use this field.</string>
+    <string name="select_device">Select device</string>
+    <string name="tap_to_select">Tap to select</string>
+    <string name="chose_time">Chose time</string>
+    <string name="from_date">From date</string>
+    <string name="from_time">From time</string>
+    <string name="to_date">To date</string>
+    <string name="to_time">To time</string>
+    <string name="is_favorite">Is favorite</string>
+    <string name="change">Change</string>
+    <string name="cannot_save_profile">Cannot save profile. Check your configuration</string>
+    <string name="profile_has_been_removed">Profile has been removed</string>
 </resources>

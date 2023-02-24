@@ -87,9 +87,10 @@ fun rememberTimeDialog(
 
 @Composable
 fun ClickableField(
+    modifier: Modifier = Modifier,
     text: String?,
     placeholder: String?,
-    modifier: Modifier = Modifier,
+    label: String?,
     onClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -104,7 +105,8 @@ fun ClickableField(
         value = text ?: "",
         onValueChange = {},
         readOnly = true,
-        placeholder = { placeholder?.let { Text(text = it) } },
+        label = label?.let { { Text(text = it) } },
+        placeholder = placeholder?.let { { Text(text = it) } },
     )
 }
 

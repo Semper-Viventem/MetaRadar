@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,7 +45,7 @@ object ProfilesListScreen {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Button(onClick = { viewModel.createNewClick() }, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Create new")
+                Text(text = stringResource(R.string.create_new))
             }
         }
     }
@@ -64,14 +65,14 @@ object ProfilesListScreen {
                 Text(text = profile.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(4.dp))
-                val activeText = if (profile.isActive) "Is active" else "Is NOT active"
+                val activeText = if (profile.isActive) stringResource(R.string.profile_is_active) else stringResource(R.string.profile_is_not_active)
                 val color = if (profile.isActive) colorResource(id = R.color.green_600) else Color.DarkGray
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(12.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_circle),
                         tint = color,
-                        contentDescription = ""
+                        contentDescription = activeText
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = activeText, fontWeight = FontWeight.Bold, color = color)

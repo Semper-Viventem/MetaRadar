@@ -40,6 +40,14 @@ fun Long.dateTimeStringFormat(format: String): String {
         .format(DateTimeFormatter.ofPattern(format))
 }
 
+fun LocalTime.dateTimeFormat(format: String): String {
+    return format(DateTimeFormatter.ofPattern(format))
+}
+
+fun LocalDate.dateTimeFormat(format: String): String {
+    return format(DateTimeFormatter.ofPattern(format))
+}
+
 fun LocalTime.toMilliseconds() = (hour * 60L * 60L * 1000L) + (minute * 60L * 1000L)
 
 fun concatTwoBytes(firstByte: Byte, secondByte: Byte): Int {

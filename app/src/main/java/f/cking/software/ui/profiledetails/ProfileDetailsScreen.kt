@@ -1,7 +1,9 @@
 package f.cking.software.ui.profiledetails
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
 import f.cking.software.common.ClickableField
+import f.cking.software.dateTimeFormat
 import f.cking.software.orNull
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.ScreenNavigationCommands.OpenDatePickerDialog
@@ -55,22 +59,22 @@ object ProfileDetailsScreen {
     private fun AppBar(viewModel: ProfileDetailsViewModel) {
         TopAppBar(
             title = {
-                Text(text = "Radar profile")
+                Text(text = stringResource(R.string.radar_profile_title))
             },
             actions = {
                 if (viewModel.profileId.isPresent) {
                     IconButton(onClick = { viewModel.onRemoveClick() }) {
-                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                        Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), tint = Color.White)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 IconButton(onClick = { viewModel.onSaveClick() }) {
-                    Icon(imageVector = Icons.Filled.Done, contentDescription = "Save", tint = Color.White)
+                    Icon(imageVector = Icons.Filled.Done, contentDescription = stringResource(R.string.save), tint = Color.White)
                 }
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.White)
                 }
             }
         )
@@ -82,13 +86,11 @@ object ProfileDetailsScreen {
             item { Header(viewModel) }
 
             val filter = viewModel.filter
-            if (filter.isPresent) {
+            if (filter != null) {
                 item {
-                    Filter(
-                        filterState = filter.get(),
-                        viewModel = viewModel,
-                        onDeleteClick = { viewModel.filter = Optional.empty() }
-                    )
+                    Box(modifier = Modifier.padding(8.dp)) {
+                        Filter(filterState = filter, viewModel = viewModel, onDeleteClick = { viewModel.filter = null })
+                    }
                 }
             } else {
                 item { CreateFilter(viewModel = viewModel) }
@@ -101,23 +103,36 @@ object ProfileDetailsScreen {
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(vertical = 8.dp)
         ) {
 
             TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
-                placeholder = { Text(text = "Name") })
+                placeholder = { Text(text = stringResource(R.string.name)) })
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 value = viewModel.description,
                 onValueChange = { viewModel.description = it },
-                placeholder = { Text(text = "Description (optional)") })
+                placeholder = { Text(text = stringResource(R.string.description)) })
             Spacer(modifier = Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Is active")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { viewModel.onIsActiveClick() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(modifier = Modifier.weight(1f), text = stringResource(R.string.is_active))
                 Spacer(modifier = Modifier.width(8.dp))
-                Switch(checked = viewModel.isActive, onCheckedChange = { viewModel.isActive = it })
+                Switch(checked = viewModel.isActive, onCheckedChange = { viewModel.onIsActiveClick() })
+                Spacer(modifier = Modifier.width(16.dp))
             }
         }
     }
@@ -133,11 +148,11 @@ object ProfileDetailsScreen {
             Button(
                 onClick = {
                     viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                        viewModel.filter = Optional.of(getFilterByType(type))
+                        viewModel.filter = getFilterByType(type)
                     })
                 },
                 content = {
-                    Text(text = "Create filter")
+                    Text(text = stringResource(R.string.add_filter))
                 }
             )
         }
@@ -160,11 +175,7 @@ object ProfileDetailsScreen {
             is UiFilterState.Manufacturer -> FilterManufacturer(viewModel, filterState, onDeleteClick)
             is UiFilterState.MinLostTime -> FilterMinLostPeriod(viewModel, filterState, onDeleteClick)
             is UiFilterState.LastDetectionInterval -> FilterLastDetectionInterval(viewModel, filterState, onDeleteClick)
-            is UiFilterState.FirstDetectionInterval -> FilterFirstDetectionInterval(
-                viewModel,
-                filterState,
-                onDeleteClick
-            )
+            is UiFilterState.FirstDetectionInterval -> FilterFirstDetectionInterval(viewModel, filterState, onDeleteClick)
             is UiFilterState.IsFollowing -> FilterIsFollowing(filterState, viewModel, onDeleteClick)
             is UiFilterState.Unknown, is UiFilterState.Interval -> FilterUnknown(filterState, onDeleteClick)
         }
@@ -177,7 +188,7 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Is following me",
+            title = stringResource(R.string.filter_device_is_following_me),
             color = colorResource(R.color.filter_is_following),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
@@ -193,11 +204,19 @@ object ProfileDetailsScreen {
             val followingIntervalText = filter.followingDetectionIntervalMs.format(DateTimeFormatter.ofPattern("HH:mm"))
 
             Column {
-                ClickableField(text = followingDurationText, placeholder = "Min following duration") {
+                ClickableField(
+                    text = followingDurationText,
+                    placeholder = stringResource(R.string.time_placeholder),
+                    label = stringResource(R.string.min_following_duration),
+                ) {
                     viewModel.router.navigate(followingDuration)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                ClickableField(text = followingIntervalText, placeholder = "Min interval to detect") {
+                ClickableField(
+                    text = followingIntervalText,
+                    placeholder = stringResource(R.string.time_placeholder),
+                    label = stringResource(R.string.min_interval_to_detect),
+                ) {
                     viewModel.router.navigate(followingInterval)
                 }
             }
@@ -207,11 +226,11 @@ object ProfileDetailsScreen {
     @Composable
     private fun FilterUnknown(filter: UiFilterState, onDeleteClick: (child: UiFilterState) -> Unit) {
         FilterBase(
-            title = "Unknown filter",
+            title = stringResource(R.string.filter_unknown),
             color = colorResource(R.color.filter_unknown),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            Text(text = "Current filter is not supported by your app version")
+            Text(text = stringResource(R.string.filter_unknown_title))
         }
     }
 
@@ -221,17 +240,20 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Name",
+            title = stringResource(R.string.filter_by_name),
             color = colorResource(R.color.filter_name),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             Column {
-                TextField(value = filter.name, singleLine = true, onValueChange = {
-                    filter.name = it
-                }, placeholder = { Text(text = "Device name") })
+                TextField(
+                    value = filter.name,
+                    singleLine = true,
+                    onValueChange = { filter.name = it },
+                    placeholder = { Text(text = stringResource(R.string.placeholder_device_name)) }
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Ignore case")
+                    Text(text = stringResource(R.string.ignore_case))
                     Checkbox(checked = filter.ignoreCase, onCheckedChange = {
                         filter.ignoreCase = it
                     })
@@ -247,14 +269,14 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Airdrop contact",
+            title = stringResource(R.string.filter_apple_airdrop_contact),
             color = colorResource(R.color.filter_airdrop_contact),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             Column {
                 TextField(value = filter.contactString, singleLine = true, onValueChange = {
                     filter.contactString = it.lowercase()
-                }, placeholder = { Text(text = "email/phone") })
+                }, placeholder = { Text(text = stringResource(R.string.placeholder_airdrope_contact)) })
 
                 val text = filter.minLostTime.orNull()?.format(DateTimeFormatter.ofPattern("HH:mm"))
                 val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
@@ -264,7 +286,11 @@ object ProfileDetailsScreen {
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Row {
-                    ClickableField(text = text, placeholder = "Min lost period") {
+                    ClickableField(
+                        text = text,
+                        label = stringResource(R.string.airdrop_min_lost_period),
+                        placeholder = stringResource(R.string.time_placeholder)
+                    ) {
                         viewModel.router.navigate(timeDialog)
                     }
                     Spacer(modifier = Modifier.width(4.dp))
@@ -274,7 +300,7 @@ object ProfileDetailsScreen {
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Airdrop cannot be linked to a specific device because Apple changes BLE addresses every 15 minutes. To select the min lost period you should use this field.",
+                    text = stringResource(R.string.airdrop_issue_description),
                     fontWeight = FontWeight.Light,
                 )
             }
@@ -288,21 +314,25 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Address",
+            title = stringResource(R.string.filter_by_address),
             color = colorResource(R.color.filter_address),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             Row {
-                TextField(value = filter.address, singleLine = true, onValueChange = {
-                    filter.address = it.uppercase()
-                }, placeholder = { Text(text = "00:00:00:00:00:00") })
+                TextField(
+                    modifier = Modifier.weight(1f),
+                    value = filter.address,
+                    singleLine = true,
+                    onValueChange = { filter.address = it.uppercase() },
+                    placeholder = { Text(text = "00:00:00:00:00:00") }
+                )
                 Spacer(modifier = Modifier.width(4.dp))
                 IconButton(onClick = {
                     viewModel.router.navigate(ScreenNavigationCommands.OpenSelectDeviceScreen { device ->
                         filter.address = device.address
                     })
                 }) {
-                    Icon(imageVector = Icons.Filled.List, contentDescription = "Select device", tint = Color.Black)
+                    Icon(imageVector = Icons.Filled.List, contentDescription = stringResource(R.string.select_device), tint = Color.Black)
                 }
             }
         }
@@ -315,13 +345,17 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Manufacturer",
+            title = stringResource(R.string.filter_by_manufacturer),
             color = colorResource(R.color.filter_manufacturer),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
             val name: String? = filter.manufacturer.orNull()?.name
-            val placeholder: String? = if (name == null) "Select" else null
+            val label = if (name == null) stringResource(R.string.tap_to_select) else null
 
-            ClickableField(text = name, placeholder = placeholder) {
+            ClickableField(
+                text = name,
+                placeholder = stringResource(R.string.select),
+                label = label,
+            ) {
                 viewModel.router.navigate(ScreenNavigationCommands.OpenSelectManufacturerScreen { manufacturer ->
                     filter.manufacturer = Optional.of(manufacturer)
                 })
@@ -336,7 +370,7 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Min lost period",
+            title = stringResource(R.string.filter_by_min_lost_period),
             color = colorResource(R.color.filter_lost_time),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
@@ -345,9 +379,9 @@ object ProfileDetailsScreen {
                 filter.minLostTime = Optional.of(time)
             }
 
-            val text = filter.minLostTime.orNull()?.format(DateTimeFormatter.ofPattern("HH:mm"))
+            val text = filter.minLostTime.orNull()?.dateTimeFormat("HH:mm")
 
-            ClickableField(text = text, placeholder = "Chose time") {
+            ClickableField(text = text, placeholder = stringResource(R.string.chose_time), label = null) {
                 viewModel.router.navigate(timeDialog)
             }
         }
@@ -360,7 +394,7 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "First detection interval",
+            title = stringResource(R.string.filter_by_first_detection_period),
             color = colorResource(R.color.filter_first_seen),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
@@ -375,7 +409,7 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Last detection interval",
+            title = stringResource(R.string.filter_by_last_detection_period),
             color = colorResource(R.color.filter_last_seen),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
@@ -389,10 +423,10 @@ object ProfileDetailsScreen {
         val dateFormat = "dd MMM yyyy"
         val timeFormat = "HH:mm"
 
-        val fromDateStr: String? = filter.fromDate.orNull()?.format(DateTimeFormatter.ofPattern(dateFormat))
-        val fromTimeStr: String? = filter.fromTime.orNull()?.format(DateTimeFormatter.ofPattern(timeFormat))
-        val toDateStr: String? = filter.toDate.orNull()?.format(DateTimeFormatter.ofPattern(dateFormat))
-        val toTimeStr: String? = filter.toTime.orNull()?.format(DateTimeFormatter.ofPattern(timeFormat))
+        val fromDateStr: String? = filter.fromDate.orNull()?.dateTimeFormat(dateFormat)
+        val fromTimeStr: String? = filter.fromTime.orNull()?.dateTimeFormat(timeFormat)
+        val toDateStr: String? = filter.toDate.orNull()?.dateTimeFormat(dateFormat)
+        val toTimeStr: String? = filter.toTime.orNull()?.dateTimeFormat(timeFormat)
 
         val fromDateDialog = OpenDatePickerDialog(filter.fromDate.orNull() ?: LocalDate.now()) { date ->
             filter.fromDate = Optional.of(date)
@@ -407,21 +441,23 @@ object ProfileDetailsScreen {
             filter.toTime = Optional.of(date)
         }
 
-        val dateWidth = 150.dp
-        val timeWidth = 150.dp
         val router = viewModel.router
         Column {
             Row {
+                val fromDatePlaceholder = stringResource(R.string.from_date)
+                val fromTimePlaceholder = stringResource(R.string.from_time)
                 ClickableField(
-                    modifier = Modifier.width(dateWidth),
+                    modifier = Modifier.weight(1f),
                     text = fromDateStr,
-                    placeholder = "From date"
+                    placeholder = fromDatePlaceholder,
+                    label = if (fromDateStr != null) fromDatePlaceholder else null
                 ) { router.navigate(fromDateDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClickableField(
-                    modifier = Modifier.width(timeWidth),
+                    modifier = Modifier.weight(1f),
                     text = fromTimeStr,
-                    placeholder = "From time"
+                    placeholder = fromTimePlaceholder,
+                    label = if (fromTimeStr != null) fromTimePlaceholder else null
                 ) { router.navigate(fromTimeDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
@@ -431,16 +467,20 @@ object ProfileDetailsScreen {
             }
             Spacer(modifier = Modifier.height(4.dp))
             Row {
+                val toDatePlaceholder = stringResource(R.string.to_date)
+                val toTimePlaceholder = stringResource(R.string.to_time)
                 ClickableField(
-                    modifier = Modifier.width(dateWidth),
+                    modifier = Modifier.weight(1f),
                     text = toDateStr,
-                    placeholder = "To date"
+                    placeholder = toDatePlaceholder,
+                    label = if (toDateStr != null) toDatePlaceholder else null,
                 ) { router.navigate(toDateDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClickableField(
-                    modifier = Modifier.width(timeWidth),
+                    modifier = Modifier.weight(1f),
                     text = toTimeStr,
-                    placeholder = "To time"
+                    placeholder = toTimePlaceholder,
+                    label = if (toTimeStr != null) toTimePlaceholder else null,
                 ) { router.navigate(toTimeDialog) }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
@@ -452,8 +492,10 @@ object ProfileDetailsScreen {
     }
 
     @Composable
-    private fun ClearIcon(action: () -> Unit) {
-        IconButton(onClick = action) { Icon(imageVector = Icons.Filled.Clear, contentDescription = "Clear") }
+    private fun ClearIcon(modifier: Modifier = Modifier, action: () -> Unit) {
+        IconButton(modifier = modifier, onClick = action) {
+            Icon(imageVector = Icons.Filled.Clear, contentDescription = stringResource(R.string.clear))
+        }
     }
 
     @Composable
@@ -462,12 +504,12 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterBase(
-            title = "Is favorite",
+            title = stringResource(R.string.filter_by_is_favorite),
             color = colorResource(R.color.filter_is_favorite),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Is favorite")
+                Text(text = stringResource(R.string.is_favorite))
                 Checkbox(checked = filter.favorite, onCheckedChange = {
                     filter.favorite = it
                 })
@@ -482,9 +524,9 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterGroup(
-            title = "All",
+            title = stringResource(R.string.filter_all_of),
             color = colorResource(R.color.filter_all),
-            addText = "Add",
+            addText = stringResource(R.string.add_filter),
             addClick = {
                 viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
                     filter.filters = filter.filters + listOf(getFilterByType(type))
@@ -506,9 +548,9 @@ object ProfileDetailsScreen {
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
         FilterGroup(
-            title = "Any",
+            title = stringResource(R.string.filter_any_of),
             color = colorResource(R.color.filter_any),
-            addText = "Add",
+            addText = stringResource(R.string.add_filter),
             addClick = {
                 viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
                     filter.filters = filter.filters + listOf(getFilterByType(type))
@@ -523,26 +565,38 @@ object ProfileDetailsScreen {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterNot(
         filter: UiFilterState.Not,
         viewModel: ProfileDetailsViewModel,
         onDeleteClick: (child: UiFilterState) -> Unit,
     ) {
-        val buttonText = if (filter.filter.isPresent) "Change" else "Set"
-        FilterGroup(
-            title = "Not",
+        FilterBase(
+            title = stringResource(R.string.filter_not),
             color = colorResource(R.color.filter_not),
-            addText = buttonText,
-            addClick = {
-                viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
-                    filter.filter = Optional.of(getFilterByType(type))
-                })
-            },
-            onDeleteClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             if (filter.filter.isPresent) {
                 Filter(filter.filter.get(), viewModel, onDeleteClick = filter::delete)
+            } else {
+                Chip(
+                    onClick = {
+                        viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { type ->
+                            filter.filter = Optional.of(getFilterByType(type))
+                        })
+                    },
+                    colors = ChipDefaults.chipColors(
+                        backgroundColor = colorResource(R.color.filter_not),
+                        contentColor = Color.White,
+                        leadingIconContentColor = Color.White
+                    ),
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.add_filter))
+                    }
+                ) {
+                    Text(text = stringResource(R.string.select))
+                }
             }
         }
     }
@@ -557,28 +611,37 @@ object ProfileDetailsScreen {
     ) {
         Column(
             Modifier
-                .padding(horizontal = 4.dp)
                 .border(border = BorderStroke(2.dp, color), shape = RoundedCornerShape(8.dp))
-                .padding(8.dp)
+                .background(color.copy(alpha = 0.1f), shape = RoundedCornerShape(8.dp))
         ) {
-            Chip(
-                onClick = onDeleteButtonClick,
-                colors = ChipDefaults.chipColors(
-                    backgroundColor = color,
-                    contentColor = Color.Black,
-                    leadingIconContentColor = Color.Black
-                ),
-                leadingIcon = {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete", modifier = Modifier.size(24.dp))
-                }
+            Box(
+                Modifier.background(color = color, shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             ) {
-                Text(text = title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(modifier = Modifier.weight(1f), text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    IconButton(modifier = Modifier.size(20.dp), onClick = onDeleteButtonClick) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.White,
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            content.invoke()
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(8.dp)
+            ) {
+                content.invoke()
+            }
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterGroup(
         title: String,
@@ -592,7 +655,17 @@ object ProfileDetailsScreen {
             Column {
                 content.invoke()
                 Spacer(modifier = Modifier.height(4.dp))
-                Button(onClick = addClick) {
+                Chip(
+                    onClick = addClick,
+                    colors = ChipDefaults.chipColors(
+                        backgroundColor = color,
+                        contentColor = Color.White,
+                        leadingIconContentColor = Color.White
+                    ),
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = addText)
+                    }
+                ) {
                     Text(text = addText)
                 }
             }

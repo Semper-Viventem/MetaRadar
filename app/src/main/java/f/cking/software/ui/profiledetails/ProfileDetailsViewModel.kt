@@ -22,7 +22,7 @@ import java.util.*
 class ProfileDetailsViewModel(
     private val radarProfilesRepository: RadarProfilesRepository,
     val router: NavRouter,
-    val appContext: Application,
+    val context: Application,
 ) : ViewModel() {
 
     var profileId: Optional<Int> by mutableStateOf(Optional.empty())
@@ -30,7 +30,7 @@ class ProfileDetailsViewModel(
     var name: String by mutableStateOf("")
     var description: String by mutableStateOf("")
     var isActive: Boolean by mutableStateOf(true)
-    var filter: Optional<UiFilterState> by mutableStateOf(Optional.empty())
+    var filter: UiFilterState? by mutableStateOf(null)
 
     init {
         initProfile(profileId.orNull())
@@ -41,8 +41,12 @@ class ProfileDetailsViewModel(
         name = ""
         description = ""
         isActive = true
-        filter = Optional.empty()
+        filter = null
         initProfile(id)
+    }
+
+    fun onIsActiveClick() {
+        isActive = !isActive
     }
 
     private fun initProfile(id: Int?) {
@@ -59,17 +63,17 @@ class ProfileDetailsViewModel(
             name = profile.name
             description = profile.description.orEmpty()
             isActive = profile.isActive
-            filter = Optional.ofNullable(profile.detectFilter?.let(::mapToUi))
+            filter = profile.detectFilter?.let(::mapToUi)
         } else {
             back()
         }
     }
 
     fun onSaveClick() {
-        if ((!filter.isPresent || filter.get().isCorrect()) && name.isNotBlank()) {
+        if (filter?.isCorrect() == true && name.isNotBlank()) {
             saveProfile()
         } else {
-            Toast.makeText(appContext, "Cannot save profile. Check your configuration", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.cannot_save_profile), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -77,7 +81,7 @@ class ProfileDetailsViewModel(
         if (profileId.isPresent) {
             viewModelScope.launch {
                 radarProfilesRepository.deleteProfile(profileId.get())
-                Toast.makeText(appContext, "'$name' profile removed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.profile_has_been_removed), Toast.LENGTH_SHORT).show()
                 back()
             }
         } else {
@@ -98,7 +102,7 @@ class ProfileDetailsViewModel(
             name = name,
             description = description,
             isActive = isActive,
-            detectFilter = filter.orNull()?.let(::mapToDomain),
+            detectFilter = filter?.let(::mapToDomain),
         )
     }
 
