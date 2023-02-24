@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,8 +45,8 @@ fun rememberDateDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton("Ok") { dialogState.hide() }
-            negativeButton("Cancel") { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok)) { dialogState.hide() }
+            negativeButton(stringResource(R.string.cancel)) { dialogState.hide() }
         },
     ) {
         datepicker(initialDate = initialDate) { localDate ->
@@ -64,8 +65,8 @@ fun rememberTimeDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton("Ok") { dialogState.hide() }
-            negativeButton("Cancel") { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok)) { dialogState.hide() }
+            negativeButton(stringResource(R.string.cancel)) { dialogState.hide() }
         },
     ) {
         timepicker(is24HourClock = true, initialTime = initialTime) { localDate ->
@@ -113,7 +114,7 @@ fun DeviceListItem(
         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Row() {
-                    Text(text = device.name ?: "N/A", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
                 device.manufacturerInfo?.name?.let {
                     Spacer(modifier = Modifier.height(4.dp))
@@ -136,7 +137,7 @@ fun DeviceListItem(
             }
             if (device.favorite) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Icon(imageVector = Icons.Filled.Star, contentDescription = "Favorite")
+                Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite))
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }

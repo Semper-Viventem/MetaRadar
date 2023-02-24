@@ -62,14 +62,14 @@ object DeviceDetailsScreen {
         val deviceData = viewModel.deviceState
         TopAppBar(
             title = {
-                Text(text = "Device details")
+                Text(text = stringResource(R.string.device_details_title))
             },
             actions = {
                 if (deviceData != null) {
                     IconButton(onClick = { viewModel.onFavoriteClick(deviceData) }) {
                         val iconId =
                             if (deviceData.favorite) R.drawable.ic_star else R.drawable.ic_star_outline
-                        val text = if (deviceData.favorite) "Is favorite" else "Is not favorite"
+                        val text = if (deviceData.favorite) stringResource(R.string.is_favorite) else stringResource(R.string.is_not_favorite)
                         Icon(
                             imageVector = ImageVector.vectorResource(id = iconId),
                             contentDescription = text,
@@ -82,7 +82,7 @@ object DeviceDetailsScreen {
                 IconButton(onClick = { viewModel.back() }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.back),
                         tint = Color.White
                     )
                 }
@@ -154,29 +154,30 @@ object DeviceDetailsScreen {
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "Name", fontWeight = FontWeight.Bold)
-            Text(text = deviceData.name ?: "N/A")
+            Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
+            Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "Address", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
             Text(text = deviceData.address)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "Manufacturer", fontWeight = FontWeight.Bold)
-            Text(text = deviceData.manufacturerInfo?.name ?: "N/A")
+            Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
+            Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
             Spacer(modifier = Modifier.height(8.dp))
 
             Row {
-                Text(text = "Detect count: ", fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.device_details_detect_count), fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(4.dp))
                 Text(text = deviceData.detectCount.toString())
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "First detection", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
             Text(text = deviceData.firstDetectionPeriod() + " ago")
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "Last detection", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
             Text(text = deviceData.lastDetectionPeriod() + " ago")
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -197,7 +198,7 @@ object DeviceDetailsScreen {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text("Change location history period", fontSize = 20.sp, fontWeight = FontWeight.Black)
+                Text(stringResource(R.string.change_history_period_dialog), fontSize = 20.sp, fontWeight = FontWeight.Black)
                 Spacer(Modifier.height(8.dp))
                 DeviceDetailsViewModel.HistoryPeriod.values().forEach { period ->
                     val isSelected = viewModel.historyPeriod == period
@@ -210,7 +211,7 @@ object DeviceDetailsScreen {
                         enabled = !isSelected,
                     ) {
                         val text = if (isSelected) {
-                            "${period.displayName} (selected)"
+                            stringResource(R.string.device_details_dialog_time_period_selected, period.displayName)
                         } else {
                             period.displayName
                         }
@@ -237,12 +238,12 @@ object DeviceDetailsScreen {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Row {
-                        Text(text = "History period: ", fontSize = 18.sp)
+                        Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
                         Text(text = viewModel.historyPeriod.displayName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Showing big location history may affect map performance",
+                        text = stringResource(R.string.device_details_history_period_subtitle),
                         fontWeight = FontWeight.Light
                     )
                 }
@@ -250,7 +251,7 @@ object DeviceDetailsScreen {
                 Image(
                     modifier = Modifier.size(24.dp),
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Change"
+                    contentDescription = stringResource(R.string.change)
                 )
             }
         }
@@ -306,7 +307,7 @@ object DeviceDetailsScreen {
                 Box(modifier = Modifier.background(color = colorResource(id = R.color.black_300), shape = RoundedCornerShape(8.dp))) {
                     Text(
                         modifier = Modifier.padding(16.dp),
-                        text = "No location history for such period",
+                        text = stringResource(R.string.device_details_no_location_history_for_such_period),
                         color = Color.White,
                     )
                 }
