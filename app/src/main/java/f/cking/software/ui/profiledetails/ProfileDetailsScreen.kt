@@ -631,7 +631,7 @@ object ProfileDetailsScreen {
                         tint = Color.Black,
                     )
                     Spacer(Modifier.weight(1f))
-                    IconButton(modifier = Modifier.size(20.dp), onClick = onDeleteButtonClick) {
+                    IconButton(onClick = onDeleteButtonClick) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.delete),
@@ -639,7 +639,6 @@ object ProfileDetailsScreen {
                             tint = Color.Black,
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
                 }
             }
             if (!minimize.value) {
