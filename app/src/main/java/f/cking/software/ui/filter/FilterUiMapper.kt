@@ -1,10 +1,9 @@
-package f.cking.software.ui.devicelist
+package f.cking.software.ui.filter
 
 import f.cking.software.*
 import f.cking.software.data.helpers.BluetoothSIG
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.ui.filter.FilterUiState
 import java.util.*
 
 object FilterUiMapper {

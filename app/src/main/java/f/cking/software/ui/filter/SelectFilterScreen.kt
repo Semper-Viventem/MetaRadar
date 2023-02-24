@@ -19,7 +19,6 @@ import f.cking.software.R
 import f.cking.software.common.navigation.BackCommand
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.ui.devicelist.FilterUiMapper
 
 object SelectFilterScreen {
 

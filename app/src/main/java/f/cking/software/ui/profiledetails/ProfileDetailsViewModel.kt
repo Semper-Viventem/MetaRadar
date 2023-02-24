@@ -13,7 +13,7 @@ import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.RadarProfile
 import f.cking.software.orNull
-import f.cking.software.ui.devicelist.FilterUiMapper
+import f.cking.software.ui.filter.FilterUiMapper
 import f.cking.software.ui.filter.FilterUiState
 import kotlinx.coroutines.launch
 import java.util.*
