@@ -1,10 +1,7 @@
 package f.cking.software.ui
 
 import f.cking.software.common.navigation.AddToStackCommand
-import f.cking.software.common.navigation.DialogCommand
 import f.cking.software.common.navigation.NavRouter
-import f.cking.software.common.rememberDateDialog
-import f.cking.software.common.rememberTimeDialog
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
@@ -15,8 +12,6 @@ import f.cking.software.ui.main.MainScreen
 import f.cking.software.ui.profiledetails.ProfileDetailsScreen
 import f.cking.software.ui.selectdevice.SelectDeviceScreen
 import f.cking.software.ui.selectmanufacturer.SelectManufacturerScreen
-import java.time.LocalDate
-import java.time.LocalTime
 
 object ScreenNavigationCommands {
 
@@ -44,20 +39,6 @@ object ScreenNavigationCommands {
         onSelected: (device: DeviceData) -> Unit
     ) : AddToStackCommand(screenFunction = {
         SelectDeviceScreen.Screen(onSelected = onSelected)
-    })
-
-    class OpenDatePickerDialog(
-        initialDate: LocalDate = LocalDate.now(),
-        onSelected: (localDate: LocalDate) -> Unit
-    ) : DialogCommand(dialogProvider = {
-        rememberDateDialog(initialDate = initialDate, dateResult = onSelected, it)
-    })
-
-    class OpenTimePickerDialog(
-        initialTime: LocalTime = LocalTime.now(),
-        onSelected: (localDate: LocalTime) -> Unit
-    ) : DialogCommand(dialogProvider = {
-        rememberTimeDialog(initialTime = initialTime, dateResult = onSelected, it)
     })
 
     class OpenDeviceDetailsScreen(val address: String) : AddToStackCommand(screenFunction = { key ->

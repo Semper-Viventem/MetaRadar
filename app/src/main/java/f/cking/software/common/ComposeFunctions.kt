@@ -39,18 +39,13 @@ import java.time.LocalTime
 fun rememberDateDialog(
     initialDate: LocalDate = LocalDate.now(),
     dateResult: (date: LocalDate) -> Unit,
-    onDialogClosed: () -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton("Ok") { onDialogClosed.invoke() }
-            negativeButton("Cancel") { onDialogClosed.invoke() }
-        },
-        onCloseRequest = {
-            it.hide()
-            onDialogClosed.invoke()
+            positiveButton("Ok") { dialogState.hide() }
+            negativeButton("Cancel") { dialogState.hide() }
         },
     ) {
         datepicker(initialDate = initialDate) { localDate ->
@@ -64,18 +59,13 @@ fun rememberDateDialog(
 fun rememberTimeDialog(
     initialTime: LocalTime = LocalTime.now(),
     dateResult: (date: LocalTime) -> Unit,
-    onDialogClosed: () -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton("Ok") { onDialogClosed.invoke() }
-            negativeButton("Cancel") { onDialogClosed.invoke() }
-        },
-        onCloseRequest = {
-            it.hide()
-            onDialogClosed.invoke()
+            positiveButton("Ok") { dialogState.hide() }
+            negativeButton("Cancel") { dialogState.hide() }
         },
     ) {
         timepicker(is24HourClock = true, initialTime = initialTime) { localDate ->

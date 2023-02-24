@@ -25,6 +25,8 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.ClickableField
 import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.rememberDateDialog
+import f.cking.software.common.rememberTimeDialog
 import f.cking.software.dateTimeFormat
 import f.cking.software.orNull
 import f.cking.software.ui.ScreenNavigationCommands
@@ -47,13 +49,13 @@ object FilterScreen {
             is FilterUiState.Not -> FilterNot(filterState, router, onDeleteClick)
             is FilterUiState.Name -> FilterName(filterState, onDeleteClick)
             is FilterUiState.Address -> FilterAddress(router, filterState, onDeleteClick)
-            is FilterUiState.AppleAirdropContact -> FilterAirdropContact(router, filterState, onDeleteClick)
+            is FilterUiState.AppleAirdropContact -> FilterAirdropContact(filterState, onDeleteClick)
             is FilterUiState.IsFavorite -> FilterIsFavorite(filterState, onDeleteClick)
             is FilterUiState.Manufacturer -> FilterManufacturer(router, filterState, onDeleteClick)
-            is FilterUiState.MinLostTime -> FilterMinLostPeriod(router, filterState, onDeleteClick)
-            is FilterUiState.LastDetectionInterval -> FilterLastDetectionInterval(router, filterState, onDeleteClick)
-            is FilterUiState.FirstDetectionInterval -> FilterFirstDetectionInterval(router, filterState, onDeleteClick)
-            is FilterUiState.IsFollowing -> FilterIsFollowing(filterState, router, onDeleteClick)
+            is FilterUiState.MinLostTime -> FilterMinLostPeriod(filterState, onDeleteClick)
+            is FilterUiState.LastDetectionInterval -> FilterLastDetectionInterval(filterState, onDeleteClick)
+            is FilterUiState.FirstDetectionInterval -> FilterFirstDetectionInterval(filterState, onDeleteClick)
+            is FilterUiState.IsFollowing -> FilterIsFollowing(filterState, onDeleteClick)
             is FilterUiState.Unknown, is FilterUiState.Interval -> FilterUnknown(filterState, onDeleteClick)
         }
     }
@@ -61,7 +63,6 @@ object FilterScreen {
     @Composable
     private fun FilterIsFollowing(
         filter: FilterUiState.IsFollowing,
-        router: NavRouter,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
         FilterBase(
@@ -69,11 +70,11 @@ object FilterScreen {
             color = colorResource(R.color.filter_is_following),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            val followingDuration = ScreenNavigationCommands.OpenTimePickerDialog(filter.followingDurationMs) { time ->
+            val followingDuration = rememberTimeDialog(filter.followingDurationMs) { time ->
                 filter.followingDurationMs = time
             }
 
-            val followingInterval = ScreenNavigationCommands.OpenTimePickerDialog(filter.followingDetectionIntervalMs) { time ->
+            val followingInterval = rememberTimeDialog(filter.followingDetectionIntervalMs) { time ->
                 filter.followingDetectionIntervalMs = time
             }
 
@@ -86,7 +87,7 @@ object FilterScreen {
                     placeholder = stringResource(R.string.time_placeholder),
                     label = stringResource(R.string.min_following_duration),
                 ) {
-                    router.navigate(followingDuration)
+                    followingDuration.show()
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 ClickableField(
@@ -94,7 +95,7 @@ object FilterScreen {
                     placeholder = stringResource(R.string.time_placeholder),
                     label = stringResource(R.string.min_interval_to_detect),
                 ) {
-                    router.navigate(followingInterval)
+                    followingInterval.show()
                 }
             }
         }
@@ -141,7 +142,6 @@ object FilterScreen {
 
     @Composable
     private fun FilterAirdropContact(
-        router: NavRouter,
         filter: FilterUiState.AppleAirdropContact,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
@@ -157,7 +157,7 @@ object FilterScreen {
 
                 val text = filter.minLostTime.orNull()?.format(DateTimeFormatter.ofPattern("HH:mm"))
                 val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
-                val timeDialog = ScreenNavigationCommands.OpenTimePickerDialog(defaultTime) { time ->
+                val timeDialog = rememberTimeDialog(defaultTime) { time ->
                     filter.minLostTime = Optional.of(time)
                 }
 
@@ -168,7 +168,7 @@ object FilterScreen {
                         label = stringResource(R.string.airdrop_min_lost_period),
                         placeholder = stringResource(R.string.time_placeholder)
                     ) {
-                        router.navigate(timeDialog)
+                        timeDialog.show()
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     ClearIcon {
@@ -242,7 +242,6 @@ object FilterScreen {
 
     @Composable
     private fun FilterMinLostPeriod(
-        router: NavRouter,
         filter: FilterUiState.MinLostTime,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
@@ -252,21 +251,20 @@ object FilterScreen {
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
             val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
-            val timeDialog = ScreenNavigationCommands.OpenTimePickerDialog(defaultTime) { time ->
+            val timeDialog = rememberTimeDialog(defaultTime) { time ->
                 filter.minLostTime = Optional.of(time)
             }
 
             val text = filter.minLostTime.orNull()?.dateTimeFormat("HH:mm")
 
             ClickableField(text = text, placeholder = stringResource(R.string.chose_time), label = null) {
-                router.navigate(timeDialog)
+                timeDialog.show()
             }
         }
     }
 
     @Composable
     private fun FilterFirstDetectionInterval(
-        router: NavRouter,
         filter: FilterUiState.FirstDetectionInterval,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
@@ -275,13 +273,12 @@ object FilterScreen {
             color = colorResource(R.color.filter_first_seen),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            TimeInterval(router = router, filter = filter)
+            TimeInterval(filter)
         }
     }
 
     @Composable
     private fun FilterLastDetectionInterval(
-        router: NavRouter,
         filter: FilterUiState.LastDetectionInterval,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
@@ -290,12 +287,12 @@ object FilterScreen {
             color = colorResource(R.color.filter_last_seen),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            TimeInterval(router = router, filter = filter)
+            TimeInterval(filter)
         }
     }
 
     @Composable
-    private fun TimeInterval(router: NavRouter, filter: FilterUiState.Interval) {
+    private fun TimeInterval(filter: FilterUiState.Interval) {
 
         val dateFormat = "dd MMM yyyy"
         val timeFormat = "HH:mm"
@@ -305,16 +302,16 @@ object FilterScreen {
         val toDateStr: String? = filter.toDate.orNull()?.dateTimeFormat(dateFormat)
         val toTimeStr: String? = filter.toTime.orNull()?.dateTimeFormat(timeFormat)
 
-        val fromDateDialog = ScreenNavigationCommands.OpenDatePickerDialog(filter.fromDate.orNull() ?: LocalDate.now()) { date ->
+        val fromDateDialog = rememberDateDialog(filter.fromDate.orNull() ?: LocalDate.now()) { date ->
             filter.fromDate = Optional.of(date)
         }
-        val fromTimeDialog = ScreenNavigationCommands.OpenTimePickerDialog(filter.fromTime.orNull() ?: LocalTime.now()) { date ->
+        val fromTimeDialog = rememberTimeDialog(filter.fromTime.orNull() ?: LocalTime.now()) { date ->
             filter.fromTime = Optional.of(date)
         }
-        val toDateDialog = ScreenNavigationCommands.OpenDatePickerDialog(filter.toDate.orNull() ?: LocalDate.now()) { date ->
+        val toDateDialog = rememberDateDialog(filter.toDate.orNull() ?: LocalDate.now()) { date ->
             filter.toDate = Optional.of(date)
         }
-        val toTimeDialog = ScreenNavigationCommands.OpenTimePickerDialog(filter.toTime.orNull() ?: LocalTime.now()) { date ->
+        val toTimeDialog = rememberTimeDialog(filter.toTime.orNull() ?: LocalTime.now()) { date ->
             filter.toTime = Optional.of(date)
         }
 
@@ -327,14 +324,14 @@ object FilterScreen {
                     text = fromDateStr,
                     placeholder = fromDatePlaceholder,
                     label = if (fromDateStr != null) fromDatePlaceholder else null
-                ) { router.navigate(fromDateDialog) }
+                ) { fromDateDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClickableField(
                     modifier = Modifier.weight(1f),
                     text = fromTimeStr,
                     placeholder = fromTimePlaceholder,
                     label = if (fromTimeStr != null) fromTimePlaceholder else null
-                ) { router.navigate(fromTimeDialog) }
+                ) { fromTimeDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
                     filter.fromDate = Optional.empty()
@@ -350,14 +347,14 @@ object FilterScreen {
                     text = toDateStr,
                     placeholder = toDatePlaceholder,
                     label = if (toDateStr != null) toDatePlaceholder else null,
-                ) { router.navigate(toDateDialog) }
+                ) { toDateDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClickableField(
                     modifier = Modifier.weight(1f),
                     text = toTimeStr,
                     placeholder = toTimePlaceholder,
                     label = if (toTimeStr != null) toTimePlaceholder else null,
-                ) { router.navigate(toTimeDialog) }
+                ) { toTimeDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
                     filter.toDate = Optional.empty()
