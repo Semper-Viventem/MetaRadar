@@ -35,6 +35,7 @@
     <string name="database_was_restored">Database was restored from backup</string>
     <string name="backup_has_succeeded">Backup has succeeded</string>
     <string name="garbage_has_cleared">Cleared %s garbage devices</string>
+    <string name="clear_all_location_history_dialog_title">Clear all location history?</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>
@@ -86,6 +87,10 @@
     <string name="change">Change</string>
     <string name="cannot_save_profile">Cannot save profile. Check your configuration</string>
     <string name="profile_has_been_removed">Profile has been removed</string>
+    <string name="delete_profile_dialog_title">Delete profile %s?</string>
+    <string name="discard_changes_dialog_title">Your changes will be lost. Continue?</string>
+    <string name="stay">Stay</string>
+    <string name="discard_changes">Discard changes</string>
 
     <!-- Devices List -->
     <string name="custom_filter">Custom filter</string>

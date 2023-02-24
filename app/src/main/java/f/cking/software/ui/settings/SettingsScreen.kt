@@ -183,7 +183,7 @@ object SettingsScreen {
             },
         ) {
             Column(Modifier.padding(16.dp)) {
-                Text(text = "Clear all location history?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.clear_all_location_history_dialog_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
 

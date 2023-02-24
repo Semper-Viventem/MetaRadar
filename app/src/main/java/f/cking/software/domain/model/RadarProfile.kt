@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class RadarProfile(
+data class RadarProfile(
     val id: Int?,
     val name: String,
     val description: String?,

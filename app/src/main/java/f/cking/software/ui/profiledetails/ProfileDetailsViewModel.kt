@@ -25,6 +25,7 @@ class ProfileDetailsViewModel(
 ) : ViewModel() {
 
     var profileId: Optional<Int> by mutableStateOf(Optional.empty())
+    var originalProfile: RadarProfile? = null
 
     var name: String by mutableStateOf("")
     var description: String by mutableStateOf("")
@@ -59,6 +60,7 @@ class ProfileDetailsViewModel(
 
     private fun loadExisting(profile: RadarProfile?) {
         if (profile != null) {
+            originalProfile = profile
             name = profile.name
             description = profile.description.orEmpty()
             isActive = profile.isActive
@@ -95,7 +97,7 @@ class ProfileDetailsViewModel(
         }
     }
 
-    private fun buildProfile(): RadarProfile {
+    fun buildProfile(): RadarProfile {
         return RadarProfile(
             id = profileId.orNull(),
             name = name,
