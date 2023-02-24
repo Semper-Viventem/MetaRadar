@@ -1,10 +1,13 @@
 package f.cking.software.ui.devicelist
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.R
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
@@ -15,9 +18,10 @@ import f.cking.software.ui.ScreenNavigationCommands
 import kotlinx.coroutines.launch
 
 class DeviceListViewModel(
+    context: Application,
     private val devicesRepository: DevicesRepository,
-    val router: NavRouter,
     private val filterCheckerImpl: FilterCheckerImpl,
+    val router: NavRouter,
 ) : ViewModel() {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
@@ -26,8 +30,8 @@ class DeviceListViewModel(
     var isSearchMode: Boolean by mutableStateOf(false)
     var quickFilters: List<FilterHolder> by mutableStateOf(
         listOf(
-            DefaultFilters.NOT_APPLE,
-            DefaultFilters.IS_FAVORITE,
+            DefaultFilters.notApple(context),
+            DefaultFilters.isFavorite(context),
         )
     )
 
@@ -126,15 +130,15 @@ class DeviceListViewModel(
 
     object DefaultFilters {
 
-        val NOT_APPLE = FilterHolder(
-            displayName = "Not apple",
+        fun notApple(context: Context) = FilterHolder(
+            displayName = context.getString(R.string.not_apple),
             filter = RadarProfile.Filter.Not(
                 filter = RadarProfile.Filter.Manufacturer(ManufacturerInfo.APPLE_ID)
             )
         )
 
-        val IS_FAVORITE = FilterHolder(
-            displayName = "Favorite",
+        fun isFavorite(context: Context) = FilterHolder(
+            displayName = context.getString(R.string.favorite),
             filter = RadarProfile.Filter.IsFavorite(favorite = true)
         )
     }

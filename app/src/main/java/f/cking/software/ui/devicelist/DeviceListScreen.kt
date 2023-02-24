@@ -186,12 +186,12 @@ object DeviceListScreen {
                     .focusRequester(focusRequest),
                 value = viewModel.searchQuery.orEmpty(),
                 onValueChange = { viewModel.onSearchInput(it) },
-                placeholder = { Text(text = "Search query", fontWeight = FontWeight.Light) },
+                placeholder = { Text(text = stringResource(R.string.search_query), fontWeight = FontWeight.Light) },
                 trailingIcon = {
                     if (viewModel.searchQuery.isNullOrBlank()) {
                         Icon(
                             Icons.Filled.Delete,
-                            contentDescription = "Close search",
+                            contentDescription = stringResource(R.string.close_search),
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable { viewModel.onOpenSearchClick() }
@@ -199,7 +199,7 @@ object DeviceListScreen {
                     } else {
                         Icon(
                             Icons.Filled.Close,
-                            contentDescription = "Clear search",
+                            contentDescription = stringResource(R.string.clear_search),
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable { viewModel.onSearchInput("") }

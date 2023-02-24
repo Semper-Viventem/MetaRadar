@@ -86,7 +86,14 @@
     <string name="change">Change</string>
     <string name="cannot_save_profile">Cannot save profile. Check your configuration</string>
     <string name="profile_has_been_removed">Profile has been removed</string>
+
+    <!-- Devices List -->
     <string name="custom_filter">Custom filter</string>
     <string name="create_filter">Create filter</string>
     <string name="filter_is_not_valid">Filter is not valid</string>
+    <string name="search_query">Search query</string>
+    <string name="close_search">Close search</string>
+    <string name="clear_search">Clear search</string>
+    <string name="not_apple">Not apple</string>
+    <string name="favorite">Favorite</string>
 </resources>
