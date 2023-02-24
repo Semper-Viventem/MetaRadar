@@ -88,10 +88,10 @@ object MainScreen {
         val icon: Int
 
         if (viewModel.bgServiceIsActive) {
-            text = "Stop"
+            text = stringResource(R.string.stop)
             icon = R.drawable.ic_cancel
         } else {
-            text = "Scan"
+            text = stringResource(R.string.scan)
             icon = R.drawable.ic_ble
         }
 
@@ -129,7 +129,7 @@ object MainScreen {
                             modifier = Modifier
                                 .size(24.dp),
                             imageVector = Icons.Filled.Refresh,
-                            contentDescription = "refresh",
+                            contentDescription = stringResource(R.string.refresh),
                             colorFilter = ColorFilter.tint(Color.White)
                         )
                     }

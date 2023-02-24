@@ -118,4 +118,13 @@
     <string name="device_details_history_period">"History period: "</string>
     <string name="device_details_history_period_subtitle">Showing big location history may affect map performance</string>
     <string name="device_details_no_location_history_for_such_period">No location history for such period</string>
+    <string name="menu_device_list">Device list</string>
+    <string name="menu_radar_profiles">Radar profiles</string>
+    <string name="menu_journal">Journal</string>
+    <string name="menu_settings">Settings</string>
+    <string name="stop">Stop</string>
+    <string name="scan">Scan</string>
+    <string name="refresh">refresh</string>
+
+    <!-- Main Screen -->
 </resources>

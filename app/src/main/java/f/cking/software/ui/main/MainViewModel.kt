@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val permissionHelper: PermissionHelper,
-    private val appContext: Application,
+    private val context: Application,
     private val bleScanner: BleScannerHelper,
 ) : ViewModel() {
 
@@ -32,25 +32,25 @@ class MainViewModel(
             Tab(
                 iconRes = R.drawable.ic_home_outline,
                 selectedIconRes = R.drawable.ic_home,
-                text = "Device list",
+                text = context.getString(R.string.menu_device_list),
                 selected = true,
             ) { DeviceListScreen.Screen() },
             Tab(
                 iconRes = R.drawable.ic_search_outline,
                 selectedIconRes = R.drawable.ic_search,
-                text = "Radar profiles",
+                text = context.getString(R.string.menu_radar_profiles),
                 selected = false,
             ) { ProfilesListScreen.Screen() },
             Tab(
                 iconRes = R.drawable.ic_journal_outline,
                 selectedIconRes = R.drawable.ic_journal,
-                text = "Journal",
+                text = context.getString(R.string.menu_journal),
                 selected = false,
             ) { JournalScreen.Screen() },
             Tab(
                 iconRes = R.drawable.ic_settings_outline,
                 selectedIconRes = R.drawable.ic_settings,
-                text = "Settings",
+                text = context.getString(R.string.menu_settings),
                 selected = false,
             ) { SettingsScreen.Screen() },
         )
@@ -63,7 +63,7 @@ class MainViewModel(
 
     fun onScanButtonClick() {
         checkPermissions {
-            BgScanService.scan(appContext)
+            BgScanService.scan(context)
         }
     }
 
@@ -75,9 +75,9 @@ class MainViewModel(
     fun runBackgroundScanning() {
         checkPermissions {
             if (BgScanService.isActive.value) {
-                BgScanService.stop(appContext)
+                BgScanService.stop(context)
             } else {
-                BgScanService.start(appContext)
+                BgScanService.start(context)
             }
         }
     }
