@@ -1,24 +1,26 @@
-pluginManagement {
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
-    includeBuild("build-logic")
+pluginManagement {
 
     plugins {
         `kotlin-dsl`
     }
 
     repositories {
-        gradlePluginPortal()
         google()
+        gradlePluginPortal()
         mavenCentral()
+        maven("https://jitpack.io")
     }
-
-
 }
 dependencyResolutionManagement {
     repositories {
         google()
+        gradlePluginPortal()
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
+
 rootProject.name = "MetaRadar"
 include(":app")
