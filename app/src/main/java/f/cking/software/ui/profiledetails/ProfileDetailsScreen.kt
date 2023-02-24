@@ -1,6 +1,5 @@
 package f.cking.software.ui.profiledetails
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -591,8 +591,8 @@ object ProfileDetailsScreen {
                     },
                     colors = ChipDefaults.chipColors(
                         backgroundColor = colorResource(R.color.filter_not),
-                        contentColor = Color.White,
-                        leadingIconContentColor = Color.White
+                        contentColor = Color.Black,
+                        leadingIconContentColor = Color.Black
                     ),
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.add_filter))
@@ -613,33 +613,30 @@ object ProfileDetailsScreen {
         content: @Composable () -> Unit,
     ) {
         val minimize = remember { mutableStateOf(false) }
+        val backgroundShape = RoundedCornerShape(8.dp)
         Column(
             Modifier
-                .border(border = BorderStroke(2.dp, color), shape = RoundedCornerShape(8.dp))
-                .background(color.copy(alpha = 0.1f), shape = RoundedCornerShape(8.dp))
+                .background(color, shape = backgroundShape)
+                .border(width = 1.dp, color = Color.Black, backgroundShape)
+                .clip(backgroundShape)
         ) {
-            val outlineShape = if (!minimize.value)  RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp) else  RoundedCornerShape(8.dp)
-            Box(
-                Modifier.background(color = color, shape = outlineShape)
-            ) {
+            Box(Modifier.clickable { minimize.value = !minimize.value }) {
                 Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(modifier = Modifier.weight(1f), text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    IconButton(modifier = Modifier.size(20.dp), onClick = { minimize.value = !minimize.value }) {
-                        val icon = if (!minimize.value) painterResource(R.drawable.ic_drop_down) else painterResource(R.drawable.ic_drop_up)
-                        Icon(
-                            painter = icon,
-                            contentDescription = stringResource(R.string.delete),
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.White,
-                        )
-                    }
-                    Spacer(Modifier.width(8.dp))
+                    Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                    val icon = if (!minimize.value) painterResource(R.drawable.ic_drop_down) else painterResource(R.drawable.ic_drop_up)
+                    Icon(
+                        painter = icon,
+                        contentDescription = stringResource(R.string.delete),
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Black,
+                    )
+                    Spacer(Modifier.weight(1f))
                     IconButton(modifier = Modifier.size(20.dp), onClick = onDeleteButtonClick) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.delete),
                             modifier = Modifier.size(24.dp),
-                            tint = Color.White,
+                            tint = Color.Black,
                         )
                     }
                     Spacer(Modifier.width(8.dp))
@@ -676,8 +673,8 @@ object ProfileDetailsScreen {
                     onClick = addClick,
                     colors = ChipDefaults.chipColors(
                         backgroundColor = color,
-                        contentColor = Color.White,
-                        leadingIconContentColor = Color.White
+                        contentColor = Color.Black,
+                        leadingIconContentColor = Color.Black
                     ),
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Add, contentDescription = addText)

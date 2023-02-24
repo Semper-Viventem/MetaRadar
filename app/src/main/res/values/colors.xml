@@ -13,19 +13,19 @@
     <color name="orange_dark_700">#E64A19</color>
     <color name="orange_dark_800">#D84315</color>
 
-    <color name="filter_any">#4DD0E1</color>
-    <color name="filter_all">#81C784</color>
-    <color name="filter_not">#9575CD</color>
-    <color name="filter_address">#FFD54F</color>
-    <color name="filter_name">#E57373</color>
-    <color name="filter_manufacturer">#F06292</color>
-    <color name="filter_last_seen">#4DB6AC</color>
-    <color name="filter_first_seen">#FF8A65</color>
-    <color name="filter_lost_time">#4FC3F7</color>
-    <color name="filter_is_favorite">#FFB74D</color>
-    <color name="filter_airdrop_contact">#BA68C8</color>
-    <color name="filter_unknown">#DCE775</color>
-    <color name="filter_is_following">#E57373</color>
+    <color name="filter_any">#80DEEA</color>
+    <color name="filter_all">#A5D6A7</color>
+    <color name="filter_not">#B39DDB</color>
+    <color name="filter_address">#FFE082</color>
+    <color name="filter_name">#FFAB91</color>
+    <color name="filter_manufacturer">#F48FB1</color>
+    <color name="filter_last_seen">#80CBC4</color>
+    <color name="filter_first_seen">#EF9A9A</color>
+    <color name="filter_lost_time">#90CAF9</color>
+    <color name="filter_is_favorite">#FFCC80</color>
+    <color name="filter_airdrop_contact">#E6EE9C</color>
+    <color name="filter_is_following">#CE93D8</color>
+    <color name="filter_unknown">#FFFFFF</color>
     <color name="error_background">#EF9A9A</color>
     <color name="profile_report_background">#0000</color>
 
