@@ -174,10 +174,7 @@ class BgScanService : Service() {
     }
 
     private fun handleAnalysResult(result: AnalyseScanBatchInteractor.Result) {
-        Log.d(
-            TAG,
-            "Background scan result: known_devices_count=${result.knownDevicesCount}, matched_profiles=${result.matchedProfiles.count()}"
-        )
+        Log.d(TAG, "Background scan result: known_devices_count=${result.knownDevicesCount}, matched_profiles=${result.matchedProfiles.count()}")
 
         updateNotification(result.knownDevicesCount)
         handleProfileCheckingResult(result.matchedProfiles)
@@ -214,20 +211,20 @@ class BgScanService : Service() {
         )
 
         val body = if (knownDeviceCount == null) {
-            "BLE scanner is started but there is no data yet"
+            getString(R.string.ble_scanner_is_started_but_no_data)
         } else if (knownDeviceCount > 0) {
-            "$knownDeviceCount known devices around."
+            getString(R.string.known_devices_around, knownDeviceCount.toString())
         } else {
-            "There are no known devices around"
+            getString(R.string.there_are_no_devices_around)
         }
 
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
-            .setContentTitle("MetaRadar service")
+            .setContentTitle(getString(R.string.app_service_title, getString(R.string.app_name)))
             .setContentText(body)
             .setOngoing(true)
             .setSmallIcon(R.drawable.ic_ble)
             .setContentIntent(openAppPendingIntent)
-            .addAction(R.drawable.ic_cancel, "Stop", cancelPendingIntent)
+            .addAction(R.drawable.ic_cancel, getString(R.string.stop), cancelPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOnlyAlertOnce(true)
             .setVibrate(null)
@@ -240,15 +237,15 @@ class BgScanService : Service() {
     private fun notifyRadarProfile(profiles: List<CheckProfileDetectionInteractor.ProfileResult>) {
         val title = if (profiles.count() == 1) {
             val profile = profiles.first()
-            "\"${profile.profile.name}\" profile is near you!"
+            getString(R.string.notification_profile_is_near_you, profile.profile.name)
         } else {
-            "${profiles.count()} profiles are near you!"
+            getString(R.string.notification_profiles_are_near_you, profiles.count().toString())
         }
 
         val content = profiles.flatMap { it.matched }
             .joinToString(
                 separator = ", ",
-                postfix = " devices matched!."
+                postfix = getString(R.string.devices_matched_postfix)
             ) { it.buildDisplayName() }
 
         val openAppIntent = Intent(this, MainActivity::class.java)
@@ -284,7 +281,7 @@ class BgScanService : Service() {
     private fun createServiceChannel() {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL,
-            "Scan BLE in background",
+            getString(R.string.scanner_notification_channel_name),
             NotificationManager.IMPORTANCE_LOW
         )
         notificationManager.createNotificationChannel(channel)
@@ -293,7 +290,7 @@ class BgScanService : Service() {
     private fun createDeviceFoundChannel() {
         val channel = NotificationChannel(
             DEVICE_FOUND_CHANNEL,
-            "Wanted device found",
+            getString(R.string.device_found_notification_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             enableVibration(true)

@@ -178,4 +178,15 @@
     <string name="stop">Stop</string>
     <string name="scan">Scan</string>
     <string name="refresh">refresh</string>
+
+    <!-- Notifications -->
+    <string name="ble_scanner_is_started_but_no_data">BLE scanner is started but there is no data yet</string>
+    <string name="known_devices_around">%s known devices around</string>
+    <string name="there_are_no_devices_around">There are no known devices around</string>
+    <string name="app_service_title">%s service</string>
+    <string name="notification_profile_is_near_you">\"%s\" profile is near you!</string>
+    <string name="notification_profiles_are_near_you">%s profile are near you!</string>
+    <string name="devices_matched_postfix">\" devices matched!\"</string>
+    <string name="scanner_notification_channel_name">Background scan service notification</string>
+    <string name="device_found_notification_channel_name">Radar notifications</string>
 </resources>
