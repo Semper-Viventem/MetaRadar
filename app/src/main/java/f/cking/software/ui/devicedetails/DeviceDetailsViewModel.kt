@@ -1,10 +1,12 @@
 package f.cking.software.ui.devicedetails
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.R
 import f.cking.software.common.navigation.BackCommand
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.helpers.LocationProvider
@@ -104,13 +106,13 @@ class DeviceDetailsViewModel(
 
     enum class HistoryPeriod(
         val periodMills: Long,
-        val displayName: String,
+        @StringRes val displayNameRes: Int,
     ) {
 
-        DAY(HISTORY_PERIOD_DAY, displayName = "Day"),
-        WEEK(HISTORY_PERIOD_WEEK, displayName = "Week"),
-        MONTH(HISTORY_PERIOD_MONTH, displayName = "Month"),
-        ALL(HISTORY_PERIOD_LONG, displayName = "All time");
+        DAY(HISTORY_PERIOD_DAY, displayNameRes = R.string.device_details_day),
+        WEEK(HISTORY_PERIOD_WEEK, displayNameRes = R.string.device_details_week),
+        MONTH(HISTORY_PERIOD_MONTH, displayNameRes = R.string.device_details_month),
+        ALL(HISTORY_PERIOD_LONG, displayNameRes = R.string.device_details_all_time);
 
         fun next(): HistoryPeriod? {
             return HistoryPeriod.values().getOrNull(ordinal + 1)

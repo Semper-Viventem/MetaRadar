@@ -210,10 +210,11 @@ object DeviceDetailsScreen {
                         },
                         enabled = !isSelected,
                     ) {
+                        val periodDisplayName = stringResource(period.displayNameRes)
                         val text = if (isSelected) {
-                            stringResource(R.string.device_details_dialog_time_period_selected, period.displayName)
+                            stringResource(R.string.device_details_dialog_time_period_selected, periodDisplayName)
                         } else {
-                            period.displayName
+                            periodDisplayName
                         }
                         Text(text = text)
                     }
@@ -239,7 +240,7 @@ object DeviceDetailsScreen {
                 Column(modifier = Modifier.weight(1f)) {
                     Row {
                         Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
-                        Text(text = viewModel.historyPeriod.displayName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
