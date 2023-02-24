@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import f.cking.software.R
 import f.cking.software.common.DeviceListItem
 import f.cking.software.domain.model.DeviceData
 import org.koin.androidx.compose.koinViewModel
@@ -69,12 +71,12 @@ object SelectDeviceScreen {
                 TextField(
                     value = viewModel.searchStr,
                     onValueChange = { viewModel.searchStr = it },
-                    placeholder = { Text(text = "Search device", color = Color.White) }
+                    placeholder = { Text(text = stringResource(R.string.search), color = Color.White) }
                 )
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             }
         )

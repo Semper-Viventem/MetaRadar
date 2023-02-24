@@ -10,8 +10,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.R
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.toHexString
 import org.koin.androidx.compose.koinViewModel
@@ -44,11 +46,11 @@ object SelectManufacturerScreen {
     private fun AppBar(viewModel: SelectManufacturerViewModel) {
         TopAppBar(
             title = {
-                Text(text = "Select manufacturer")
+                Text(text = stringResource(R.string.select_manufacturer))
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             }
         )

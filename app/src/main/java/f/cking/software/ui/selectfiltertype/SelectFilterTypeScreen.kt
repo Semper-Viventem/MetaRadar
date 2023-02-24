@@ -10,8 +10,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import f.cking.software.R
 import org.koin.androidx.compose.koinViewModel
 
 object SelectFilterTypeScreen {
@@ -42,11 +44,11 @@ object SelectFilterTypeScreen {
     private fun AppBar(viewModel: SelectFilterTypeViewModel) {
         TopAppBar(
             title = {
-                Text(text = "Select filter rype")
+                Text(text = stringResource(R.string.select_filter))
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             }
         )
@@ -61,7 +63,7 @@ object SelectFilterTypeScreen {
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                text = item.typeName,
+                text = stringResource(item.displayNameRes),
                 fontSize = 18.sp
             )
         }

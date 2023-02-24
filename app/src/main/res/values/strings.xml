@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">MetaRadar</string>
+    <string name="search">Search</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
+    <string name="back">Back</string>
 
     <!-- Settings -->
     <string name="no_location_data_yet">No location data yet</string>
@@ -21,4 +23,30 @@
     <string name="settings_clear_all_location_history">Clear locations history</string>
     <string name="settings_use_gps_title">Use GPS location only</string>
     <string name="settings_use_gps_subtitle">Don\'t use Fused Location. No heuristic bullshit, good old GPS, the data is more true. Requires good GPS signal. Higher battery consumption.</string>
+    <string name="settings_location_history_was_removed">Location history was removed</string>
+    <string name="backup_has_failed">Backup has failed. See report in the Journal</string>
+    <string name="directory_was_not_selected">Directory wasn\'t selected</string>
+    <string name="file_was_not_selected">File wasn\'t selected</string>
+    <string name="cannot_restore_database">Cannot restore database. See report in the Journal</string>
+    <string name="database_was_restored">Database was restored from backup</string>
+    <string name="backup_has_succeeded">Backup has succeeded</string>
+    <string name="garbage_has_cleared">Cleared %s garbage devices</string>
+
+    <!-- Select manufacturer -->
+    <string name="select_manufacturer">Select manufacturer</string>
+
+    <!-- Select filter -->
+    <string name="select_filter">Select filter</string>
+    <string name="filter_by_name">By name</string>
+    <string name="filter_by_address">By address</string>
+    <string name="filter_by_first_detection_period">By first detection period</string>
+    <string name="filter_by_last_detection_period">By last detection period</string>
+    <string name="filter_by_is_favorite">By is favorite</string>
+    <string name="filter_by_manufacturer">By manufacturer</string>
+    <string name="filter_by_min_lost_period">By min lost period</string>
+    <string name="filter_apple_airdrop_contact">Apple airdrop contact</string>
+    <string name="filter_device_is_following_me">Device is following me</string>
+    <string name="filter_any_of">ANY of</string>
+    <string name="filter_all_of">All of</string>
+    <string name="filter_not">Not</string>
 </resources>

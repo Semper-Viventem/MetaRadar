@@ -1,16 +1,19 @@
 package f.cking.software.ui.selectfiltertype
 
-enum class FilterType(val typeName: String) {
-    NAME("By  name"),
-    ADDRESS("By address"),
-    BY_FIRST_DETECTION("By first detection period"),
-    BY_LAST_DETECTION("By last detection period"),
-    BY_IS_FAVORITE("By is favorite"),
-    BY_MANUFACTURER("By manufacturer"),
-    BY_MIN_DETECTION_TIME("By min lost period"),
-    AIRDROP_CONTACT("Apple airdrop contact"),
-    IS_FOLLOWING("Device is following me"),
-    BY_LOGIC_ANY("Logic OR filter"),
-    BY_LOGIC_ALL("Logic AND filter"),
-    BY_LOGIC_NOT("Logic NOT filter"),
+import androidx.annotation.StringRes
+import f.cking.software.R
+
+enum class FilterType(@StringRes val displayNameRes: Int) {
+    NAME(R.string.filter_by_name),
+    ADDRESS(R.string.filter_by_address),
+    BY_FIRST_DETECTION(R.string.filter_by_first_detection_period),
+    BY_LAST_DETECTION(R.string.filter_by_last_detection_period),
+    BY_IS_FAVORITE(R.string.filter_by_is_favorite),
+    BY_MANUFACTURER(R.string.filter_by_manufacturer),
+    BY_MIN_DETECTION_TIME(R.string.filter_by_min_lost_period),
+    AIRDROP_CONTACT(R.string.filter_apple_airdrop_contact),
+    IS_FOLLOWING(R.string.filter_device_is_following_me),
+    BY_LOGIC_ANY(R.string.filter_any_of),
+    BY_LOGIC_ALL(R.string.filter_all_of),
+    BY_LOGIC_NOT(R.string.filter_not),
 }

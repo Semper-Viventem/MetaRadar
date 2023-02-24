@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.R
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
@@ -46,7 +47,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             garbageRemovingInProgress = true
             val garbageCount = clearGarbageInteractor.execute()
-            toast("Cleared $garbageCount garbage devices")
+            toast(context.getString(R.string.garbage_has_cleared, garbageCount.toString()))
             garbageRemovingInProgress = false
         }
     }
@@ -55,7 +56,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             locationRemovingInProgress = true
             locationRepository.removeAllLocations()
-            toast("Location history was removed")
+            toast(context.getString(R.string.settings_location_history_was_removed))
             locationRemovingInProgress = false
         }
     }
@@ -78,14 +79,14 @@ class SettingsViewModel(
         viewModelScope.launch {
             createBackupFileInteractor.execute()
                 .catch {
-                    toast("Backup has failed. See report in the Journal")
+                    toast(context.getString(R.string.backup_has_failed))
                     reportError(it)
                 }
                 .collect { uri ->
                     if (uri != null) {
                         backupFileTo(uri)
                     } else {
-                        toast("Directory wasn't selected")
+                        toast(context.getString(R.string.directory_was_not_selected))
                     }
                 }
         }
@@ -94,12 +95,15 @@ class SettingsViewModel(
     fun onRestoreDBClick() {
         viewModelScope.launch {
             selectBackupFileInteractor.execute()
-                .catch { reportError(it) }
+                .catch {
+                    toast(context.getString(R.string.cannot_restore_database))
+                    reportError(it)
+                }
                 .collect { uri ->
                     if (uri != null) {
                         restoreFrom(uri)
                     } else {
-                        toast("File wasn't selected")
+                        toast(context.getString(R.string.file_was_not_selected))
                     }
                 }
         }
@@ -120,11 +124,11 @@ class SettingsViewModel(
             try {
                 restoreDatabaseInteractor.execute(uri)
             } catch (e: Throwable) {
-                toast("Cannot restore database. See report in the Journal")
+                toast(context.getString(R.string.cannot_restore_database))
                 reportError(e)
             }
             backupDbInProgress = false
-            toast("Database was restored from backup")
+            toast(context.getString(R.string.database_was_restored))
         }
     }
 
@@ -134,11 +138,11 @@ class SettingsViewModel(
             try {
                 backupDatabaseInteractor.execute(uri)
             } catch (e: Throwable) {
-                toast("Backup has failed. See report in the Journal")
+                toast(context.getString(R.string.backup_has_failed))
                 reportError(e)
             }
             backupDbInProgress = false
-            toast("Backup has succeeded")
+            toast(context.getString(R.string.backup_has_succeeded))
         }
     }
 
