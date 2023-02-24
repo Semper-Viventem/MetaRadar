@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -21,11 +23,15 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
+import f.cking.software.R
 import f.cking.software.common.DeviceListItem
 import f.cking.software.common.Divider
+import f.cking.software.ui.ScreenNavigationCommands
+import f.cking.software.ui.filter.FilterScreen
 import org.koin.androidx.compose.koinViewModel
 
 object DeviceListScreen {
@@ -80,11 +86,7 @@ object DeviceListScreen {
                     val allFilters = (viewModel.quickFilters + viewModel.appliedFilter).toSet()
                     allFilters.forEach {
                         val isSelected = viewModel.appliedFilter.contains(it)
-                        val color = if (isSelected) {
-                            MaterialTheme.colors.primarySurface
-                        } else {
-                            Color.LightGray
-                        }
+                        val color = if (isSelected) MaterialTheme.colors.primarySurface else Color.LightGray
                         Chip(
                             colors = ChipDefaults.chipColors(
                                 backgroundColor = color,
@@ -94,11 +96,7 @@ object DeviceListScreen {
                             onClick = { viewModel.onFilterClick(it) },
                             leadingIcon = {
                                 if (isSelected) {
-                                    Icon(
-                                        Icons.Filled.Delete,
-                                        contentDescription = "Delete",
-                                        modifier = Modifier.size(24.dp)
-                                    )
+                                    Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
                                 }
                             }
                         ) {
@@ -106,30 +104,9 @@ object DeviceListScreen {
                         }
                     }
 
-                    val color = if (viewModel.isSearchMode) {
-                        MaterialTheme.colors.primarySurface
-                    } else {
-                        Color.LightGray
-                    }
-                    Chip(
-                        colors = ChipDefaults.chipColors(
-                            backgroundColor = color,
-                            contentColor = Color.Black,
-                            leadingIconContentColor = Color.Black,
-                        ),
-                        leadingIcon = {
-                            if (viewModel.isSearchMode) {
-                                Icon(
-                                    Icons.Filled.Delete,
-                                    contentDescription = "Delete",
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        },
-                        onClick = { viewModel.onOpenSearchClick() },
-                    ) {
-                        Text(text = viewModel.searchQuery?.takeIf { it.isNotBlank() } ?: "Search")
-                    }
+                    SearchChip(viewModel)
+
+                    AddFilterChip(viewModel)
                 }
 
                 if (viewModel.isSearchMode) {
@@ -139,8 +116,63 @@ object DeviceListScreen {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun SearchStr(viewModel: DeviceListViewModel) {
+    private fun AddFilterChip(viewModel: DeviceListViewModel) {
+
+        val filterName = stringResource(R.string.custom_filter)
+
+        Chip(
+            colors = ChipDefaults.chipColors(
+                backgroundColor = Color.LightGray,
+                contentColor = Color.Black,
+                leadingIconContentColor = Color.Black,
+            ),
+            leadingIcon = {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
+            },
+            onClick = {
+                viewModel.router.navigate(ScreenNavigationCommands.OpenSelectFilterTypeScreen { initialFilter ->
+                    viewModel.router.navigate(ScreenNavigationCommands.OpenCreateFilterScreen(
+                        initialFilterState = FilterScreen.getFilterByType(initialFilter),
+                        router = viewModel.router,
+                    ) { filter ->
+                        val filterHolder = DeviceListViewModel.FilterHolder(
+                            displayName = filterName,
+                            filter = filter,
+                        )
+                        viewModel.onFilterClick(filterHolder)
+                    })
+                })
+            },
+        ) {
+            Text(text = stringResource(R.string.add_filter))
+        }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    private fun SearchChip(viewModel: DeviceListViewModel) {
+        val color = if (viewModel.isSearchMode) MaterialTheme.colors.primarySurface else Color.LightGray
+
+        Chip(
+            colors = ChipDefaults.chipColors(
+                backgroundColor = color,
+                contentColor = Color.Black,
+                leadingIconContentColor = Color.Black,
+            ),
+            leadingIcon = {
+                val icon = if (viewModel.isSearchMode) Icons.Filled.Delete else Icons.Filled.Search
+                Icon(icon, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
+            },
+            onClick = { viewModel.onOpenSearchClick() },
+        ) {
+            Text(text = viewModel.searchQuery?.takeIf { it.isNotBlank() } ?: stringResource(R.string.search))
+        }
+    }
+
+    @Composable
+    private fun SearchStr(viewModel: DeviceListViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

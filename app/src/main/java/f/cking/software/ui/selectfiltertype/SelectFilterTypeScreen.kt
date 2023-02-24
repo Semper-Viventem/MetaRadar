@@ -30,8 +30,8 @@ object SelectFilterTypeScreen {
                     viewModel.types.forEach { type ->
                         item {
                             TypeItem(item = type) {
-                                onSelected.invoke(type)
                                 viewModel.back()
+                                onSelected.invoke(type)
                             }
                         }
                     }

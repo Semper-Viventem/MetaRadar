@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class DeviceListViewModel(
     private val devicesRepository: DevicesRepository,
-    private val router: NavRouter,
+    val router: NavRouter,
     private val filterCheckerImpl: FilterCheckerImpl,
 ) : ViewModel() {
 
