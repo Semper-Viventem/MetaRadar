@@ -5,21 +5,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import f.cking.software.R
 import f.cking.software.dateTimeStringFormat
 import org.koin.androidx.compose.koinViewModel
 
@@ -67,28 +66,25 @@ object SettingsScreen {
             ) {
                 val locationData = viewModel.locationData
                 if (locationData == null) {
-                    Text(text = "No location data yet")
+                    Text(text = stringResource(R.string.no_location_data_yet))
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Location fetches only if the scanner is started",
+                        text = stringResource(R.string.location_fetches_only_if_service_is_turned_on),
                         fontWeight = FontWeight.Light
                     )
                 } else {
+                    val formattedTime = locationData.emitTime.dateTimeStringFormat("HH:mm")
                     Text(
-                        text = "Last location update time: ${
-                            locationData.emitTime.dateTimeStringFormat(
-                                "HH:mm"
-                            )
-                        }"
+                        text = stringResource(R.string.last_location_update_time, formattedTime)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "lat: ${locationData.location.latitude}",
+                        text = stringResource(R.string.lat_template, locationData.location.latitude),
                         fontWeight = FontWeight.Light
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "lng: ${locationData.location.longitude}",
+                        text = stringResource(R.string.lng_template, locationData.location.longitude),
                         fontWeight = FontWeight.Light
                     )
                 }
@@ -105,7 +101,7 @@ object SettingsScreen {
             onClick = { viewModel.onRemoveGarbageClick() },
             enabled = !viewModel.garbageRemovingInProgress
         ) {
-            Text(text = "Clear garbage")
+            Text(text = stringResource(R.string.clear_garbage))
         }
     }
 
@@ -116,16 +112,16 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = "Cancel") { dialogState.hide() }
-                positiveButton(text = "Confirm") {
+                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm)) {
                     dialogState.hide()
                     viewModel.onRestoreDBClick()
                 }
             },
         ) {
             Column(Modifier.padding(16.dp)) {
-                Text(text = "Restore database from file?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text(text = "The current database will be overwritten, data will be lost")
+                Text(text = stringResource(R.string.restore_data_from_file_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.restore_data_from_file_subtitle))
             }
         }
 
@@ -136,7 +132,7 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
-            Text(text = "Restore database")
+            Text(text = stringResource(R.string.settings_restore_database))
         }
     }
 
@@ -147,16 +143,16 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = "Cancel") { dialogState.hide() }
-                positiveButton(text = "Confirm") {
+                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm)) {
                     dialogState.hide()
                     viewModel.onBackupDBClick()
                 }
             },
         ) {
             Column(Modifier.padding(16.dp)) {
-                Text(text = "Save database to devise storage?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text(text = "The database contains your location history. Please handle it with care, this is your sensitive data")
+                Text(text = stringResource(R.string.backup_database_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.backup_database_subtitle))
             }
         }
 
@@ -167,41 +163,38 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
-            Text(text = "Backup database")
+            Text(text = stringResource(R.string.settings_backup_database))
         }
     }
 
     @Composable
     private fun ClearLocationsButton(viewModel: SettingsViewModel) {
-        val openDialog = remember { mutableStateOf(false) }
-        if (openDialog.value) {
-            AlertDialog(
-                onDismissRequest = { openDialog.value = false },
-                title = { Text(text = "Clear all location history?") },
-                confirmButton = {
-                    Button(onClick = {
-                        openDialog.value = false
-                        viewModel.onClearLocationsClick()
-                    }) {
-                        Text(text = "Confirm")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { openDialog.value = false }) {
-                        Text(text = "Cancel")
-                    }
-                },
-            )
+
+        val dialogState = rememberMaterialDialogState()
+
+        MaterialDialog(
+            dialogState = dialogState,
+            buttons = {
+                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm)) {
+                    dialogState.hide()
+                    viewModel.onClearLocationsClick()
+                }
+            },
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(text = "Clear all location history?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
         }
 
         Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            onClick = { openDialog.value = true },
+            onClick = { dialogState.show() },
             enabled = !viewModel.locationRemovingInProgress
         ) {
-            Text(text = "Clear locations history")
+            Text(text = stringResource(R.string.settings_clear_all_location_history))
         }
     }
 
@@ -219,13 +212,9 @@ object SettingsScreen {
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(text = "Use GPS location only instead of fused location")
+                    Text(text = stringResource(R.string.settings_use_gps_title))
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "No heuristic bullshit, good old GPS, the data is more true. Requires good GPS signal. Higher battery consumption.",
-                        fontWeight = FontWeight.Light,
-                        fontSize = 12.sp,
-                    )
+                    Text(text = stringResource(R.string.settings_use_gps_subtitle), fontWeight = FontWeight.Light, fontSize = 12.sp,)
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Switch(

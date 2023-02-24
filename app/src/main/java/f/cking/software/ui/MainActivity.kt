@@ -92,5 +92,4 @@ class MainActivity : AppCompatActivity() {
     private class MainActivityViewModel : ViewModel() {
         val navigator: Navigator = Navigator(root = ScreenNavigationCommands.OpenMainScreen)
     }
-
 }

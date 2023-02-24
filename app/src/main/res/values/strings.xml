@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">MetaRadar</string>
+
+    <!-- Common -->
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Settings -->
+    <string name="no_location_data_yet">No location data yet</string>
+    <string name="location_fetches_only_if_service_is_turned_on">Location fetches only if the scanner is started</string>
+    <string name="last_location_update_time">Last location update time: %s</string>
+    <string name="lat_template">lat: %s</string>
+    <string name="lng_template">lng: %s</string>
+    <string name="clear_garbage">Clear garbage</string>
+    <string name="restore_data_from_file_title">Restore database from file?</string>
+    <string name="restore_data_from_file_subtitle">The current database will be overwritten, data will be lost</string>
+    <string name="settings_restore_database">Restore database</string>
+    <string name="backup_database_title">Save database to devise storage?</string>
+    <string name="backup_database_subtitle">The database contains your location history. Please handle it with care, this is your sensitive data</string>
+    <string name="settings_backup_database">Backup database</string>
+    <string name="settings_clear_all_location_history">Clear locations history</string>
+    <string name="settings_use_gps_title">Use GPS location only</string>
+    <string name="settings_use_gps_subtitle">Don\'t use Fused Location. No heuristic bullshit, good old GPS, the data is more true. Requires good GPS signal. Higher battery consumption.</string>
 </resources>
