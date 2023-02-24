@@ -50,7 +50,7 @@
     <string name="filter_by_min_lost_period">By min lost period</string>
     <string name="filter_apple_airdrop_contact">Apple airdrop contact</string>
     <string name="filter_device_is_following_me">Device is following me</string>
-    <string name="filter_any_of">ANY of</string>
+    <string name="filter_any_of">Any of</string>
     <string name="filter_all_of">All of</string>
     <string name="filter_not">Not</string>
 
