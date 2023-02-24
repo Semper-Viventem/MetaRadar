@@ -7,19 +7,17 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-fun getTimePeriodStr(timeMs: Long): String {
-    val sec = timeMs / (1000L)
-    val min = timeMs / (1000L * 60L)
-    val hours = timeMs / (1000L * 60L * 60L)
-    val days = timeMs / (1000L * 60L * 60L * 24L)
+fun Long.getTimePeriodStr(context: Context): String {
+    val sec = this / (1000)
+    val min = this / (1000 * 60)
+    val hours = this / (1000 * 60 * 60)
+    val days = this / (1000 * 60 * 60 * 24)
 
     return when {
-        days > 1L -> "$days days"
-        days == 1L -> "$days day"
-        hours > 1L -> "$hours hours"
-        hours == 1L -> "$hours hour"
-        min > 0 -> "$min min"
-        else -> "$sec sec"
+        days >= 1L -> context.resources.getQuantityString(R.plurals.day, days.toInt(), days.toInt())
+        hours >= 1L -> context.resources.getQuantityString(R.plurals.hour, hours.toInt(), hours.toInt())
+        min >= 1L -> context.resources.getQuantityString(R.plurals.min, min.toInt(), min.toInt())
+        else -> context.resources.getQuantityString(R.plurals.sec, sec.toInt(), sec.toInt())
     }
 }
 

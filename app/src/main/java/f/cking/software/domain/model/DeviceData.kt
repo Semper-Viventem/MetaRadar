@@ -1,5 +1,6 @@
 package f.cking.software.domain.model
 
+import android.content.Context
 import f.cking.software.getTimePeriodStr
 
 data class DeviceData(
@@ -18,12 +19,12 @@ data class DeviceData(
         return if (!customName.isNullOrBlank()) customName else name ?: address
     }
 
-    fun firstDetectionPeriod(): String {
-        return getTimePeriodStr(System.currentTimeMillis() - firstDetectTimeMs)
+    fun firstDetectionPeriod(context: Context): String {
+        return (System.currentTimeMillis() - firstDetectTimeMs).getTimePeriodStr(context)
     }
 
-    fun lastDetectionPeriod(): String {
-        return getTimePeriodStr(System.currentTimeMillis() - lastDetectTimeMs)
+    fun lastDetectionPeriod(context: Context): String {
+        return (System.currentTimeMillis() - lastDetectTimeMs).getTimePeriodStr(context)
     }
 
     fun mergeWithNewDetected(new: DeviceData): DeviceData {

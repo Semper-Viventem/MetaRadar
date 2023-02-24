@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -174,11 +175,11 @@ object DeviceDetailsScreen {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.firstDetectionPeriod() + " ago")
+            Text(text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current)))
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.lastDetectionPeriod() + " ago")
+            Text(text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current)))
             Spacer(modifier = Modifier.height(8.dp))
         }
     }

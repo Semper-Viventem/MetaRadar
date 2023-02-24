@@ -12,6 +12,51 @@
     <string name="clear">Clear</string>
     <string name="ok">OK</string>
 
+    <plurals name="day">
+        <item quantity="zero">%1$d days</item>
+        <item quantity="one">%1$d day</item>
+        <item quantity="two">%1$d days</item>
+        <item quantity="few">%1$d days</item>
+        <item quantity="many">%1$d days</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+
+    <plurals name="hour">
+        <item quantity="zero">%1$d hours</item>
+        <item quantity="one">%1$d hour</item>
+        <item quantity="two">%1$d hours</item>
+        <item quantity="few">%1$d hours</item>
+        <item quantity="many">%1$d hours</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="month">
+        <item quantity="zero">%1$d months</item>
+        <item quantity="one">%1$d month</item>
+        <item quantity="two">%1$d months</item>
+        <item quantity="few">%1$d months</item>
+        <item quantity="many">%1$d months</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+
+    <plurals name="min">
+        <item quantity="zero">%1$d min</item>
+        <item quantity="one">%1$d min</item>
+        <item quantity="two">%1$d min</item>
+        <item quantity="few">%1$d min</item>
+        <item quantity="many">%1$d min</item>
+        <item quantity="other">%1$d min</item>
+    </plurals>
+
+    <plurals name="sec">
+        <item quantity="zero">%1$d sec</item>
+        <item quantity="one">%1$d sec</item>
+        <item quantity="two">%1$d sec</item>
+        <item quantity="few">%1$d sec</item>
+        <item quantity="many">%1$d sec</item>
+        <item quantity="other">%1$d min</item>
+    </plurals>
+
     <!-- Settings -->
     <string name="no_location_data_yet">No location data yet</string>
     <string name="location_fetches_only_if_service_is_turned_on">Location fetches only if the scanner is started</string>
@@ -122,6 +167,8 @@
     <string name="device_details_week">Week</string>
     <string name="device_details_month">Month</string>
     <string name="device_details_all_time">All time</string>
+    <string name="time_ago">%s ago</string>
+    <string name="lifetime_data">lifetime: %1$s | last update: %2$s ago</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>

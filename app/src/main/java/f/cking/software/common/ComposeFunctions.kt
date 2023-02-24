@@ -131,7 +131,11 @@ fun DeviceListItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "lifetime: ${device.firstDetectionPeriod()} | last update: ${device.lastDetectionPeriod()} ago",
+                    text = stringResource(
+                        R.string.lifetime_data,
+                        device.firstDetectionPeriod(LocalContext.current),
+                        device.lastDetectionPeriod(LocalContext.current)
+                    ),
                     fontWeight = FontWeight.Light
                 )
             }
