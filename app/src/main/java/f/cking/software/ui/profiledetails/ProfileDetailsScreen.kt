@@ -11,10 +11,13 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -609,16 +612,28 @@ object ProfileDetailsScreen {
         onDeleteButtonClick: () -> Unit,
         content: @Composable () -> Unit,
     ) {
+        val minimize = remember { mutableStateOf(false) }
         Column(
             Modifier
                 .border(border = BorderStroke(2.dp, color), shape = RoundedCornerShape(8.dp))
                 .background(color.copy(alpha = 0.1f), shape = RoundedCornerShape(8.dp))
         ) {
+            val outlineShape = if (!minimize.value)  RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp) else  RoundedCornerShape(8.dp)
             Box(
-                Modifier.background(color = color, shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                Modifier.background(color = color, shape = outlineShape)
             ) {
                 Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(modifier = Modifier.weight(1f), text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    IconButton(modifier = Modifier.size(20.dp), onClick = { minimize.value = !minimize.value }) {
+                        val icon = if (!minimize.value) painterResource(R.drawable.ic_drop_down) else painterResource(R.drawable.ic_drop_up)
+                        Icon(
+                            painter = icon,
+                            contentDescription = stringResource(R.string.delete),
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.White,
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
                     IconButton(modifier = Modifier.size(20.dp), onClick = onDeleteButtonClick) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
@@ -630,13 +645,15 @@ object ProfileDetailsScreen {
                     Spacer(Modifier.width(8.dp))
                 }
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(8.dp)
-            ) {
-                content.invoke()
+            if (!minimize.value) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(8.dp)
+                ) {
+                    content.invoke()
+                }
             }
         }
     }
