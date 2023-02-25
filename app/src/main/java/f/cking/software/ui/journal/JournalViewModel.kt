@@ -40,7 +40,7 @@ class JournalViewModel(
         if (payload != null) {
             router.navigate(ScreenNavigationCommands.OpenDeviceDetailsScreen(payload))
         } else {
-            Toast.makeText(context, "Such device was removed from the database", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.journal_device_was_removed), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -81,7 +81,7 @@ class JournalViewModel(
         return JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
             color = R.color.profile_report_background,
-            title = "Profile detected: \"${getProfileName(report.profileId)}\"",
+            title = context.getString(R.string.journal_profile_detected, getProfileName(report.profileId)),
             subtitle = null,
             journalEntry = journalEntry,
             items = mapListItems(report.deviceAddresses),
@@ -91,7 +91,7 @@ class JournalViewModel(
     private fun Long.formattedDate() = dateTimeStringFormat("dd MMM yyyy, HH:mm")
 
     private suspend fun getProfileName(id: Int): String {
-        return profileRepository.getById(id)?.name ?: "UNKNOWN"
+        return profileRepository.getById(id)?.name ?: context.getString(R.string.unknown_capital_case)
     }
 
     private suspend fun mapListItems(addresses: List<String>): List<JournalEntryUiModel.ListItemUiModel> {
@@ -99,7 +99,7 @@ class JournalViewModel(
         return addresses.map { address ->
             val device = matchedDevices.firstOrNull { it.address == address }
             JournalEntryUiModel.ListItemUiModel(
-                displayName = device?.buildDisplayName() ?: "$address (removed)",
+                displayName = device?.buildDisplayName() ?: context.getString(R.string.journal_profile_removed, address),
                 payload = device?.address,
             )
         }

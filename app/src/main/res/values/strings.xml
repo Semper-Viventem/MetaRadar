@@ -189,4 +189,10 @@
     <string name="devices_matched_postfix">\" devices matched!\"</string>
     <string name="scanner_notification_channel_name">Background scan service notification</string>
     <string name="device_found_notification_channel_name">Radar notifications</string>
+
+    <!-- Journal -->
+    <string name="journal_device_was_removed">Such device was removed from the database</string>
+    <string name="journal_profile_detected">Profile detected: \"%s\"</string>
+    <string name="journal_profile_removed">%s (removed)</string>
+    <string name="unknown_capital_case">UNKNOWN</string>
 </resources>
