@@ -54,7 +54,7 @@
         <item quantity="two">%1$d sec</item>
         <item quantity="few">%1$d sec</item>
         <item quantity="many">%1$d sec</item>
-        <item quantity="other">%1$d min</item>
+        <item quantity="other">%1$d sec</item>
     </plurals>
 
     <!-- Settings -->
