@@ -1,3 +1,7 @@
+@file:Suppress("UnstableApiUsage")
+
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -27,14 +31,38 @@ android {
         }
     }
 
+    val DEBUG = "debug"
+    val RELEASE = "release"
+
+    signingConfigs {
+        maybeCreate(DEBUG).apply {
+            storeFile = file("../signing/debug-keystore.jks")
+            storePassword = "metaradar-debug-keystore"
+            keyAlias = "meta-radar"
+            keyPassword = "metaradar-debug-keystore"
+        }
+        maybeCreate(RELEASE).apply {
+            storeFile = file(gradleLocalProperties(rootDir).getProperty("releaseStoreFile"))
+            storePassword = gradleLocalProperties(rootDir).getProperty("releaseStorePassword")
+            keyAlias = gradleLocalProperties(rootDir).getProperty("releaseKeyAlias")
+            keyPassword = gradleLocalProperties(rootDir).getProperty("releaseKeyPassword")
+        }
+    }
+
     buildTypes {
-        maybeCreate("debug").apply {
+        maybeCreate(DEBUG).apply {
+            applicationIdSuffix = ".debug"
             isMinifyEnabled = false
+            isShrinkResources = false
             isDebuggable = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            signingConfig = signingConfigs[DEBUG]
+        }
+        maybeCreate(RELEASE).apply {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = false
+            signingConfig = signingConfigs[RELEASE]
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
