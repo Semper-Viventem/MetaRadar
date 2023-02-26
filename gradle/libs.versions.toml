@@ -104,6 +104,7 @@ compose-activity = { module = "androidx.activity:activity-compose", version.ref 
 material = { module = "com.google.android.material:material", version.ref = "material" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-dialogs = { module = "io.github.vanpra.compose-material-dialogs:core", version.ref = "compose-dialogs"}

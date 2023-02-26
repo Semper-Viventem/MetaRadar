@@ -16,6 +16,7 @@ import f.cking.software.data.repo.LocationRepository
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.toDomain
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
@@ -29,14 +30,19 @@ class DeviceDetailsViewModel(
 ) : ViewModel() {
 
     var deviceState: DeviceData? by mutableStateOf(null)
-    var points: List<LocationModel> by mutableStateOf(emptyList())
+    var pointsState: List<LocationModel> by mutableStateOf(emptyList())
+    val pointsStateFlow = MutableStateFlow<List<LocationModel>>(emptyList())
     var historyPeriod: HistoryPeriod by mutableStateOf(DEFAULT_HISTORY_PERIOD)
-    var currentLocation: LocationModel? by mutableStateOf(null)
+
+    private var currentLocation: LocationModel? = null
+
+    val cameraState = MutableStateFlow<MapCameraState>(DEFAULT_MAP_CAMERA_STATE)
 
     init {
         viewModelScope.launch {
             observeLocation()
             loadDevice(address)
+            refreshLocationHistory(address, autotunePeriod = true)
         }
     }
 
@@ -46,7 +52,6 @@ class DeviceDetailsViewModel(
             back()
         } else {
             deviceState = device
-            refreshLocationHistory(address, autotunePeriod = true)
         }
     }
 
@@ -58,6 +63,7 @@ class DeviceDetailsViewModel(
                     .take(1)
                     .collect { location ->
                         currentLocation = location?.location?.toDomain(System.currentTimeMillis())
+                        updateCameraPosition(pointsState, currentLocation)
                     }
             }
         }
@@ -81,7 +87,24 @@ class DeviceDetailsViewModel(
             selectHistoryPeriodSelected(nextStep!!, address, autotunePeriod)
         }
 
-        points = fetched
+        pointsState = fetched
+        pointsStateFlow.emit(fetched)
+        updateCameraPosition(pointsState, currentLocation)
+    }
+
+    private suspend fun updateCameraPosition(points: List<LocationModel>, currentLocation: LocationModel?) {
+        val previousState: MapCameraState = cameraState.value
+        val withAnimation = previousState != DEFAULT_MAP_CAMERA_STATE
+        val newState = if (points.isNotEmpty()) {
+            MapCameraState.MultiplePoints(points, withAnimation = withAnimation)
+        } else if (currentLocation != null) {
+            MapCameraState.SinglePoint(location = currentLocation, zoom = MapConfig.DEFAULT_MAP_ZOOM, withAnimation = withAnimation)
+        } else {
+            DEFAULT_MAP_CAMERA_STATE.copy(withAnimation = withAnimation)
+        }
+        if (newState != previousState) {
+            cameraState.emit(newState)
+        }
     }
 
     fun selectHistoryPeriodSelected(
@@ -125,6 +148,19 @@ class DeviceDetailsViewModel(
         }
     }
 
+    sealed interface MapCameraState {
+        data class SinglePoint(
+            val location: LocationModel,
+            val zoom: Double,
+            val withAnimation: Boolean,
+        ) : MapCameraState
+
+        data class MultiplePoints(
+            val points: List<LocationModel>,
+            val withAnimation: Boolean,
+        ) : MapCameraState
+    }
+
     companion object {
         private const val HISTORY_PERIOD_DAY = 24 * 60 * 60 * 1000L // 24 hours
         private const val HISTORY_PERIOD_WEEK = 7 * 24 * 60 * 60 * 1000L // 1 week
@@ -132,5 +168,11 @@ class DeviceDetailsViewModel(
         private const val HISTORY_PERIOD_LONG = Long.MAX_VALUE
         private const val MAX_POINTS_FOR_AUTO_UPGRADE_PERIOD = 20_000
         private val DEFAULT_HISTORY_PERIOD = HistoryPeriod.DAY
+
+        private val DEFAULT_MAP_CAMERA_STATE = MapCameraState.SinglePoint(
+            location = LocationModel(0.0, 0.0, 0),
+            zoom = MapConfig.MIN_MAP_ZOOM,
+            withAnimation = false
+        )
     }
 }

@@ -193,14 +193,15 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
 @Composable
 fun MapView(
     modifier: Modifier = Modifier,
-    onLoad: ((map: MapView) -> Unit)? = null
+    onLoad: ((map: MapView) -> Unit)? = null,
+    onUpdate: ((map: MapView) -> Unit)? = null,
 ) {
     val mapViewState = rememberMapViewWithLifecycle()
 
     AndroidView(
-        { mapViewState },
+        { mapViewState.apply { onLoad?.invoke(this) } },
         modifier
-    ) { mapView -> onLoad?.invoke(mapView) }
+    ) { mapView -> onUpdate?.invoke(mapView) }
 }
 
 @Composable

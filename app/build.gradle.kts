@@ -96,6 +96,8 @@ dependencies {
     implementation(libs.compose.dialogs)
     implementation(libs.compose.dialogs.datetime)
     implementation(libs.compose.flow.row)
+    debugImplementation (libs.compose.tooling)
+    implementation(libs.compose.tooling.preview)
 
     // room
     implementation(libs.room.runtime)
