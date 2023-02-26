@@ -2,10 +2,14 @@ package f.cking.software
 
 import android.content.Context
 import android.util.TypedValue
+import android.view.Display
+import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import java.security.MessageDigest
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
+
 
 fun Long.getTimePeriodStr(context: Context): String {
     val sec = this / (1000)
@@ -19,6 +23,11 @@ fun Long.getTimePeriodStr(context: Context): String {
         min >= 1L -> context.resources.getQuantityString(R.plurals.min, min.toInt(), min.toInt())
         else -> context.resources.getQuantityString(R.plurals.sec, sec.toInt(), sec.toInt())
     }
+}
+
+fun Context.frameRate(): Float {
+    val display: Display = ContextCompat.getSystemService(this, WindowManager::class.java)!!.defaultDisplay
+    return display.getRefreshRate()
 }
 
 @ExperimentalUnsignedTypes // just to make it clear that the experimental unsigned types are used

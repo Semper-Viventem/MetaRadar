@@ -1,5 +1,8 @@
 package f.cking.software.ui.devicedetails
 
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,17 +34,22 @@ import f.cking.software.common.MapView
 import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.dpToPx
+import f.cking.software.frameRate
+import kotlinx.coroutines.*
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import java.util.*
 
 object DeviceDetailsScreen {
 
+    private val TAG = "DeviceDetailsScreen"
+
     @Composable
-    fun Screen(address: String,key: String) {
+    fun Screen(address: String, key: String) {
         val viewModel: DeviceDetailsViewModel = koinViewModel(key = key) { parametersOf(address) }
 
         Scaffold(
@@ -261,7 +271,15 @@ object DeviceDetailsScreen {
 
     @Composable
     private fun Map(modifier: Modifier = Modifier, viewModel: DeviceDetailsViewModel) {
-        val points = viewModel.points
+        val scope = rememberCoroutineScope()
+        val context = LocalContext.current
+        val batchProcessor = remember {
+            AsyncBatchProcessor<Marker, MapView>(
+                framerate = context.frameRate(),
+                provideIsCancelled = { !scope.isActive },
+                processItem = { marker, map -> map.overlays.add(marker) },
+            )
+        }
 
         Box(
             modifier = modifier
@@ -270,41 +288,11 @@ object DeviceDetailsScreen {
         ) {
 
             MapView(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) { map ->
-                map.setMultiTouchControls(true)
-                map.overlays.clear()
-                map.minZoomLevel = MIN_MAP_ZOOM
-                map.maxZoomLevel = MAX_MAP_ZOOM
+                modifier = Modifier.fillMaxWidth(),
+                onLoad = { map -> configureMap(map, viewModel, scope, batchProcessor) }
+            )
 
-                if (points.isNotEmpty()) {
-                    val markers = points.map { location ->
-                        Marker(map).apply {
-                            position = GeoPoint(location.lat, location.lng)
-                            title = location.time.dateTimeStringFormat("dd.MM.yy HH:mm")
-                        }
-                    }
-                    map.overlays.addAll(markers)
-                    map.zoomToBoundingBox(
-                        BoundingBox.fromGeoPoints(markers.map { it.position }),
-                        !map.isCenter(),
-                        map.context.dpToPx(16f),
-                        MAX_MAP_ZOOM,
-                        MAP_ANIMATION
-                    )
-                } else {
-                    val location = viewModel.currentLocation
-                    if (location != null) {
-                        val animationSpeed = if (map.isCenter()) MAP_NO_ANIMATION else MAP_ANIMATION
-                        map.controller.animateTo(GeoPoint(location.lat, location.lng), DEFAULT_MAP_ZOOM, animationSpeed)
-                    }  else {
-                        map.controller.setZoom(MIN_MAP_ZOOM)
-                    }
-                }
-                map.invalidate()
-            }
-
+            val points = viewModel.points
             if (points.isEmpty()) {
                 Box(modifier = Modifier.background(color = colorResource(id = R.color.black_300), shape = RoundedCornerShape(8.dp))) {
                     Text(
@@ -315,8 +303,106 @@ object DeviceDetailsScreen {
                 }
             }
         }
-
     }
+
+    private fun configureMap(
+        map: MapView,
+        viewModel: DeviceDetailsViewModel,
+        scope: CoroutineScope,
+        batchProcessor: AsyncBatchProcessor<Marker, MapView>
+    ) {
+        map.setMultiTouchControls(true)
+        map.overlays.clear()
+        map.minZoomLevel = MIN_MAP_ZOOM
+        map.maxZoomLevel = MAX_MAP_ZOOM
+        map.controller.setZoom(MIN_MAP_ZOOM)
+
+        val points = viewModel.points
+
+        val location = viewModel.currentLocation
+
+        if (points.isNotEmpty()) {
+            scope.launch {
+                val markers = withContext(Dispatchers.Default) {
+                    points.mapIndexed { i, location ->
+                        Marker(map).apply {
+                            position = GeoPoint(location.lat, location.lng)
+                            title = location.time.dateTimeStringFormat("dd.MM.yy HH:mm")
+                        }
+                    }
+                }
+
+                batchProcessor.process(markers, map) {
+                    map.zoomToBoundingBox(
+                        BoundingBox.fromGeoPoints(markers.map { it.position }),
+                        !map.isCenter(),
+                        map.context.dpToPx(16f),
+                        MAX_MAP_ZOOM,
+                        MAP_ANIMATION
+                    )
+                }
+            }
+        } else {
+            if (location != null) {
+                val animationSpeed = if (map.isCenter()) MAP_NO_ANIMATION else MAP_ANIMATION
+                map.controller.animateTo(GeoPoint(location.lat, location.lng), DEFAULT_MAP_ZOOM, animationSpeed)
+            } else {
+                map.controller.setZoom(MIN_MAP_ZOOM)
+            }
+        }
+    }
+
+    class AsyncBatchProcessor<T, P>(
+        private val framerate: Float,
+        private val provideIsCancelled: () -> Boolean,
+        private val processItem: (item: T, payload: P) -> Unit,
+    ) {
+
+        private val handler = Handler(Looper.getMainLooper())
+        private val activeTasks = mutableSetOf<String>()
+
+        fun process(iterable: Iterable<T>, payload: P, onComplete: (payload: P) -> Unit) {
+            cancel()
+            val task = UUID.randomUUID().toString()
+            activeTasks.add(task)
+            processInternal(iterable.iterator(), task, payload, onComplete)
+        }
+
+        fun cancel() {
+            handler.removeCallbacksAndMessages(TOKEN)
+            activeTasks.clear()
+        }
+
+        private fun processInternal(
+            iterator: Iterator<T>,
+            taskKey: String,
+            payload: P,
+            onComplete: (payload: P) -> Unit,
+        ) {
+
+            val batchTimeout = (1000 / framerate / 2).toLong()
+            val drawStartTime = SystemClock.elapsedRealtime()
+            fun shouldDelayUntilNextFrame(drawStartTime: Long): Boolean = SystemClock.elapsedRealtime() - drawStartTime > batchTimeout
+
+            var shouldWaitNextFrame = false
+            while (iterator.hasNext() && !shouldWaitNextFrame && !provideIsCancelled.invoke() && activeTasks.contains(taskKey)) {
+                val next = iterator.next()
+                processItem.invoke(next, payload)
+                shouldWaitNextFrame = shouldDelayUntilNextFrame(drawStartTime)
+            }
+
+            if (shouldWaitNextFrame) {
+                handler.postDelayed({ processInternal(iterator, taskKey, payload, onComplete) }, TOKEN, framerate.toLong() / 2)
+            } else if (!iterator.hasNext() && !provideIsCancelled.invoke() && activeTasks.contains(taskKey)) {
+                onComplete.invoke(payload)
+            }
+        }
+
+        companion object {
+            private const val TOKEN = "batch_token"
+        }
+    }
+
     private fun MapView.isCenter(): Boolean = mapCenter.latitude == 0.0 && mapCenter.longitude == 0.0
 
 
