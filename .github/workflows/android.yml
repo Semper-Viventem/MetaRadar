@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: 'Build check'
 
     runs-on: ubuntu-latest
 
