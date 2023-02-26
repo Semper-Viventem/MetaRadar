@@ -43,5 +43,5 @@ object ScreenNavigationCommands {
 
     class OpenDeviceDetailsScreen(val address: String) : AddToStackCommand(screenFunction = { key ->
         DeviceDetailsScreen.Screen(address = address, key)
-    }, key = address)
+    })
 }

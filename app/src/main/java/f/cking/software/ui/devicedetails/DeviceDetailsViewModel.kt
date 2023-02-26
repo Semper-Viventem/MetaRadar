@@ -16,6 +16,7 @@ import f.cking.software.data.repo.LocationRepository
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.toDomain
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 class DeviceDetailsViewModel(
@@ -54,6 +55,7 @@ class DeviceDetailsViewModel(
             viewModelScope.launch {
                 locationProvider.fetchOnce()
                 locationProvider.observeLocation()
+                    .take(1)
                     .collect { location ->
                         currentLocation = location?.location?.toDomain(System.currentTimeMillis())
                     }
