@@ -42,10 +42,10 @@ android {
             keyPassword = "metaradar-debug-keystore"
         }
         maybeCreate(RELEASE).apply {
-            storeFile = file(gradleLocalProperties(rootDir).getProperty("releaseStoreFile"))
-            storePassword = gradleLocalProperties(rootDir).getProperty("releaseStorePassword")
-            keyAlias = gradleLocalProperties(rootDir).getProperty("releaseKeyAlias")
-            keyPassword = gradleLocalProperties(rootDir).getProperty("releaseKeyPassword")
+            storeFile = file(gradleLocalProperties(rootDir).getProperty("releaseStoreFile", "/"))
+            storePassword = gradleLocalProperties(rootDir).getProperty("releaseStorePassword", "")
+            keyAlias = gradleLocalProperties(rootDir).getProperty("releaseKeyAlias", "")
+            keyPassword = gradleLocalProperties(rootDir).getProperty("releaseKeyPassword", "")
         }
     }
 
@@ -124,7 +124,7 @@ dependencies {
     implementation(libs.compose.dialogs)
     implementation(libs.compose.dialogs.datetime)
     implementation(libs.compose.flow.row)
-    debugImplementation (libs.compose.tooling)
+    debugImplementation(libs.compose.tooling)
     implementation(libs.compose.tooling.preview)
 
     // room
