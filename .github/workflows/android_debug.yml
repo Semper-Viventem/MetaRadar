@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: 'Build check'
+    name: 'Build debug'
 
     runs-on: ubuntu-latest
 
