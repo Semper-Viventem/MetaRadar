@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -37,9 +36,7 @@ import f.cking.software.domain.model.LocationModel
 import f.cking.software.dpToPx
 import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.osmdroid.util.BoundingBox
@@ -140,8 +137,16 @@ object DeviceDetailsScreen {
                 .fillMaxHeight()
                 .fillMaxWidth()
         ) {
-            Map(modifier = Modifier.weight(1f).fillMaxWidth(), viewModel = viewModel)
-            LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            LocationHistory(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(), viewModel = viewModel
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
                 item { DeviceContent(deviceData = deviceData, viewModel = viewModel) }
             }
         }
@@ -276,9 +281,60 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun Map(modifier: Modifier = Modifier, viewModel: DeviceDetailsViewModel) {
+    private fun LocationHistory(modifier: Modifier = Modifier, viewModel: DeviceDetailsViewModel) {
+        Box(modifier = modifier) {
+            Map(
+                viewModel = viewModel,
+                isLoading = { viewModel.markersInLoadingState = it }
+            )
+            MapOverlay(viewModel = viewModel)
+        }
+    }
+
+    @Composable
+    private fun MapOverlay(
+        viewModel: DeviceDetailsViewModel
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            if (viewModel.pointsState.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Box(modifier = Modifier.background(color = colorResource(id = R.color.black_300), shape = RoundedCornerShape(8.dp))) {
+                        Text(
+                            modifier = Modifier.padding(16.dp),
+                            text = stringResource(R.string.device_details_no_location_history_for_such_period),
+                            color = Color.White,
+                        )
+                    }
+                }
+            }
+
+            if (viewModel.markersInLoadingState) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(5.dp),
+                    color = Color.Black
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun Map(
+        viewModel: DeviceDetailsViewModel,
+        isLoading: (isLoading: Boolean) -> Unit,
+    ) {
+
         val scope = rememberCoroutineScope()
-        val markersInLoadingState = remember { mutableStateOf(false) }
         val frameRate = LocalContext.current.frameRate()
 
         val batchProcessor = remember {
@@ -298,95 +354,67 @@ object DeviceDetailsScreen {
                     map.overlays.add(marker)
                 },
                 onStart = { map ->
-                    markersInLoadingState.value = true
+                    isLoading.invoke(true)
                     map.overlays.clear()
                     map.invalidate()
                 },
                 onComplete = { map ->
-                    markersInLoadingState.value = false
+                    isLoading.invoke(false)
                     map.invalidate()
                 },
                 onCancelled = { map ->
-                    markersInLoadingState.value = false
+                    isLoading.invoke(false)
                     map?.invalidate()
                 }
             )
         }
 
-        Box(modifier = modifier) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center,
-            ) {
-
-                MapView(
-                    modifier = Modifier.fillMaxWidth(),
-                    onLoad = { map -> configureMap(map, viewModel, batchProcessor, scope) }
-                )
-                if (viewModel.pointsState.isEmpty()) {
-                    Box(modifier = Modifier.background(color = colorResource(id = R.color.black_300), shape = RoundedCornerShape(8.dp))) {
-                        Text(
-                            modifier = Modifier.padding(16.dp),
-                            text = stringResource(R.string.device_details_no_location_history_for_such_period),
-                            color = Color.White,
-                        )
-                    }
-                }
-            }
-            if (markersInLoadingState.value) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(5.dp),
-                    color = Color.Black
-                )
-            }
-        }
+        MapView(
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            onLoad = { map -> initMapState(map) },
+            onUpdate = { map -> refreshMap(map, viewModel, batchProcessor) }
+        )
     }
 
-    private fun configureMap(
-        map: MapView,
-        viewModel: DeviceDetailsViewModel,
-        batchProcessor: AsyncBatchProcessor<LocationModel, MapView>,
-        scope: CoroutineScope,
-    ) {
-
+    private fun initMapState(map: MapView) {
         map.setMultiTouchControls(true)
-        map.overlays.clear()
         map.minZoomLevel = MapConfig.MIN_MAP_ZOOM
         map.maxZoomLevel = MapConfig.MAX_MAP_ZOOM
         map.controller.setZoom(MapConfig.MIN_MAP_ZOOM)
+    }
 
-        scope.launch {
-            viewModel.pointsStateFlow.collect { points ->
-                batchProcessor.process(points, map)
+    private fun refreshMap(
+        map: MapView,
+        viewModel: DeviceDetailsViewModel,
+        batchProcessor: AsyncBatchProcessor<LocationModel, MapView>,
+    ) {
+
+        val points = viewModel.pointsState
+        batchProcessor.process(points, map)
+
+        when (val cameraConfig = viewModel.cameraState) {
+            is DeviceDetailsViewModel.MapCameraState.SinglePoint -> {
+                Log.d(TAG, cameraConfig.toString())
+                val point = GeoPoint(cameraConfig.location.lat, cameraConfig.location.lng)
+                map.controller.animateTo(
+                    point,
+                    cameraConfig.zoom,
+                    if (cameraConfig.withAnimation) MapConfig.MAP_ANIMATION else MapConfig.MAP_NO_ANIMATION
+                )
+                map.invalidate()
             }
-        }
-        scope.launch {
-            viewModel.cameraState.collect { cameraConfig ->
-                when (cameraConfig) {
-                    is DeviceDetailsViewModel.MapCameraState.SinglePoint -> {
-                        Log.d(TAG, cameraConfig.toString())
-                        val point = GeoPoint(cameraConfig.location.lat, cameraConfig.location.lng)
-                        map.controller.animateTo(
-                            point,
-                            cameraConfig.zoom,
-                            if (cameraConfig.withAnimation) MapConfig.MAP_ANIMATION else MapConfig.MAP_NO_ANIMATION
-                        )
-                        map.invalidate()
-                    }
-                    is DeviceDetailsViewModel.MapCameraState.MultiplePoints -> {
-                        Log.d(TAG, cameraConfig.toString())
-                        map.zoomToBoundingBox(
-                            BoundingBox.fromGeoPoints(cameraConfig.points.map { GeoPoint(it.lat, it.lng) }),
-                            cameraConfig.withAnimation,
-                            map.context.dpToPx(16f),
-                            MapConfig.MAX_MAP_ZOOM,
-                            MapConfig.MAP_ANIMATION
-                        )
-                        map.invalidate()
-                    }
+            is DeviceDetailsViewModel.MapCameraState.MultiplePoints -> {
+                Log.d(TAG, cameraConfig.toString())
+                map.post {
+                    map.zoomToBoundingBox(
+                        BoundingBox.fromGeoPoints(cameraConfig.points.map { GeoPoint(it.lat, it.lng) }),
+                        cameraConfig.withAnimation,
+                        map.context.dpToPx(16f),
+                        MapConfig.MAX_MAP_ZOOM,
+                        MapConfig.MAP_ANIMATION,
+                    )
                 }
+                map.invalidate()
             }
         }
     }

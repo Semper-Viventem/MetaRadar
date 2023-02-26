@@ -16,7 +16,6 @@ import f.cking.software.data.repo.LocationRepository
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.toDomain
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
@@ -31,12 +30,12 @@ class DeviceDetailsViewModel(
 
     var deviceState: DeviceData? by mutableStateOf(null)
     var pointsState: List<LocationModel> by mutableStateOf(emptyList())
-    val pointsStateFlow = MutableStateFlow<List<LocationModel>>(emptyList())
-    var historyPeriod: HistoryPeriod by mutableStateOf(DEFAULT_HISTORY_PERIOD)
+    var cameraState: MapCameraState by mutableStateOf(DEFAULT_MAP_CAMERA_STATE)
+    var historyPeriod by mutableStateOf(DEFAULT_HISTORY_PERIOD)
+    var markersInLoadingState by mutableStateOf(false)
 
     private var currentLocation: LocationModel? = null
 
-    val cameraState = MutableStateFlow<MapCameraState>(DEFAULT_MAP_CAMERA_STATE)
 
     init {
         viewModelScope.launch {
@@ -60,7 +59,7 @@ class DeviceDetailsViewModel(
             viewModelScope.launch {
                 locationProvider.fetchOnce()
                 locationProvider.observeLocation()
-                    .take(1)
+                    .take(2)
                     .collect { location ->
                         currentLocation = location?.location?.toDomain(System.currentTimeMillis())
                         updateCameraPosition(pointsState, currentLocation)
@@ -88,12 +87,11 @@ class DeviceDetailsViewModel(
         }
 
         pointsState = fetched
-        pointsStateFlow.emit(fetched)
         updateCameraPosition(pointsState, currentLocation)
     }
 
-    private suspend fun updateCameraPosition(points: List<LocationModel>, currentLocation: LocationModel?) {
-        val previousState: MapCameraState = cameraState.value
+    private fun updateCameraPosition(points: List<LocationModel>, currentLocation: LocationModel?) {
+        val previousState: MapCameraState = cameraState
         val withAnimation = previousState != DEFAULT_MAP_CAMERA_STATE
         val newState = if (points.isNotEmpty()) {
             MapCameraState.MultiplePoints(points, withAnimation = withAnimation)
@@ -103,7 +101,7 @@ class DeviceDetailsViewModel(
             DEFAULT_MAP_CAMERA_STATE.copy(withAnimation = withAnimation)
         }
         if (newState != previousState) {
-            cameraState.emit(newState)
+            cameraState = newState
         }
     }
 
