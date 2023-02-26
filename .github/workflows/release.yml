@@ -2,9 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches: [ "release" ]
 
 jobs:
   build:
@@ -33,4 +31,10 @@ jobs:
            echo releaseKeyAlias=\"RELEASE_STORE_KEY\" >> ./local.properties
            echo releaseKeyPassword=\"RELEASE_STORE_KEY_PASSWORD\" >> ./local.properties
     - name: Build with Gradle
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleRelease
+    - name: Releasing using Hub
+      uses: ShaunLWM/action-release-debugapk@release
+      env:
+        GITHUB_TOKEN: ${{ secrets.DEBUG_RELEASE_TOKEN }}
+        APP_FOLDER: app
+        RELEASE_TITLE: Release Build
