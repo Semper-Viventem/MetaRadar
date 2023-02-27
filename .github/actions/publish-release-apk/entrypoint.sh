@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ls -a
+git config --global --add safe.directory /github/workspace
 git status
 #hub checkout ${${REPO_BRANCH}:-master}
 #VERSION_NAME=`grep -oP 'versionName = "\K(.*?)(?=")' ./${APP_FOLDER}/build.gradle.kts`
