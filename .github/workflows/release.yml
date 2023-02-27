@@ -9,6 +9,7 @@ jobs:
     name: 'Publish debug build'
 
     runs-on: ubuntu-latest
+    environment: release
 
     steps:
       - uses: actions/checkout@v3
