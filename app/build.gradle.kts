@@ -42,10 +42,10 @@ android {
             keyPassword = "metaradar-debug-keystore"
         }
         maybeCreate(RELEASE).apply {
-            storeFile = file(gradleLocalProperties(rootDir).getProperty("releaseStoreFile", "/"))
-            storePassword = gradleLocalProperties(rootDir).getProperty("releaseStorePassword", "")
-            keyAlias = gradleLocalProperties(rootDir).getProperty("releaseKeyAlias", "")
-            keyPassword = gradleLocalProperties(rootDir).getProperty("releaseKeyPassword", "")
+            storeFile = file(gradleLocalProperties(rootDir).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: "/"))
+            storePassword = gradleLocalProperties(rootDir).getProperty("releaseStorePassword", System.getenv("RELEASE_STORE_PASSWORD") ?: "")
+            keyAlias = gradleLocalProperties(rootDir).getProperty("releaseKeyAlias", System.getenv("RELEASE_STORE_KEY") ?: "")
+            keyPassword = gradleLocalProperties(rootDir).getProperty("releaseKeyPassword", System.getenv("RELEASE_STORE_KEY_PASSWORD") ?: "")
         }
     }
 
