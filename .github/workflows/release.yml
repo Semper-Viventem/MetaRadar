@@ -37,6 +37,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app
-          RELEASE_TITLE: Debug Build
+          RELEASE_TITLE: Release Build
           REPO_BRANCH: release
           BUILD_TYPE: release
