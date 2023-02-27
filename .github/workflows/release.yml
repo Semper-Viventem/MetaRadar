@@ -25,7 +25,7 @@ jobs:
         run: ./gradlew assembleDebug
       - uses: actions/checkout@v3
       - name: Releasing using Hub
-        uses: ./.github/actions/publish-release-apk
+        uses: ./.github/workflows/publish_release_apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app

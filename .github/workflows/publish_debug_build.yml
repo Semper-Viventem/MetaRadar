@@ -18,7 +18,13 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
       - uses: actions/checkout@v3
+
       - name: Releasing using Hub
         uses: ./.github/actions/publish-release-apk
         env:
@@ -27,4 +33,3 @@ jobs:
           RELEASE_TITLE: Debug Build
           REPO_BRANCH: master
           BUILD_TYPE: debug
-          GRADLEW_CONFIG: assembleDebug
