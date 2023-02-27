@@ -1,7 +1,6 @@
 #!/bin/bash
 
 curl -sSL https://get.docker.com/ | sudo sh
-docker pull mingc/android-build-box:latest
 hub clone https://github.com/Semper-Viventem/MetaRadar.git
 hub checkout ${${REPO_BRANCH}:-master}
 ls
