@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import f.cking.software.R
 import f.cking.software.data.helpers.BleScannerHelper
 import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.service.BgScanService
 import f.cking.software.ui.devicelist.DeviceListScreen
 import f.cking.software.ui.journal.JournalScreen
@@ -22,6 +23,7 @@ class MainViewModel(
     private val permissionHelper: PermissionHelper,
     private val context: Application,
     private val bleScanner: BleScannerHelper,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     var scanStarted: Boolean by mutableStateOf(bleScanner.inProgress.value)
@@ -80,6 +82,14 @@ class MainViewModel(
                 BgScanService.start(context)
             }
         }
+    }
+
+    fun needToShowPermissionsIntro(): Boolean {
+        return !settingsRepository.getPermissionsIntroWasShown()
+    }
+
+    fun userHasPassedPermissionsIntro() {
+        settingsRepository.setPermissionsIntroWasShown(true)
     }
 
     private fun observeScanInProgress() {
