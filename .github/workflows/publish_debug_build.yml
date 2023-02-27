@@ -26,7 +26,6 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug
       - name: Releasing using Hub
-      - name: Releasing using Hub
         uses: ./.github/actions/publish-release-apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
