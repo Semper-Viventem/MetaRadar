@@ -203,7 +203,7 @@
     <string name="permissions_intro_nearby_title">Nearby (Bluetooth) access</string>
     <string name="permissions_intro_nearby_description">Bluetooth scanning requires permission for Nearby (Bluetooth) devices.</string>
     <string name="permissions_intro_doze_mode_title">Doze mode (optional)</string>
-    <string name="permissions_intro_doze_mode_text">This permission is needed to increase the stability of the scanner in the background. Optional.</string>
+    <string name="permissions_intro_doze_mode_text">Android restricts certain processes in the background. This permission is needed to increase the stability of the scanner in the background. Optional.</string>
     <string name="permission_data_coolect_info">The application does not collect or transmit data. The project is fully open source and available on github</string>
     <string name="device_list_placeholder">Nno data yet. To start scanning, click on the Scan button</string>
 </resources>
