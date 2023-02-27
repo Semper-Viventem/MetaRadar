@@ -33,8 +33,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assembleRelease
     - name: Releasing using Hub
-      uses: ShaunLWM/action-release-debugapk@release
+      uses: Semper-Viventem/action-release-debugapk@master
       env:
-        GITHUB_TOKEN: ${{ secrets.DEBUG_RELEASE_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
         APP_FOLDER: app
-        RELEASE_TITLE: Release Build
+        RELEASE_TITLE: Debug Build
+        REPO_BRANCH: release
