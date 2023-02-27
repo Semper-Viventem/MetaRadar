@@ -24,7 +24,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleDebug
       - name: Releasing using Hub
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
         uses: ./.github/actions/publish-release-apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}

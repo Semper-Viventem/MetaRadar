@@ -12,10 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-#        with:
-#          repository: Semper-Viventem/MetaRadar
-#          path: MetaRadar
-#          fetch-depth: 0
       - name: set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -28,6 +24,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleDebug
       - name: Releasing using Hub
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
         uses: ./.github/actions/publish-release-apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
