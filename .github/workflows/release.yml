@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: 'Publish release build'
+    name: 'Publish debug build'
 
     runs-on: ubuntu-latest
 
@@ -19,15 +19,24 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Config local properties
+        env:
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_STORE_KEY: ${{ secrets.RELEASE_STORE_KEY }}
+          RELEASE_STORE_KEY_PASSWORD: ${{ secrets.RELEASE_STORE_KEY_PASSWORD }}
+        run: echo releaseStorePassword=\"RELEASE_STORE_PASSWORD\" >> ./local.properties
+          echo releaseKeyAlias=\"RELEASE_STORE_KEY\" >> ./local.properties
+          echo releaseKeyPassword=\"RELEASE_STORE_KEY_PASSWORD\" >> ./local.properties
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleRelease
       - name: Releasing using Hub
         uses: ./.github/actions/publish-release-apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app
-          RELEASE_TITLE: Release Build
+          RELEASE_TITLE: Debug Build
+          REPO_BRANCH: release
           BUILD_TYPE: release
-          GRADLEW_CONFIG: assembleRelease
