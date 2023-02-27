@@ -25,10 +25,11 @@ jobs:
         run: ./gradlew assembleDebug
       - uses: actions/checkout@v3
       - name: Releasing using Hub
-        uses: ./.github/workflows/publish_release_apk.yml
+        uses: ./.github/workflows/publish_release_apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app
           RELEASE_TITLE: Release Build
           REPO_BRANCH: release
           BUILD_TYPE: release
+          GRADLEW_CONFIG: assembleRelease

@@ -11,24 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: gradle
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug
-    - uses: actions/checkout@v3
-    - name: Releasing using Hub
-      uses: ./.github/workflows/publish_release_apk.yml
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        APP_FOLDER: app
-        RELEASE_TITLE: Debug Build
-        REPO_BRANCH: master
-        BUILD_TYPE: debug
+      - uses: actions/checkout@v3
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
+      - uses: actions/checkout@v3
+      - name: Releasing using Hub
+        uses: ./.github/workflows/publish_release_apk.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          APP_FOLDER: app
+          RELEASE_TITLE: Debug Build
+          REPO_BRANCH: master
+          BUILD_TYPE: debug
+          GRADLEW_CONFIG: assembleDebug
