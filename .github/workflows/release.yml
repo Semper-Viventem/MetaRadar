@@ -18,6 +18,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app
           RELEASE_TITLE: Debug Build
-          REPO_BRANCH: release
           BUILD_TYPE: release
           GRADLEW_CONFIG: assembleRelease

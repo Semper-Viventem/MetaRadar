@@ -8,9 +8,6 @@ inputs:
   GITHUB_TOKEN:
     required: true
     description: "Github secret token to allow automated publishing of APK to release."
-  REPO_BRANCH:
-    required: false
-    description: "Github repository branch name."
   BUILD_TYPE:
     required: true
     description: "Choose build type [release/debug]"
