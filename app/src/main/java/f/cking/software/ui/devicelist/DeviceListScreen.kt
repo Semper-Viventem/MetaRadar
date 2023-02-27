@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -23,6 +24,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -51,23 +53,50 @@ object DeviceListScreen {
             }
         }
 
-        LazyColumn(
+        val list = viewModel.devicesViewState
+
+        if (list.isEmpty()) {
+            ContentPlaceholder()
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .nestedScroll(nestedScroll),
+            ) {
+                stickyHeader {
+                    Filters(viewModel)
+                }
+
+                list.mapIndexed { index, deviceData ->
+                    item { DeviceListItem(device = deviceData) { viewModel.onDeviceClick(deviceData) } }
+                    val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
+                    if (showDivider) {
+                        item { Divider() }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun ContentPlaceholder() {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .nestedScroll(nestedScroll),
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
         ) {
-            stickyHeader {
-                Filters(viewModel)
-            }
-
-            val list = viewModel.devicesViewState
-            list.mapIndexed { index, deviceData ->
-                item { DeviceListItem(device = deviceData) { viewModel.onDeviceClick(deviceData) } }
-                val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
-                if (showDivider) {
-                    item { Divider() }
-                }
+            Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                val text = stringResource(R.string.device_list_placeholder)
+                Icon(
+                    modifier = Modifier.size(100.dp),
+                    painter = painterResource(id = R.drawable.ic_ghost),
+                    contentDescription = text,
+                    tint = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = text, color = Color.Gray)
             }
         }
     }
