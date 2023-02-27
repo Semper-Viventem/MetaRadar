@@ -24,9 +24,11 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assembleDebug
     - name: Releasing using Hub
-      uses: Semper-Viventem/action-release-debugapk@master
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         APP_FOLDER: app
         RELEASE_TITLE: Debug Build
         REPO_BRANCH: master
+      runs:
+        using: "docker"
+        image: "Dockerfile"
