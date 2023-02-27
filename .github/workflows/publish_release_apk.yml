@@ -11,6 +11,9 @@ inputs:
   REPO_BRANCH:
     required: false
     description: "Github repository branch name."
+  BUILD_TYPE:
+    required: true
+    description: "Choose build type [release/debug]"
 runs:
   using: "docker"
   image: "Dockerfile"

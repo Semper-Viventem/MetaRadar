@@ -23,6 +23,7 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew assembleDebug
+    - uses: actions/checkout@v3
     - name: Releasing using Hub
       uses: ./.github/workflows/publish_release_apk.yml
       env:
@@ -30,3 +31,4 @@ jobs:
         APP_FOLDER: app
         RELEASE_TITLE: Debug Build
         REPO_BRANCH: master
+        BUILD_TYPE: debug
