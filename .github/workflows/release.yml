@@ -20,13 +20,9 @@ jobs:
           cache: gradle
 
       - name: Config local properties
-        env:
-          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          RELEASE_STORE_KEY: ${{ secrets.RELEASE_STORE_KEY }}
-          RELEASE_STORE_KEY_PASSWORD: ${{ secrets.RELEASE_STORE_KEY_PASSWORD }}
-        run: echo releaseStorePassword=\"RELEASE_STORE_PASSWORD\" >> ./local.properties
-          echo releaseKeyAlias=\"RELEASE_STORE_KEY\" >> ./local.properties
-          echo releaseKeyPassword=\"RELEASE_STORE_KEY_PASSWORD\" >> ./local.properties
+        run: echo releaseStorePassword=${{ secrets.RELEASE_STORE_PASSWORD }} >> ./local.properties
+             echo releaseKeyAlias=${{ secrets.RELEASE_STORE_KEY }} >> ./local.properties
+             echo releaseKeyPassword=${{ secrets.RELEASE_STORE_KEY_PASSWORD }} >> ./local.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -37,6 +33,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app
-          RELEASE_TITLE: Debug Build
+          RELEASE_TITLE: Release Build
           REPO_BRANCH: release
           BUILD_TYPE: release
