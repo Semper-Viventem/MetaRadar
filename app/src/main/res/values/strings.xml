@@ -10,6 +10,7 @@
     <string name="delete">Delete</string>
     <string name="select">Select</string>
     <string name="clear">Clear</string>
+    <string name="decline">Decline</string>
     <string name="ok">OK</string>
 
     <plurals name="day">
@@ -195,4 +196,14 @@
     <string name="journal_profile_detected">Profile detected: \"%s\"</string>
     <string name="journal_profile_removed">%s (removed)</string>
     <string name="unknown_capital_case">UNKNOWN</string>
+
+    <!-- Permissions -->
+    <string name="permission_intro_bg_location_text">There are two reasons for background location permission:\n1. Part of the functionality is related to the analysis of data regarding the current location of the user.\n2. To work correctly with Bluetooth in the background in android, location permission is also required, since the application.</string>
+    <string name="permissions_intro_bg_location_title">Background Location</string>
+    <string name="permissions_intro_nearby_title">Nearby (Bluetooth) access</string>
+    <string name="permissions_intro_nearby_description">Bluetooth scanning requires permission for Nearby (Bluetooth) devices.</string>
+    <string name="permissions_intro_doze_mode_title">Doze mode (optional)</string>
+    <string name="permissions_intro_doze_mode_text">This permission is needed to increase the stability of the scanner in the background. Optional.</string>
+    <string name="permission_data_coolect_info">The application does not collect or transmit data. The project is fully open source and available on github</string>
+    <string name="device_list_placeholder">Nno data yet. To start scanning, click on the Scan button</string>
 </resources>

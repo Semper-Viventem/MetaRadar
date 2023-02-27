@@ -1,21 +1,28 @@
 package f.cking.software.ui.main
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.MaterialDialogState
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import org.koin.androidx.compose.koinViewModel
 
@@ -95,9 +102,26 @@ object MainScreen {
             icon = R.drawable.ic_ble
         }
 
+        val context = LocalContext.current
+        val permissionsIntro = permissionsIntroDialog(
+            onPassed = {
+                viewModel.userHasPassedPermissionsIntro()
+                viewModel.runBackgroundScanning()
+            },
+            onDeclined = {
+                Toast.makeText(context, "The scanner cannot work without these permissions", Toast.LENGTH_SHORT).show()
+            }
+        )
+
         ExtendedFloatingActionButton(
             text = { Text(text = text, fontWeight = FontWeight.Bold) },
-            onClick = { viewModel.runBackgroundScanning() },
+            onClick = {
+                if (viewModel.needToShowPermissionsIntro()) {
+                    permissionsIntro.show()
+                } else {
+                    viewModel.runBackgroundScanning()
+                }
+            },
             icon = {
                 Image(
                     painter = painterResource(id = icon),
@@ -106,6 +130,81 @@ object MainScreen {
                 )
             }
         )
+    }
+
+    @Composable
+    private fun permissionsIntroDialog(
+        onPassed: () -> Unit,
+        onDeclined: () -> Unit,
+    ): MaterialDialogState {
+        val state = rememberMaterialDialogState()
+        MaterialDialog(
+            dialogState = state,
+            buttons = {
+                positiveButton(stringResource(id = R.string.confirm)) {
+                    state.hide()
+                    onPassed.invoke()
+                }
+                negativeButton(stringResource(id = R.string.decline)) {
+                    state.hide()
+                    onDeclined.invoke()
+                }
+            }
+        ) {
+            LazyColumn(Modifier.padding(horizontal = 8.dp)) {
+                item {
+                    Text(text = "Permissions required", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                item {
+                    Text(text = stringResource(R.string.permissions_intro_nearby_title), fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_ble),
+                            contentDescription = stringResource(R.string.permissions_intro_nearby_title),
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.permissions_intro_nearby_description))
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                item {
+                    Text(text = stringResource(R.string.permissions_intro_bg_location_title), fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = stringResource(R.string.permissions_intro_bg_location_title),
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.permission_intro_bg_location_text))
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                item {
+                    Text(text = stringResource(R.string.permissions_intro_doze_mode_title), fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_charge),
+                            contentDescription = stringResource(R.string.permissions_intro_doze_mode_title),
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.permissions_intro_doze_mode_text))
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                item { 
+                    Text(text = stringResource(R.string.permission_data_coolect_info))
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+        return state
     }
 
     @Composable

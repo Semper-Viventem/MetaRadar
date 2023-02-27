@@ -47,11 +47,20 @@ class SettingsRepository(
         return sharedPreferences.getBoolean(KEY_USE_GPS_ONLY, TheAppConfig.USE_GPS_LOCATION_ONLY)
     }
 
+    fun getPermissionsIntroWasShown(): Boolean {
+        return sharedPreferences.getBoolean(KEY_PERMISSIONS_INTRO_WAS_SHOWN, false)
+    }
+
+    fun setPermissionsIntroWasShown(value: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_PERMISSIONS_INTRO_WAS_SHOWN, value).apply()
+    }
+
     companion object {
         private const val KEY_SCAN_INTERVAL = "key_scan_interval"
         private const val KEY_SCAN_RESTRICTED_INTERVAL = "key_scan_restricted_interval"
         private const val KEY_SCAN_DURATION = "key_scan_duration"
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"
         private const val KEY_USE_GPS_ONLY = "key_use_gps_location_only"
+        private const val KEY_PERMISSIONS_INTRO_WAS_SHOWN = "key_permissions_intro_was_shown"
     }
 }
