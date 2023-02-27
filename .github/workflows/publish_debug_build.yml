@@ -20,7 +20,7 @@ jobs:
           cache: gradle
       - uses: actions/checkout@v3
       - name: Releasing using Hub
-        uses: ./.github/workflows/publish_release_apk
+        uses: ./.github/actions/publish-release-apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app
