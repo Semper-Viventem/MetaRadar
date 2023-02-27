@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          repository: Semper-Viventem/MetaRadar
-          path: MetaRadar
-          fetch-depth: 0
+#        with:
+#          repository: Semper-Viventem/MetaRadar
+#          path: MetaRadar
+#          fetch-depth: 0
       - name: set up JDK 11
         uses: actions/setup-java@v3
         with:
