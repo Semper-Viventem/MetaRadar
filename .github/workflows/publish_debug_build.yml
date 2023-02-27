@@ -24,12 +24,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assembleDebug
     - name: Releasing using Hub
+      uses: ./.github/workflows/publish_release_apk.yml
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         APP_FOLDER: app
         RELEASE_TITLE: Debug Build
         REPO_BRANCH: master
-      run: apt update && apt -y upgrade && apt install -y hub && apt autoremove && apt autoclean && apt clean
-           hub checkout ${${REPO_BRANCH}:-master}
-           VERSION_NAME=`grep -oP 'versionName = "\K(.*?)(?=")' ./${APP_FOLDER}/build.gradle.kts`
-           hub release create -a ./${APP_FOLDER}/build/outputs/apk/debug/*-debug.apk -m "${RELEASE_TITLE} - v${VERSION_NAME}"
