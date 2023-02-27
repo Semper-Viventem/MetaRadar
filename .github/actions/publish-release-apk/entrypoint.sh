@@ -1,8 +1,10 @@
 #!/bin/bash
 
 curl -sSL https://get.docker.com/ | sudo sh
+docker pull mingc/android-build-box:latest
 hub clone https://github.com/Semper-Viventem/MetaRadar.git
 hub checkout ${${REPO_BRANCH}:-master}
+ls
 chmod +x gradlew
 docker run --rm -v `pwd`:/project mingc/android-build-box bash -c "cd /project; ./gradlew ${assembleDebug}"
 VERSION_NAME=`grep -oP 'versionName = "\K(.*?)(?=")' ./${APP_FOLDER}/build.gradle.kts`
