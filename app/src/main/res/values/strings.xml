@@ -83,6 +83,7 @@
     <string name="backup_has_succeeded">Backup has succeeded</string>
     <string name="garbage_has_cleared">Cleared %s garbage devices</string>
     <string name="clear_all_location_history_dialog_title">Clear all location history?</string>
+    <string name="launch_on_system_startup_title">Launch on system startup</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>

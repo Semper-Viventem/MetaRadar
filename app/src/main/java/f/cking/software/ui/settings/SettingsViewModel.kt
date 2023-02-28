@@ -38,6 +38,7 @@ class SettingsViewModel(
     var backupDbInProgress: Boolean by mutableStateOf(false)
     var useGpsLocationOnly: Boolean by mutableStateOf(settingsRepository.getUseGpsLocationOnly())
     var locationData: LocationProvider.LocationHandle? by mutableStateOf(null)
+    var runOnStartup: Boolean by mutableStateOf(settingsRepository.getRunOnStartup())
 
     init {
         observeLocationData()
@@ -107,6 +108,12 @@ class SettingsViewModel(
                     }
                 }
         }
+    }
+
+    fun setRunOnStartup() {
+        val newValue = !settingsRepository.getRunOnStartup()
+        settingsRepository.setRunOnStartup(newValue)
+        runOnStartup = newValue
     }
 
     private fun observeLocationData() {

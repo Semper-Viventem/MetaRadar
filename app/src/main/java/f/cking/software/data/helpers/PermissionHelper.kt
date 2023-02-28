@@ -78,6 +78,10 @@ class PermissionHelper(
         )
     }
 
+    fun checkAllPermissions(): Boolean {
+        return (BLE_PERMISSIONS + BACKGROUND_LOCATION).all { checkPermission(it) }
+    }
+
     private fun checkPermission(permission: String): Boolean {
         return ActivityCompat.checkSelfPermission(
             context,
