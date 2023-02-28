@@ -1,11 +1,13 @@
 package f.cking.software.ui.profileslist
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,7 @@ import org.koin.androidx.compose.koinViewModel
 
 object ProfilesListScreen {
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Screen() {
         val viewModel: ProfilesListViewModel = koinViewModel()
@@ -31,22 +34,54 @@ object ProfilesListScreen {
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-
-            item { CreateNewButton(viewModel = viewModel) }
+            stickyHeader {
+                Header(viewModel = viewModel)
+            }
             viewModel.profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    private fun CreateNewButton(viewModel: ProfilesListViewModel) {
-        Box(
+    private fun Header(viewModel: ProfilesListViewModel) {
+        Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth(),
+            elevation = 8.dp,
         ) {
-            Button(onClick = { viewModel.createNewClick() }, modifier = Modifier.fillMaxWidth()) {
-                Text(text = stringResource(R.string.create_new))
+            LazyRow(
+                modifier = Modifier.padding(vertical = 8.dp),
+            ) {
+                item {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Chip(
+                        colors = ChipDefaults.chipColors(
+                            backgroundColor = MaterialTheme.colors.primary,
+                            contentColor = Color.White,
+                        ),
+                        onClick = { viewModel.createNewClick() },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                        }
+                    ) { Text(text = stringResource(R.string.create_new)) }
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
+                viewModel.defaultFiltersTemplate.forEach {
+                    item {
+                        DefaultFilterChip(filter = it, viewModel = viewModel)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                }
             }
+        }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    private fun DefaultFilterChip(filter: ProfilesListViewModel.FilterTemplate, viewModel: ProfilesListViewModel) {
+        Chip(onClick = { viewModel.selectFilterTemplate(filter) }) {
+            Text(text = stringResource(filter.displayNameRes))
         }
     }
 

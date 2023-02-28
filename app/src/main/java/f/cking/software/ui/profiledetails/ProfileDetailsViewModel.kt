@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 
 class ProfileDetailsViewModel(
     val profileId: Int?,
+    val template: FilterUiState?,
     val router: NavRouter,
     private val radarProfilesRepository: RadarProfilesRepository,
     private val context: Application,
@@ -27,13 +28,13 @@ class ProfileDetailsViewModel(
     var name: String by mutableStateOf("")
     var description: String by mutableStateOf("")
     var isActive: Boolean by mutableStateOf(true)
-    var filter: FilterUiState? by mutableStateOf(null)
+    var filter: FilterUiState? by mutableStateOf(template)
 
     init {
         if (profileId != null) {
             loadProfile(profileId)
         } else {
-            handleProfile(EMPTY_PROFILE)
+            handleProfile(EMPTY_PROFILE, template = template)
         }
     }
 
@@ -74,19 +75,18 @@ class ProfileDetailsViewModel(
             val profile = radarProfilesRepository.getById(id = id)
             originalProfile = profile
             if (profile != null) {
-                handleProfile(profile)
+                handleProfile(profile, template = null)
             } else {
                 back()
             }
         }
     }
 
-    private fun handleProfile(profile: RadarProfile) {
+    private fun handleProfile(profile: RadarProfile, template: FilterUiState?) {
         name = profile.name
         description = profile.description.orEmpty()
         isActive = profile.isActive
-        filter = profile.detectFilter?.let(FilterUiMapper::mapToUi)
-
+        filter = template ?: profile.detectFilter?.let(FilterUiMapper::mapToUi)
     }
 
     private fun saveProfile() {
