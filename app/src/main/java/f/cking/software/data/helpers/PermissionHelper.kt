@@ -9,14 +9,18 @@ import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import f.cking.software.R
 
 class PermissionHelper(
     private val context: Context,
     private val activityProvider: ActivityProvider,
+    private val intentHelper: IntentHelper,
 ) {
 
     private var pending: (() -> Unit)? = null
+    private var permissionRequestTime: Long? = null
 
     fun checkBlePermissions(
         onRequestPermissions: (permissions: Array<String>, permissionRequestCode: Int, pendingFun: () -> Unit) -> Unit = ::requestPermissions,
@@ -49,8 +53,14 @@ class PermissionHelper(
 
     fun onPermissionGranted(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         val allPermissionsGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-        if (requestCode == PERMISSIONS_REQUEST_CODE && allPermissionsGranted) {
-            pending?.invoke()
+        val requestTime = permissionRequestTime
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            if (allPermissionsGranted) {
+                pending?.invoke()
+            } else if (requestTime != null && System.currentTimeMillis() - requestTime <= MIN_REQUEST_TIME_MS) {
+                Toast.makeText(activityProvider.requireActivity(), context.getString(R.string.grant_permissions_manually), Toast.LENGTH_LONG).show()
+                intentHelper.openAppSettings()
+            }
         }
     }
 
@@ -60,6 +70,7 @@ class PermissionHelper(
         onPermissionGranted: () -> Unit
     ) {
         this.pending = onPermissionGranted
+        permissionRequestTime = System.currentTimeMillis()
         ActivityCompat.requestPermissions(
             activityProvider.requireActivity(),
             permissions,
@@ -76,6 +87,7 @@ class PermissionHelper(
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 1000
+        const val MIN_REQUEST_TIME_MS = 100L
 
         val BACKGROUND_LOCATION = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         val BLE_PERMISSIONS: Array<String> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

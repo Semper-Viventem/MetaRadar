@@ -17,7 +17,7 @@ class DataModule(
         single { SettingsRepository(get()) }
         single { AppDatabase.build(get(), appDatabaseName) }
         single { DevicesRepository(get()) }
-        single { PermissionHelper(get(), get()) }
+        single { PermissionHelper(get(), get(), get()) }
         single { ActivityProvider() }
         single { IntentHelper(get()) }
         single { RadarProfilesRepository(get()) }

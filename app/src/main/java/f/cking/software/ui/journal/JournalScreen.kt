@@ -12,9 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
+import f.cking.software.R
+import f.cking.software.common.ContentPlaceholder
 import f.cking.software.common.Divider
 import org.koin.androidx.compose.koinViewModel
 
@@ -23,15 +26,19 @@ object JournalScreen {
     @Composable
     fun Screen() {
         val viewModel: JournalViewModel = koinViewModel()
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        ) {
-
-            viewModel.journal.map {
-                item { JournalEntry(uiModel = it, viewModel) }
-                item { Divider() }
+        val journal = viewModel.journal
+        if (journal.isEmpty()) {
+            ContentPlaceholder(text = stringResource(R.string.journal_placeholder))
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ) {
+                journal.map {
+                    item { JournalEntry(uiModel = it, viewModel) }
+                    item { Divider() }
+                }
             }
         }
     }
