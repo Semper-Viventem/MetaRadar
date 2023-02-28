@@ -17,8 +17,8 @@ object ScreenNavigationCommands {
 
     object OpenMainScreen : AddToStackCommand(screenFunction = { MainScreen.Screen() })
 
-    class OpenProfileScreen(private val profileId: Int?) : AddToStackCommand(screenFunction = { key ->
-        ProfileDetailsScreen.Screen(profileId = profileId, key)
+    class OpenProfileScreen(private val profileId: Int?, private val template: FilterUiState?) : AddToStackCommand(screenFunction = { key ->
+        ProfileDetailsScreen.Screen(profileId = profileId, template, key)
     })
 
     class OpenCreateFilterScreen(

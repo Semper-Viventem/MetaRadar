@@ -20,6 +20,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.filter.FilterScreen
+import f.cking.software.ui.filter.FilterUiState
 import f.cking.software.ui.filter.SelectFilterTypeScreen
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -27,8 +28,8 @@ import org.koin.core.parameter.parametersOf
 object ProfileDetailsScreen {
 
     @Composable
-    fun Screen(profileId: Int?, key: String) {
-        val viewModel: ProfileDetailsViewModel = koinViewModel(key = key) { parametersOf(profileId) }
+    fun Screen(profileId: Int?, template: FilterUiState?, key: String) {
+        val viewModel: ProfileDetailsViewModel = koinViewModel(key = key) { parametersOf(profileId, template) }
         Scaffold(
             modifier = Modifier
                 .fillMaxWidth()

@@ -106,6 +106,7 @@
     <string name="create_new">Create new</string>
     <string name="profile_is_active">Is active</string>
     <string name="profile_is_not_active">Is NOT active</string>
+    <string name="radar_profile_placeholder">Radar profiles help you find the device you are looking for. The app will notify you if some device around you matches the profile. Click \"Create new\" or select a template to create a new profile.</string>
 
     <!-- Profile details -->
     <string name="radar_profile_title">Radar profile</string>
@@ -170,6 +171,7 @@
     <string name="device_details_all_time">All time</string>
     <string name="time_ago">%s ago</string>
     <string name="lifetime_data">lifetime: %1$s | last update: %2$s ago</string>
+    <string name="device_list_placeholder">No data yet. To start scanning, click on the Scan button</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>
@@ -196,14 +198,15 @@
     <string name="journal_profile_detected">Profile detected: \"%s\"</string>
     <string name="journal_profile_removed">%s (removed)</string>
     <string name="unknown_capital_case">UNKNOWN</string>
+    <string name="journal_placeholder">This is an event journal, the entire history of the radar will be displayed here so as not to lose anything.</string>
 
     <!-- Permissions -->
-    <string name="permission_intro_bg_location_text">There are two reasons for background location permission:\n1. Part of the functionality is related to the analysis of data regarding the current location of the user.\n2. To work correctly with Bluetooth in the background in android, location permission is also required, since the application.</string>
+    <string name="permission_intro_bg_location_text">There are two reasons for background location permission:\n- Part of the functionality is related to the analysis of data regarding the current location of the user.\n- To work correctly with Bluetooth in the background in android, location permission is also required, since the application.</string>
     <string name="permissions_intro_bg_location_title">Background Location</string>
     <string name="permissions_intro_nearby_title">Nearby (Bluetooth) access</string>
     <string name="permissions_intro_nearby_description">Bluetooth scanning requires permission for Nearby (Bluetooth) devices.</string>
     <string name="permissions_intro_doze_mode_title">Doze mode (optional)</string>
     <string name="permissions_intro_doze_mode_text">Android restricts certain processes in the background. This permission is needed to increase the stability of the scanner in the background. Optional.</string>
     <string name="permission_data_coolect_info">The application does not collect or transmit data. The project is fully open source and available on github</string>
-    <string name="device_list_placeholder">Nno data yet. To start scanning, click on the Scan button</string>
+    <string name="grant_permissions_manually">Grant the necessary permissions manually</string>
 </resources>

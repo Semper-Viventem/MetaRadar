@@ -3,6 +3,7 @@ package f.cking.software.data.helpers
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 
 class IntentHelper(private val activityProvider: ActivityProvider) {
 
@@ -34,6 +35,13 @@ class IntentHelper(private val activityProvider: ActivityProvider) {
         }
         activityProvider.requireActivity().startActivityForResult(intent, ACTIVITY_RESULT_CREATE_FILE)
         pendingConsumers[ACTIVITY_RESULT_CREATE_FILE] = onResult
+    }
+
+    fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", activityProvider.requireActivity().getPackageName(), null)
+        intent.data = uri
+        activityProvider.requireActivity().startActivity(intent)
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
