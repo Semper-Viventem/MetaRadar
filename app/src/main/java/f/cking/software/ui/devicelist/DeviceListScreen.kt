@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -24,13 +23,13 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
+import f.cking.software.common.ContentPlaceholder
 import f.cking.software.common.DeviceListItem
 import f.cking.software.common.Divider
 import f.cking.software.ui.ScreenNavigationCommands
@@ -56,7 +55,7 @@ object DeviceListScreen {
         val list = viewModel.devicesViewState
 
         if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
-            ContentPlaceholder()
+            ContentPlaceholder(stringResource(R.string.device_list_placeholder))
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -75,28 +74,6 @@ object DeviceListScreen {
                         item { Divider() }
                     }
                 }
-            }
-        }
-    }
-
-    @Composable
-    fun ContentPlaceholder() {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                val text = stringResource(R.string.device_list_placeholder)
-                Icon(
-                    modifier = Modifier.size(100.dp),
-                    painter = painterResource(id = R.drawable.ic_ghost),
-                    contentDescription = text,
-                    tint = Color.Gray
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = text, color = Color.Gray)
             }
         }
     }

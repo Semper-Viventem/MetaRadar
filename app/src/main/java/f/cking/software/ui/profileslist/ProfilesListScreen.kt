@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
+import f.cking.software.common.ContentPlaceholder
 import f.cking.software.domain.model.RadarProfile
 import org.koin.androidx.compose.koinViewModel
 
@@ -29,15 +30,24 @@ object ProfilesListScreen {
     @Composable
     fun Screen() {
         val viewModel: ProfilesListViewModel = koinViewModel()
-        LazyColumn(
-            modifier = Modifier
+        Column(
+            Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-            stickyHeader {
-                Header(viewModel = viewModel)
+            Header(viewModel = viewModel)
+        }
+        val profiles = viewModel.profiles
+        if (profiles.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ) {
+                profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
             }
-            viewModel.profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
+        } else {
+            ContentPlaceholder(stringResource(R.string.radar_profile_placeholder))
         }
     }
 
@@ -47,7 +57,7 @@ object ProfilesListScreen {
         Surface(
             modifier = Modifier
                 .fillMaxWidth(),
-            elevation = 8.dp,
+            elevation = 4.dp,
         ) {
             LazyRow(
                 modifier = Modifier.padding(vertical = 8.dp),

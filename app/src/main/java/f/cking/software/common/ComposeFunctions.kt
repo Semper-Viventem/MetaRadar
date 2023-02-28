@@ -11,14 +11,18 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -213,5 +217,29 @@ fun Divider() {
                 .fillMaxWidth()
                 .background(Color.LightGray)
         )
+    }
+}
+
+@Composable
+fun ContentPlaceholder(
+    text: String,
+    icon: Painter = painterResource(R.drawable.ic_ghost),
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                modifier = Modifier.size(100.dp),
+                painter = icon,
+                contentDescription = text,
+                tint = Color.Gray
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = text, color = Color.Gray, textAlign = TextAlign.Center)
+        }
     }
 }
