@@ -45,6 +45,8 @@ object SettingsScreen {
             BackupDB(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             RestoreDB(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            RunOnStartup(viewModel = viewModel)
         }
     }
 
@@ -200,26 +202,54 @@ object SettingsScreen {
 
     @Composable
     private fun UseGpsLocationOnly(viewModel: SettingsViewModel) {
+        Switcher(
+            value = viewModel.useGpsLocationOnly,
+            title = stringResource(R.string.settings_use_gps_title),
+            subtitle = stringResource(R.string.settings_use_gps_subtitle),
+            onClick = { viewModel.onUseGpsLocationOnlyClick() }
+        )
+    }
+
+    @Composable
+    private fun RunOnStartup(viewModel: SettingsViewModel) {
+        Switcher(
+            value = viewModel.runOnStartup,
+            title = stringResource(R.string.launch_on_system_startup_title),
+            subtitle = null,
+            onClick = { viewModel.setRunOnStartup() }
+        )
+    }
+
+    @Composable
+    private fun Switcher(
+        value: Boolean,
+        title: String,
+        subtitle: String?,
+        onClick: () -> Unit,
+    ) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            .clickable { viewModel.onUseGpsLocationOnlyClick() }
+            .clickable { onClick.invoke() }
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(text = stringResource(R.string.settings_use_gps_title))
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = stringResource(R.string.settings_use_gps_subtitle), fontWeight = FontWeight.Light, fontSize = 12.sp,)
+                    Text(text = title)
+                    subtitle?.let {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp)
+                    }
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Switch(
-                    checked = viewModel.useGpsLocationOnly,
-                    onCheckedChange = { viewModel.onUseGpsLocationOnlyClick() }
+                    checked = value,
+                    onCheckedChange = { onClick.invoke() }
                 )
             }
         }

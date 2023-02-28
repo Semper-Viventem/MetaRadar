@@ -55,6 +55,15 @@ class SettingsRepository(
         sharedPreferences.edit().putBoolean(KEY_PERMISSIONS_INTRO_WAS_SHOWN, value).apply()
     }
 
+    fun getRunOnStartup(): Boolean {
+        return sharedPreferences.getBoolean(KEY_RUN_ON_STARTUP, false)
+    }
+
+    fun setRunOnStartup(value: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_RUN_ON_STARTUP, value).apply()
+    }
+
+
     companion object {
         private const val KEY_SCAN_INTERVAL = "key_scan_interval"
         private const val KEY_SCAN_RESTRICTED_INTERVAL = "key_scan_restricted_interval"
@@ -62,5 +71,6 @@ class SettingsRepository(
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"
         private const val KEY_USE_GPS_ONLY = "key_use_gps_location_only"
         private const val KEY_PERMISSIONS_INTRO_WAS_SHOWN = "key_permissions_intro_was_shown"
+        private const val KEY_RUN_ON_STARTUP = "key_run_on_startup"
     }
 }
