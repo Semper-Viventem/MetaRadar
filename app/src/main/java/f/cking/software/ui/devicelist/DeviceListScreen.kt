@@ -55,7 +55,7 @@ object DeviceListScreen {
 
         val list = viewModel.devicesViewState
 
-        if (list.isEmpty()) {
+        if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
             ContentPlaceholder()
         } else {
             LazyColumn(

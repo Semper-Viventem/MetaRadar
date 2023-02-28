@@ -2,18 +2,20 @@ package f.cking.software.ui.main
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -151,60 +153,75 @@ object MainScreen {
                 }
             }
         ) {
-            LazyColumn(Modifier.padding(horizontal = 8.dp)) {
-                item {
-                    Text(text = "Permissions required", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                item {
-                    Text(text = stringResource(R.string.permissions_intro_nearby_title), fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_ble),
-                            contentDescription = stringResource(R.string.permissions_intro_nearby_title),
-                            tint = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = stringResource(R.string.permissions_intro_nearby_description))
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                item {
-                    Text(text = stringResource(R.string.permissions_intro_bg_location_title), fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = stringResource(R.string.permissions_intro_bg_location_title),
-                            tint = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = stringResource(R.string.permission_intro_bg_location_text))
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                item {
-                    Text(text = stringResource(R.string.permissions_intro_doze_mode_title), fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_charge),
-                            contentDescription = stringResource(R.string.permissions_intro_doze_mode_title),
-                            tint = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = stringResource(R.string.permissions_intro_doze_mode_text))
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                item { 
-                    Text(text = stringResource(R.string.permission_data_coolect_info))
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
+            PermissionDisclaimerContent()
         }
         return state
+    }
+
+    @Composable
+    fun PermissionDisclaimerContent() {
+        LazyColumn(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
+            item {
+                Text(text = "Permissions required", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                PermissionDisclaimer(
+                    title = stringResource(R.string.permissions_intro_nearby_title),
+                    subtitle = stringResource(R.string.permissions_intro_nearby_description),
+                    icon = painterResource(R.drawable.ic_ble),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                PermissionDisclaimer(
+                    title = stringResource(R.string.permissions_intro_bg_location_title),
+                    subtitle = stringResource(R.string.permission_intro_bg_location_text),
+                    icon = painterResource(R.drawable.ic_location),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                PermissionDisclaimer(
+                    title = stringResource(R.string.permissions_intro_doze_mode_title),
+                    subtitle = stringResource(R.string.permissions_intro_doze_mode_title),
+                    icon = painterResource(R.drawable.ic_charge),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Text(text = stringResource(R.string.permission_data_coolect_info))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+
+    @Composable
+    private fun PermissionDisclaimer(
+        title: String,
+        subtitle: String,
+        icon: Painter,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.LightGray, shape = RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            Column() {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = icon,
+                        contentDescription = title,
+                        tint = Color.Black
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = title, fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text =subtitle)
+            }
+        }
     }
 
     @Composable
@@ -214,7 +231,7 @@ object MainScreen {
                 Text(text = stringResource(R.string.app_name))
             },
             actions = {
-                if (viewModel.scanStarted) {
+                if (viewModel.scanStarted && viewModel.bgServiceIsActive) {
                     CircularProgressIndicator(
                         color = Color.White,
                         modifier = Modifier
@@ -222,7 +239,7 @@ object MainScreen {
                     )
                     Spacer(modifier = Modifier.width(12.dp))
 
-                } else {
+                } else if (viewModel.bgServiceIsActive) {
                     IconButton(onClick = { viewModel.onScanButtonClick() }) {
                         Image(
                             modifier = Modifier

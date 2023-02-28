@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -244,18 +245,17 @@ object DeviceDetailsScreen {
             }
         }
 
+        val shape = RoundedCornerShape(corner = CornerSize(8.dp))
         Box(
             modifier = Modifier
-                .clickable { dialog.show() }
+                .clip(shape = shape)
                 .fillMaxWidth()
-                .background(
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                ),
+                .background(color = Color.LightGray, shape = shape,)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { dialog.show() }
                     .padding(vertical = 8.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
