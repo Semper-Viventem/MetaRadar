@@ -36,18 +36,18 @@ object ProfilesListScreen {
                 .fillMaxHeight()
         ) {
             Header(viewModel = viewModel)
-        }
-        val profiles = viewModel.profiles
-        if (profiles.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
-                profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
+            val profiles = viewModel.profiles
+            if (profiles.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
+                }
+            } else {
+                ContentPlaceholder(stringResource(R.string.radar_profile_placeholder))
             }
-        } else {
-            ContentPlaceholder(stringResource(R.string.radar_profile_placeholder))
         }
     }
 
