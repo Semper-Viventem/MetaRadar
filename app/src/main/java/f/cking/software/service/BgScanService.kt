@@ -95,7 +95,12 @@ class BgScanService : Service() {
                 FOREGROUND_NOTIFICATION_ID,
                 buildForegroundNotification(knownDeviceCount = null)
             )
-            locationProvider.startLocationFetching()
+            try {
+                locationProvider.startLocationFetching(ignoreError = false)
+            } catch (e: LocationProvider.LocationManagerIsNotAvailableException) {
+                notifyLocationIsTurnedOff()
+                stopSelf()
+            }
 
             permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _, _ ->
@@ -137,6 +142,7 @@ class BgScanService : Service() {
     private fun handleScanResult(batch: List<BleScanDevice>) {
 
         if (batch.isEmpty() && !locationProvider.isLocationAvailable() && !locationDisabledWasReported) {
+            notifyLocationIsTurnedOff()
             reportError(IllegalStateException("The BLE scanner did not return anything. This may happen if geolocation is turned off at the system level. Location access is required to work with BLE on Android."))
             locationDisabledWasReported = true
         } else if (batch.isNotEmpty()) {
@@ -202,13 +208,7 @@ class BgScanService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val openAppIntent = Intent(this, MainActivity::class.java)
-        val openAppPendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            openAppIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val openAppPendingIntent = getOpenAppIntent()
 
         val body = if (knownDeviceCount == null) {
             getString(R.string.ble_scanner_is_started_but_no_data)
@@ -218,7 +218,7 @@ class BgScanService : Service() {
             getString(R.string.there_are_no_devices_around)
         }
 
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
+        return NotificationCompat.Builder(this, SERVICE_NOTIFICATION_CHANNEL)
             .setContentTitle(getString(R.string.app_service_title, getString(R.string.app_name)))
             .setContentText(body)
             .setOngoing(true)
@@ -248,17 +248,11 @@ class BgScanService : Service() {
                 postfix = getString(R.string.devices_matched_postfix)
             ) { it.buildDisplayName() }
 
-        val openAppIntent = Intent(this, MainActivity::class.java)
-        val openAppPendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            openAppIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val openAppPendingIntent = getOpenAppIntent()
 
         createDeviceFoundChannel()
 
-        val notification = NotificationCompat.Builder(this, DEVICE_FOUND_CHANNEL)
+        val notification = NotificationCompat.Builder(this, RADAR_PROFILE_CHANNEL)
             .setContentTitle(title)
             .setContentText(content)
             .setSmallIcon(R.drawable.ic_ble)
@@ -266,11 +260,43 @@ class BgScanService : Service() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setGroup(DEVICE_FOUND_GROUP)
+            .setGroup(RADAR_PROFILE_GROUP)
             .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_ALL)
             .build()
 
         notificationManager.notify(Random.nextInt(), notification)
+    }
+
+    private fun notifyLocationIsTurnedOff() {
+
+        val title = getString(R.string.location_is_turned_off_title)
+        val content = getString(R.string.location_is_turned_off_subtitle)
+
+        val openAppPendingIntent = getOpenAppIntent()
+
+        createErrorsNotificationChannel()
+
+        val notification = NotificationCompat.Builder(this, ERRORS_CHANNEL)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setSmallIcon(R.drawable.ic_ble)
+            .setContentIntent(openAppPendingIntent)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .build()
+
+        notificationManager.notify(Random.nextInt(), notification)
+    }
+
+    private fun getOpenAppIntent(): PendingIntent {
+        val openAppIntent = Intent(this, MainActivity::class.java)
+        return PendingIntent.getActivity(
+            this,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 
     private fun updateNotification(knownDeviceCount: Int) {
@@ -280,7 +306,7 @@ class BgScanService : Service() {
 
     private fun createServiceChannel() {
         val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL,
+            SERVICE_NOTIFICATION_CHANNEL,
             getString(R.string.scanner_notification_channel_name),
             NotificationManager.IMPORTANCE_LOW
         )
@@ -289,12 +315,19 @@ class BgScanService : Service() {
 
     private fun createDeviceFoundChannel() {
         val channel = NotificationChannel(
-            DEVICE_FOUND_CHANNEL,
+            RADAR_PROFILE_CHANNEL,
             getString(R.string.device_found_notification_channel_name),
             NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            enableVibration(true)
-        }
+        ).apply { enableVibration(true) }
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun createErrorsNotificationChannel() {
+        val channel = NotificationChannel(
+            ERRORS_CHANNEL,
+            getString(R.string.errors_notifications),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply { enableVibration(true) }
         notificationManager.createNotificationChannel(channel)
     }
 
@@ -310,9 +343,10 @@ class BgScanService : Service() {
     }
 
     companion object {
-        private const val NOTIFICATION_CHANNEL = "background_scan"
-        private const val DEVICE_FOUND_CHANNEL = "wanted_device_found"
-        private const val DEVICE_FOUND_GROUP = "devices_found_group"
+        private const val SERVICE_NOTIFICATION_CHANNEL = "service_notification_channel"
+        private const val RADAR_PROFILE_CHANNEL = "radar_profile_channel"
+        private const val RADAR_PROFILE_GROUP = "radar_profile_group"
+        private const val ERRORS_CHANNEL = "radar_errors_channel"
 
         private const val FOREGROUND_NOTIFICATION_ID = 42
         private const val MAX_FAILURE_SCANS_TO_CLOSE = 10
