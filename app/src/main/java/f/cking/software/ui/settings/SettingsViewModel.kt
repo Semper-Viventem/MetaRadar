@@ -71,7 +71,9 @@ class SettingsViewModel(
             // restart location provider
             if (locationProvider.isActive()) {
                 locationProvider.stopLocationListening()
-                locationProvider.startLocationFetching()
+                locationProvider.startLocationFetching(ignoreError = false)
+            } else {
+                locationProvider.fetchOnce()
             }
         }
     }
