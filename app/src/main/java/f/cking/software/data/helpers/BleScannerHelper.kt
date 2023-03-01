@@ -18,12 +18,12 @@ import java.util.*
 class BleScannerHelper(
     private val devicesRepository: DevicesRepository,
     private val getKnownDevicesInteractor: GetKnownDevicesInteractor,
-    appContext: Context,
+    private val appContext: Context,
 ) {
 
     private val TAG = "BleScannerHelper"
 
-    private var bluetoothScanner: BluetoothLeScanner
+    private var bluetoothScanner: BluetoothLeScanner? = null
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val batch = hashMapOf<String, BleScanDevice>()
     private var currentScanTimeMs: Long = System.currentTimeMillis()
@@ -34,8 +34,7 @@ class BleScannerHelper(
     private var scanListener: ScanListener? = null
 
     init {
-        val bluetoothAdapter = appContext.getSystemService(BluetoothManager::class.java).adapter
-        bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
+        tryToInitBluetoothScanner()
     }
 
     private val callback = object : ScanCallback() {
@@ -91,7 +90,7 @@ class BleScannerHelper(
                 .build()
 
             withContext(Dispatchers.IO) {
-                bluetoothScanner.startScan(scanFilters, scanSettings, callback)
+                requireScanner().startScan(scanFilters, scanSettings, callback)
                 handler.postDelayed({ cancelScanning(ScanResultInternal.Success) }, scanDurationMs)
             }
         }
@@ -104,7 +103,7 @@ class BleScannerHelper(
     @SuppressLint("MissingPermission")
     private fun cancelScanning(scanResult: ScanResultInternal) {
         inProgress.tryEmit(false)
-        bluetoothScanner.stopScan(callback)
+        bluetoothScanner?.stopScan(callback)
 
 
         when (scanResult) {
@@ -122,6 +121,18 @@ class BleScannerHelper(
         scanListener = null
     }
 
+    private fun tryToInitBluetoothScanner() {
+        val bluetoothAdapter = appContext.getSystemService(BluetoothManager::class.java).adapter
+        bluetoothScanner = bluetoothAdapter?.bluetoothLeScanner
+    }
+
+    private fun requireScanner(): BluetoothLeScanner {
+        if (bluetoothScanner == null) {
+            tryToInitBluetoothScanner()
+        }
+        return bluetoothScanner ?: throw BluetoothIsNotInitialized()
+    }
+
     interface ScanListener {
         fun onSuccess(batch: List<BleScanDevice>)
         fun onFailure(exception: Exception)
@@ -136,6 +147,7 @@ class BleScannerHelper(
         object Canceled : ScanResultInternal
     }
 
-    class BLEScanFailure(errorCode: Int): RuntimeException("BLE Scan failed with error code: $errorCode")
+    class BLEScanFailure(errorCode: Int) : RuntimeException("BLE Scan failed with error code: $errorCode")
 
+    class BluetoothIsNotInitialized : RuntimeException("Bluetooth scanner is not initialized")
 }
