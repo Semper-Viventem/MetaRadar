@@ -24,5 +24,6 @@ class DataModule(
         single { LocationProvider(get(), get(), get()) }
         single { LocationRepository(get()) }
         single { JournalRepository(get()) }
+        single { NotificationsHelper(get()) }
     }
 }
