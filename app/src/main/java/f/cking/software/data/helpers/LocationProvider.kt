@@ -80,7 +80,7 @@ class LocationProvider(
 
     private val restartServiceRunnable = Runnable {
         stopLocationListening()
-        startLocationFetching()
+        startLocationFetching(ignoreError = true)
     }
 
     fun isLocationAvailable(): Boolean {
@@ -104,8 +104,8 @@ class LocationProvider(
     }
 
     @SuppressLint("MissingPermission")
-    fun startLocationFetching() {
-        if (!isLocationAvailable()) {
+    fun startLocationFetching(ignoreError: Boolean) {
+        if (!ignoreError && !isLocationAvailable()) {
             throw LocationManagerIsNotAvailableException()
         }
         fetchLocation(withRestartSchedule = true)
@@ -124,7 +124,7 @@ class LocationProvider(
     fun fetchOnce() {
         if (isActive) {
             stopLocationListening()
-            startLocationFetching()
+            startLocationFetching(ignoreError = true)
         } else {
             fetchLocation(withRestartSchedule = false)
         }

@@ -210,4 +210,7 @@
     <string name="permissions_intro_doze_mode_text">Android restricts certain processes in the background. This permission is needed to increase the stability of the scanner in the background. Optional.</string>
     <string name="permission_data_coolect_info">The application does not collect or transmit data. The project is fully open source and available on github</string>
     <string name="grant_permissions_manually">Grant the necessary permissions manually</string>
+    <string name="location_is_turned_off_title">Location is turned off</string>
+    <string name="location_is_turned_off_subtitle">Bluetooth radar can\'t scan when the location is turned off due to android\'s restrictions</string>
+    <string name="errors_notifications">Errors notifications</string>
 </resources>
