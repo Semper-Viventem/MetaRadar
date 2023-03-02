@@ -65,7 +65,7 @@ object MainScreen {
                 },
             ) {
                 Column(Modifier.padding(16.dp)) {
-                    Text(text = stringResource(id = R.string.location_is_turned_off_title))
+                    Text(text = stringResource(id = R.string.location_is_turned_off_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = stringResource(id = R.string.location_is_turned_off_subtitle))
                 }
