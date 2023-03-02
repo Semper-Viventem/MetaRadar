@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import java.security.MessageDigest
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 fun Long.getTimePeriodStr(context: Context): String {
@@ -35,7 +34,6 @@ fun ByteArray.toHexUByteString() = asUByteArray().joinToString("") { it.toString
 fun ByteArray.toHexString() = joinToString("") { it.toHexString() }
 fun Byte.toHexString() = "%02x".format(this)
 fun Int.toHexString() = "%04x".format(this)
-fun <T> Optional<T>.orNull(): T? = if (isPresent) get() else null
 
 fun Long.toLocalDate(timeZone: ZoneId = ZoneId.systemDefault()) = Instant.ofEpochMilli(this).atZone(timeZone).toLocalDate()
 fun Long.toLocalTime(timeZone: ZoneId = ZoneId.systemDefault()) = Instant.ofEpochMilli(this).atZone(timeZone).toLocalTime()

@@ -446,7 +446,7 @@ object FilterScreen {
     ) {
         val selectFilterDialog = rememberMaterialDialogState()
         SelectFilterTypeScreen.Dialog(selectFilterDialog) { newFilter ->
-            filter.filter = Optional.of(newFilter)
+            filter.filter = newFilter
         }
 
         FilterBase(
@@ -454,8 +454,8 @@ object FilterScreen {
             color = colorResource(R.color.filter_not),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
-            if (filter.filter.isPresent) {
-                Filter(filter.filter.get(), router = router, onDeleteClick = filter::delete)
+            if (filter.filter != null) {
+                Filter(filter.filter!!, router = router, onDeleteClick = filter::delete)
             } else {
                 Chip(
                     onClick = { selectFilterDialog.show() },

@@ -7,7 +7,6 @@ import f.cking.software.TheAppConfig
 import f.cking.software.domain.model.ManufacturerInfo
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 
 sealed class FilterUiState {
 
@@ -94,14 +93,14 @@ sealed class FilterUiState {
     }
 
     class Not : FilterUiState() {
-        var filter: Optional<FilterUiState> by mutableStateOf(Optional.empty())
+        var filter: FilterUiState? by mutableStateOf(null)
 
         fun delete(filter: FilterUiState) {
-            this.filter = Optional.empty()
+            this.filter = null
         }
 
         override fun isCorrect(): Boolean {
-            return filter.isPresent && filter.get().isCorrect()
+            return filter != null && filter!!.isCorrect()
         }
     }
 

@@ -7,7 +7,6 @@ import f.cking.software.domain.model.RadarProfile
 import f.cking.software.timeFromDateTime
 import f.cking.software.toLocalDate
 import f.cking.software.toLocalTime
-import java.util.*
 
 object FilterUiMapper {
 
@@ -20,7 +19,7 @@ object FilterUiMapper {
             is FilterUiState.Manufacturer -> RadarProfile.Filter.Manufacturer(from.manufacturer!!.id)
             is FilterUiState.Any -> RadarProfile.Filter.Any(from.filters.map { mapToDomain(it) })
             is FilterUiState.All -> RadarProfile.Filter.All(from.filters.map { mapToDomain(it) })
-            is FilterUiState.Not -> RadarProfile.Filter.Not(mapToDomain(from.filter.get()))
+            is FilterUiState.Not -> RadarProfile.Filter.Not(mapToDomain(from.filter!!))
             is FilterUiState.LastDetectionInterval -> RadarProfile.Filter.LastDetectionInterval(
                 from = if (from.fromDate != null && from.fromTime != null) {
                     timeFromDateTime(from.fromDate!!, from.fromTime!!)
@@ -98,7 +97,7 @@ object FilterUiMapper {
                 this.filters = from.filters.map { mapToUi(it) }
             }
             is RadarProfile.Filter.Not -> FilterUiState.Not().apply {
-                this.filter = Optional.of(mapToUi(from.filter))
+                this.filter = mapToUi(from.filter)
             }
             is RadarProfile.Filter.AppleAirdropContact -> FilterUiState.AppleAirdropContact().apply {
                 this.contactString = from.contactStr
