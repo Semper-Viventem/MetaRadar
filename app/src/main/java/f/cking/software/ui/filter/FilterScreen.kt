@@ -33,6 +33,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 object FilterScreen {
 
@@ -155,7 +156,7 @@ object FilterScreen {
                 }, placeholder = { Text(text = stringResource(R.string.placeholder_airdrope_contact)) })
 
                 val text = filter.minLostTime?.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
-                val defaultTime: Long = filter.minLostTime ?: (1L * 60L * 60L * 1000L) // 1 hour
+                val defaultTime: Long = filter.minLostTime ?: TimeUnit.HOURS.toMillis(1)
                 val timeDialog = rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
                     filter.minLostTime = time.toMilliseconds()
                 }
@@ -247,7 +248,7 @@ object FilterScreen {
             color = colorResource(R.color.filter_lost_time),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            val defaultTime = filter.minLostTime ?: (1L * 60L * 60L * 1000L) // 1 hour
+            val defaultTime = filter.minLostTime ?: TimeUnit.HOURS.toMillis(1)
             val timeDialog = rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
                 filter.minLostTime = time.toMilliseconds()
             }
