@@ -96,14 +96,15 @@ class BgScanService : Service() {
                 )
             )
 
-
             permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _, _ ->
-                    locationProvider.startLocationFetching()
                     reportError(IllegalStateException("BLE Service is started but permissins are not granted"))
                     stopSelf()
                 },
-                onPermissionGranted = ::scan
+                onPermissionGranted =  {
+                    locationProvider.startLocationFetching()
+                    scan()
+                }
             )
         }
 
@@ -140,6 +141,9 @@ class BgScanService : Service() {
                     createCloseServiceIntent(this@BgScanService)
                 )
                 scheduleNextScan()
+            } catch (e: Throwable) {
+                reportError(e)
+                stopSelf()
             }
         }
     }
