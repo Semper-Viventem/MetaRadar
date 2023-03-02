@@ -91,12 +91,8 @@ class BgScanService : Service() {
                 NotificationsHelper.FOREGROUND_NOTIFICATION_ID,
                 notificationsHelper.buildForegroundNotification(knownDeviceCount = null, createCloseServiceIntent(this))
             )
-            try {
-                locationProvider.startLocationFetching(ignoreError = false)
-            } catch (e: LocationProvider.LocationManagerIsNotAvailableException) {
-                notificationsHelper.notifyLocationIsTurnedOff()
-                stopSelf()
-            }
+
+            locationProvider.startLocationFetching()
 
             permissionHelper.checkBlePermissions(
                 onRequestPermissions = { _, _, _ ->

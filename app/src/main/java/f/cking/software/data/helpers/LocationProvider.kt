@@ -80,7 +80,7 @@ class LocationProvider(
 
     private val restartServiceRunnable = Runnable {
         stopLocationListening()
-        startLocationFetching(ignoreError = true)
+        startLocationFetching()
     }
 
     fun isLocationAvailable(): Boolean {
@@ -104,10 +104,7 @@ class LocationProvider(
     }
 
     @SuppressLint("MissingPermission")
-    fun startLocationFetching(ignoreError: Boolean) {
-        if (!ignoreError && !isLocationAvailable()) {
-            throw LocationManagerIsNotAvailableException()
-        }
+    fun startLocationFetching() {
         fetchLocation(withRestartSchedule = true)
         isActive = true
     }
@@ -124,7 +121,7 @@ class LocationProvider(
     fun fetchOnce() {
         if (isActive) {
             stopLocationListening()
-            startLocationFetching(ignoreError = true)
+            startLocationFetching()
         } else {
             fetchLocation(withRestartSchedule = false)
         }
@@ -217,9 +214,6 @@ class LocationProvider(
         val location: Location,
         val emitTime: Long,
     )
-
-    class LocationManagerIsNotAvailableException :
-        IllegalStateException("Location is not available or turned off")
 
     companion object {
         private const val INTERVAL_MS = 10_000L

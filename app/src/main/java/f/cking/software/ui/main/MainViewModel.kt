@@ -8,8 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vanpra.composematerialdialogs.MaterialDialogState
 import f.cking.software.R
 import f.cking.software.data.helpers.BleScannerHelper
+import f.cking.software.data.helpers.IntentHelper
+import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.service.BgScanService
@@ -24,10 +27,13 @@ class MainViewModel(
     private val context: Application,
     private val bleScanner: BleScannerHelper,
     private val settingsRepository: SettingsRepository,
+    private val locationProvider: LocationProvider,
+    private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
     var scanStarted: Boolean by mutableStateOf(bleScanner.inProgress.value)
     var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive.value)
+    var showLocationDisabledDialog: MaterialDialogState = MaterialDialogState()
 
     var tabs by mutableStateOf(
         listOf(
@@ -78,10 +84,16 @@ class MainViewModel(
         checkPermissions {
             if (BgScanService.isActive.value) {
                 BgScanService.stop(context)
-            } else {
+            } else if (locationProvider.isLocationAvailable()) {
                 BgScanService.start(context)
+            } else {
+                showLocationDisabledDialog.show()
             }
         }
+    }
+
+    fun onTurnOnLocationClick() {
+        intentHelper.openLocationSettings()
     }
 
     fun needToShowPermissionsIntro(): Boolean {
