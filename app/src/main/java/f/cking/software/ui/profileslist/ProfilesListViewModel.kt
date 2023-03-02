@@ -10,11 +10,10 @@ import f.cking.software.R
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.toLocalTime
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.FilterUiState
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ProfilesListViewModel(
     private val radarProfilesRepository: RadarProfilesRepository,
@@ -65,7 +64,7 @@ class ProfilesListViewModel(
                 filters = listOf(
                     FilterUiState.IsFavorite(),
                     FilterUiState.MinLostTime().apply {
-                        minLostTime = Optional.of((2 * 60 * 60 * 1000L).toLocalTime()) // 2 hours
+                        minLostTime = TimeUnit.HOURS.toMillis(2)
                     }
                 )
             }

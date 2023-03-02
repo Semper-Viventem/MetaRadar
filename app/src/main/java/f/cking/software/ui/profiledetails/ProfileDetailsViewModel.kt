@@ -51,8 +51,11 @@ class ProfileDetailsViewModel(
     }
 
     fun onSaveClick() {
-        if (filter?.isCorrect() == true && name.isNotBlank()) {
-            saveProfile()
+        if (filter?.isCorrect() == true && name.isNotBlank() && buildProfile() != null) {
+            viewModelScope.launch {
+                radarProfilesRepository.saveProfile(buildProfile()!!)
+                router.navigate(BackCommand)
+            }
         } else {
             Toast.makeText(context, context.getString(R.string.cannot_save_profile), Toast.LENGTH_LONG).show()
         }
@@ -89,21 +92,18 @@ class ProfileDetailsViewModel(
         filter = template ?: profile.detectFilter?.let(FilterUiMapper::mapToUi)
     }
 
-    private fun saveProfile() {
-        viewModelScope.launch {
-            radarProfilesRepository.saveProfile(buildProfile())
-            router.navigate(BackCommand)
+    private fun buildProfile(): RadarProfile? {
+        return try {
+            RadarProfile(
+                id = profileId,
+                name = name,
+                description = description,
+                isActive = isActive,
+                detectFilter = filter?.let(FilterUiMapper::mapToDomain),
+            )
+        } catch (e: Throwable) {
+            null
         }
-    }
-
-    private fun buildProfile(): RadarProfile {
-        return RadarProfile(
-            id = profileId,
-            name = name,
-            description = description,
-            isActive = isActive,
-            detectFilter = filter?.let(FilterUiMapper::mapToDomain),
-        )
     }
 
     companion object {
