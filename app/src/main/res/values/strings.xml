@@ -13,6 +13,7 @@
     <string name="decline">Decline</string>
     <string name="ok">OK</string>
     <string name="turn_on">Turn on</string>
+    <string name="report">Report</string>
 
     <plurals name="day">
         <item quantity="zero">%1$d days</item>
@@ -85,6 +86,7 @@
     <string name="garbage_has_cleared">Cleared %s garbage devices</string>
     <string name="clear_all_location_history_dialog_title">Clear all location history?</string>
     <string name="launch_on_system_startup_title">Launch on system startup</string>
+    <string name="report_issue_title">Noticed a problem or have a feature request?</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>
@@ -217,4 +219,5 @@
     <string name="permissions_intro_doze_mode_text">Android restricts certain processes in the background. This permission is needed to increase the stability of the scanner in the background. Optional.</string>
     <string name="permission_data_coolect_info">The application does not collect or transmit data. The project is fully open source and available on github</string>
     <string name="grant_permissions_manually">Grant the necessary permissions manually</string>
+    <string name="cannot_open_the_url">Cannot open the url</string>
 </resources>
