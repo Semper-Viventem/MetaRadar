@@ -3,6 +3,7 @@ package f.cking.software.ui.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -29,22 +30,28 @@ object SettingsScreen {
     @Composable
     fun Screen() {
         val viewModel: SettingsViewModel = koinViewModel()
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            ClearDatabaseBlock(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            LocationBlock(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            BackupDatabaseBlock(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            RunOnStartup(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            ReportIssue(viewModel = viewModel)
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ClearDatabaseBlock(viewModel = viewModel)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LocationBlock(viewModel = viewModel)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    BackupDatabaseBlock(viewModel = viewModel)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    RunOnStartup(viewModel = viewModel)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ReportIssue(viewModel = viewModel)
+                }
+            }
         }
     }
 
