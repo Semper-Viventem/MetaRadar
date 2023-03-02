@@ -51,6 +51,7 @@ object MainScreen {
             }
         )
         LocationDisabledDialog(viewModel)
+        BluetoothDisabledDialog(viewModel)
     }
 
     @Composable
@@ -70,6 +71,25 @@ object MainScreen {
                     Text(text = stringResource(id = R.string.location_is_turned_off_subtitle))
                 }
             }
+    }
+
+    @Composable
+    private fun BluetoothDisabledDialog(viewModel: MainViewModel) {
+        MaterialDialog(
+            dialogState = viewModel.showBluetoothDisabledDialog,
+            buttons = {
+                negativeButton(stringResource(R.string.cancel))
+                positiveButton(stringResource(R.string.turn_on)) {
+                    viewModel.onTurnOnBluetoothClick()
+                }
+            },
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(text = stringResource(id = R.string.bluetooth_is_not_available_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.bluetooth_is_not_available_content))
+            }
+        }
     }
 
     @Composable

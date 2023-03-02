@@ -12,7 +12,7 @@ class DataModule(
     private val appDatabaseName: String,
 ) {
     val module = module {
-        single { BleScannerHelper(get(), get(), get()) }
+        single { BleScannerHelper(get(), get()) }
         single { get<Context>().getSharedPreferences(sharedPreferencesName, MODE_PRIVATE) }
         single { SettingsRepository(get()) }
         single { AppDatabase.build(get(), appDatabaseName) }

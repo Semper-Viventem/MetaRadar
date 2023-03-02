@@ -12,6 +12,7 @@
     <string name="clear">Clear</string>
     <string name="decline">Decline</string>
     <string name="ok">OK</string>
+    <string name="turn_on">Turn on</string>
 
     <plurals name="day">
         <item quantity="zero">%1$d days</item>
@@ -186,6 +187,7 @@
     <!-- Notifications -->
     <string name="ble_scanner_is_started_but_no_data">BLE scanner is started but there is no data yet</string>
     <string name="known_devices_around">%s known devices around</string>
+    <string name="total_devices_around">%s total devices around</string>
     <string name="there_are_no_devices_around">There are no known devices around</string>
     <string name="app_service_title">%s service</string>
     <string name="notification_profile_is_near_you">\"%s\" profile is near you!</string>
@@ -197,7 +199,7 @@
     <string name="location_is_turned_off_subtitle">Bluetooth radar can\'t scan when the location is turned off due to android\'s restrictions</string>
     <string name="errors_notifications">Errors notifications</string>
     <string name="bluetooth_is_not_available_title">Bluetooth is not available</string>
-    <string name="bluetooth_is_not_available_content">It looks like Bluetooth is turned off or not available on your device</string>
+    <string name="bluetooth_is_not_available_content">It looks like Bluetooth is turned off or not available on your device. Turn on Bluetooth to continue</string>
 
     <!-- Journal -->
     <string name="journal_device_was_removed">Such device was removed from the database</string>
@@ -215,5 +217,4 @@
     <string name="permissions_intro_doze_mode_text">Android restricts certain processes in the background. This permission is needed to increase the stability of the scanner in the background. Optional.</string>
     <string name="permission_data_coolect_info">The application does not collect or transmit data. The project is fully open source and available on github</string>
     <string name="grant_permissions_manually">Grant the necessary permissions manually</string>
-    <string name="turn_on">Turn on</string>
 </resources>
