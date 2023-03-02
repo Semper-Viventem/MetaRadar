@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import f.cking.software.R
 import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
@@ -15,7 +16,6 @@ import kotlin.random.Random
 class NotificationsHelper(
     private val context: Context,
 ) {
-
 
 
     private val notificationManager by lazy { context.getSystemService(NotificationManager::class.java) }
@@ -95,7 +95,11 @@ class NotificationsHelper(
     fun notifyLocationIsTurnedOff() {
         notifyError(
             title = context.getString(R.string.location_is_turned_off_title),
-            content = context.getString(R.string.location_is_turned_off_subtitle)
+            content = context.getString(R.string.location_is_turned_off_subtitle),
+            button = NotificationButton(
+                intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS),
+                text = context.getString(R.string.turn_on),
+            )
         )
     }
 
@@ -103,6 +107,7 @@ class NotificationsHelper(
         notifyError(
             title = context.getString(R.string.bluetooth_is_not_available_title),
             content = context.getString(R.string.bluetooth_is_not_available_content),
+            button = null
         )
     }
 
@@ -110,7 +115,7 @@ class NotificationsHelper(
         notificationManager.cancel(notificationId)
     }
 
-    private fun notifyError(title: String, content: String?) {
+    private fun notifyError(title: String, content: String?, button: NotificationButton?) {
         val openAppPendingIntent = getOpenAppIntent()
 
         createErrorsNotificationChannel()
@@ -119,6 +124,17 @@ class NotificationsHelper(
             .setContentTitle(title)
             .setContentText(content)
             .setSmallIcon(R.drawable.ic_ble)
+            .apply {
+                if (button != null) {
+                    val buttonIntent = PendingIntent.getActivity(
+                        context,
+                        0,
+                        button.intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                    addAction(R.drawable.ic_location, button.text, buttonIntent)
+                }
+            }
             .setContentIntent(openAppPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -169,6 +185,11 @@ class NotificationsHelper(
         ).apply { enableVibration(true) }
         notificationManager.createNotificationChannel(channel)
     }
+
+    data class NotificationButton(
+        val intent: Intent,
+        val text: String,
+    )
 
     companion object {
         private const val SERVICE_NOTIFICATION_CHANNEL = "service_notification_channel"

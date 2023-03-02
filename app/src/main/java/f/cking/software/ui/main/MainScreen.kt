@@ -50,6 +50,26 @@ object MainScreen {
                 BottomNavigationBar(viewModel)
             }
         )
+        LocationDisabledDialog(viewModel)
+    }
+
+    @Composable
+    private fun LocationDisabledDialog(viewModel: MainViewModel) {
+            MaterialDialog(
+                dialogState = viewModel.showLocationDisabledDialog,
+                buttons = {
+                    negativeButton(stringResource(R.string.cancel))
+                    positiveButton(stringResource(R.string.turn_on)) {
+                        viewModel.onTurnOnLocationClick()
+                    }
+                },
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(text = stringResource(id = R.string.location_is_turned_off_title))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(id = R.string.location_is_turned_off_subtitle))
+                }
+            }
     }
 
     @Composable

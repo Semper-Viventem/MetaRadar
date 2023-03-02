@@ -44,6 +44,11 @@ class IntentHelper(private val activityProvider: ActivityProvider) {
         activityProvider.requireActivity().startActivity(intent)
     }
 
+    fun openLocationSettings() {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        activityProvider.requireActivity().startActivity(intent)
+    }
+
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val consumer = pendingConsumers[requestCode]
         if (resultCode == Activity.RESULT_OK) {
