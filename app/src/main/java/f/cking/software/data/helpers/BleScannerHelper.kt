@@ -1,13 +1,13 @@
 package f.cking.software.data.helpers
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.GetKnownDevicesInteractor
 import f.cking.software.domain.model.BleScanDevice
 import kotlinx.coroutines.Dispatchers
@@ -16,13 +16,13 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 class BleScannerHelper(
-    private val devicesRepository: DevicesRepository,
     private val getKnownDevicesInteractor: GetKnownDevicesInteractor,
     private val appContext: Context,
 ) {
 
     private val TAG = "BleScannerHelper"
 
+    private var bluetoothAdapter: BluetoothAdapter? = null
     private var bluetoothScanner: BluetoothLeScanner? = null
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val batch = hashMapOf<String, BleScanDevice>()
@@ -60,6 +60,11 @@ class BleScannerHelper(
         }
     }
 
+    fun isBluetoothEnabled(): Boolean {
+        tryToInitBluetoothScanner()
+        return bluetoothAdapter?.isEnabled == true
+    }
+
     @SuppressLint("MissingPermission")
     suspend fun scan(
         scanRestricted: Boolean = false,
@@ -67,6 +72,10 @@ class BleScannerHelper(
         scanListener: ScanListener,
     ) {
         Log.d(TAG, "Start BLE Scan. Restricted mode: $scanRestricted")
+
+        if (!isBluetoothEnabled()) {
+            throw BluetoothIsNotInitialized()
+        }
 
         if (inProgress.value) {
             Log.e(TAG, "BLE Scan failed because previous scan is not finished")
@@ -122,7 +131,7 @@ class BleScannerHelper(
     }
 
     private fun tryToInitBluetoothScanner() {
-        val bluetoothAdapter = appContext.getSystemService(BluetoothManager::class.java).adapter
+        bluetoothAdapter = appContext.getSystemService(BluetoothManager::class.java).adapter
         bluetoothScanner = bluetoothAdapter?.bluetoothLeScanner
     }
 
@@ -149,5 +158,5 @@ class BleScannerHelper(
 
     class BLEScanFailure(errorCode: Int) : RuntimeException("BLE Scan failed with error code: $errorCode")
 
-    class BluetoothIsNotInitialized : RuntimeException("Bluetooth scanner is not initialized")
+    class BluetoothIsNotInitialized : RuntimeException("Bluetooth is turned off or not available on this device")
 }

@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
@@ -21,7 +22,7 @@ class NotificationsHelper(
     private val notificationManager by lazy { context.getSystemService(NotificationManager::class.java) }
 
     fun buildForegroundNotification(
-        knownDeviceCount: Int?,
+        notificationContent: ServiceNotificationContent,
         cancelIntent: Intent,
     ): Notification {
         createServiceChannel()
@@ -35,12 +36,12 @@ class NotificationsHelper(
 
         val openAppPendingIntent = getOpenAppIntent()
 
-        val body = if (knownDeviceCount == null) {
-            context.getString(R.string.ble_scanner_is_started_but_no_data)
-        } else if (knownDeviceCount > 0) {
-            context.getString(R.string.known_devices_around, knownDeviceCount.toString())
-        } else {
-            context.getString(R.string.there_are_no_devices_around)
+        val body = when (notificationContent) {
+            is ServiceNotificationContent.KnownDevicesAround -> context.getString(R.string.known_devices_around, notificationContent.knownDeviceCount.toString())
+            is ServiceNotificationContent.TotalDevicesAround -> context.getString(R.string.total_devices_around, notificationContent.totalDeviceCount.toString())
+            is ServiceNotificationContent.NoDataYet -> context.getString(R.string.ble_scanner_is_started_but_no_data)
+            is ServiceNotificationContent.BluetoothIsTurnedOff -> context.getString(R.string.bluetooth_is_not_available_title)
+            is ServiceNotificationContent.LocationIsTurnedOff -> context.getString(R.string.location_is_turned_off_title)
         }
 
         return NotificationCompat.Builder(context, SERVICE_NOTIFICATION_CHANNEL)
@@ -107,7 +108,10 @@ class NotificationsHelper(
         notifyError(
             title = context.getString(R.string.bluetooth_is_not_available_title),
             content = context.getString(R.string.bluetooth_is_not_available_content),
-            button = null
+            button = NotificationButton(
+                intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                text = context.getString(R.string.turn_on)
+            )
         )
     }
 
@@ -154,8 +158,8 @@ class NotificationsHelper(
         )
     }
 
-    fun updateNotification(knownDeviceCount: Int, canelIntent: Intent) {
-        val notification = buildForegroundNotification(knownDeviceCount, canelIntent)
+    fun updateNotification(serviceNotificationContent: ServiceNotificationContent, canelIntent: Intent) {
+        val notification = buildForegroundNotification(serviceNotificationContent, canelIntent)
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification)
     }
 
@@ -190,6 +194,19 @@ class NotificationsHelper(
         val intent: Intent,
         val text: String,
     )
+
+    sealed interface ServiceNotificationContent {
+
+        object NoDataYet : ServiceNotificationContent
+
+        data class TotalDevicesAround(val totalDeviceCount: Int) : ServiceNotificationContent
+
+        data class KnownDevicesAround(val knownDeviceCount: Int) : ServiceNotificationContent
+
+        object BluetoothIsTurnedOff : ServiceNotificationContent
+
+        object LocationIsTurnedOff : ServiceNotificationContent
+    }
 
     companion object {
         private const val SERVICE_NOTIFICATION_CHANNEL = "service_notification_channel"

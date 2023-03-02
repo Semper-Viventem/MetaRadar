@@ -25,15 +25,16 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     private val permissionHelper: PermissionHelper,
     private val context: Application,
-    private val bleScanner: BleScannerHelper,
+    private val bluetoothHelper: BleScannerHelper,
     private val settingsRepository: SettingsRepository,
     private val locationProvider: LocationProvider,
     private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
-    var scanStarted: Boolean by mutableStateOf(bleScanner.inProgress.value)
+    var scanStarted: Boolean by mutableStateOf(bluetoothHelper.inProgress.value)
     var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive.value)
     var showLocationDisabledDialog: MaterialDialogState = MaterialDialogState()
+    var showBluetoothDisabledDialog: MaterialDialogState = MaterialDialogState()
 
     var tabs by mutableStateOf(
         listOf(
@@ -84,16 +85,22 @@ class MainViewModel(
         checkPermissions {
             if (BgScanService.isActive.value) {
                 BgScanService.stop(context)
-            } else if (locationProvider.isLocationAvailable()) {
-                BgScanService.start(context)
-            } else {
+            } else if (!locationProvider.isLocationAvailable()) {
                 showLocationDisabledDialog.show()
+            } else if (!bluetoothHelper.isBluetoothEnabled()) {
+                showBluetoothDisabledDialog.show()
+            } else {
+                BgScanService.start(context)
             }
         }
     }
 
     fun onTurnOnLocationClick() {
         intentHelper.openLocationSettings()
+    }
+
+    fun onTurnOnBluetoothClick() {
+        intentHelper.openBluetoothSettings()
     }
 
     fun needToShowPermissionsIntro(): Boolean {
@@ -106,7 +113,7 @@ class MainViewModel(
 
     private fun observeScanInProgress() {
         viewModelScope.launch {
-            bleScanner.inProgress
+            bluetoothHelper.inProgress
                 .collect { scanStarted = it }
         }
     }

@@ -1,6 +1,7 @@
 package f.cking.software.data.helpers
 
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -46,6 +47,11 @@ class IntentHelper(private val activityProvider: ActivityProvider) {
 
     fun openLocationSettings() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        activityProvider.requireActivity().startActivity(intent)
+    }
+
+    fun openBluetoothSettings() {
+        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         activityProvider.requireActivity().startActivity(intent)
     }
 
