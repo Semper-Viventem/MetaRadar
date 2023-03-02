@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import f.cking.software.TheAppConfig
 import f.cking.software.domain.model.ManufacturerInfo
-import f.cking.software.toLocalTime
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -15,13 +14,13 @@ sealed class FilterUiState {
     abstract fun isCorrect(): Boolean
 
     abstract class Interval : FilterUiState() {
-        var fromDate: Optional<LocalDate> by mutableStateOf(Optional.empty())
-        var fromTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
-        var toDate: Optional<LocalDate> by mutableStateOf(Optional.empty())
-        var toTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
+        var fromDate: LocalDate? by mutableStateOf(null)
+        var fromTime: LocalTime? by mutableStateOf(null)
+        var toDate: LocalDate? by mutableStateOf(null)
+        var toTime: LocalTime? by mutableStateOf(null)
 
         override fun isCorrect(): Boolean {
-            return (fromDate.isPresent && fromTime.isPresent) || (toDate.isPresent && toTime.isPresent)
+            return (fromDate != null && fromTime != null) || (toDate != null && toTime != null)
         }
     }
 
@@ -47,10 +46,10 @@ sealed class FilterUiState {
     }
 
     class Manufacturer : FilterUiState() {
-        var manufacturer: Optional<ManufacturerInfo> by mutableStateOf(Optional.empty())
+        var manufacturer: ManufacturerInfo? by mutableStateOf(null)
 
         override fun isCorrect(): Boolean {
-            return manufacturer.isPresent
+            return manufacturer != null
         }
     }
 
@@ -63,10 +62,10 @@ sealed class FilterUiState {
     }
 
     class MinLostTime : FilterUiState() {
-        var minLostTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
+        var minLostTime: Long? by mutableStateOf(null)
 
         override fun isCorrect(): Boolean {
-            return minLostTime.isPresent
+            return minLostTime != null
         }
     }
 
@@ -108,7 +107,7 @@ sealed class FilterUiState {
 
     class AppleAirdropContact() : FilterUiState() {
         var contactString: String by mutableStateOf("")
-        var minLostTime: Optional<LocalTime> by mutableStateOf(Optional.empty())
+        var minLostTime: Long? by mutableStateOf(null)
 
         override fun isCorrect(): Boolean {
             return contactString.isNotBlank()
@@ -116,8 +115,8 @@ sealed class FilterUiState {
     }
 
     class IsFollowing() : FilterUiState() {
-        var followingDurationMs: LocalTime by mutableStateOf(TheAppConfig.MIN_FOLLOWING_DURATION_TIME_MS.toLocalTime())
-        var followingDetectionIntervalMs: LocalTime by mutableStateOf(TheAppConfig.MIN_FOLLOWING_INTERVAL_TIME_MS.toLocalTime())
+        var followingDurationMs: Long by mutableStateOf(TheAppConfig.MIN_FOLLOWING_DURATION_TIME_MS)
+        var followingDetectionIntervalMs: Long by mutableStateOf(TheAppConfig.MIN_FOLLOWING_INTERVAL_TIME_MS)
 
         override fun isCorrect(): Boolean {
             return true

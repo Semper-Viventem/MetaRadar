@@ -22,17 +22,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import f.cking.software.*
 import f.cking.software.R
 import f.cking.software.common.ClickableField
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.common.rememberDateDialog
 import f.cking.software.common.rememberTimeDialog
-import f.cking.software.dateTimeFormat
-import f.cking.software.orNull
 import f.cking.software.ui.ScreenNavigationCommands
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 import java.util.*
 
 object FilterScreen {
@@ -70,16 +69,16 @@ object FilterScreen {
             color = colorResource(R.color.filter_is_following),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            val followingDuration = rememberTimeDialog(filter.followingDurationMs) { time ->
-                filter.followingDurationMs = time
+            val followingDuration = rememberTimeDialog(filter.followingDurationMs.toLocalTime(ZoneId.of("GMT"))) { time ->
+                filter.followingDurationMs = time.toMilliseconds()
             }
 
-            val followingInterval = rememberTimeDialog(filter.followingDetectionIntervalMs) { time ->
-                filter.followingDetectionIntervalMs = time
+            val followingInterval = rememberTimeDialog(filter.followingDetectionIntervalMs.toLocalTime(ZoneId.of("GMT"))) { time ->
+                filter.followingDetectionIntervalMs = time.toMilliseconds()
             }
 
-            val followingDurationText = filter.followingDurationMs.format(DateTimeFormatter.ofPattern("HH:mm"))
-            val followingIntervalText = filter.followingDetectionIntervalMs.format(DateTimeFormatter.ofPattern("HH:mm"))
+            val followingDurationText = filter.followingDurationMs.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
+            val followingIntervalText = filter.followingDetectionIntervalMs.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
 
             Column {
                 ClickableField(
@@ -155,10 +154,10 @@ object FilterScreen {
                     filter.contactString = it.lowercase()
                 }, placeholder = { Text(text = stringResource(R.string.placeholder_airdrope_contact)) })
 
-                val text = filter.minLostTime.orNull()?.format(DateTimeFormatter.ofPattern("HH:mm"))
-                val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
-                val timeDialog = rememberTimeDialog(defaultTime) { time ->
-                    filter.minLostTime = Optional.of(time)
+                val text = filter.minLostTime?.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
+                val defaultTime: Long = filter.minLostTime ?: (1L * 60L * 60L * 1000L) // 1 hour
+                val timeDialog = rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
+                    filter.minLostTime = time.toMilliseconds()
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -171,9 +170,7 @@ object FilterScreen {
                         timeDialog.show()
                     }
                     Spacer(modifier = Modifier.width(4.dp))
-                    ClearIcon {
-                        filter.minLostTime = Optional.empty()
-                    }
+                    ClearIcon { filter.minLostTime = null }
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
@@ -225,7 +222,7 @@ object FilterScreen {
             title = stringResource(R.string.filter_by_manufacturer),
             color = colorResource(R.color.filter_manufacturer),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
-            val name: String? = filter.manufacturer.orNull()?.name
+            val name: String? = filter.manufacturer?.name
             val label = if (name == null) stringResource(R.string.tap_to_select) else null
 
             ClickableField(
@@ -234,7 +231,7 @@ object FilterScreen {
                 label = label,
             ) {
                 router.navigate(ScreenNavigationCommands.OpenSelectManufacturerScreen { manufacturer ->
-                    filter.manufacturer = Optional.of(manufacturer)
+                    filter.manufacturer = manufacturer
                 })
             }
         }
@@ -250,12 +247,12 @@ object FilterScreen {
             color = colorResource(R.color.filter_lost_time),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
-            val defaultTime = filter.minLostTime.orNull() ?: LocalTime.of(1, 0)
-            val timeDialog = rememberTimeDialog(defaultTime) { time ->
-                filter.minLostTime = Optional.of(time)
+            val defaultTime = filter.minLostTime ?: (1L * 60L * 60L * 1000L) // 1 hour
+            val timeDialog = rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
+                filter.minLostTime = time.toMilliseconds()
             }
 
-            val text = filter.minLostTime.orNull()?.dateTimeFormat("HH:mm")
+            val text = filter.minLostTime?.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
 
             ClickableField(text = text, placeholder = stringResource(R.string.chose_time), label = null) {
                 timeDialog.show()
@@ -297,22 +294,22 @@ object FilterScreen {
         val dateFormat = "dd MMM yyyy"
         val timeFormat = "HH:mm"
 
-        val fromDateStr: String? = filter.fromDate.orNull()?.dateTimeFormat(dateFormat)
-        val fromTimeStr: String? = filter.fromTime.orNull()?.dateTimeFormat(timeFormat)
-        val toDateStr: String? = filter.toDate.orNull()?.dateTimeFormat(dateFormat)
-        val toTimeStr: String? = filter.toTime.orNull()?.dateTimeFormat(timeFormat)
+        val fromDateStr: String? = filter.fromDate?.dateTimeFormat(dateFormat)
+        val fromTimeStr: String? = filter.fromTime?.dateTimeFormat(timeFormat)
+        val toDateStr: String? = filter.toDate?.dateTimeFormat(dateFormat)
+        val toTimeStr: String? = filter.toTime?.dateTimeFormat(timeFormat)
 
-        val fromDateDialog = rememberDateDialog(filter.fromDate.orNull() ?: LocalDate.now()) { date ->
-            filter.fromDate = Optional.of(date)
+        val fromDateDialog = rememberDateDialog(filter.fromDate ?: LocalDate.now()) { date ->
+            filter.fromDate = date
         }
-        val fromTimeDialog = rememberTimeDialog(filter.fromTime.orNull() ?: LocalTime.now()) { date ->
-            filter.fromTime = Optional.of(date)
+        val fromTimeDialog = rememberTimeDialog(filter.fromTime ?: LocalTime.now()) { date ->
+            filter.fromTime = date
         }
-        val toDateDialog = rememberDateDialog(filter.toDate.orNull() ?: LocalDate.now()) { date ->
-            filter.toDate = Optional.of(date)
+        val toDateDialog = rememberDateDialog(filter.toDate ?: LocalDate.now()) { date ->
+            filter.toDate = date
         }
-        val toTimeDialog = rememberTimeDialog(filter.toTime.orNull() ?: LocalTime.now()) { date ->
-            filter.toTime = Optional.of(date)
+        val toTimeDialog = rememberTimeDialog(filter.toTime ?: LocalTime.now()) { date ->
+            filter.toTime = date
         }
 
         Column {
@@ -334,8 +331,8 @@ object FilterScreen {
                 ) { fromTimeDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
-                    filter.fromDate = Optional.empty()
-                    filter.fromTime = Optional.empty()
+                    filter.fromDate = null
+                    filter.fromTime = null
                 }
             }
             Spacer(modifier = Modifier.height(4.dp))
@@ -357,8 +354,8 @@ object FilterScreen {
                 ) { toTimeDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
-                    filter.toDate = Optional.empty()
-                    filter.toDate = Optional.empty()
+                    filter.toDate = null
+                    filter.toDate = null
                 }
             }
         }
