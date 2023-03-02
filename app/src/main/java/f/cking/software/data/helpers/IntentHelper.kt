@@ -1,10 +1,14 @@
 package f.cking.software.data.helpers
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.widget.Toast
+import f.cking.software.R
 
 class IntentHelper(private val activityProvider: ActivityProvider) {
 
@@ -50,9 +54,21 @@ class IntentHelper(private val activityProvider: ActivityProvider) {
         activityProvider.requireActivity().startActivity(intent)
     }
 
+    @SuppressLint("MissingPermission")
     fun openBluetoothSettings() {
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         activityProvider.requireActivity().startActivity(intent)
+    }
+
+    fun openUrl(url: String) {
+        val webpage: Uri = Uri.parse(url)
+        val intent = Intent(Intent.ACTION_VIEW, webpage)
+        val activity = activityProvider.requireActivity()
+        try {
+            activity.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(activity, activity.getString(R.string.cannot_open_the_url), Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

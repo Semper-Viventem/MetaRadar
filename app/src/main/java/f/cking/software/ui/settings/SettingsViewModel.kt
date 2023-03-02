@@ -9,7 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.BuildConfig
 import f.cking.software.R
+import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
@@ -29,6 +31,7 @@ class SettingsViewModel(
     private val createBackupFileInteractor: CreateBackupFileInteractor,
     private val selectBackupFileInteractor: SelectBackupFileInteractor,
     private val restoreDatabaseInteractor: RestoreDatabaseInteractor,
+    private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
     private val TAG = "SettingsViewModel"
@@ -116,6 +119,10 @@ class SettingsViewModel(
         val newValue = !settingsRepository.getRunOnStartup()
         settingsRepository.setRunOnStartup(newValue)
         runOnStartup = newValue
+    }
+
+    fun opReportIssueClick() {
+        intentHelper.openUrl(BuildConfig.REPORT_ISSUE_URL)
     }
 
     private fun observeLocationData() {

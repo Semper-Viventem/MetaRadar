@@ -11,9 +11,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -34,72 +36,89 @@ object SettingsScreen {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            ClearGarbageButton(viewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-            ClearLocationsButton(viewModel)
+            ClearDatabaseBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
-            LocationInfo(viewModel)
+            LocationBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
-            UseGpsLocationOnly(viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            BackupDB(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            RestoreDB(viewModel = viewModel)
+            BackupDatabaseBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             RunOnStartup(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ReportIssue(viewModel = viewModel)
         }
     }
 
     @Composable
     private fun LocationInfo(viewModel: SettingsViewModel) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
+        Column {
+            val locationData = viewModel.locationData
+            if (locationData == null) {
+                Text(text = stringResource(R.string.no_location_data_yet), fontWeight = FontWeight.SemiBold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = stringResource(R.string.location_fetches_only_if_service_is_turned_on), fontWeight = FontWeight.Light)
+            } else {
+                val formattedTime = locationData.emitTime.dateTimeStringFormat("HH:mm")
+                Text(text = stringResource(R.string.last_location_update_time, formattedTime), fontWeight = FontWeight.SemiBold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = stringResource(R.string.lat_template, locationData.location.latitude), fontWeight = FontWeight.Light)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(text = stringResource(R.string.lng_template, locationData.location.longitude), fontWeight = FontWeight.Light)
+            }
+        }
+    }
+
+    @Composable
+    private fun RoundedBox(
+        modifier: Modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        internalPaddings: Dp = 16.dp,
+        boxContent: @Composable ColumnScope.() -> Unit
+    ) {
+        Box(modifier = modifier) {
+            val shape = RoundedCornerShape(corner = CornerSize(8.dp))
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .background(
-                        color = Color.LightGray,
-                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                    )
-                    .padding(8.dp)
-            ) {
-                val locationData = viewModel.locationData
-                if (locationData == null) {
-                    Text(text = stringResource(R.string.no_location_data_yet))
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.location_fetches_only_if_service_is_turned_on),
-                        fontWeight = FontWeight.Light
-                    )
-                } else {
-                    val formattedTime = locationData.emitTime.dateTimeStringFormat("HH:mm")
-                    Text(
-                        text = stringResource(R.string.last_location_update_time, formattedTime)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.lat_template, locationData.location.latitude),
-                        fontWeight = FontWeight.Light
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = stringResource(R.string.lng_template, locationData.location.longitude),
-                        fontWeight = FontWeight.Light
-                    )
-                }
+                    .background(color = Color.LightGray, shape = shape)
+                    .clip(shape = shape)
+                    .padding(internalPaddings)
+            ) { boxContent(this) }
+        }
+    }
+
+    @Composable
+    private fun ClearDatabaseBlock(viewModel: SettingsViewModel) {
+        RoundedBox {
+            ClearGarbageButton(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ClearLocationsButton(viewModel)
+        }
+    }
+
+    @Composable
+    private fun LocationBlock(viewModel: SettingsViewModel) {
+        RoundedBox(internalPaddings = 0.dp) {
+            Box(modifier = Modifier.padding(16.dp)) {
+                LocationInfo(viewModel)
             }
+            UseGpsLocationOnly(viewModel)
+        }
+    }
+
+    @Composable
+    private fun BackupDatabaseBlock(viewModel: SettingsViewModel) {
+        RoundedBox {
+            BackupDB(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            RestoreDB(viewModel = viewModel)
         }
     }
 
     @Composable
     private fun ClearGarbageButton(viewModel: SettingsViewModel) {
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
             onClick = { viewModel.onRemoveGarbageClick() },
             enabled = !viewModel.garbageRemovingInProgress
         ) {
@@ -128,9 +147,7 @@ object SettingsScreen {
         }
 
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
@@ -159,9 +176,7 @@ object SettingsScreen {
         }
 
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
@@ -190,9 +205,7 @@ object SettingsScreen {
         }
 
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
             onClick = { dialogState.show() },
             enabled = !viewModel.locationRemovingInProgress
         ) {
@@ -212,12 +225,25 @@ object SettingsScreen {
 
     @Composable
     private fun RunOnStartup(viewModel: SettingsViewModel) {
-        Switcher(
-            value = viewModel.runOnStartup,
-            title = stringResource(R.string.launch_on_system_startup_title),
-            subtitle = null,
-            onClick = { viewModel.setRunOnStartup() }
-        )
+        RoundedBox(internalPaddings = 0.dp) {
+            Switcher(
+                value = viewModel.runOnStartup,
+                title = stringResource(R.string.launch_on_system_startup_title),
+                subtitle = null,
+                onClick = { viewModel.setRunOnStartup() }
+            )
+        }
+    }
+
+    @Composable
+    private fun ReportIssue(viewModel: SettingsViewModel) {
+        RoundedBox {
+            Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
+                Text(text = stringResource(R.string.report))
+            }
+        }
     }
 
     @Composable
