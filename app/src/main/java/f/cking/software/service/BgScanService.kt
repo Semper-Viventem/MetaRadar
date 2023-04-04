@@ -6,12 +6,8 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.os.PowerManager
 import android.util.Log
-import f.cking.software.data.helpers.BleScannerHelper
-import f.cking.software.data.helpers.LocationProvider
-import f.cking.software.data.helpers.NotificationsHelper
-import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.data.helpers.*
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
 import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
@@ -33,11 +29,11 @@ class BgScanService : Service() {
     private val settingsRepository: SettingsRepository by inject()
     private val locationProvider: LocationProvider by inject()
     private val notificationsHelper: NotificationsHelper by inject()
+    private val powerModeHelper: PowerModeHelper by inject()
 
     private val saveScanBatchInteractor: SaveScanBatchInteractor by inject()
     private val analyseScanBatchInteractor: AnalyseScanBatchInteractor by inject()
     private val saveReportInteractor: SaveReportInteractor by inject()
-    private val powerManager by lazy { getSystemService(PowerManager::class.java) }
 
     private val handler = Handler(Looper.getMainLooper())
     private var failureScanCounter: Int = 0
@@ -129,11 +125,7 @@ class BgScanService : Service() {
     private fun scan() {
         scope.launch {
             try {
-                bleScannerHelper.scan(
-                    scanRestricted = isNonInteractiveMode(),
-                    scanDurationMs = settingsRepository.getScanDuration(),
-                    scanListener = bleListener,
-                )
+                bleScannerHelper.scan(scanListener = bleListener,)
             } catch (e: BleScannerHelper.BluetoothIsNotInitialized) {
                 handleBleIsTurnedOffError()
                 notificationsHelper.updateNotification(
@@ -204,13 +196,6 @@ class BgScanService : Service() {
         }
     }
 
-    /**
-     * BLE scan is limited if device's screen is turned off
-     */
-    private fun isNonInteractiveMode(): Boolean {
-        return !powerManager.isInteractive
-    }
-
     private fun handleProfileCheckingResult(profiles: List<CheckProfileDetectionInteractor.ProfileResult>) {
         if (profiles.isNotEmpty()) {
             notificationsHelper.notifyRadarProfile(profiles)
@@ -223,11 +208,7 @@ class BgScanService : Service() {
     }
 
     private fun scheduleNextScan() {
-        val interval = if (isNonInteractiveMode()) {
-            settingsRepository.getScanRestrictedInterval()
-        } else {
-            settingsRepository.getScanInterval()
-        }
+        val interval = powerModeHelper.powerMode().scanInterval
         handler.postDelayed(nextScanRunnable, interval)
     }
 

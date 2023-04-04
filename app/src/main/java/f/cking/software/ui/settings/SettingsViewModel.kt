@@ -50,8 +50,12 @@ class SettingsViewModel(
     fun onRemoveGarbageClick() {
         viewModelScope.launch {
             garbageRemovingInProgress = true
-            val garbageCount = clearGarbageInteractor.execute()
-            toast(context.getString(R.string.garbage_has_cleared, garbageCount.toString()))
+            try {
+                val garbageCount = clearGarbageInteractor.execute()
+                toast(context.getString(R.string.garbage_has_cleared, garbageCount.toString()))
+            } catch (e: Exception) {
+                reportError(e)
+            }
             garbageRemovingInProgress = false
         }
     }

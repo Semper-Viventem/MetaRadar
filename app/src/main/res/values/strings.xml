@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MetaRadar</string>
+    <string name="app_name">BLE Radar</string>
     <string name="search">Search</string>
 
     <!-- Common -->
@@ -191,7 +191,8 @@
     <string name="known_devices_around">%s known devices around</string>
     <string name="total_devices_around">%s total devices around</string>
     <string name="there_are_no_devices_around">There are no known devices around</string>
-    <string name="app_service_title">%s service</string>
+    <string name="app_service_title">@string/app_name</string>
+    <string name="app_service_title_power_saving">%s · Power saving</string>
     <string name="notification_profile_is_near_you">\"%s\" profile is near you!</string>
     <string name="notification_profiles_are_near_you">%s profile are near you!</string>
     <string name="devices_matched_postfix">\" devices matched!\"</string>

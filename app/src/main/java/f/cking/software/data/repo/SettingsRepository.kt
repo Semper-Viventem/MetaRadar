@@ -7,30 +7,6 @@ class SettingsRepository(
     private val sharedPreferences: SharedPreferences,
 ) {
 
-    fun setScanInterval(scanInterval: Long) {
-        sharedPreferences.edit().putLong(KEY_SCAN_INTERVAL, scanInterval).apply()
-    }
-
-    fun getScanInterval(): Long {
-        return sharedPreferences.getLong(KEY_SCAN_INTERVAL, TheAppConfig.DEFAULT_SCAN_INTERVAL_MS)
-    }
-
-    fun setScanRestrictedInterval(scanInterval: Long) {
-        sharedPreferences.edit().putLong(KEY_SCAN_RESTRICTED_INTERVAL, scanInterval).apply()
-    }
-
-    fun getScanRestrictedInterval(): Long {
-        return sharedPreferences.getLong(KEY_SCAN_RESTRICTED_INTERVAL, TheAppConfig.RESTRICTED_MODE_SCAN_INTERVAL_MS)
-    }
-
-    fun setScanDuration(scanDuration: Long) {
-        sharedPreferences.edit().putLong(KEY_SCAN_DURATION, scanDuration).apply()
-    }
-
-    fun getScanDuration(): Long {
-        return sharedPreferences.getLong(KEY_SCAN_DURATION, TheAppConfig.DEFAULT_SCAN_DURATION_MS)
-    }
-
     fun setGarbagingTime(time: Long) {
         sharedPreferences.edit().putLong(KEY_GARBAGING_TIME, time).apply()
     }
@@ -65,9 +41,6 @@ class SettingsRepository(
 
 
     companion object {
-        private const val KEY_SCAN_INTERVAL = "key_scan_interval"
-        private const val KEY_SCAN_RESTRICTED_INTERVAL = "key_scan_restricted_interval"
-        private const val KEY_SCAN_DURATION = "key_scan_duration"
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"
         private const val KEY_USE_GPS_ONLY = "key_use_gps_location_only"
         private const val KEY_PERMISSIONS_INTRO_WAS_SHOWN = "key_permissions_intro_was_shown"
