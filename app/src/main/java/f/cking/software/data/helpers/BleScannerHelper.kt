@@ -18,6 +18,7 @@ import java.util.*
 class BleScannerHelper(
     private val getKnownDevicesInteractor: GetKnownDevicesInteractor,
     private val appContext: Context,
+    private val powerModeHelper: PowerModeHelper,
 ) {
 
     private val TAG = "BleScannerHelper"
@@ -67,11 +68,9 @@ class BleScannerHelper(
 
     @SuppressLint("MissingPermission")
     suspend fun scan(
-        scanRestricted: Boolean = false,
-        scanDurationMs: Long,
         scanListener: ScanListener,
     ) {
-        Log.d(TAG, "Start BLE Scan. Restricted mode: $scanRestricted")
+        Log.d(TAG, "Start BLE Scan. Restricted mode: ${powerModeHelper.powerMode().useRestrictedBleConfig}")
 
         if (!isBluetoothEnabled()) {
             throw BluetoothIsNotInitialized()
@@ -86,7 +85,7 @@ class BleScannerHelper(
             inProgress.tryEmit(true)
             currentScanTimeMs = System.currentTimeMillis()
 
-            val scanFilters = if (scanRestricted) {
+            val scanFilters = if (powerModeHelper.powerMode().useRestrictedBleConfig) {
                 bleFiltersProvider.getBGFilters() +
                         bleFiltersProvider.getPopularServiceUUIDS() +
                         bleFiltersProvider.getManufacturerFilter()
@@ -100,7 +99,7 @@ class BleScannerHelper(
 
             withContext(Dispatchers.IO) {
                 requireScanner().startScan(scanFilters, scanSettings, callback)
-                handler.postDelayed({ cancelScanning(ScanResultInternal.Success) }, scanDurationMs)
+                handler.postDelayed({ cancelScanning(ScanResultInternal.Success) }, powerModeHelper.powerMode().scanDuration)
             }
         }
     }

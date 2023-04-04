@@ -25,14 +25,14 @@ class LocationProvider(
     private val context: Context,
     private val settingsRepository: SettingsRepository,
     private val saveReportInteractor: SaveReportInteractor,
+    private val powerModeHelper: PowerModeHelper,
 ) {
 
     private val TAG = "LocationProvider"
 
     private val locationState = MutableStateFlow<LocationHandle?>(null)
 
-    private val locationManager: LocationManager? =
-        context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+    private val locationManager: LocationManager? = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
 
     private val consumer = Consumer<Location?> { newLocation ->
 
@@ -52,10 +52,13 @@ class LocationProvider(
             return@Consumer
         }
 
-        Log.d(
-            TAG,
-            "New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)"
-        )
+        if (!powerModeHelper.powerMode().useLocation) {
+            Log.d(TAG, "Location is turned of for such power mode (${powerModeHelper.powerMode().name})")
+            return@Consumer
+        }
+
+        Log.d(TAG, "New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
+
         locationState.tryEmit(LocationHandle(newLocation, System.currentTimeMillis()))
     }
 
@@ -134,10 +137,13 @@ class LocationProvider(
         }
         cancellationSignal = CancellationSignal()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (!powerModeHelper.powerMode().useLocation) {
+            // don't call the location manager update, just schedule next request
+            scheduleNextRequest()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             locationManager?.getCurrentLocation(
                 provider(),
-                LocationRequest.Builder(INTERVAL_MS)
+                LocationRequest.Builder(powerModeHelper.powerMode().locationUpdateInterval)
                     .setDurationMillis(LOCATION_REQUEST_MAX_DURATION_MILLS)
                     .setMaxUpdateDelayMillis(LOCATION_REQUEST_MAX_DURATION_MILLS)
                     .setQuality(LocationRequest.QUALITY_HIGH_ACCURACY)
@@ -175,7 +181,7 @@ class LocationProvider(
     }
 
     private fun scheduleNextRequest() {
-        handler.postDelayed(nextLocationRequest, INTERVAL_MS)
+        handler.postDelayed(nextLocationRequest, powerModeHelper.powerMode().locationUpdateInterval)
     }
 
     /**
@@ -216,7 +222,6 @@ class LocationProvider(
     )
 
     companion object {
-        private const val INTERVAL_MS = 10_000L
         private const val LOCATION_REQUEST_MAX_DURATION_MILLS = 30_000L
         private const val MAX_ALLOWED_ACCURACY_METERS = 100F
         private const val ALLOWED_LOCATION_LIVETIME_MS = 2L * 60L * 1000L // 2 min
