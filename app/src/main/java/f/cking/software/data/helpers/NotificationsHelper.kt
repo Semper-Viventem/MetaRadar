@@ -16,8 +16,8 @@ import kotlin.random.Random
 
 class NotificationsHelper(
     private val context: Context,
+    private val powerModeHelper: PowerModeHelper,
 ) {
-
 
     private val notificationManager by lazy { context.getSystemService(NotificationManager::class.java) }
 
@@ -44,8 +44,14 @@ class NotificationsHelper(
             is ServiceNotificationContent.LocationIsTurnedOff -> context.getString(R.string.location_is_turned_off_title)
         }
 
+        val title = if (powerModeHelper.powerMode() == PowerModeHelper.PowerMode.POWER_SAVING) {
+            context.getString(R.string.app_service_title_power_saving, context.getString(R.string.app_service_title))
+        } else {
+            context.getString(R.string.app_service_title)
+        }
+
         return NotificationCompat.Builder(context, SERVICE_NOTIFICATION_CHANNEL)
-            .setContentTitle(context.getString(R.string.app_service_title, context.getString(R.string.app_name)))
+            .setContentTitle(title)
             .setContentText(body)
             .setOngoing(true)
             .setSmallIcon(R.drawable.ic_ble)

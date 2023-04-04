@@ -20,7 +20,7 @@ android {
         minSdk = 29
         targetSdk = 33
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.10-alpha"
+        versionName = "0.11-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -82,7 +82,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 }
 
@@ -126,6 +126,7 @@ dependencies {
     implementation(libs.compose.dialogs)
     implementation(libs.compose.dialogs.datetime)
     implementation(libs.compose.flow.row)
+    implementation(libs.ktx)
     debugImplementation(libs.compose.tooling)
     implementation(libs.compose.tooling.preview)
 
