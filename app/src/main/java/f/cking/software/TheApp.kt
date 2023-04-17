@@ -7,6 +7,7 @@ import f.cking.software.ui.UiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
+import timber.log.Timber
 
 class TheApp : Application() {
 
@@ -14,6 +15,7 @@ class TheApp : Application() {
         super.onCreate()
         instance = this
         initDi()
+        initTimber()
     }
 
     private fun initDi() {
@@ -24,6 +26,12 @@ class TheApp : Application() {
                 InteractorsModule.module,
                 UiModule.module,
             )
+        }
+    }
+
+    private fun initTimber() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
         }
     }
 

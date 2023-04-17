@@ -141,7 +141,11 @@ dependencies {
     // Map
     implementation(libs.map)
 
+    // app restart
     implementation(libs.process.phoenix)
+
+    // logger
+    implementation(libs.timber)
 
     // tests
     testImplementation(libs.junit)

@@ -1,6 +1,5 @@
 package f.cking.software.ui.devicedetails
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,10 +43,9 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import timber.log.Timber
 
 object DeviceDetailsScreen {
-
-    private val TAG = "DeviceDetailsScreen"
 
     @Composable
     fun Screen(address: String, key: String) {
@@ -394,7 +392,7 @@ object DeviceDetailsScreen {
 
         when (val cameraConfig = viewModel.cameraState) {
             is DeviceDetailsViewModel.MapCameraState.SinglePoint -> {
-                Log.d(TAG, cameraConfig.toString())
+                Timber.d(cameraConfig.toString())
                 val point = GeoPoint(cameraConfig.location.lat, cameraConfig.location.lng)
                 map.controller.animateTo(
                     point,
@@ -404,7 +402,7 @@ object DeviceDetailsScreen {
                 map.invalidate()
             }
             is DeviceDetailsViewModel.MapCameraState.MultiplePoints -> {
-                Log.d(TAG, cameraConfig.toString())
+                Timber.d(cameraConfig.toString())
                 map.post {
                     map.zoomToBoundingBox(
                         BoundingBox.fromGeoPoints(cameraConfig.points.map { GeoPoint(it.lat, it.lng) }),
