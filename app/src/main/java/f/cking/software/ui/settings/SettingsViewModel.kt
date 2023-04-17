@@ -2,7 +2,6 @@ package f.cking.software.ui.settings
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +18,7 @@ import f.cking.software.domain.interactor.*
 import f.cking.software.domain.model.JournalEntry
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
@@ -171,7 +171,7 @@ class SettingsViewModel(
     }
 
     private fun reportError(error: Throwable) {
-        Log.e(TAG, "Settings error", error)
+        Timber.e(error)
         viewModelScope.launch {
             val report = JournalEntry.Report.Error(
                 title = "[Settings]: ${error.message ?: error::class.java}",

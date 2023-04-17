@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.core.location.LocationListenerCompat
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.SaveReportInteractor
@@ -18,6 +17,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import timber.log.Timber
 import java.lang.Runnable
 import java.util.function.Consumer
 
@@ -27,8 +27,6 @@ class LocationProvider(
     private val saveReportInteractor: SaveReportInteractor,
     private val powerModeHelper: PowerModeHelper,
 ) {
-
-    private val TAG = "LocationProvider"
 
     private val locationState = MutableStateFlow<LocationHandle?>(null)
 
@@ -43,21 +41,21 @@ class LocationProvider(
         val provider = provider()
 
         if (newLocation == null) {
-            Log.d(TAG, "Empty location emitted  (provider: $provider)")
+            Timber.d("Empty location emitted  (provider: $provider)")
             return@Consumer
         }
 
         if (!newLocation.isRelevant(locationState.value?.location)) {
-            Log.d(TAG, "Irrelevant location has emitted (provider: $provider)")
+            Timber.d("Irrelevant location has emitted (provider: $provider)")
             return@Consumer
         }
 
         if (!powerModeHelper.powerMode().useLocation) {
-            Log.d(TAG, "Location is turned of for such power mode (${powerModeHelper.powerMode().name})")
+            Timber.d("Location is turned of for such power mode (${powerModeHelper.powerMode().name})")
             return@Consumer
         }
 
-        Log.d(TAG, "New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
+        Timber.d("New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
 
         locationState.tryEmit(LocationHandle(newLocation, System.currentTimeMillis()))
     }
@@ -195,7 +193,7 @@ class LocationProvider(
     }
 
     private fun reportError(error: Throwable) {
-        Log.e(TAG, error.message.orEmpty(), error)
+        Timber.e(error)
         scope.launch {
             val report = JournalEntry.Report.Error(
                 error.message ?: error::class.java.name,

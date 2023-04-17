@@ -2,7 +2,6 @@ package f.cking.software.data.database
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
@@ -11,6 +10,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 
 @Database(
@@ -31,8 +31,6 @@ import java.io.File
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    private val TAG = "AppDatabase"
-
     abstract fun deviceDao(): DeviceDao
     abstract fun radarProfileDao(): RadarProfileDao
     abstract fun appleContactDao(): AppleContactDao
@@ -41,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun journalDao(): JournalDao
 
     suspend fun backupDatabase(toUri: Uri, context: Context) {
-        Log.i(TAG, "Backup DB to file: ${toUri}")
+        Timber.i("Backup DB to file: ${toUri}")
         withContext(Dispatchers.IO) {
             val dbFile = File(context.getDatabasePath(openHelper.databaseName).toString())
             if (!dbFile.exists()) {

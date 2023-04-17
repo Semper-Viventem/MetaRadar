@@ -7,12 +7,12 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import f.cking.software.domain.interactor.GetKnownDevicesInteractor
 import f.cking.software.domain.model.BleScanDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.*
 
 class BleScannerHelper(
@@ -20,8 +20,6 @@ class BleScannerHelper(
     private val appContext: Context,
     private val powerModeHelper: PowerModeHelper,
 ) {
-
-    private val TAG = "BleScannerHelper"
 
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var bluetoothScanner: BluetoothLeScanner? = null
@@ -56,7 +54,7 @@ class BleScannerHelper(
 
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
-            Log.e(TAG, "BLE Scan failed with error: $errorCode")
+            Timber.e("BLE Scan failed with error: $errorCode")
             cancelScanning(ScanResultInternal.Failure(errorCode))
         }
     }
@@ -70,14 +68,14 @@ class BleScannerHelper(
     suspend fun scan(
         scanListener: ScanListener,
     ) {
-        Log.d(TAG, "Start BLE Scan. Restricted mode: ${powerModeHelper.powerMode().useRestrictedBleConfig}")
+        Timber.d("Start BLE Scan. Restricted mode: ${powerModeHelper.powerMode().useRestrictedBleConfig}")
 
         if (!isBluetoothEnabled()) {
             throw BluetoothIsNotInitialized()
         }
 
         if (inProgress.value) {
-            Log.e(TAG, "BLE Scan failed because previous scan is not finished")
+            Timber.e("BLE Scan failed because previous scan is not finished")
         } else {
             this@BleScannerHelper.scanListener = scanListener
             batch.clear()
@@ -116,7 +114,7 @@ class BleScannerHelper(
 
         when (scanResult) {
             is ScanResultInternal.Success -> {
-                Log.d(TAG, "BLE Scan finished ${batch.count()} devices found")
+                Timber.d("BLE Scan finished ${batch.count()} devices found")
                 scanListener?.onSuccess(batch.values.toList())
             }
             is ScanResultInternal.Failure -> {
