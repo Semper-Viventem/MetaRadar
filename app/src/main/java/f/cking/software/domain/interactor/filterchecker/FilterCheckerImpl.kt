@@ -1,5 +1,6 @@
 package f.cking.software.domain.interactor.filterchecker
 
+import f.cking.software.data.helpers.PowerModeHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.CheckDeviceIsFollowingInteractor
 import f.cking.software.domain.model.AppleAirDrop
@@ -9,7 +10,8 @@ import f.cking.software.domain.model.RadarProfile
 class FilterCheckerImpl(
     private val checkDeviceIsFollowing: CheckDeviceIsFollowingInteractor,
     private val devicesRepository: DevicesRepository,
-) : FilterChecker<RadarProfile.Filter>() {
+    private val powerModeHelper: PowerModeHelper,
+) : FilterChecker<RadarProfile.Filter>(powerModeHelper) {
 
     private val internalFilters: MutableList<FilterChecker<*>> = mutableListOf()
 
@@ -96,7 +98,7 @@ class FilterCheckerImpl(
         check: suspend (deviceData: DeviceData, filter: T) -> Boolean,
     ): FilterChecker<T> {
 
-        val filter = object : FilterChecker<T>() {
+        val filter = object : FilterChecker<T>(powerModeHelper) {
             override suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean {
                 return check.invoke(deviceData, filter)
             }

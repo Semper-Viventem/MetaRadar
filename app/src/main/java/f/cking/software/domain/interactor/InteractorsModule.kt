@@ -17,7 +17,7 @@ object InteractorsModule {
         factory { CheckProfileDetectionInteractor(get(), get(), get(), get(), get(), get()) }
         factory { BuildDeviceFromScanDataInteractor(get()) }
         factory { GetAirdropInfoFromBleFrame() }
-        single { FilterCheckerImpl(get(), get()) }
+        single { FilterCheckerImpl(get(), get(), get()) }
         factory { CheckDeviceIsFollowingInteractor(get()) }
         factory { SaveReportInteractor(get()) }
         factory { BackupDatabaseInteractor(get(), get()) }
