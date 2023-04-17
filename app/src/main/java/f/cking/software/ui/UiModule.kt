@@ -20,7 +20,7 @@ object UiModule {
         viewModel { DeviceListViewModel(get(), get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { ProfilesListViewModel(get(), get()) }
-        viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get()) }
+        viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get(), get(), get()) }
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
         viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get()) }

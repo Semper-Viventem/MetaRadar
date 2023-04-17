@@ -2,6 +2,7 @@ package f.cking.software.domain.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class RadarProfile(
@@ -13,7 +14,7 @@ data class RadarProfile(
 ) {
 
     @Serializable
-    sealed class Filter {
+    sealed class Filter(@Transient val difficulty: Int = 0) {
 
         @Serializable
         @SerialName("last_detection_interval")
@@ -49,22 +50,22 @@ data class RadarProfile(
             val contactStr: String,
             val airdropShaFormat: Int,
             val minLostTime: Long? = null,
-        ) : Filter()
+        ) : Filter(difficulty = 2)
 
         @Serializable
         @SerialName("is_following")
         data class IsFollowing(
             val followingDurationMs: Long,
             val followingDetectionIntervalMs: Long,
-        ) : Filter()
+        ) : Filter(difficulty = 3)
 
         @Serializable
         @SerialName("any")
-        data class Any(val filters: List<Filter>) : Filter()
+        data class Any(val filters: List<Filter>) : Filter(difficulty = 1)
 
         @Serializable
         @SerialName("all")
-        data class All(val filters: List<Filter>) : Filter()
+        data class All(val filters: List<Filter>) : Filter(difficulty = 1)
 
         @Serializable
         @SerialName("not")
