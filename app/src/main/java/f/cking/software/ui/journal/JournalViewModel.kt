@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.JournalRepository
 import f.cking.software.data.repo.RadarProfilesRepository
@@ -22,7 +22,7 @@ class JournalViewModel(
     private val journalRepository: JournalRepository,
     private val profileRepository: RadarProfilesRepository,
     private val devicesRepository: DevicesRepository,
-    private val router: NavRouter,
+    private val router: Router,
     private val context: Application,
 ) : ViewModel() {
 

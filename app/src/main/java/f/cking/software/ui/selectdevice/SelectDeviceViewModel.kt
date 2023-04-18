@@ -6,13 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.model.DeviceData
 import kotlinx.coroutines.launch
 
 class SelectDeviceViewModel(
-    private val router: NavRouter,
+    private val router: Router,
     private val devicesRepository: DevicesRepository,
 ) : ViewModel() {
 

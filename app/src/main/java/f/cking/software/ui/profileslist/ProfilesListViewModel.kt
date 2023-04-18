@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.ScreenNavigationCommands
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 class ProfilesListViewModel(
     private val radarProfilesRepository: RadarProfilesRepository,
-    private val router: NavRouter,
+    private val router: Router,
 ) : ViewModel() {
 
     var profiles: List<RadarProfile> by mutableStateOf(emptyList())

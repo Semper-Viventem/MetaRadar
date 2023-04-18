@@ -91,6 +91,9 @@
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>
 
+    <!-- Select location -->
+    <string name="select_location">Select location</string>
+
     <!-- Select filter -->
     <string name="select_filter">Select filter</string>
     <string name="filter_by_name">By name</string>
