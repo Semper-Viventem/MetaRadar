@@ -434,6 +434,7 @@ object FilterScreen {
                             .clickable {
                                 router.navigate(ScreenNavigationCommands.OpenSelectLocationScreen(
                                     initialLocationModel = filter.targetLocation,
+                                    initialRadius = filter.radius,
                                 ) { location, radiusMeters ->
                                     filter.targetLocation = location
                                     filter.radius = radiusMeters

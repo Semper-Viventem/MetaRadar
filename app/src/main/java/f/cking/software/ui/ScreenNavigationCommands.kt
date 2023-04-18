@@ -48,6 +48,7 @@ object ScreenNavigationCommands {
 
     class OpenSelectLocationScreen(
         initialLocationModel: LocationModel?,
+        initialRadius: Float?,
         onSelected: (location: LocationModel, radiusMeters: Float) -> Unit
     ) : AddToStackCommand(screenFunction = { key, router ->
         SelectLocationScreen.Screen(
@@ -58,7 +59,8 @@ object ScreenNavigationCommands {
             onCloseClick = {
                 router.navigate(BackCommand)
             },
-            initialLocationModel = initialLocationModel
+            initialLocationModel = initialLocationModel,
+            initialRadius = initialRadius,
         )
     })
 }
