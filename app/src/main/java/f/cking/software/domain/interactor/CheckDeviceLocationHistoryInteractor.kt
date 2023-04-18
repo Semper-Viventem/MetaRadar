@@ -1,6 +1,7 @@
 package f.cking.software.domain.interactor
 
 import f.cking.software.data.repo.LocationRepository
+import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 
 class CheckDeviceLocationHistoryInteractor(
@@ -19,12 +20,17 @@ class CheckDeviceLocationHistoryInteractor(
     suspend fun execute(
         targetLocation: LocationModel,
         radius: Float,
-        deviceAddress: String,
+        device: DeviceData,
         fromTime: Long,
         toTime: Long,
     ): Boolean {
+
+        if (toTime < device.firstDetectTimeMs || fromTime > device.lastDetectTimeMs) {
+            return false
+        }
+
         val locations = locationRepository.getAllLocationsByAddress(
-            deviceAddress = deviceAddress,
+            deviceAddress = device.address,
             fromTime = fromTime,
             toTime = toTime
         )
