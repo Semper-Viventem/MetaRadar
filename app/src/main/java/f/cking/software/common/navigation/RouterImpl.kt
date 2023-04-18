@@ -1,6 +1,6 @@
 package f.cking.software.common.navigation
 
-class NavRouter {
+class RouterImpl : Router {
 
     private var navigator: Navigator? = null
 
@@ -12,7 +12,7 @@ class NavRouter {
         navigator = null
     }
 
-    fun navigate(command: NavigationCommand) {
+    override fun navigate(command: NavigationCommand) {
         navigator?.handle(command)
     }
 }

@@ -4,10 +4,16 @@ import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
-import f.cking.software.domain.model.*
+import f.cking.software.domain.model.AppleAirDrop
+import f.cking.software.domain.model.BleScanDevice
+import f.cking.software.domain.model.DeviceData
+import f.cking.software.domain.model.JournalEntry
+import f.cking.software.domain.model.ManufacturerInfo
+import f.cking.software.domain.model.RadarProfile
 import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class CheckProfileDetectionInteractor(
     private val devicesRepository: DevicesRepository,
@@ -20,6 +26,7 @@ class CheckProfileDetectionInteractor(
 
     suspend fun execute(batch: List<BleScanDevice>): List<ProfileResult> {
         return withContext(Dispatchers.Default) {
+            val checkStartTime = System.currentTimeMillis()
             val existingDevices = devicesRepository.getAllByAddresses(batch.map { it.address })
 
             val devices = batch.map { found ->
@@ -35,6 +42,8 @@ class CheckProfileDetectionInteractor(
 
             result.forEach { saveReport(it) }
 
+            val totalDuration = System.currentTimeMillis() - checkStartTime
+            Timber.i("Radar detection check: ${result.size} profiles detected. Duration $totalDuration ms")
             result
         }
     }

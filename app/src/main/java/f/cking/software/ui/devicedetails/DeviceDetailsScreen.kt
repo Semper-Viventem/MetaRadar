@@ -3,11 +3,26 @@ package f.cking.software.ui.devicedetails
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
@@ -16,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +44,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.MapView
+import f.cking.software.common.RoundedBox
 import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
@@ -243,37 +258,39 @@ object DeviceDetailsScreen {
             }
         }
 
-        val shape = RoundedCornerShape(corner = CornerSize(8.dp))
-        Box(
-            modifier = Modifier
-                .clip(shape = shape)
-                .fillMaxWidth()
-                .background(color = Color.LightGray, shape = shape,)
+        RoundedBox(
+            modifier = Modifier.fillMaxWidth(),
+            internalPaddings = 0.dp
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { dialog.show() }
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    .clickable { dialog.show() },
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Row {
-                        Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
-                        Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row {
+                            Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
+                            Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.device_details_history_period_subtitle),
+                            fontWeight = FontWeight.Light
+                        )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.device_details_history_period_subtitle),
-                        fontWeight = FontWeight.Light
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Image(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.change)
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Image(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.change)
-                )
             }
         }
     }
@@ -368,7 +385,9 @@ object DeviceDetailsScreen {
         }
 
         MapView(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
             onLoad = { map -> initMapState(map) },
             onUpdate = { map -> refreshMap(map, viewModel, batchProcessor) }
         )

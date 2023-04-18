@@ -27,6 +27,7 @@
     <color name="filter_is_following">#CE93D8</color>
     <color name="filter_unknown">#FFFFFF</color>
     <color name="error_background">#EF9A9A</color>
+    <color name="filter_device_location">#FFAB91</color>
     <color name="profile_report_background">#0000</color>
 
     <color name="green_600">#43A047</color>

@@ -4,12 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.helpers.BluetoothSIG
 import f.cking.software.domain.model.ManufacturerInfo
 
 class SelectManufacturerViewModel(
-    private val router: NavRouter,
+    private val router: Router,
 ) : ViewModel() {
 
     val manufacturers by mutableStateOf(

@@ -71,6 +71,7 @@ object SelectFilterTypeScreen {
             FilterType.BY_MIN_DETECTION_TIME -> FilterUiState.MinLostTime()
             FilterType.AIRDROP_CONTACT -> FilterUiState.AppleAirdropContact()
             FilterType.IS_FOLLOWING -> FilterUiState.IsFollowing()
+            FilterType.BY_DEVICE_LOCATION -> FilterUiState.DeviceLocation()
         }
     }
 }

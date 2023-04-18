@@ -25,7 +25,8 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.*
 import f.cking.software.R
 import f.cking.software.common.ClickableField
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.RoundedBox
+import f.cking.software.common.navigation.Router
 import f.cking.software.common.rememberDateDialog
 import f.cking.software.common.rememberTimeDialog
 import f.cking.software.ui.ScreenNavigationCommands
@@ -40,7 +41,7 @@ object FilterScreen {
     @Composable
     fun Filter(
         filterState: FilterUiState,
-        router: NavRouter,
+        router: Router,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
         when (filterState) {
@@ -56,6 +57,7 @@ object FilterScreen {
             is FilterUiState.LastDetectionInterval -> FilterLastDetectionInterval(filterState, onDeleteClick)
             is FilterUiState.FirstDetectionInterval -> FilterFirstDetectionInterval(filterState, onDeleteClick)
             is FilterUiState.IsFollowing -> FilterIsFollowing(filterState, onDeleteClick)
+            is FilterUiState.DeviceLocation -> FilterDeviceLocation(filterState, router, onDeleteClick)
             is FilterUiState.Unknown, is FilterUiState.Interval -> FilterUnknown(filterState, onDeleteClick)
         }
     }
@@ -184,7 +186,7 @@ object FilterScreen {
 
     @Composable
     private fun FilterAddress(
-        router: NavRouter,
+        router: Router,
         filter: FilterUiState.Address,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
@@ -215,7 +217,7 @@ object FilterScreen {
 
     @Composable
     private fun FilterManufacturer(
-        router: NavRouter,
+        router: Router,
         filter: FilterUiState.Manufacturer,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
@@ -391,7 +393,7 @@ object FilterScreen {
     @Composable
     private fun FilterAll(
         filter: FilterUiState.All,
-        router: NavRouter,
+        router: Router,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
         val selectFilterDialog = rememberMaterialDialogState()
@@ -414,9 +416,61 @@ object FilterScreen {
     }
 
     @Composable
+    private fun FilterDeviceLocation(
+        filter: FilterUiState.DeviceLocation,
+        router: Router,
+        onDeleteClick: (child: FilterUiState) -> Unit,
+    ) {
+        FilterBase(
+            title = stringResource(R.string.filter_device_location),
+            color = colorResource(R.color.filter_device_location),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            Column {
+                RoundedBox(modifier = Modifier.fillMaxWidth(), internalPaddings = 0.dp) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                router.navigate(ScreenNavigationCommands.OpenSelectLocationScreen(
+                                    initialLocationModel = filter.targetLocation,
+                                    initialRadius = filter.radius,
+                                ) { location, radiusMeters ->
+                                    filter.targetLocation = location
+                                    filter.radius = radiusMeters
+                                })
+                            }
+                    ) {
+                        val locationText = if (filter.targetLocation != null) {
+                            stringResource(R.string.filter_location_has_data, filter.radius)
+                        } else {
+                            stringResource(R.string.filter_location_no_data)
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 16.dp)
+                        ) {
+                            Text(modifier = Modifier.weight(1f), text = locationText)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                painter = painterResource(R.drawable.ic_location),
+                                contentDescription = locationText,
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                TimeInterval(filter = filter)
+            }
+        }
+    }
+
+    @Composable
     private fun FilterAny(
         filter: FilterUiState.Any,
-        router: NavRouter,
+        router: Router,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
         val selectFilterDialog = rememberMaterialDialogState()
@@ -442,7 +496,7 @@ object FilterScreen {
     @Composable
     private fun FilterNot(
         filter: FilterUiState.Not,
-        router: NavRouter,
+        router: Router,
         onDeleteClick: (child: FilterUiState) -> Unit,
     ) {
         val selectFilterDialog = rememberMaterialDialogState()

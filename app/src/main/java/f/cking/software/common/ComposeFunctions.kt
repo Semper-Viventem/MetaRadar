@@ -2,7 +2,19 @@ package f.cking.software.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -13,6 +25,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -23,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -241,5 +255,25 @@ fun ContentPlaceholder(
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = text, color = Color.Gray, textAlign = TextAlign.Center)
         }
+    }
+}
+
+@Composable
+fun RoundedBox(
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 8.dp),
+    internalPaddings: Dp = 16.dp,
+    boxContent: @Composable ColumnScope.() -> Unit
+) {
+    Box(modifier = modifier) {
+        val shape = RoundedCornerShape(corner = CornerSize(8.dp))
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(color = Color.LightGray, shape = shape)
+                .clip(shape = shape)
+                .padding(internalPaddings)
+        ) { boxContent(this) }
     }
 }

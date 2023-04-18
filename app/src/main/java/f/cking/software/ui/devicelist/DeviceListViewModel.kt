@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.DeviceData
@@ -21,7 +21,7 @@ class DeviceListViewModel(
     context: Application,
     private val devicesRepository: DevicesRepository,
     private val filterCheckerImpl: FilterCheckerImpl,
-    val router: NavRouter,
+    val router: Router,
 ) : ViewModel() {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())

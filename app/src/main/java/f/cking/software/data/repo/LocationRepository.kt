@@ -31,10 +31,11 @@ class LocationRepository(
 
     suspend fun getAllLocationsByAddress(
         deviceAddress: String,
-        fromTime: Long = 0
+        fromTime: Long = 0,
+        toTime: Long = Long.MAX_VALUE,
     ): List<LocationModel> {
         return withContext(Dispatchers.IO) {
-            locationDao.getAllLocationsByDeviceAddress(deviceAddress, fromTime)
+            locationDao.getAllLocationsByDeviceAddress(deviceAddress, fromTime, toTime)
                 .map { it.toDomain() }
         }
     }
