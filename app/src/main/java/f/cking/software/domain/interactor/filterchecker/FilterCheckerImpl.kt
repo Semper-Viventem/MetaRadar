@@ -70,7 +70,7 @@ class FilterCheckerImpl(
         detected
     }
     private val deviceLocation = filterChecker<RadarProfile.Filter.DeviceLocation>(useCache = true) { device, filter ->
-        checkDeviceLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, device.address, filter.fromTimeMs, filter.toTimeMs)
+        checkDeviceLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, device, filter.fromTimeMs, filter.toTimeMs)
     }
 
     override suspend fun checkInternal(deviceData: DeviceData, filter: RadarProfile.Filter): Boolean {
