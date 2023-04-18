@@ -17,7 +17,7 @@ object InteractorsModule {
         factory { CheckProfileDetectionInteractor(get(), get(), get(), get(), get(), get()) }
         factory { BuildDeviceFromScanDataInteractor(get()) }
         factory { GetAirdropInfoFromBleFrame() }
-        single { FilterCheckerImpl(get(), get(), get()) }
+        single { FilterCheckerImpl(get(), get(), get(), get()) }
         factory { CheckDeviceIsFollowingInteractor(get()) }
         factory { SaveReportInteractor(get()) }
         factory { BackupDatabaseInteractor(get(), get()) }
@@ -26,5 +26,6 @@ object InteractorsModule {
         factory { RestoreDatabaseInteractor(get(), get(), get()) }
         factory { SaveRadarProfile(get(), get()) }
         factory { DeleteRadarProfile(get(), get()) }
+        factory { CheckDeviceLocationHistoryInteractor(get()) }
     }
 }

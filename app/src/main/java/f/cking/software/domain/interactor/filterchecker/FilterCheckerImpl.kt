@@ -3,6 +3,7 @@ package f.cking.software.domain.interactor.filterchecker
 import f.cking.software.data.helpers.PowerModeHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.CheckDeviceIsFollowingInteractor
+import f.cking.software.domain.interactor.CheckDeviceLocationHistoryInteractor
 import f.cking.software.domain.model.AppleAirDrop
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.RadarProfile
@@ -11,6 +12,7 @@ class FilterCheckerImpl(
     private val checkDeviceIsFollowing: CheckDeviceIsFollowingInteractor,
     private val devicesRepository: DevicesRepository,
     private val powerModeHelper: PowerModeHelper,
+    private val checkDeviceLocationHistoryInteractor: CheckDeviceLocationHistoryInteractor,
 ) : FilterChecker<RadarProfile.Filter>(powerModeHelper) {
 
     private val internalFilters: MutableList<FilterChecker<*>> = mutableListOf()
@@ -67,6 +69,9 @@ class FilterCheckerImpl(
         }
         detected
     }
+    private val deviceLocation = filterChecker<RadarProfile.Filter.DeviceLocation>(useCache = true) { device, filter ->
+        checkDeviceLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, device.address, filter.fromTimeMs, filter.toTimeMs)
+    }
 
     override suspend fun checkInternal(deviceData: DeviceData, filter: RadarProfile.Filter): Boolean {
         return when (filter) {
@@ -82,6 +87,7 @@ class FilterCheckerImpl(
             is RadarProfile.Filter.All -> all.check(deviceData, filter)
             is RadarProfile.Filter.Not -> not.check(deviceData, filter)
             is RadarProfile.Filter.IsFollowing -> isFollowing.check(deviceData, filter)
+            is RadarProfile.Filter.DeviceLocation -> deviceLocation.check(deviceData, filter)
         }
     }
 

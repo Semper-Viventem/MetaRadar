@@ -70,5 +70,14 @@ data class RadarProfile(
         @Serializable
         @SerialName("not")
         data class Not(val filter: Filter) : Filter()
+
+        @Serializable
+        @SerialName("device_location")
+        data class DeviceLocation(
+            val location: LocationModel,
+            val radiusMeters: Float,
+            var fromTimeMs: Long,
+            var toTimeMs: Long,
+        ) : Filter(difficulty = 3)
     }
 }
