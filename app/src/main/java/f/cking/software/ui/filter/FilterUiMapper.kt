@@ -7,6 +7,8 @@ import f.cking.software.domain.model.RadarProfile
 import f.cking.software.timeFromDateTime
 import f.cking.software.toLocalDate
 import f.cking.software.toLocalTime
+import java.time.LocalDate
+import java.time.LocalTime
 
 object FilterUiMapper {
 
@@ -21,28 +23,12 @@ object FilterUiMapper {
             is FilterUiState.All -> RadarProfile.Filter.All(from.filters.map { mapToDomain(it) })
             is FilterUiState.Not -> RadarProfile.Filter.Not(mapToDomain(from.filter!!))
             is FilterUiState.LastDetectionInterval -> RadarProfile.Filter.LastDetectionInterval(
-                from = if (from.fromDate != null && from.fromTime != null) {
-                    timeFromDateTime(from.fromDate!!, from.fromTime!!)
-                } else {
-                    Long.MIN_VALUE
-                },
-                to = if (from.toDate != null && from.toTime != null) {
-                    timeFromDateTime(from.toDate!!, from.toTime!!)
-                } else {
-                    Long.MAX_VALUE
-                }
+                from = mapTimeToUi(from.fromDate, from.fromTime, Long.MIN_VALUE),
+                to = mapTimeToUi(from.toDate, from.toTime, Long.MAX_VALUE),
             )
             is FilterUiState.FirstDetectionInterval -> RadarProfile.Filter.FirstDetectionInterval(
-                from = if (from.fromDate != null && from.fromTime != null) {
-                    timeFromDateTime(from.fromDate!!, from.fromTime!!)
-                } else {
-                    Long.MIN_VALUE
-                },
-                to = if (from.toDate != null && from.toTime != null) {
-                    timeFromDateTime(from.toDate!!, from.toTime!!)
-                } else {
-                    Long.MAX_VALUE
-                }
+                from = mapTimeToUi(from.fromDate, from.fromTime, Long.MIN_VALUE),
+                to = mapTimeToUi(from.toDate, from.toTime, Long.MAX_VALUE),
             )
             is FilterUiState.MinLostTime -> RadarProfile.Filter.MinLostTime(from.minLostTime!!)
             is FilterUiState.AppleAirdropContact -> RadarProfile.Filter.AppleAirdropContact(
@@ -53,6 +39,12 @@ object FilterUiMapper {
             is FilterUiState.IsFollowing -> RadarProfile.Filter.IsFollowing(
                 followingDurationMs = from.followingDurationMs,
                 followingDetectionIntervalMs = from.followingDetectionIntervalMs,
+            )
+            is FilterUiState.DeviceLocation -> RadarProfile.Filter.DeviceLocation(
+                location = from.targetLocation!!,
+                radiusMeters = from.radius,
+                fromTimeMs = mapTimeToUi(from.fromDate, from.fromTime, Long.MIN_VALUE),
+                toTimeMs = mapTimeToUi(from.toDate, from.toTime, Long.MAX_VALUE),
             )
             is FilterUiState.Unknown, is FilterUiState.Interval -> throw IllegalArgumentException("Unsupported type: ${from::class.java}")
         }
@@ -107,6 +99,22 @@ object FilterUiMapper {
                 this.followingDurationMs = from.followingDurationMs
                 this.followingDetectionIntervalMs = from.followingDetectionIntervalMs
             }
+            is RadarProfile.Filter.DeviceLocation -> FilterUiState.DeviceLocation().apply {
+                this.targetLocation = from.location
+                this.radius = from.radiusMeters
+                this.fromDate = from.fromTimeMs.takeIf { it != Long.MIN_VALUE }?.toLocalDate()
+                this.fromTime = from.fromTimeMs.takeIf { it != Long.MIN_VALUE }?.toLocalTime()
+                this.toDate = from.toTimeMs.takeIf { it != Long.MAX_VALUE }?.toLocalDate()
+                this.toTime = from.toTimeMs.takeIf { it != Long.MAX_VALUE }?.toLocalTime()
+            }
+        }
+    }
+
+    private fun mapTimeToUi(date: LocalDate?, time: LocalTime?, defaultValue: Long): Long {
+        return if (date != null && time != null) {
+            timeFromDateTime(date, time)
+        } else {
+            defaultValue
         }
     }
 }

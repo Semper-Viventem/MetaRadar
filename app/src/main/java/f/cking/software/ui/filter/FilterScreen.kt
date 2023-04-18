@@ -25,6 +25,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.*
 import f.cking.software.R
 import f.cking.software.common.ClickableField
+import f.cking.software.common.RoundedBox
 import f.cking.software.common.navigation.NavRouter
 import f.cking.software.common.rememberDateDialog
 import f.cking.software.common.rememberTimeDialog
@@ -56,6 +57,7 @@ object FilterScreen {
             is FilterUiState.LastDetectionInterval -> FilterLastDetectionInterval(filterState, onDeleteClick)
             is FilterUiState.FirstDetectionInterval -> FilterFirstDetectionInterval(filterState, onDeleteClick)
             is FilterUiState.IsFollowing -> FilterIsFollowing(filterState, onDeleteClick)
+            is FilterUiState.DeviceLocation -> FilterDeviceLocation(filterState, onDeleteClick)
             is FilterUiState.Unknown, is FilterUiState.Interval -> FilterUnknown(filterState, onDeleteClick)
         }
     }
@@ -409,6 +411,51 @@ object FilterScreen {
             filter.filters.forEach {
                 Filter(filterState = it, router = router, onDeleteClick = filter::delete)
                 Spacer(modifier = Modifier.height(4.dp))
+            }
+        }
+    }
+
+    @Composable
+    private fun FilterDeviceLocation(
+        filter: FilterUiState.DeviceLocation,
+        onDeleteClick: (child: FilterUiState) -> Unit,
+    ) {
+        FilterBase(
+            title = stringResource(R.string.filter_device_location),
+            color = colorResource(R.color.filter_device_location),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+            Column {
+                RoundedBox(modifier = Modifier.fillMaxWidth(), internalPaddings = 0.dp) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                // todo: open location picker
+                            }
+                    ) {
+                        val locationText = if (filter.targetLocation != null) {
+                            stringResource(R.string.filter_location_has_data, filter.radius)
+                        } else {
+                            stringResource(R.string.filter_location_no_data)
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 16.dp)
+                        ) {
+                            Text(modifier = Modifier.weight(1f), text = locationText)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                painter = painterResource(R.drawable.ic_location),
+                                contentDescription = locationText,
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                TimeInterval(filter = filter)
             }
         }
     }
