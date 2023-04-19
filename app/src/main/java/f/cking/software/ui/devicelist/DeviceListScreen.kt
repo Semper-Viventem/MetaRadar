@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,7 +27,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.ContentPlaceholder
@@ -56,6 +56,14 @@ object DeviceListScreen {
 
         if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
             ContentPlaceholder(stringResource(R.string.device_list_placeholder))
+            if (viewModel.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp),
+                    color = Color.Black
+                )
+            }
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -78,7 +86,6 @@ object DeviceListScreen {
                 }
 
                 list.mapIndexed { index, deviceData ->
-
                     item { DeviceListItem(device = deviceData) { viewModel.onDeviceClick(deviceData) } }
                     val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                     if (showDivider) {
@@ -97,34 +104,46 @@ object DeviceListScreen {
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                FlowRow(
-                    modifier = Modifier.padding(8.dp),
-                    mainAxisSpacing = 4.dp
+                LazyRow(
+                    modifier = Modifier.padding(vertical = 8.dp),
                 ) {
                     val allFilters = (viewModel.quickFilters + viewModel.appliedFilter).toSet()
+
+                    item { Spacer(modifier = Modifier.width(8.dp)) }
+
                     allFilters.forEach {
-                        val isSelected = viewModel.appliedFilter.contains(it)
-                        val color = if (isSelected) MaterialTheme.colors.primarySurface else Color.LightGray
-                        Chip(
-                            colors = ChipDefaults.chipColors(
-                                backgroundColor = color,
-                                contentColor = Color.Black,
-                                leadingIconContentColor = Color.Black,
-                            ),
-                            onClick = { viewModel.onFilterClick(it) },
-                            leadingIcon = {
-                                if (isSelected) {
-                                    Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
+                        item {
+                            val isSelected = viewModel.appliedFilter.contains(it)
+                            val color = if (isSelected) MaterialTheme.colors.primarySurface else Color.LightGray
+
+                            Chip(
+                                colors = ChipDefaults.chipColors(
+                                    backgroundColor = color,
+                                    contentColor = Color.Black,
+                                    leadingIconContentColor = Color.Black,
+                                ),
+                                onClick = { viewModel.onFilterClick(it) },
+                                leadingIcon = {
+                                    if (isSelected) {
+                                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
+                                    }
                                 }
+                            ) {
+                                Text(text = it.displayName)
                             }
-                        ) {
-                            Text(text = it.displayName)
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
                     }
 
-                    SearchChip(viewModel)
+                    item {
+                        SearchChip(viewModel)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
 
-                    AddFilterChip(viewModel)
+                    item {
+                        AddFilterChip(viewModel)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
                 }
 
                 if (viewModel.isSearchMode) {

@@ -14,8 +14,9 @@ abstract class FilterChecker<T : RadarProfile.Filter>(
     suspend fun check(deviceData: DeviceData, filter: T): Boolean {
         val key = "${deviceData.address}_${filter.hashCode()}_${filter::class.simpleName}"
         val cacheValue = cache[key]
-        val expirationTime = powerModeHelper.powerMode().filterCacheExpirationTime
-        if (useCache() && cacheValue != null && System.currentTimeMillis() - cacheValue.time < expirationTime) {
+        if (useCache() && cacheValue != null
+            && System.currentTimeMillis() - cacheValue.time < powerModeHelper.powerMode(useCached = true).filterCacheExpirationTime
+        ) {
             // Timber.d("Cache hit for $key")
             return cacheValue.value
         }
@@ -24,7 +25,7 @@ abstract class FilterChecker<T : RadarProfile.Filter>(
         return result
     }
 
-    protected abstract suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean
+    abstract suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean
 
     protected open fun useCache(): Boolean = true
 
