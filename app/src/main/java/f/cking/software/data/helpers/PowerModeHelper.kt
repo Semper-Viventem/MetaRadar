@@ -8,13 +8,18 @@ class PowerModeHelper(
 ) {
 
     private val powerManager by lazy { context.getSystemService(PowerManager::class.java) }
+    private var cachedPowerMode: PowerMode = PowerMode.DEFAULT
 
-    fun powerMode(): PowerMode {
-        return when {
-            powerManager.isPowerSaveMode -> PowerMode.POWER_SAVING
-            !powerManager.isInteractive -> PowerMode.DEFAULT_RESTRICTED
-            else -> PowerMode.DEFAULT
+    fun powerMode(useCached: Boolean = false): PowerMode {
+        if (!useCached) {
+            cachedPowerMode = when {
+                powerManager.isPowerSaveMode -> PowerMode.POWER_SAVING
+                !powerManager.isInteractive -> PowerMode.DEFAULT_RESTRICTED
+                else -> PowerMode.DEFAULT
+            }
         }
+
+        return cachedPowerMode
     }
 
     enum class PowerMode(

@@ -43,12 +43,15 @@ class DeviceListViewModel(
             first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(
                 second.lastDetectTimeMs
             )
+
             first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1)
                 ?: -1
+
             first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
                 first.manufacturerInfo?.name?.compareTo(
                     second.manufacturerInfo?.name ?: return@Comparator 1
                 ) ?: -1
+
             else -> first.address.compareTo(second.address)
         }
     }
@@ -89,7 +92,11 @@ class DeviceListViewModel(
         viewModelScope.launch {
             isLoading = true
             devicesRepository.observeDevices()
-                .collect { devices -> applyDevices(devices) }
+                .collect { devices ->
+                    isLoading = true
+                    applyDevices(devices)
+                    isLoading = false
+                }
         }
     }
 
@@ -98,19 +105,32 @@ class DeviceListViewModel(
             isLoading = true
             val devices = devicesRepository.getDevices()
             applyDevices(devices)
+            isLoading = false
         }
     }
 
     private suspend fun applyDevices(devices: List<DeviceData>) {
-        isLoading = true
-        devicesViewState = devices
-            .filter { checkFilter(it) && filterQuery(it) }
-            .sortedWith(generalComparator)
-        isLoading = false
+        val filter = withContext(Dispatchers.Main) {
+            when {
+                appliedFilter.isEmpty() -> null
+                appliedFilter.size == 1 -> appliedFilter.first().filter
+                else -> RadarProfile.Filter.All(appliedFilter.map { it.filter })
+            }
+        }
+
+        val query = withContext(Dispatchers.Main) {
+            searchQuery
+        }
+
+        devicesViewState = withContext(Dispatchers.Default) {
+            devices
+                .filter { checkFilter(it, filter) && filterQuery(it, query) }
+                .sortedWith(generalComparator)
+        }
     }
 
-    private fun filterQuery(device: DeviceData): Boolean {
-        return searchQuery?.takeIf { it.isNotBlank() }?.let { searchStr ->
+    private fun filterQuery(device: DeviceData, query: String?): Boolean {
+        return query?.takeIf { it.isNotBlank() }?.let { searchStr ->
             (device.name?.contains(searchStr, true) ?: false)
                     || (device.customName?.contains(searchStr, true) ?: false)
                     || (device.manufacturerInfo?.name?.contains(searchStr, true) ?: false)
@@ -118,16 +138,9 @@ class DeviceListViewModel(
         } ?: true
     }
 
-    private suspend fun checkFilter(device: DeviceData): Boolean {
-        val filter = withContext(Dispatchers.Main) {
-            appliedFilter.takeIf { it.isNotEmpty() }
-                ?.let { RadarProfile.Filter.All(it.map { it.filter }) }
-        }
-
+    private suspend fun checkFilter(device: DeviceData, filter: RadarProfile.Filter?): Boolean {
         return if (filter != null) {
-            withContext(Dispatchers.Default) {
-                filterCheckerImpl.check(device, filter)
-            }
+            filterCheckerImpl.check(device, filter)
         } else {
             true
         }
