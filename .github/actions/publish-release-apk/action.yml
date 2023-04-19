@@ -11,6 +11,9 @@ inputs:
   BUILD_TYPE:
     required: true
     description: "Choose build type [release/debug]"
+  BUILD_FLAVOR:
+    required: true
+    description: "Choose build flavor [github/googlePlay]"
 runs:
   using: "docker"
   image: "Dockerfile"

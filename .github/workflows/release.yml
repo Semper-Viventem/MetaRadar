@@ -22,14 +22,14 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
+      - name: Build apk
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_STORE_PATH: ${{ secrets.RELEASE_STORE_PATH }}
           RELEASE_STORE_KEY: ${{ secrets.RELEASE_STORE_KEY }}
           RELEASE_STORE_KEY_PASSWORD: ${{ secrets.RELEASE_STORE_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
-      - name: Releasing using Hub
+        run: ./gradlew assembleGithubRelease
+      - name: Release to Github
         uses: ./.github/actions/publish-release-apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
@@ -37,3 +37,19 @@ jobs:
           RELEASE_TITLE: Release Build
           REPO_BRANCH: release
           BUILD_TYPE: release
+          BUILD_FLAVOR: github
+      - name: Build aab
+        env:
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_STORE_PATH: ${{ secrets.RELEASE_STORE_PATH }}
+          RELEASE_STORE_KEY: ${{ secrets.RELEASE_STORE_KEY }}
+          RELEASE_STORE_KEY_PASSWORD: ${{ secrets.RELEASE_STORE_KEY_PASSWORD }}
+        run: ./gradlew bundleGooglePlayRelease
+      - name: Release to GooglePlay
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          packageName: f.cking.software
+          releaseFiles: app/build/outputs/bundle/googlePlayRelease/app-googlePlay-release.aab
+          track: production
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
