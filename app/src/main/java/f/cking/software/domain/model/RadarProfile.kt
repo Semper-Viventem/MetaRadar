@@ -59,7 +59,7 @@ data class RadarProfile(
         data class IsFollowing(
             val followingDurationMs: Long,
             val followingDetectionIntervalMs: Long,
-        ) : Filter(checkDifficulty = 30)
+        ) : Filter(checkDifficulty = 50)
 
         @Serializable
         @SerialName("any")
@@ -100,6 +100,6 @@ data class RadarProfile(
             val location: LocationModel,
             val radiusMeters: Float,
             val noLocationDefaultValue: Boolean,
-        ) : Filter(checkDifficulty = 50)
+        ) : Filter(checkDifficulty = 10)
     }
 }
