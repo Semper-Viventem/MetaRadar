@@ -15,7 +15,9 @@ import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.ScreenNavigationCommands
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DeviceListViewModel(
     context: Application,
@@ -97,9 +99,11 @@ class DeviceListViewModel(
     }
 
     private suspend fun applyDevices(devices: List<DeviceData>) {
-        devicesViewState = devices
-            .filter { checkFilter(it) && filterQuery(it) }
-            .sortedWith(generalComparator)
+        devicesViewState = withContext(Dispatchers.Default) {
+            devices
+                .filter { checkFilter(it) && filterQuery(it) }
+                .sortedWith(generalComparator)
+        }
     }
 
     private fun filterQuery(device: DeviceData): Boolean {
@@ -112,14 +116,16 @@ class DeviceListViewModel(
     }
 
     private suspend fun checkFilter(device: DeviceData): Boolean {
-        val filter = appliedFilter
-            .takeIf { it.isNotEmpty() }
-            ?.let { RadarProfile.Filter.All(it.map { it.filter }) }
+        return withContext(Dispatchers.Default) {
+            val filter = appliedFilter
+                .takeIf { it.isNotEmpty() }
+                ?.let { RadarProfile.Filter.All(it.map { it.filter }) }
 
-        return if (filter != null) {
-            filterCheckerImpl.check(device, filter)
-        } else {
-            true
+            if (filter != null) {
+                filterCheckerImpl.check(device, filter)
+            } else {
+                true
+            }
         }
     }
 

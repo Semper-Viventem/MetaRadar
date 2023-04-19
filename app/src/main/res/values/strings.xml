@@ -110,6 +110,7 @@
     <string name="filter_all_of">All of</string>
     <string name="filter_not">Not</string>
     <string name="filter_device_location">By device location</string>
+    <string name="filter_user_location">By your location</string>
 
     <!-- Profiles list -->
     <string name="create_new">Create new</string>
@@ -141,6 +142,7 @@
     <string name="to_date">To date</string>
     <string name="to_time">To time</string>
     <string name="is_favorite">Is favorite</string>
+    <string name="filter_user_location_if_no_location">Skip filter if location is not available (otherwise default value is false)</string>
     <string name="change">Change</string>
     <string name="cannot_save_profile">Cannot save profile. Check your configuration</string>
     <string name="profile_has_been_removed">Profile has been removed</string>

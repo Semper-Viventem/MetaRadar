@@ -21,7 +21,13 @@ class ProfilesListViewModel(
 ) : ViewModel() {
 
     var profiles: List<RadarProfile> by mutableStateOf(emptyList())
-    var defaultFiltersTemplate: List<FilterTemplate> by mutableStateOf(listOf(DEFAULT_FILTER_FOLLOWING, DEFAULT_FILTER_FAVORITE))
+    var defaultFiltersTemplate: List<FilterTemplate> by mutableStateOf(
+        listOf(
+            DEFAULT_FILTER_FOLLOWING,
+            DEFAULT_FILTER_FAVORITE,
+            DEFAULT_FILTER_BY_LOCATION,
+        )
+    )
 
     init {
         observeProfiles()
@@ -66,6 +72,17 @@ class ProfilesListViewModel(
                     FilterUiState.MinLostTime().apply {
                         minLostTime = TimeUnit.HOURS.toMillis(2)
                     }
+                )
+            }
+        )
+        private val DEFAULT_FILTER_BY_LOCATION = FilterTemplate(
+            displayNameRes = R.string.filter_device_location,
+            filterUiState = FilterUiState.All().apply {
+                filters = listOf(
+                    FilterUiState.MinLostTime().apply {
+                        minLostTime = TimeUnit.HOURS.toMillis(2)
+                    },
+                    FilterUiState.DeviceLocation(),
                 )
             }
         )

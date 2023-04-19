@@ -3,7 +3,6 @@ package f.cking.software.domain.interactor.filterchecker
 import f.cking.software.data.helpers.PowerModeHelper
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.RadarProfile
-import timber.log.Timber
 
 abstract class FilterChecker<T : RadarProfile.Filter>(
     private val powerModeHelper: PowerModeHelper,
@@ -16,7 +15,6 @@ abstract class FilterChecker<T : RadarProfile.Filter>(
         val cacheValue = cache[key]
         val expirationTime = powerModeHelper.powerMode().filterCacheExpirationTime
         if (useCache() && cacheValue != null && System.currentTimeMillis() - cacheValue.time < expirationTime) {
-            Timber.d("Cache hit for $key")
             return cacheValue.value
         }
         val result = checkInternal(deviceData, filter)
@@ -24,7 +22,7 @@ abstract class FilterChecker<T : RadarProfile.Filter>(
         return result
     }
 
-    abstract suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean
+    protected abstract suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean
 
     protected open fun useCache(): Boolean = true
 

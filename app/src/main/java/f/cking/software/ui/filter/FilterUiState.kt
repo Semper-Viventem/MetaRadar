@@ -124,6 +124,17 @@ sealed class FilterUiState {
                     && ((toDate != null && toTime != null) || (toDate == null && toTime == null))
         }
     }
+
+    class UserLocation : FilterUiState() {
+        var targetLocation: LocationModel? by mutableStateOf(null)
+        var radius: Float by mutableStateOf(TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS)
+        var defaultValueIfNoLocation: Boolean by mutableStateOf(false)
+
+        override fun isCorrect(): Boolean {
+            return targetLocation != null
+        }
+    }
+
     class IsFollowing() : FilterUiState() {
         var followingDurationMs: Long by mutableStateOf(TheAppConfig.MIN_FOLLOWING_DURATION_TIME_MS)
         var followingDetectionIntervalMs: Long by mutableStateOf(TheAppConfig.MIN_FOLLOWING_INTERVAL_TIME_MS)

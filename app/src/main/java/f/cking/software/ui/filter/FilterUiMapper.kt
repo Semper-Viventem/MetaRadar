@@ -19,9 +19,6 @@ object FilterUiMapper {
             is FilterUiState.Address -> RadarProfile.Filter.Address(from.address)
             is FilterUiState.IsFavorite -> RadarProfile.Filter.IsFavorite(from.favorite)
             is FilterUiState.Manufacturer -> RadarProfile.Filter.Manufacturer(from.manufacturer!!.id)
-            is FilterUiState.Any -> RadarProfile.Filter.Any(from.filters.map { mapToDomain(it) })
-            is FilterUiState.All -> RadarProfile.Filter.All(from.filters.map { mapToDomain(it) })
-            is FilterUiState.Not -> RadarProfile.Filter.Not(mapToDomain(from.filter!!))
             is FilterUiState.LastDetectionInterval -> RadarProfile.Filter.LastDetectionInterval(
                 from = mapTimeToUi(from.fromDate, from.fromTime, Long.MIN_VALUE),
                 to = mapTimeToUi(from.toDate, from.toTime, Long.MAX_VALUE),
@@ -46,6 +43,14 @@ object FilterUiMapper {
                 fromTimeMs = mapTimeToUi(from.fromDate, from.fromTime, Long.MIN_VALUE),
                 toTimeMs = mapTimeToUi(from.toDate, from.toTime, Long.MAX_VALUE),
             )
+            is FilterUiState.UserLocation -> RadarProfile.Filter.UserLocation(
+                location = from.targetLocation!!,
+                radiusMeters = from.radius,
+                noLocationDefaultValue = from.defaultValueIfNoLocation,
+            )
+            is FilterUiState.Any -> RadarProfile.Filter.Any(from.filters.map { mapToDomain(it) }.sortedBy { it.getDifficulty() })
+            is FilterUiState.All -> RadarProfile.Filter.All(from.filters.map { mapToDomain(it) }.sortedBy { it.getDifficulty() })
+            is FilterUiState.Not -> RadarProfile.Filter.Not(mapToDomain(from.filter!!))
             is FilterUiState.Unknown, is FilterUiState.Interval -> throw IllegalArgumentException("Unsupported type: ${from::class.java}")
         }
     }
@@ -106,6 +111,11 @@ object FilterUiMapper {
                 this.fromTime = from.fromTimeMs.takeIf { it != Long.MIN_VALUE }?.toLocalTime()
                 this.toDate = from.toTimeMs.takeIf { it != Long.MAX_VALUE }?.toLocalDate()
                 this.toTime = from.toTimeMs.takeIf { it != Long.MAX_VALUE }?.toLocalTime()
+            }
+            is RadarProfile.Filter.UserLocation -> FilterUiState.UserLocation().apply {
+                this.targetLocation = from.location
+                this.radius = from.radiusMeters
+                this.defaultValueIfNoLocation = from.noLocationDefaultValue
             }
         }
     }
