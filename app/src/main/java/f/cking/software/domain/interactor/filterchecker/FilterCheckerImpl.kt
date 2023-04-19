@@ -53,12 +53,10 @@ class FilterCheckerImpl(
     }
     private val any = filterChecker<RadarProfile.Filter.Any> { device, filter ->
         filter.filters
-            .sortedBy { it.difficulty }
             .any { check(device, it) }
     }
     private val all = filterChecker<RadarProfile.Filter.All> { device, filter ->
         filter.filters
-            .sortedBy { it.difficulty }
             .all { check(device, it) }
     }
     private val not = filterChecker<RadarProfile.Filter.Not> { device, filter ->
