@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: 'Publish debug build'
+    name: 'Publish release build'
 
     runs-on: ubuntu-latest
     environment: release
@@ -52,4 +52,4 @@ jobs:
           packageName: f.cking.software
           releaseFiles: app/build/outputs/bundle/googlePlayRelease/app-googlePlay-release.aab
           track: production
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
+          mappingFile: app/build/outputs/mapping/googlePlayRelease/mapping.txt
