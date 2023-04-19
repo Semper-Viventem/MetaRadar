@@ -31,3 +31,4 @@ jobs:
           RELEASE_TITLE: Debug Build
           REPO_BRANCH: master
           BUILD_TYPE: debug
+          BUILD_FLAVOR: github

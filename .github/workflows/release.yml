@@ -37,3 +37,4 @@ jobs:
           RELEASE_TITLE: Release Build
           REPO_BRANCH: release
           BUILD_TYPE: release
+          BUILD_FLAVOR: github
