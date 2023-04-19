@@ -64,10 +64,21 @@ object DeviceListScreen {
                     .nestedScroll(nestedScroll),
             ) {
                 stickyHeader {
-                    Filters(viewModel)
+                    Box() {
+                        Filters(viewModel)
+                        if (viewModel.isLoading) {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(4.dp),
+                                color = Color.Black
+                            )
+                        }
+                    }
                 }
 
                 list.mapIndexed { index, deviceData ->
+
                     item { DeviceListItem(device = deviceData) { viewModel.onDeviceClick(deviceData) } }
                     val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                     if (showDivider) {

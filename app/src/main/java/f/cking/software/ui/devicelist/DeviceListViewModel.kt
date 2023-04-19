@@ -30,6 +30,7 @@ class DeviceListViewModel(
     var appliedFilter: List<FilterHolder> by mutableStateOf(emptyList())
     var searchQuery: String? by mutableStateOf(null)
     var isSearchMode: Boolean by mutableStateOf(false)
+    var isLoading: Boolean by mutableStateOf(false)
     var quickFilters: List<FilterHolder> by mutableStateOf(
         listOf(
             DefaultFilters.notApple(context),
@@ -86,6 +87,7 @@ class DeviceListViewModel(
 
     private fun observeDevices() {
         viewModelScope.launch {
+            isLoading = true
             devicesRepository.observeDevices()
                 .collect { devices -> applyDevices(devices) }
         }
@@ -93,17 +95,18 @@ class DeviceListViewModel(
 
     private fun fetchDevices() {
         viewModelScope.launch {
+            isLoading = true
             val devices = devicesRepository.getDevices()
             applyDevices(devices)
         }
     }
 
     private suspend fun applyDevices(devices: List<DeviceData>) {
-        devicesViewState = withContext(Dispatchers.Default) {
-            devices
-                .filter { checkFilter(it) && filterQuery(it) }
-                .sortedWith(generalComparator)
-        }
+        isLoading = true
+        devicesViewState = devices
+            .filter { checkFilter(it) && filterQuery(it) }
+            .sortedWith(generalComparator)
+        isLoading = false
     }
 
     private fun filterQuery(device: DeviceData): Boolean {
@@ -116,16 +119,17 @@ class DeviceListViewModel(
     }
 
     private suspend fun checkFilter(device: DeviceData): Boolean {
-        return withContext(Dispatchers.Default) {
-            val filter = appliedFilter
-                .takeIf { it.isNotEmpty() }
+        val filter = withContext(Dispatchers.Main) {
+            appliedFilter.takeIf { it.isNotEmpty() }
                 ?.let { RadarProfile.Filter.All(it.map { it.filter }) }
+        }
 
-            if (filter != null) {
+        return if (filter != null) {
+            withContext(Dispatchers.Default) {
                 filterCheckerImpl.check(device, filter)
-            } else {
-                true
             }
+        } else {
+            true
         }
     }
 
