@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import f.cking.software.BuildConfig
 import f.cking.software.R
 import f.cking.software.common.RoundedBox
 import f.cking.software.dateTimeStringFormat
@@ -53,6 +54,9 @@ object SettingsScreen {
                     RunOnStartup(viewModel = viewModel)
                     Spacer(modifier = Modifier.height(8.dp))
                     ReportIssue(viewModel = viewModel)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AppInfo()
+                    Spacer(modifier = Modifier.height(64.dp))
                 }
             }
         }
@@ -233,6 +237,19 @@ object SettingsScreen {
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
                 Text(text = stringResource(R.string.report))
             }
+        }
+    }
+
+    @Composable
+    private fun AppInfo() {
+        RoundedBox {
+            Text(text = stringResource(R.string.app_info_title), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(R.string.app_info_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release))
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION))
         }
     }
 

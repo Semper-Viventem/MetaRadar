@@ -87,6 +87,11 @@
     <string name="clear_all_location_history_dialog_title">Clear all location history?</string>
     <string name="launch_on_system_startup_title">Launch on system startup</string>
     <string name="report_issue_title">Noticed a problem or have a feature request?</string>
+    <string name="app_info_title">Information</string>
+    <string name="app_info_version">Version: %1$s (%2$s)</string>
+    <string name="app_info_build_type_release">Build type: Release</string>
+    <string name="app_info_build_type_debug">Build type: Debug</string>
+    <string name="app_info_distribution">Distribution: %s</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>

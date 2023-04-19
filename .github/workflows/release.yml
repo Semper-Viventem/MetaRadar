@@ -28,7 +28,7 @@ jobs:
           RELEASE_STORE_PATH: ${{ secrets.RELEASE_STORE_PATH }}
           RELEASE_STORE_KEY: ${{ secrets.RELEASE_STORE_KEY }}
           RELEASE_STORE_KEY_PASSWORD: ${{ secrets.RELEASE_STORE_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleGithubRelease
       - name: Releasing using Hub
         uses: ./.github/actions/publish-release-apk
         env:
