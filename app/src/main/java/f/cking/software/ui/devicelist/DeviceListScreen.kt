@@ -133,7 +133,6 @@ object DeviceListScreen {
         SelectFilterTypeScreen.Dialog(selectFilterDialog) { initialFilter ->
             viewModel.router.navigate(ScreenNavigationCommands.OpenCreateFilterScreen(
                 initialFilterState = initialFilter,
-                router = viewModel.router,
             ) { filter ->
                 val filterHolder = DeviceListViewModel.FilterHolder(
                     displayName = filterName,

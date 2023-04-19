@@ -20,7 +20,7 @@ android {
         minSdk = 29
         targetSdk = 33
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.11-beta"
+        versionName = "0.12-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -141,7 +141,11 @@ dependencies {
     // Map
     implementation(libs.map)
 
+    // app restart
     implementation(libs.process.phoenix)
+
+    // logger
+    implementation(libs.timber)
 
     // tests
     testImplementation(libs.junit)

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import f.cking.software.TheAppConfig
+import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.model.ManufacturerInfo
 import java.time.LocalDate
 import java.time.LocalTime
@@ -18,7 +19,7 @@ sealed class FilterUiState {
         var toDate: LocalDate? by mutableStateOf(null)
         var toTime: LocalTime? by mutableStateOf(null)
 
-        override fun isCorrect(): Boolean {
+        open override fun isCorrect(): Boolean {
             return (fromDate != null && fromTime != null) || (toDate != null && toTime != null)
         }
     }
@@ -104,12 +105,33 @@ sealed class FilterUiState {
         }
     }
 
-    class AppleAirdropContact() : FilterUiState() {
+    class AppleAirdropContact : FilterUiState() {
         var contactString: String by mutableStateOf("")
         var minLostTime: Long? by mutableStateOf(null)
 
         override fun isCorrect(): Boolean {
             return contactString.isNotBlank()
+        }
+    }
+
+    class DeviceLocation : Interval() {
+        var targetLocation: LocationModel? by mutableStateOf(null)
+        var radius: Float by mutableStateOf(TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS)
+
+        override fun isCorrect(): Boolean {
+            return targetLocation != null
+                    && ((fromDate != null && fromTime != null) || (fromDate == null && fromTime == null))
+                    && ((toDate != null && toTime != null) || (toDate == null && toTime == null))
+        }
+    }
+
+    class UserLocation : FilterUiState() {
+        var targetLocation: LocationModel? by mutableStateOf(null)
+        var radius: Float by mutableStateOf(TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS)
+        var defaultValueIfNoLocation: Boolean by mutableStateOf(false)
+
+        override fun isCorrect(): Boolean {
+            return targetLocation != null
         }
     }
 

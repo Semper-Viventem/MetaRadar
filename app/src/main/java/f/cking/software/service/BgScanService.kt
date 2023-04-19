@@ -6,9 +6,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import f.cking.software.data.helpers.*
-import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
 import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
 import f.cking.software.domain.interactor.SaveReportInteractor
@@ -18,15 +16,13 @@ import f.cking.software.domain.model.JournalEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 
 class BgScanService : Service() {
 
-    private val TAG = "BgScanService"
-
     private val permissionHelper: PermissionHelper by inject()
     private val bleScannerHelper: BleScannerHelper by inject()
-    private val settingsRepository: SettingsRepository by inject()
     private val locationProvider: LocationProvider by inject()
     private val notificationsHelper: NotificationsHelper by inject()
     private val powerModeHelper: PowerModeHelper by inject()
@@ -76,14 +72,14 @@ class BgScanService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (intent != null && intent.action == ACTION_STOP_SERVICE) {
-            Log.d(TAG, "Background service close action handled")
+            Timber.d("Background service close action handled")
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         } else if (intent != null && intent.action == ACTION_SCAN_NOW) {
-            Log.d(TAG, "Background service scan now command")
+            Timber.d("Background service scan now command")
             scan()
         } else {
-            Log.d(TAG, "Background service launched")
+            Timber.d("Background service launched")
             startForeground(
                 NotificationsHelper.FOREGROUND_NOTIFICATION_ID,
                 notificationsHelper.buildForegroundNotification(
@@ -109,7 +105,7 @@ class BgScanService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "Background service destroyed")
+        Timber.d("Background service destroyed")
         scope.cancel()
         isActive.tryEmit(false)
         bleScannerHelper.stopScanning()
@@ -203,7 +199,7 @@ class BgScanService : Service() {
     }
 
     private fun handleAnalysResult(result: AnalyseScanBatchInteractor.Result) {
-        Log.d(TAG, "Background scan result: known_devices_count=${result.knownDevicesCount}, matched_profiles=${result.matchedProfiles.count()}")
+        Timber.d("Background scan result: known_devices_count=${result.knownDevicesCount}, matched_profiles=${result.matchedProfiles.count()}")
         handleProfileCheckingResult(result.matchedProfiles)
     }
 
@@ -213,7 +209,7 @@ class BgScanService : Service() {
     }
 
     private fun reportError(error: Throwable) {
-        Log.e(TAG, error.message.orEmpty(), error)
+        Timber.e(error)
         scope.launch {
             val report = JournalEntry.Report.Error(
                 title = "[BLE Service Error]: ${error.message ?: error::class.java}",

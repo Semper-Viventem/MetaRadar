@@ -9,8 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
 import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.RadarProfilesRepository
+import f.cking.software.domain.interactor.DeleteRadarProfile
+import f.cking.software.domain.interactor.SaveRadarProfile
 import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.filter.FilterUiMapper
 import f.cking.software.ui.filter.FilterUiState
@@ -19,8 +21,10 @@ import kotlinx.coroutines.launch
 class ProfileDetailsViewModel(
     val profileId: Int?,
     val template: FilterUiState?,
-    val router: NavRouter,
+    val router: Router,
     private val radarProfilesRepository: RadarProfilesRepository,
+    private val saveRadarProfile: SaveRadarProfile,
+    private val deleteRadarProfile: DeleteRadarProfile,
     private val context: Application,
 ) : ViewModel() {
 
@@ -53,7 +57,7 @@ class ProfileDetailsViewModel(
     fun onSaveClick() {
         if (filter?.isCorrect() == true && name.isNotBlank() && buildProfile() != null) {
             viewModelScope.launch {
-                radarProfilesRepository.saveProfile(buildProfile()!!)
+                saveRadarProfile.execute(buildProfile()!!)
                 router.navigate(BackCommand)
             }
         } else {
@@ -64,7 +68,7 @@ class ProfileDetailsViewModel(
     fun onRemoveClick() {
         if (profileId != null) {
             viewModelScope.launch {
-                radarProfilesRepository.deleteProfile(profileId)
+                deleteRadarProfile.execute(profileId)
                 Toast.makeText(context, context.getString(R.string.profile_has_been_removed), Toast.LENGTH_SHORT).show()
                 back()
             }

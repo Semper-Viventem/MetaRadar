@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.ScreenNavigationCommands
@@ -17,11 +17,17 @@ import java.util.concurrent.TimeUnit
 
 class ProfilesListViewModel(
     private val radarProfilesRepository: RadarProfilesRepository,
-    private val router: NavRouter,
+    private val router: Router,
 ) : ViewModel() {
 
     var profiles: List<RadarProfile> by mutableStateOf(emptyList())
-    var defaultFiltersTemplate: List<FilterTemplate> by mutableStateOf(listOf(DEFAULT_FILTER_FOLLOWING, DEFAULT_FILTER_FAVORITE))
+    var defaultFiltersTemplate: List<FilterTemplate> by mutableStateOf(
+        listOf(
+            DEFAULT_FILTER_FOLLOWING,
+            DEFAULT_FILTER_FAVORITE,
+            DEFAULT_FILTER_BY_LOCATION,
+        )
+    )
 
     init {
         observeProfiles()
@@ -66,6 +72,17 @@ class ProfilesListViewModel(
                     FilterUiState.MinLostTime().apply {
                         minLostTime = TimeUnit.HOURS.toMillis(2)
                     }
+                )
+            }
+        )
+        private val DEFAULT_FILTER_BY_LOCATION = FilterTemplate(
+            displayNameRes = R.string.filter_device_location,
+            filterUiState = FilterUiState.All().apply {
+                filters = listOf(
+                    FilterUiState.MinLostTime().apply {
+                        minLostTime = TimeUnit.HOURS.toMillis(2)
+                    },
+                    FilterUiState.DeviceLocation(),
                 )
             }
         )

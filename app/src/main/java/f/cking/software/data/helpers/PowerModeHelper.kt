@@ -23,6 +23,7 @@ class PowerModeHelper(
         val useLocation: Boolean,
         val locationUpdateInterval: Long,
         val useRestrictedBleConfig: Boolean,
+        val filterCacheExpirationTime: Long,
     ) {
         DEFAULT(
             scanDuration = 5_000L,
@@ -30,6 +31,7 @@ class PowerModeHelper(
             useLocation = true,
             locationUpdateInterval = 10_000L,
             useRestrictedBleConfig = false,
+            filterCacheExpirationTime = 3 * 60 * 1000L, // 3 minutes
         ),
         DEFAULT_RESTRICTED(
             scanDuration = 5_000L,
@@ -37,6 +39,7 @@ class PowerModeHelper(
             useLocation = true,
             locationUpdateInterval = 10_000L,
             useRestrictedBleConfig = true,
+            filterCacheExpirationTime = 5 * 60 * 1000L, // 5 minutes
         ),
         POWER_SAVING(
             scanDuration = 2_000L,
@@ -44,6 +47,7 @@ class PowerModeHelper(
             useLocation = false,
             locationUpdateInterval = 60_000L,
             useRestrictedBleConfig = true,
+            filterCacheExpirationTime = 10 * 60 * 1000L, // 10 minutes
         ),
     }
 }

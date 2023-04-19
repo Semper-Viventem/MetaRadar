@@ -1,6 +1,7 @@
 package f.cking.software.ui
 
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
+import f.cking.software.common.navigation.RouterImpl
 import f.cking.software.ui.devicedetails.DeviceDetailsViewModel
 import f.cking.software.ui.devicelist.DeviceListViewModel
 import f.cking.software.ui.journal.JournalViewModel
@@ -15,12 +16,13 @@ import org.koin.dsl.module
 
 object UiModule {
     val module = module {
-        single { NavRouter() }
+        single { RouterImpl() }
+        single<Router> { get<RouterImpl>() }
         viewModel { MainViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { DeviceListViewModel(get(), get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { ProfilesListViewModel(get(), get()) }
-        viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get()) }
+        viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get(), get(), get()) }
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
         viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get()) }

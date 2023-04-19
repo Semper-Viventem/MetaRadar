@@ -91,6 +91,10 @@
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>
 
+    <!-- Select location -->
+    <string name="select_location">Select location</string>
+    <string name="select_location_radius">Radius: %.1f m.</string>
+
     <!-- Select filter -->
     <string name="select_filter">Select filter</string>
     <string name="filter_by_name">By name</string>
@@ -105,6 +109,8 @@
     <string name="filter_any_of">Any of</string>
     <string name="filter_all_of">All of</string>
     <string name="filter_not">Not</string>
+    <string name="filter_device_location">By device location</string>
+    <string name="filter_user_location">By your location</string>
 
     <!-- Profiles list -->
     <string name="create_new">Create new</string>
@@ -136,6 +142,7 @@
     <string name="to_date">To date</string>
     <string name="to_time">To time</string>
     <string name="is_favorite">Is favorite</string>
+    <string name="filter_user_location_if_no_location">Skip filter if location is not available (otherwise default value is false)</string>
     <string name="change">Change</string>
     <string name="cannot_save_profile">Cannot save profile. Check your configuration</string>
     <string name="profile_has_been_removed">Profile has been removed</string>
@@ -143,6 +150,8 @@
     <string name="discard_changes_dialog_title">Your changes will be lost. Continue?</string>
     <string name="stay">Stay</string>
     <string name="discard_changes">Discard changes</string>
+    <string name="filter_location_has_data">Location selected. Radius: %.1f m</string>
+    <string name="filter_location_no_data">Select target location</string>
 
     <!-- Devices List -->
     <string name="custom_filter">Custom filter</string>

@@ -15,8 +15,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.R
 import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.NavRouter
 import f.cking.software.common.navigation.Navigator
+import f.cking.software.common.navigation.RouterImpl
 import f.cking.software.data.helpers.ActivityProvider
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.PermissionHelper
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private val permissionHelper: PermissionHelper by inject()
     private val intentHelper: IntentHelper by inject()
     private val activityProvider: ActivityProvider by inject()
-    private val router: NavRouter by inject()
+    private val router: RouterImpl by inject()
     private val sharedPreferences: SharedPreferences by inject()
     private val viewModel: MainActivityViewModel by viewModels {
         viewModelFactory { initializer { MainActivityViewModel() } }

@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
 import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.NavRouter
+import f.cking.software.common.navigation.Router
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.DevicesRepository
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 class DeviceDetailsViewModel(
     private val address: String,
-    private val router: NavRouter,
+    private val router: Router,
     private val devicesRepository: DevicesRepository,
     private val locationRepository: LocationRepository,
     private val locationProvider: LocationProvider,

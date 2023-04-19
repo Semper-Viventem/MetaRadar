@@ -2,6 +2,7 @@ package f.cking.software.domain.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class RadarProfile(
@@ -13,7 +14,9 @@ data class RadarProfile(
 ) {
 
     @Serializable
-    sealed class Filter {
+    sealed class Filter(@Transient protected val checkDifficulty: Int = 0) {
+
+        open fun getDifficulty(): Int = checkDifficulty
 
         @Serializable
         @SerialName("last_detection_interval")
@@ -49,25 +52,54 @@ data class RadarProfile(
             val contactStr: String,
             val airdropShaFormat: Int,
             val minLostTime: Long? = null,
-        ) : Filter()
+        ) : Filter(checkDifficulty = 20)
 
         @Serializable
         @SerialName("is_following")
         data class IsFollowing(
             val followingDurationMs: Long,
             val followingDetectionIntervalMs: Long,
-        ) : Filter()
+        ) : Filter(checkDifficulty = 50)
 
         @Serializable
         @SerialName("any")
-        data class Any(val filters: List<Filter>) : Filter()
+        data class Any(val filters: List<Filter>) : Filter(checkDifficulty = 1) {
+            override fun getDifficulty(): Int {
+                return filters.sumOf { it.getDifficulty() } + checkDifficulty
+            }
+        }
 
         @Serializable
         @SerialName("all")
-        data class All(val filters: List<Filter>) : Filter()
+        data class All(val filters: List<Filter>) : Filter(checkDifficulty = 1) {
+            override fun getDifficulty(): Int {
+                return filters.sumOf { it.getDifficulty() } + checkDifficulty
+            }
+        }
 
         @Serializable
         @SerialName("not")
-        data class Not(val filter: Filter) : Filter()
+        data class Not(val filter: Filter) : Filter(checkDifficulty = 1) {
+            override fun getDifficulty(): Int {
+                return filter.getDifficulty() + checkDifficulty
+            }
+        }
+
+        @Serializable
+        @SerialName("device_location")
+        data class DeviceLocation(
+            val location: LocationModel,
+            val radiusMeters: Float,
+            val fromTimeMs: Long,
+            val toTimeMs: Long,
+        ) : Filter(checkDifficulty = 100)
+
+        @Serializable
+        @SerialName("user_location")
+        data class UserLocation(
+            val location: LocationModel,
+            val radiusMeters: Float,
+            val noLocationDefaultValue: Boolean,
+        ) : Filter(checkDifficulty = 10)
     }
 }
