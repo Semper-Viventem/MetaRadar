@@ -48,7 +48,7 @@ jobs:
       - name: Release to GooglePlay
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: f.cking.software
           releaseFiles: app/build/outputs/bundle/googlePlayRelease/app-googlePlay-release.aab
           track: production
