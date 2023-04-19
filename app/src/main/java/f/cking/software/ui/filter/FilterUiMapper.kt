@@ -46,6 +46,11 @@ object FilterUiMapper {
                 fromTimeMs = mapTimeToUi(from.fromDate, from.fromTime, Long.MIN_VALUE),
                 toTimeMs = mapTimeToUi(from.toDate, from.toTime, Long.MAX_VALUE),
             )
+            is FilterUiState.UserLocation -> RadarProfile.Filter.UserLocation(
+                location = from.targetLocation!!,
+                radiusMeters = from.radius,
+                noLocationDefaultValue = from.defaultValueIfNoLocation,
+            )
             is FilterUiState.Unknown, is FilterUiState.Interval -> throw IllegalArgumentException("Unsupported type: ${from::class.java}")
         }
     }
@@ -106,6 +111,11 @@ object FilterUiMapper {
                 this.fromTime = from.fromTimeMs.takeIf { it != Long.MIN_VALUE }?.toLocalTime()
                 this.toDate = from.toTimeMs.takeIf { it != Long.MAX_VALUE }?.toLocalDate()
                 this.toTime = from.toTimeMs.takeIf { it != Long.MAX_VALUE }?.toLocalTime()
+            }
+            is RadarProfile.Filter.UserLocation -> FilterUiState.UserLocation().apply {
+                this.targetLocation = from.location
+                this.radius = from.radiusMeters
+                this.defaultValueIfNoLocation = from.noLocationDefaultValue
             }
         }
     }

@@ -13,8 +13,9 @@ enum class FilterType(@StringRes val displayNameRes: Int) {
     BY_MIN_DETECTION_TIME(R.string.filter_by_min_lost_period),
     AIRDROP_CONTACT(R.string.filter_apple_airdrop_contact),
     IS_FOLLOWING(R.string.filter_device_is_following_me),
+    BY_DEVICE_LOCATION(R.string.filter_device_location),
+    BY_USER_LOCATION(R.string.filter_user_location),
     BY_LOGIC_ANY(R.string.filter_any_of),
     BY_LOGIC_ALL(R.string.filter_all_of),
     BY_LOGIC_NOT(R.string.filter_not),
-    BY_DEVICE_LOCATION(R.string.filter_device_location),
 }

@@ -76,8 +76,16 @@ data class RadarProfile(
         data class DeviceLocation(
             val location: LocationModel,
             val radiusMeters: Float,
-            var fromTimeMs: Long,
-            var toTimeMs: Long,
+            val fromTimeMs: Long,
+            val toTimeMs: Long,
         ) : Filter(difficulty = 3)
+
+        @Serializable
+        @SerialName("user_location")
+        data class UserLocation(
+            val location: LocationModel,
+            val radiusMeters: Float,
+            val noLocationDefaultValue: Boolean,
+        ) : Filter(difficulty = 2)
     }
 }
