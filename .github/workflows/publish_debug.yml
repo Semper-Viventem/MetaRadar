@@ -21,9 +21,9 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
+      - name: Build apk
         run: ./gradlew assembleGithubDebug
-      - name: Releasing using Hub
+      - name: Releasing to Github
         uses: ./.github/actions/publish-release-apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
