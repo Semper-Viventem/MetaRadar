@@ -109,8 +109,10 @@ class BleScannerHelper(
     @SuppressLint("MissingPermission")
     private fun cancelScanning(scanResult: ScanResultInternal) {
         inProgress.tryEmit(false)
-        bluetoothScanner?.stopScan(callback)
 
+        if (bluetoothAdapter?.state == BluetoothAdapter.STATE_ON) {
+            bluetoothScanner?.stopScan(callback)
+        }
 
         when (scanResult) {
             is ScanResultInternal.Success -> {
