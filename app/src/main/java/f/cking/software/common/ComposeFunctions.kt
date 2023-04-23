@@ -135,8 +135,10 @@ fun DeviceListItem(
     ) {
         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Column(modifier = Modifier.weight(1f)) {
-                Row() {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    device.tags.forEach { TagChip(tagName =it) }
                 }
                 device.manufacturerInfo?.name?.let {
                     Spacer(modifier = Modifier.height(4.dp))
@@ -306,7 +308,7 @@ private val tagColors = listOf(
 fun TagChip(
     tagName: String,
     tagIcon: ImageVector? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit = {},
 ) {
     val color = tagColors[tagName.hashCode() % tagColors.size]
     Chip(

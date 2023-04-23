@@ -242,7 +242,6 @@ object DeviceDetailsScreen {
             FlowRow(
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 mainAxisSpacing = 8.dp,
-                crossAxisSpacing = 8.dp,
             ) {
                 AddTag(viewModel = viewModel, deviceData = deviceData)
                 deviceData.tags.forEach { tag ->
@@ -258,7 +257,23 @@ object DeviceDetailsScreen {
         name: String,
         viewModel: DeviceDetailsViewModel,
     ) {
-        TagChip(tagName = name, tagIcon = Icons.Filled.Delete)  { viewModel.onRemoveTagClick(deviceData, name) }
+        val dialogState = rememberMaterialDialogState()
+
+        MaterialDialog(
+            dialogState = dialogState,
+            buttons = {
+                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm)) {
+                    dialogState.hide()
+                    viewModel.onRemoveTagClick(deviceData, name)
+                }
+            },
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(text = stringResource(R.string.delete_tag_title, name), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        TagChip(tagName = name, tagIcon = Icons.Filled.Delete)  { dialogState.show() }
     }
 
     @OptIn(ExperimentalMaterialApi::class)

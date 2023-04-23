@@ -6,11 +6,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +43,9 @@ object TagDialog {
             },
             onCloseRequest = { dialog.hide() },
         ) {
-            Column(modifier = Modifier.padding(8.dp).fillMaxHeight()) {
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .height(300.dp)) {
                 TextField(
                     value = inputState.value,
                     onValueChange = { inputState.value = it },
@@ -83,14 +84,18 @@ object TagDialog {
             ) {
                 Text(text = stringResource(id = R.string.create_new_tag))
             }
-
-            FlowRow(
-                modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                mainAxisSpacing = 8.dp,
-                crossAxisSpacing = 8.dp,
-            ) {
-                tags.value.forEach { name ->
-                    TagChip(tagName = name, tagIcon = Icons.Filled.Delete) { onTagSelected.invoke(name) }
+            LazyColumn(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
+                item {
+                    FlowRow(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        mainAxisSpacing = 8.dp,
+                    ) {
+                        tags.value.forEach { name ->
+                            TagChip(tagName = name) { onTagSelected.invoke(name) }
+                        }
+                    }
                 }
             }
         }

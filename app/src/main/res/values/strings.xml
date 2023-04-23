@@ -160,6 +160,7 @@
     <string name="tag_name">Tag name</string>
     <string name="create_new_tag">Create new</string>
     <string name="add_tag">Add tag</string>
+    <string name="delete_tag_title">Delete tag \"%s\"?</string>
 
     <!-- Devices List -->
     <string name="custom_filter">Custom filter</string>
