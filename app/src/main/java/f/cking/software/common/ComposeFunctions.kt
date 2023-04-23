@@ -57,6 +57,7 @@ import f.cking.software.toHexString
 import org.osmdroid.views.MapView
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlin.math.abs
 
 @Composable
 fun rememberDateDialog(
@@ -286,7 +287,7 @@ fun RoundedBox(
     }
 }
 
-private val tagColors = listOf(
+private val colors = listOf(
     Color(0xFFE57373),
     Color(0xFFF06292),
     Color(0xFFBA68C8),
@@ -305,6 +306,9 @@ private val tagColors = listOf(
     Color(0xFFA1887F),
     Color(0xFF90A4AE),
 )
+fun colorByHash(hash: Int): Color {
+    return colors[abs(hash % colors.size)]
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -313,10 +317,9 @@ fun TagChip(
     tagIcon: ImageVector? = null,
     onClick: () -> Unit = {},
 ) {
-    val color = tagColors[tagName.hashCode() % tagColors.size]
     Chip(
         colors = ChipDefaults.chipColors(
-            backgroundColor = color,
+            backgroundColor = colorByHash(tagName.hashCode()),
             contentColor = Color.Black,
             leadingIconContentColor = Color.Black,
         ),
