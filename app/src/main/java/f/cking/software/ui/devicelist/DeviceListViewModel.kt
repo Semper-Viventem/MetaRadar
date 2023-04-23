@@ -40,17 +40,16 @@ class DeviceListViewModel(
 
     private val generalComparator = Comparator<DeviceData> { second, first ->
         when {
-            first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(
-                second.lastDetectTimeMs
-            )
+            first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
 
-            first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1)
-                ?: -1
+            first.tags.size != second.tags.size -> first.tags.size.compareTo(second.tags.size)
+            first.favorite && !second.favorite -> 1
+            !first.favorite && second.favorite -> -1
+
+            first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
 
             first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
-                first.manufacturerInfo?.name?.compareTo(
-                    second.manufacturerInfo?.name ?: return@Comparator 1
-                ) ?: -1
+                first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
 
             else -> first.address.compareTo(second.address)
         }
@@ -86,6 +85,14 @@ class DeviceListViewModel(
 
     fun onDeviceClick(device: DeviceData) {
         router.navigate(ScreenNavigationCommands.OpenDeviceDetailsScreen(device.address))
+    }
+
+    fun onTagSelected(tag: String) {
+        val tagFilter = FilterHolder(
+            displayName = tag,
+            filter = RadarProfile.Filter.ByTag(tag),
+        )
+        onFilterClick(tagFilter)
     }
 
     private fun observeDevices() {

@@ -126,6 +126,7 @@ fun ClickableField(
 @Composable
 fun DeviceListItem(
     device: DeviceData,
+    onTagSelected: (tag: String) -> Unit = {},
     onClick: () -> Unit,
 ) {
     Box(
@@ -139,7 +140,7 @@ fun DeviceListItem(
                 Spacer(modifier = Modifier.width(4.dp))
                 device.tags.forEach {
                     Spacer(modifier = Modifier.width(4.dp))
-                    TagChip(tagName = it)
+                    TagChip(tagName = it, onClick = { onTagSelected.invoke(it) })
                 }
                 if (device.favorite) {
                     Spacer(modifier = Modifier.width(8.dp))

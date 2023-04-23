@@ -86,7 +86,13 @@ object DeviceListScreen {
                 }
 
                 list.mapIndexed { index, deviceData ->
-                    item { DeviceListItem(device = deviceData) { viewModel.onDeviceClick(deviceData) } }
+                    item {
+                        DeviceListItem(
+                            device = deviceData,
+                            onClick = { viewModel.onDeviceClick(deviceData) },
+                            onTagSelected = { viewModel.onTagSelected(it) },
+                        )
+                    }
                     val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                     if (showDivider) {
                         item { Divider() }
