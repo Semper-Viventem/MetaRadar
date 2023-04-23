@@ -1,4 +1,4 @@
-package f.cking.software.data.database
+package f.cking.software.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -16,5 +16,5 @@ data class DeviceEntity(
     @ColumnInfo(name = "manufacturer_id") val manufacturerId: Int? = null,
     @ColumnInfo(name = "manufacturer_name") val manufacturerName: String? = null,
     @ColumnInfo(name = "last_following_detection_ms") val lastFollowingDetectionMs: Long? = null,
-    @ColumnInfo(name = "tags") val tags: List<String> = emptyList(),
+    @ColumnInfo(name = "tags", defaultValue = "") val tags: List<String>,
 )

@@ -6,8 +6,22 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import f.cking.software.data.database.dao.AppleContactDao
+import f.cking.software.data.database.dao.DeviceDao
+import f.cking.software.data.database.dao.JournalDao
+import f.cking.software.data.database.dao.LocationDao
+import f.cking.software.data.database.dao.RadarProfileDao
+import f.cking.software.data.database.dao.TagDao
+import f.cking.software.data.database.entity.AppleContactEntity
+import f.cking.software.data.database.entity.DeviceEntity
+import f.cking.software.data.database.entity.DeviceToLocationEntity
+import f.cking.software.data.database.entity.JournalEntryEntity
+import f.cking.software.data.database.entity.LocationEntity
+import f.cking.software.data.database.entity.RadarProfileEntity
+import f.cking.software.data.database.entity.TagEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -21,6 +35,7 @@ import java.io.File
         LocationEntity::class,
         DeviceToLocationEntity::class,
         JournalEntryEntity::class,
+        TagEntity::class,
     ],
     autoMigrations = [
         AutoMigration(from = 7, to = 8),
@@ -30,14 +45,15 @@ import java.io.File
     exportSchema = true,
     version = 11,
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun deviceDao(): DeviceDao
     abstract fun radarProfileDao(): RadarProfileDao
     abstract fun appleContactDao(): AppleContactDao
     abstract fun locationDao(): LocationDao
-
     abstract fun journalDao(): JournalDao
+    abstract fun tagDao(): TagDao
 
     suspend fun backupDatabase(toUri: Uri, context: Context) {
         Timber.i("Backup DB to file: ${toUri}")

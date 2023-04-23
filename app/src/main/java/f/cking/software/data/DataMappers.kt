@@ -1,11 +1,11 @@
 package f.cking.software.domain
 
 import android.location.Location
-import f.cking.software.data.database.AppleContactEntity
-import f.cking.software.data.database.DeviceEntity
-import f.cking.software.data.database.JournalEntryEntity
-import f.cking.software.data.database.LocationEntity
-import f.cking.software.data.database.RadarProfileEntity
+import f.cking.software.data.database.entity.AppleContactEntity
+import f.cking.software.data.database.entity.DeviceEntity
+import f.cking.software.data.database.entity.JournalEntryEntity
+import f.cking.software.data.database.entity.LocationEntity
+import f.cking.software.data.database.entity.RadarProfileEntity
 import f.cking.software.domain.model.AppleAirDrop
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.JournalEntry
