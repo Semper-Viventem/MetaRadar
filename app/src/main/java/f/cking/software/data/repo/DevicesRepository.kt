@@ -2,8 +2,8 @@ package f.cking.software.data.repo
 
 import f.cking.software.data.database.AppDatabase
 import f.cking.software.data.database.DatabaseUtils
-import f.cking.software.data.database.DeviceDao
-import f.cking.software.data.database.DeviceEntity
+import f.cking.software.data.database.dao.DeviceDao
+import f.cking.software.data.database.entity.DeviceEntity
 import f.cking.software.domain.model.AppleAirDrop
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.toData
@@ -44,10 +44,9 @@ class DevicesRepository(
         }
     }
 
-    suspend fun changeFavorite(device: DeviceData) {
+    suspend fun saveDevice(data: DeviceData) {
         withContext(Dispatchers.IO) {
-            val new = device.copy(favorite = !device.favorite)
-            deviceDao.insert(new.toData())
+            deviceDao.insert(data.toData())
             notifyListeners()
         }
     }

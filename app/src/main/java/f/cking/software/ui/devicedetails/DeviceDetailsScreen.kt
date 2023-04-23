@@ -16,15 +16,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -40,17 +46,20 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.MapView
 import f.cking.software.common.RoundedBox
+import f.cking.software.common.TagChip
 import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.dpToPx
 import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
+import f.cking.software.ui.tagdialog.TagDialog
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -159,7 +168,7 @@ object DeviceDetailsScreen {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 item { DeviceContent(deviceData = deviceData, viewModel = viewModel) }
             }
@@ -179,8 +188,10 @@ object DeviceDetailsScreen {
                 .padding(16.dp),
         ) {
 
-
             HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Tags(deviceData = deviceData, viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
@@ -217,6 +228,76 @@ object DeviceDetailsScreen {
             Text(text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current)))
             Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+
+    @Composable
+    fun Tags(
+        deviceData: DeviceData,
+        viewModel: DeviceDetailsViewModel,
+    ) {
+        RoundedBox(
+            modifier = Modifier.fillMaxWidth(),
+            internalPaddings = 0.dp
+        ) {
+            FlowRow(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+            ) {
+                AddTag(viewModel = viewModel, deviceData = deviceData)
+                deviceData.tags.forEach { tag ->
+                    Tag(name = tag, viewModel = viewModel, deviceData = deviceData)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun Tag(
+        deviceData: DeviceData,
+        name: String,
+        viewModel: DeviceDetailsViewModel,
+    ) {
+        val dialogState = rememberMaterialDialogState()
+
+        MaterialDialog(
+            dialogState = dialogState,
+            buttons = {
+                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm)) {
+                    dialogState.hide()
+                    viewModel.onRemoveTagClick(deviceData, name)
+                }
+            },
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(text = stringResource(R.string.delete_tag_title, name), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+        TagChip(tagName = name, tagIcon = Icons.Filled.Delete) { dialogState.show() }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    fun AddTag(
+        deviceData: DeviceData,
+        viewModel: DeviceDetailsViewModel,
+    ) {
+        val addTagDialog = TagDialog.rememberDialog {
+            viewModel.onNewTagSelected(deviceData, it)
+        }
+        Chip(
+            colors = ChipDefaults.chipColors(
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = Color.White,
+            ),
+            onClick = { addTagDialog.show() },
+            leadingIcon = {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            }
+        ) { Text(text = stringResource(R.string.add_tag)) }
     }
 
     @Composable
@@ -420,6 +501,7 @@ object DeviceDetailsScreen {
                 )
                 map.invalidate()
             }
+
             is DeviceDetailsViewModel.MapCameraState.MultiplePoints -> {
                 Timber.d(cameraConfig.toString())
                 map.post {

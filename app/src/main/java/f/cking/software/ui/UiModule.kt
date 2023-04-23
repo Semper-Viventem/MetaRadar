@@ -25,7 +25,7 @@ object UiModule {
         viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get(), get(), get()) }
         viewModel { SelectManufacturerViewModel(get()) }
         viewModel { SelectDeviceViewModel(get(), get()) }
-        viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get()) }
+        viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { JournalViewModel(get(), get(), get(), get(), get()) }
     }
 }

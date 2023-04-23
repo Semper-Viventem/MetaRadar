@@ -1,6 +1,7 @@
-package f.cking.software.data.database
+package f.cking.software.data.database.dao
 
 import androidx.room.*
+import f.cking.software.data.database.entity.DeviceEntity
 
 @Dao
 interface DeviceDao {

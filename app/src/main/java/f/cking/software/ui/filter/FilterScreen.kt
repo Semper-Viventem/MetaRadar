@@ -26,10 +26,12 @@ import f.cking.software.*
 import f.cking.software.R
 import f.cking.software.common.ClickableField
 import f.cking.software.common.RoundedBox
+import f.cking.software.common.TagChip
 import f.cking.software.common.navigation.Router
 import f.cking.software.common.rememberDateDialog
 import f.cking.software.common.rememberTimeDialog
 import f.cking.software.ui.ScreenNavigationCommands
+import f.cking.software.ui.tagdialog.TagDialog
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -59,6 +61,7 @@ object FilterScreen {
             is FilterUiState.IsFollowing -> FilterIsFollowing(filterState, onDeleteClick)
             is FilterUiState.DeviceLocation -> FilterDeviceLocation(filterState, router, onDeleteClick)
             is FilterUiState.UserLocation -> FilterUserLocation(filterState, router, onDeleteClick)
+            is FilterUiState.Tag -> FilterTag(filterState, onDeleteClick)
             is FilterUiState.Unknown, is FilterUiState.Interval -> FilterUnknown(filterState, onDeleteClick)
         }
     }
@@ -139,6 +142,40 @@ object FilterScreen {
                         filter.ignoreCase = it
                     })
                 }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    private fun FilterTag(
+        filter: FilterUiState.Tag,
+        onDeleteClick: (child: FilterUiState) -> Unit,
+    ) {
+        FilterBase(
+            title = stringResource(R.string.filter_by_tag),
+            color = colorResource(R.color.filter_tag),
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+        ) {
+
+            val addTagDialog = TagDialog.rememberDialog {
+                filter.tag = it
+            }
+            val tag = filter.tag
+
+            if (tag == null) {
+                Chip(
+                    colors = ChipDefaults.chipColors(
+                        backgroundColor = MaterialTheme.colors.primary,
+                        contentColor = Color.White,
+                    ),
+                    onClick = { addTagDialog.show() },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                    }
+                ) { Text(text = stringResource(R.string.select_tag)) }
+            } else {
+                TagChip(tagName = tag, tagIcon = Icons.Filled.Delete) { filter.tag = null }
             }
         }
     }
@@ -516,7 +553,8 @@ object FilterScreen {
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .clickable { filter.defaultValueIfNoLocation = !filter.defaultValueIfNoLocation },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
