@@ -25,9 +25,10 @@ import java.io.File
     autoMigrations = [
         AutoMigration(from = 7, to = 8),
         AutoMigration(from = 9, to = 10),
+        AutoMigration(from = 10, to = 11),
     ],
     exportSchema = true,
-    version = 10,
+    version = 11,
 )
 abstract class AppDatabase : RoomDatabase() {
 

@@ -1,8 +1,17 @@
 package f.cking.software.domain
 
 import android.location.Location
-import f.cking.software.data.database.*
-import f.cking.software.domain.model.*
+import f.cking.software.data.database.AppleContactEntity
+import f.cking.software.data.database.DeviceEntity
+import f.cking.software.data.database.JournalEntryEntity
+import f.cking.software.data.database.LocationEntity
+import f.cking.software.data.database.RadarProfileEntity
+import f.cking.software.domain.model.AppleAirDrop
+import f.cking.software.domain.model.DeviceData
+import f.cking.software.domain.model.JournalEntry
+import f.cking.software.domain.model.LocationModel
+import f.cking.software.domain.model.ManufacturerInfo
+import f.cking.software.domain.model.RadarProfile
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -40,6 +49,7 @@ fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
             manufacturerName?.let { name -> ManufacturerInfo(id, name, appleAirDrop) }
         },
         lastFollowingDetectionTimeMs = lastFollowingDetectionMs,
+        tags = tags,
     )
 }
 
@@ -55,6 +65,7 @@ fun DeviceData.toData(): DeviceEntity {
         manufacturerId = manufacturerInfo?.id,
         manufacturerName = manufacturerInfo?.name,
         lastFollowingDetectionMs = lastFollowingDetectionTimeMs,
+        tags = tags,
     )
 }
 
