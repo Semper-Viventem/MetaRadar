@@ -157,6 +157,9 @@
     <string name="discard_changes">Discard changes</string>
     <string name="filter_location_has_data">Location selected. Radius: %.1f m</string>
     <string name="filter_location_no_data">Select target location</string>
+    <string name="tag_name">Tag name</string>
+    <string name="create_new_tag">Create new</string>
+    <string name="add_tag">Add tag</string>
 
     <!-- Devices List -->
     <string name="custom_filter">Custom filter</string>

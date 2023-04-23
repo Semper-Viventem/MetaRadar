@@ -44,10 +44,9 @@ class DevicesRepository(
         }
     }
 
-    suspend fun changeFavorite(device: DeviceData) {
+    suspend fun saveDevice(data: DeviceData) {
         withContext(Dispatchers.IO) {
-            val new = device.copy(favorite = !device.favorite)
-            deviceDao.insert(new.toData())
+            deviceDao.insert(data.toData())
             notifyListeners()
         }
     }
