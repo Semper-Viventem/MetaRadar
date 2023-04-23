@@ -75,6 +75,9 @@ class FilterCheckerImpl(
     private val userLocation = filterChecker<RadarProfile.Filter.UserLocation> { device, filter ->
         checkUserLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, filter.noLocationDefaultValue)
     }
+    private val tag = filterChecker<RadarProfile.Filter.ByTag> { device, filter ->
+        device.tags.contains(filter.tag)
+    }
 
     override suspend fun checkInternal(deviceData: DeviceData, filter: RadarProfile.Filter): Boolean {
         return when (filter) {
@@ -92,6 +95,7 @@ class FilterCheckerImpl(
             is RadarProfile.Filter.IsFollowing -> isFollowing.check(deviceData, filter)
             is RadarProfile.Filter.DeviceLocation -> deviceLocation.check(deviceData, filter)
             is RadarProfile.Filter.UserLocation -> userLocation.check(deviceData, filter)
+            is RadarProfile.Filter.ByTag -> tag.check(deviceData, filter)
         }
     }
 

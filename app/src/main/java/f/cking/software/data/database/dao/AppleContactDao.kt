@@ -1,9 +1,10 @@
-package f.cking.software.data.database
+package f.cking.software.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import f.cking.software.data.database.entity.AppleContactEntity
 
 @Dao
 interface AppleContactDao {

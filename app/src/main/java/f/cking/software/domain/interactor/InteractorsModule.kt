@@ -28,5 +28,8 @@ object InteractorsModule {
         factory { DeleteRadarProfile(get(), get()) }
         factory { CheckDeviceLocationHistoryInteractor(get()) }
         factory { CheckUserLocationHistoryInteractor(get()) }
+        factory { AddTagToDeviceInteractor(get(), get()) }
+        factory { RemoveTagFromDeviceInteractor(get()) }
+        factory { ChangeFavoriteInteractor(get()) }
     }
 }

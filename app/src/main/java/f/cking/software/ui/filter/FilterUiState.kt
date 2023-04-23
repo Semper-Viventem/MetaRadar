@@ -69,6 +69,14 @@ sealed class FilterUiState {
         }
     }
 
+    class Tag : FilterUiState() {
+        var tag: String? by mutableStateOf(null)
+
+        override fun isCorrect(): Boolean {
+            return !tag.isNullOrBlank()
+        }
+    }
+
     class Any : FilterUiState() {
         var filters: List<FilterUiState> by mutableStateOf(emptyList())
 

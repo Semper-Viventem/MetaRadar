@@ -13,6 +13,9 @@ import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.LocationRepository
+import f.cking.software.domain.interactor.AddTagToDeviceInteractor
+import f.cking.software.domain.interactor.ChangeFavoriteInteractor
+import f.cking.software.domain.interactor.RemoveTagFromDeviceInteractor
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.toDomain
@@ -26,6 +29,9 @@ class DeviceDetailsViewModel(
     private val locationRepository: LocationRepository,
     private val locationProvider: LocationProvider,
     private val permissionHelper: PermissionHelper,
+    private val addTagToDeviceInteractor: AddTagToDeviceInteractor,
+    private val removeTagFromDeviceInteractor: RemoveTagFromDeviceInteractor,
+    private val changeFavoriteInteractor: ChangeFavoriteInteractor,
 ) : ViewModel() {
 
     var deviceState: DeviceData? by mutableStateOf(null)
@@ -118,8 +124,22 @@ class DeviceDetailsViewModel(
 
     fun onFavoriteClick(device: DeviceData) {
         viewModelScope.launch {
-            devicesRepository.changeFavorite(device)
+            changeFavoriteInteractor.execute(device)
             loadDevice(device.address)
+        }
+    }
+
+    fun onNewTagSelected(device: DeviceData, tag: String) {
+        viewModelScope.launch {
+            addTagToDeviceInteractor.execute(device, tag)
+            loadDevice(deviceState!!.address)
+        }
+    }
+
+    fun onRemoveTagClick(device: DeviceData, tag: String) {
+        viewModelScope.launch {
+            removeTagFromDeviceInteractor.execute(device, tag)
+            loadDevice(deviceState!!.address)
         }
     }
 

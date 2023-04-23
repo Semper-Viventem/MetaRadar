@@ -1,4 +1,4 @@
-package f.cking.software.data.database
+package f.cking.software.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

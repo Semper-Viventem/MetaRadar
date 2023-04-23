@@ -116,6 +116,7 @@
     <string name="filter_not">Not</string>
     <string name="filter_device_location">By device location</string>
     <string name="filter_user_location">By your location</string>
+    <string name="filter_by_tag">By tag</string>
 
     <!-- Profiles list -->
     <string name="create_new">Create new</string>
@@ -157,6 +158,7 @@
     <string name="discard_changes">Discard changes</string>
     <string name="filter_location_has_data">Location selected. Radius: %.1f m</string>
     <string name="filter_location_no_data">Select target location</string>
+    <string name="select_tag">Select tag</string>
 
     <!-- Devices List -->
     <string name="custom_filter">Custom filter</string>
@@ -190,6 +192,10 @@
     <string name="time_ago">%s ago</string>
     <string name="lifetime_data">lifetime: %1$s | last update: %2$s ago</string>
     <string name="device_list_placeholder">No data yet. To start scanning, click on the Scan button</string>
+    <string name="tag_name">Tag name</string>
+    <string name="create_new_tag">Create new</string>
+    <string name="add_tag">Add tag</string>
+    <string name="delete_tag_title">Delete tag \"%s\"?</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>

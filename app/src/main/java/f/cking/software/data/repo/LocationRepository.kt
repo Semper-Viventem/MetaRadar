@@ -2,7 +2,7 @@ package f.cking.software.data.repo
 
 import f.cking.software.data.database.AppDatabase
 import f.cking.software.data.database.DatabaseUtils
-import f.cking.software.data.database.DeviceToLocationEntity
+import f.cking.software.data.database.entity.DeviceToLocationEntity
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain

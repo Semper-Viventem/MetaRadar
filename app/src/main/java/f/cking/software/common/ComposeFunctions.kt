@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -29,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -122,6 +126,7 @@ fun ClickableField(
 @Composable
 fun DeviceListItem(
     device: DeviceData,
+    onTagSelected: (tag: String) -> Unit = {},
     onClick: () -> Unit,
 ) {
     Box(
@@ -129,39 +134,42 @@ fun DeviceListItem(
             .fillMaxWidth()
             .clickable { onClick.invoke() },
     ) {
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row() {
-                    Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.width(4.dp))
+                device.tags.forEach {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TagChip(tagName = it, onClick = { onTagSelected.invoke(it) })
                 }
-                device.manufacturerInfo?.name?.let {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = it)
-                }
-                device.manufacturerInfo?.airdrop?.let { airdrop ->
+                if (device.favorite) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = airdrop.contacts.joinToString { "0x${it.sha256.toHexString().uppercase()}" })
+                    Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite))
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = device.address,
-                    fontWeight = FontWeight.Light
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(
-                        R.string.lifetime_data,
-                        device.firstDetectionPeriod(LocalContext.current),
-                        device.lastDetectionPeriod(LocalContext.current)
-                    ),
-                    fontWeight = FontWeight.Light
-                )
             }
-            if (device.favorite) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite))
-                Spacer(modifier = Modifier.width(8.dp))
+            device.manufacturerInfo?.name?.let {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = it)
             }
+            device.manufacturerInfo?.airdrop?.let { airdrop ->
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = airdrop.contacts.joinToString { "0x${it.sha256.toHexString().uppercase()}" })
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = device.address,
+                fontWeight = FontWeight.Light
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource(
+                    R.string.lifetime_data,
+                    device.firstDetectionPeriod(LocalContext.current),
+                    device.lastDetectionPeriod(LocalContext.current)
+                ),
+                fontWeight = FontWeight.Light
+            )
         }
     }
 }
@@ -275,5 +283,46 @@ fun RoundedBox(
                 .clip(shape = shape)
                 .padding(internalPaddings)
         ) { boxContent(this) }
+    }
+}
+
+private val tagColors = listOf(
+    Color(0xFFE57373),
+    Color(0xFFF06292),
+    Color(0xFFBA68C8),
+    Color(0xFF9575CD),
+    Color(0xFF7986CB),
+    Color(0xFF64B5F6),
+    Color(0xFF4FC3F7),
+    Color(0xFF4DD0E1),
+    Color(0xFF4DB6AC),
+    Color(0xFF81C784),
+    Color(0xFFAED581),
+    Color(0xFFFF8A65),
+    Color(0xFFD4E157),
+    Color(0xFFFFD54F),
+    Color(0xFFFFB74D),
+    Color(0xFFA1887F),
+    Color(0xFF90A4AE),
+)
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun TagChip(
+    tagName: String,
+    tagIcon: ImageVector? = null,
+    onClick: () -> Unit = {},
+) {
+    val color = tagColors[tagName.hashCode() % tagColors.size]
+    Chip(
+        colors = ChipDefaults.chipColors(
+            backgroundColor = color,
+            contentColor = Color.Black,
+            leadingIconContentColor = Color.Black,
+        ),
+        onClick = onClick,
+        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null) } },
+    ) {
+        Text(text = tagName)
     }
 }

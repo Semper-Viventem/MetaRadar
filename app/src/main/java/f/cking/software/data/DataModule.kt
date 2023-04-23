@@ -3,8 +3,19 @@ package f.cking.software.data
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import f.cking.software.data.database.AppDatabase
-import f.cking.software.data.helpers.*
-import f.cking.software.data.repo.*
+import f.cking.software.data.helpers.ActivityProvider
+import f.cking.software.data.helpers.BleScannerHelper
+import f.cking.software.data.helpers.IntentHelper
+import f.cking.software.data.helpers.LocationProvider
+import f.cking.software.data.helpers.NotificationsHelper
+import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.data.helpers.PowerModeHelper
+import f.cking.software.data.repo.DevicesRepository
+import f.cking.software.data.repo.JournalRepository
+import f.cking.software.data.repo.LocationRepository
+import f.cking.software.data.repo.RadarProfilesRepository
+import f.cking.software.data.repo.SettingsRepository
+import f.cking.software.data.repo.TagsRepository
 import org.koin.dsl.module
 
 class DataModule(
@@ -26,5 +37,6 @@ class DataModule(
         single { JournalRepository(get()) }
         single { NotificationsHelper(get(), get()) }
         single { PowerModeHelper(get()) }
+        single { TagsRepository(get()) }
     }
 }
