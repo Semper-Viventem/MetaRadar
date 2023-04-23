@@ -8,7 +8,7 @@ class RemoveTagFromDeviceInteractor(
 ) {
 
     suspend fun execute(device: DeviceData, tag: String) {
-        val deviceWithTags = device.copy(tags = device.tags.filter { it != tag })
+        val deviceWithTags = device.copy(tags = device.tags.filter { it != tag }.toSet())
         devicesRepository.saveDevice(deviceWithTags)
     }
 }

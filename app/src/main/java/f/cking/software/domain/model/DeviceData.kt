@@ -12,7 +12,7 @@ data class DeviceData(
     val detectCount: Int,
     val customName: String?,
     val favorite: Boolean,
-    val tags: List<String>,
+    val tags: Set<String>,
     val lastFollowingDetectionTimeMs: Long?,
 ) {
 

@@ -23,7 +23,7 @@ class BuildDeviceFromScanDataInteractor(
                 )
             },
             lastFollowingDetectionTimeMs = null,
-            tags = emptyList(),
+            tags = emptySet(),
         )
     }
 }

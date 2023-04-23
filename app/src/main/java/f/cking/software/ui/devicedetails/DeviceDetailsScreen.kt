@@ -191,7 +191,7 @@ object DeviceDetailsScreen {
             HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Tags(deviceData = deviceData, viewModel =viewModel)
+            Tags(deviceData = deviceData, viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
@@ -240,8 +240,9 @@ object DeviceDetailsScreen {
             internalPaddings = 0.dp
         ) {
             FlowRow(
-                modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                mainAxisSpacing = 8.dp,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
             ) {
                 AddTag(viewModel = viewModel, deviceData = deviceData)
                 deviceData.tags.forEach { tag ->
@@ -273,7 +274,9 @@ object DeviceDetailsScreen {
                 Text(text = stringResource(R.string.delete_tag_title, name), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
-        TagChip(tagName = name, tagIcon = Icons.Filled.Delete)  { dialogState.show() }
+
+        Spacer(modifier = Modifier.width(8.dp))
+        TagChip(tagName = name, tagIcon = Icons.Filled.Delete) { dialogState.show() }
     }
 
     @OptIn(ExperimentalMaterialApi::class)
@@ -498,6 +501,7 @@ object DeviceDetailsScreen {
                 )
                 map.invalidate()
             }
+
             is DeviceDetailsViewModel.MapCameraState.MultiplePoints -> {
                 Timber.d(cameraConfig.toString())
                 map.post {
