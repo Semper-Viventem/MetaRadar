@@ -46,7 +46,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.flowlayout.FlowColumn
+import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
@@ -168,7 +168,7 @@ object DeviceDetailsScreen {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.5f)
             ) {
                 item { DeviceContent(deviceData = deviceData, viewModel = viewModel) }
             }
@@ -235,12 +235,19 @@ object DeviceDetailsScreen {
         deviceData: DeviceData,
         viewModel: DeviceDetailsViewModel,
     ) {
-        RoundedBox {
-            FlowColumn {
+        RoundedBox(
+            modifier = Modifier.fillMaxWidth(),
+            internalPaddings = 0.dp
+        ) {
+            FlowRow(
+                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                mainAxisSpacing = 8.dp,
+                crossAxisSpacing = 8.dp,
+            ) {
+                AddTag(viewModel = viewModel, deviceData = deviceData)
                 deviceData.tags.forEach { tag ->
                     Tag(name = tag, viewModel = viewModel, deviceData = deviceData)
                 }
-                AddTag(viewModel = viewModel, deviceData = deviceData)
             }
         }
     }

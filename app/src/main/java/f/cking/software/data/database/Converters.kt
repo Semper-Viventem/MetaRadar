@@ -11,6 +11,10 @@ class Converters() {
 
     @TypeConverter
     fun toStringList(string: String): List<String> {
-        return string.split(",")
+        return if (string.isBlank()) {
+            emptyList()
+        } else {
+            string.split(",")
+        }
     }
 }
