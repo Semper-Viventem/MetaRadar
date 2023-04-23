@@ -175,7 +175,7 @@ object FilterScreen {
                     }
                 ) { Text(text = stringResource(R.string.select_tag)) }
             } else {
-                TagChip(tagName = tag) { filter.tag = null }
+                TagChip(tagName = tag, tagIcon = Icons.Filled.Delete) { filter.tag = null }
             }
         }
     }
