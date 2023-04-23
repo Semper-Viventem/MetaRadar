@@ -48,6 +48,7 @@ object FilterUiMapper {
                 radiusMeters = from.radius,
                 noLocationDefaultValue = from.defaultValueIfNoLocation,
             )
+            is FilterUiState.Tag -> RadarProfile.Filter.ByTag(from.tag!!)
             is FilterUiState.Any -> RadarProfile.Filter.Any(from.filters.map { mapToDomain(it) }.sortedBy { it.getDifficulty() })
             is FilterUiState.All -> RadarProfile.Filter.All(from.filters.map { mapToDomain(it) }.sortedBy { it.getDifficulty() })
             is FilterUiState.Not -> RadarProfile.Filter.Not(mapToDomain(from.filter!!))
@@ -86,6 +87,9 @@ object FilterUiMapper {
             }
             is RadarProfile.Filter.MinLostTime -> FilterUiState.MinLostTime().apply {
                 this.minLostTime = from.minLostTime
+            }
+            is RadarProfile.Filter.ByTag -> FilterUiState.Tag().apply {
+                this.tag = from.tag
             }
             is RadarProfile.Filter.All -> FilterUiState.All().apply {
                 this.filters = from.filters.map { mapToUi(it) }

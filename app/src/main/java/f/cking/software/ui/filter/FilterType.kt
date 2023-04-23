@@ -15,6 +15,7 @@ enum class FilterType(@StringRes val displayNameRes: Int) {
     IS_FOLLOWING(R.string.filter_device_is_following_me),
     BY_DEVICE_LOCATION(R.string.filter_device_location),
     BY_USER_LOCATION(R.string.filter_user_location),
+    BY_TAG(R.string.filter_by_tag),
     BY_LOGIC_ANY(R.string.filter_any_of),
     BY_LOGIC_ALL(R.string.filter_all_of),
     BY_LOGIC_NOT(R.string.filter_not),

@@ -47,6 +47,10 @@ data class RadarProfile(
         data class MinLostTime(val minLostTime: Long) : Filter()
 
         @Serializable
+        @SerialName("tag")
+        data class ByTag(val tag: String) : Filter()
+
+        @Serializable
         @SerialName("airdrop_contact")
         data class AppleAirdropContact(
             val contactStr: String,

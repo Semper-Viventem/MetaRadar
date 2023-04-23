@@ -25,7 +25,7 @@ abstract class FilterChecker<T : RadarProfile.Filter>(
         return result
     }
 
-    abstract suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean
+    protected abstract suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean
 
     protected open fun useCache(): Boolean = true
 
