@@ -196,6 +196,7 @@
     <string name="create_new_tag">Create new</string>
     <string name="add_tag">Add tag</string>
     <string name="delete_tag_title">Delete tag \"%s\"?</string>
+    <string name="osm_copyright">© OpenStreetMap</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>

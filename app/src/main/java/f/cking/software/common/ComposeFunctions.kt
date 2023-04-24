@@ -2,25 +2,10 @@ package f.cking.software.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
@@ -224,11 +209,18 @@ fun MapView(
     onUpdate: ((map: MapView) -> Unit)? = null,
 ) {
     val mapViewState = rememberMapViewWithLifecycle()
-
-    AndroidView(
-        { mapViewState.apply { onLoad?.invoke(this) } },
-        modifier
-    ) { mapView -> onUpdate?.invoke(mapView) }
+    Box(modifier = modifier) {
+        AndroidView(
+            { mapViewState.apply { onLoad?.invoke(this) } },
+        ) { mapView -> onUpdate?.invoke(mapView) }
+        Text(
+            text = stringResource(R.string.osm_copyright),
+            modifier = Modifier.align(Alignment.BottomStart),
+            color = Color.DarkGray,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+        )
+    }
 }
 
 @Composable
