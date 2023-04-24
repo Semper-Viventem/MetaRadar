@@ -13,6 +13,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -38,6 +39,7 @@ import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.openUrl
 import f.cking.software.toHexString
 import org.osmdroid.views.MapView
 import java.time.LocalDate
@@ -209,13 +211,17 @@ fun MapView(
     onUpdate: ((map: MapView) -> Unit)? = null,
 ) {
     val mapViewState = rememberMapViewWithLifecycle()
+    val context = LocalContext.current
     Box(modifier = modifier) {
         AndroidView(
             { mapViewState.apply { onLoad?.invoke(this) } },
         ) { mapView -> onUpdate?.invoke(mapView) }
         Text(
             text = stringResource(R.string.osm_copyright),
-            modifier = Modifier.align(Alignment.BottomStart),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .alpha(0.9f)
+                .clickable { context.openUrl("https://www.openstreetmap.org/copyright") },
             color = Color.DarkGray,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
@@ -298,6 +304,7 @@ private val colors = listOf(
     Color(0xFFA1887F),
     Color(0xFF90A4AE),
 )
+
 fun colorByHash(hash: Int): Color {
     return colors[abs(hash % colors.size)]
 }

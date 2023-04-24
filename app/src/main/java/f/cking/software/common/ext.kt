@@ -1,9 +1,13 @@
 package f.cking.software
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.TypedValue
 import android.view.Display
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import java.security.MessageDigest
 import java.time.*
@@ -80,6 +84,16 @@ object SHA256 {
 
     fun fromStringAirdrop(string: String): Int {
         return fromString(string).let { concatTwoBytes(it[0], it[1]) }
+    }
+}
+
+fun Context.openUrl(url: String) {
+    val webpage: Uri = Uri.parse(url)
+    val intent = Intent(Intent.ACTION_VIEW, webpage)
+    try {
+        startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, getString(R.string.cannot_open_the_url), Toast.LENGTH_SHORT).show()
     }
 }
 
