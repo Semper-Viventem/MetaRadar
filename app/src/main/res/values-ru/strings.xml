@@ -201,13 +201,13 @@
     <string name="there_are_no_devices_around">Нет известных устройств вокруг</string>
     <string name="app_service_title">@string/app_name</string>
     <string name="app_service_title_power_saving">%s · Режим энергосбережения</string>
-    <string name="notification_profile_is_near_you">\"%s\" профиль обнаружен!</string>
+    <string name="notification_profile_is_near_you">обнаружен профиль: \"%s\"!</string>
 
     <plurals name="notification_profiles_are_near_you">
-        <item quantity="one">%s профиль обнаружен!</item>
-        <item quantity="few">%s профиля обнаружено!</item>
-        <item quantity="many">%s профилей обнаружено!</item>
-        <item quantity="other">%s профилей обнаружено!</item>
+        <item quantity="one">%s обнаружен профиль!</item>
+        <item quantity="few">обнаружено %s профиля!</item>
+        <item quantity="many">обнаружено %s профилей!</item>
+        <item quantity="other">обнаружено %s профилей!</item>
     </plurals>
 
     <string name="devices_matched_postfix">\" устройство совпало!\"</string>
@@ -221,7 +221,7 @@
 
     <!-- Journal -->
     <string name="journal_device_was_removed">Данное устройство было удалено из Базы Даных</string>
-    <string name="journal_profile_detected">Профиль обнаружен: \"%s\"</string>
+    <string name="journal_profile_detected">Обнаружен профиль: \"%s\"</string>
     <string name="journal_profile_removed">%s (удалено)</string>
     <string name="unknown_capital_case">НЕИЗВЕСТНО</string>
     <string name="journal_placeholder">Это Журнал событий. Вся история радара и сообщения об ошибках будут сохранены здесь, чтобы ничего не пропустить.</string>
