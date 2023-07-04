@@ -1,8 +1,7 @@
 <resources>
-    <string name="app_name">BLE Radar</string>
-    <string name="search">Поиск</string>
 
     <!-- Common -->
+    <string name="search">Поиск</string>
     <string name="cancel">Отмена</string>
     <string name="confirm">Подтвердить</string>
     <string name="back">Назад</string>
@@ -54,8 +53,6 @@
     <string name="no_location_data_yet">Нет данных геолокации</string>
     <string name="location_fetches_only_if_service_is_turned_on">Геолокация обновляется, когда работает сканер.</string>
     <string name="last_location_update_time">Время последнего обновления геолокации: %s.</string>
-    <string name="lat_template">lat: %s</string>
-    <string name="lng_template">lng: %s</string>
     <string name="clear_garbage">Очистить мусор</string>
     <string name="restore_data_from_file_title">Восстановить Базу Данных из файла?</string>
     <string name="restore_data_from_file_subtitle">Текущая База Данных будет перезаписана. Данные будут удалены.</string>

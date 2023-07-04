@@ -1,83 +1,35 @@
 <resources>
-    <string name="app_name" translatable="false">BLE Radar</string>
 
     <!-- Common -->
-    <string name="search">Search</string>
-    <string name="cancel">Cancel</string>
-    <string name="confirm">Confirm</string>
-    <string name="back">Back</string>
-    <string name="save">Save</string>
-    <string name="delete">Delete</string>
-    <string name="select">Select</string>
-    <string name="clear">Clear</string>
-    <string name="decline">Decline</string>
+    <string name="search">Keresés</string>
+    <string name="cancel">Mégse</string>
+    <string name="confirm">Beleegyezés</string>
+    <string name="back">Vissza</string>
+    <string name="save">Mentés</string>
+    <string name="delete">Törlés</string>
+    <string name="select">Kiválasztás</string>
+    <string name="clear">Törlés</string>
+    <string name="decline">Elutasítás</string>
     <string name="ok">OK</string>
-    <string name="turn_on">Turn on</string>
-    <string name="report">Report</string>
-
-    <plurals name="day">
-        <item quantity="zero">%1$d days</item>
-        <item quantity="one">%1$d day</item>
-        <item quantity="two">%1$d days</item>
-        <item quantity="few">%1$d days</item>
-        <item quantity="many">%1$d days</item>
-        <item quantity="other">%1$d days</item>
-    </plurals>
-
-    <plurals name="hour">
-        <item quantity="zero">%1$d hours</item>
-        <item quantity="one">%1$d hour</item>
-        <item quantity="two">%1$d hours</item>
-        <item quantity="few">%1$d hours</item>
-        <item quantity="many">%1$d hours</item>
-        <item quantity="other">%1$d hours</item>
-    </plurals>
-
-    <plurals name="month">
-        <item quantity="zero">%1$d months</item>
-        <item quantity="one">%1$d month</item>
-        <item quantity="two">%1$d months</item>
-        <item quantity="few">%1$d months</item>
-        <item quantity="many">%1$d months</item>
-        <item quantity="other">%1$d months</item>
-    </plurals>
-
-    <plurals name="min">
-        <item quantity="zero">%1$d min</item>
-        <item quantity="one">%1$d min</item>
-        <item quantity="two">%1$d min</item>
-        <item quantity="few">%1$d min</item>
-        <item quantity="many">%1$d min</item>
-        <item quantity="other">%1$d min</item>
-    </plurals>
-
-    <plurals name="sec">
-        <item quantity="zero">%1$d sec</item>
-        <item quantity="one">%1$d sec</item>
-        <item quantity="two">%1$d sec</item>
-        <item quantity="few">%1$d sec</item>
-        <item quantity="many">%1$d sec</item>
-        <item quantity="other">%1$d sec</item>
-    </plurals>
+    <string name="turn_on">Bekapcsolás</string>
+    <string name="report">Jelentés</string>
 
     <!-- Settings -->
-    <string name="no_location_data_yet">No location data yet</string>
-    <string name="location_fetches_only_if_service_is_turned_on">Location fetches only if the scanner is started</string>
-    <string name="last_location_update_time">Last location update time: %s</string>
-    <string name="lat_template">lat: %s</string>
-    <string name="lng_template">lng: %s</string>
-    <string name="clear_garbage">Clear garbage</string>
-    <string name="restore_data_from_file_title">Restore database from file?</string>
-    <string name="restore_data_from_file_subtitle">The current database will be overwritten, data will be lost</string>
-    <string name="settings_restore_database">Restore database</string>
-    <string name="backup_database_title">Save database to devise storage?</string>
-    <string name="backup_database_subtitle">The database contains your location history. Please handle it with care, this is your sensitive data</string>
-    <string name="settings_backup_database">Backup database</string>
-    <string name="settings_clear_all_location_history">Clear locations history</string>
-    <string name="settings_use_gps_title">Use GPS location only</string>
-    <string name="settings_use_gps_subtitle">Don\'t use Fused Location. No heuristic bullshit, good old GPS, the data is more true. Requires good GPS signal. Higher battery consumption.</string>
-    <string name="settings_location_history_was_removed">Location history was removed</string>
-    <string name="backup_has_failed">Backup has failed. See report in the Journal</string>
+    <string name="no_location_data_yet">Még nincsenek helyadatok</string>
+    <string name="location_fetches_only_if_service_is_turned_on">A hely csak akkor jelenik meg, ha a szkenner elindul</string>
+    <string name="last_location_update_time">Legutóbbi helyzet-frissítés: %s</string>
+    <string name="clear_garbage">Szemét törlése</string>
+    <string name="restore_data_from_file_title">Visszaállítod az adatbázist fájlból?</string>
+    <string name="restore_data_from_file_subtitle">A jelenlegi adatbázis felül lesz írva, az adatok el fognak veszni</string>
+    <string name="settings_restore_database">Adatbázis visszaállítása</string>
+    <string name="backup_database_title">zeretnéd elmenteni az adatbázist az eszköz tárhelyére?</string>
+    <string name="backup_database_subtitle">Ez az adatbázis a te helyelőzményeidet tartalmazza. Kérlek figyelj oda rá, ezek a te bizalmas adataid</string>
+    <string name="settings_backup_database">Adatbázis biztonsági mentése</string>
+    <string name="settings_clear_all_location_history">Helyelőzmények törlése</string>
+    <string name="settings_use_gps_title">Csak GPS helyadatok használata</string>
+    <string name="settings_use_gps_subtitle">Ne használj Összeolvasztott Helyedatokat (Fused Location). Semmi heurisztikus szarság, csak a jó öreg GPS, az adatai pontosabbak. Jó GPS jelet igényel és jobban fogyasztja az akkumlátort.</string>
+    <string name="settings_location_history_was_removed">A helyelőzmények törölve lettek</string>
+    <string name="backup_has_failed">A biztonsági mentés sikertelen. Lásd a jelentést a Naplóban</string>
     <string name="directory_was_not_selected">Directory wasn\'t selected</string>
     <string name="file_was_not_selected">File wasn\'t selected</string>
     <string name="cannot_restore_database">Cannot restore database. See report in the Journal</string>
@@ -218,8 +170,6 @@
 
     <plurals name="notification_profiles_are_near_you">
         <item quantity="one">%1$d profile is near you!</item>
-        <item quantity="few">%1$d profiles are near you!</item>
-        <item quantity="many">%1$d profiles are near you!</item>
         <item quantity="other">%1$d profiles are near you!</item>
     </plurals>
 
