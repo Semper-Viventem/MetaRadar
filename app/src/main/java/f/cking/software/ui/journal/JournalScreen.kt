@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import f.cking.software.R
@@ -58,7 +59,13 @@ object JournalScreen {
                     .padding(16.dp)
             ) {
                 Row(Modifier.fillMaxWidth()) {
-                    Text(modifier = Modifier.weight(1f), text = uiModel.title, fontWeight = FontWeight.Bold)
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = uiModel.title,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin)
                 }
@@ -72,7 +79,8 @@ object JournalScreen {
                         },
                         text = uiModel.subtitle,
                         fontWeight = FontWeight.Normal,
-                        maxLines = if (isExpanded) Int.MAX_VALUE else 5
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 5,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 

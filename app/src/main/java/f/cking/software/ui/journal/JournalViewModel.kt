@@ -64,11 +64,21 @@ class JournalViewModel(
         journalEntry: JournalEntry,
         report: JournalEntry.Report.Error,
     ): JournalEntryUiModel {
+        val title = if (report.title.length > MAX_ERROR_TITLE_LENGTH) {
+            report.title.substring(0 until MAX_ERROR_TITLE_LENGTH)
+        } else {
+            report.title
+        }
+        val description = if (report.stackTrace.length > MAX_ERROR_DESCRIPTION_LENGTH) {
+            report.stackTrace.substring(0 until MAX_ERROR_DESCRIPTION_LENGTH)
+        } else {
+            report.stackTrace
+        }
         return JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
             color = R.color.error_background,
-            title = report.title,
-            subtitle = report.stackTrace,
+            title = title,
+            subtitle = description,
             journalEntry = journalEntry,
             items = null,
         )
@@ -117,5 +127,10 @@ class JournalViewModel(
             val displayName: String,
             val payload: String?,
         )
+    }
+
+    companion object {
+        private const val MAX_ERROR_TITLE_LENGTH = 256
+        private const val MAX_ERROR_DESCRIPTION_LENGTH = 10000
     }
 }
