@@ -1,0 +1,232 @@
+<resources>
+
+    <!-- Common -->
+    <string name="search">Поиск</string>
+    <string name="cancel">Отмена</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="back">Назад</string>
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+    <string name="select">Выбрать</string>
+    <string name="clear">Отчистить</string>
+    <string name="decline">Отменить</string>
+    <string name="ok">ОК</string>
+    <string name="turn_on">Включить</string>
+    <string name="report">Сообщить о проблеме</string>
+
+    <plurals name="day">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дней</item>
+    </plurals>
+
+    <plurals name="hour">
+        <item quantity="one">%d час</item>
+        <item quantity="few">%d часа</item>
+        <item quantity="many">%d часов</item>
+        <item quantity="other">%d часов</item>
+    </plurals>
+
+    <plurals name="min">
+        <item quantity="one">%1$d мин</item>
+        <item quantity="few">%1$d мин</item>
+        <item quantity="many">%1$d мин</item>
+        <item quantity="other">%1$d мин</item>
+    </plurals>
+
+    <plurals name="sec">
+        <item quantity="one">%1$d сек</item>
+        <item quantity="few">%1$d сек</item>
+        <item quantity="many">%1$d сек</item>
+        <item quantity="other">%1$d сек</item>
+    </plurals>
+
+    <!-- Settings -->
+    <string name="no_location_data_yet">Нет данных геолокации</string>
+    <string name="location_fetches_only_if_service_is_turned_on">Геолокация обновляется, когда работает сканер.</string>
+    <string name="last_location_update_time">Время последнего обновления геолокации: %s.</string>
+    <string name="clear_garbage">Очистить мусор</string>
+    <string name="restore_data_from_file_title">Восстановить Базу Данных из файла?</string>
+    <string name="restore_data_from_file_subtitle">Текущая База Данных будет перезаписана. Данные будут удалены.</string>
+    <string name="settings_restore_database">Восстановить БД</string>
+    <string name="backup_database_title">Сохранить Базу Данных в память устройства?</string>
+    <string name="backup_database_subtitle">База Данных содержит вашу историю перемещений. Пожалуйста, никуда не передавайте ее — это ваши персональные данные.</string>
+    <string name="settings_backup_database">Создать резервную копию Базы Данных</string>
+    <string name="settings_clear_all_location_history">Очистить историю перемещений</string>
+    <string name="settings_use_gps_title">Использовать только GPS устройства</string>
+    <string name="settings_use_gps_subtitle">Не использовать Android Fused Location. Без эвристической хуйни, старый добрый GPS. Более высокая достоверность данных, выше энергопотребление.</string>
+    <string name="settings_location_history_was_removed">История геолокаций безвозвратно удалена.</string>
+    <string name="backup_has_failed">Не удалось создать резервную копию. Отчет об ошибке записан в Журнал</string>
+    <string name="directory_was_not_selected">Директория не выбрана</string>
+    <string name="file_was_not_selected">Файл не выбран</string>
+    <string name="cannot_restore_database">Не удалось восстановить БД из резервной копии. Отчет об ошибке записан в Журнал</string>
+    <string name="database_was_restored">База Данных восстановлена из резервной копии</string>
+    <string name="backup_has_succeeded">Резервная копия успешно сохранена</string>
+    <string name="garbage_has_cleared">Удалено %s мусорных записей из БД</string>
+    <string name="clear_all_location_history_dialog_title">Очистить всю историю геолокации из БД?</string>
+    <string name="launch_on_system_startup_title">Запускать сканер при старте системы</string>
+    <string name="report_issue_title">Нашли проблему или хотите что-то предложить?</string>
+    <string name="app_info_title">Информация</string>
+    <string name="app_info_version">Версия: %1$s (%2$s)</string>
+    <string name="app_info_build_type_release">Тип сборки: Release</string>
+    <string name="app_info_build_type_debug">Тип сборки: Debug</string>
+    <string name="app_info_distribution">Доставка сборки: %s</string>
+
+    <!-- Select manufacturer -->
+    <string name="select_manufacturer">Выбор производителя</string>
+
+    <!-- Select location -->
+    <string name="select_location">Выбор геолокации</string>
+    <string name="select_location_radius">Радиус: %.1f m.</string>
+
+    <!-- Select filter -->
+    <string name="select_filter">Выбор фильтра</string>
+    <string name="filter_by_name">По имени</string>
+    <string name="filter_by_address">По адресу</string>
+    <string name="filter_by_first_detection_period">По периоду первого обнаружения</string>
+    <string name="filter_by_last_detection_period">По периоду последнего обнаружения</string>
+    <string name="filter_by_is_favorite">По флагу избранное</string>
+    <string name="filter_by_manufacturer">По производителю</string>
+    <string name="filter_by_min_lost_period">По минимальному отсутствию в эфире</string>
+    <string name="filter_apple_airdrop_contact">Apple airdrop контакт</string>
+    <string name="filter_device_is_following_me">Девайс преследует меня</string>
+    <string name="filter_any_of">Любой из …</string>
+    <string name="filter_all_of">Каждый из …</string>
+    <string name="filter_not">Не …</string>
+    <string name="filter_device_location">По геолокации устройства</string>
+    <string name="filter_user_location">По вашей геолокации</string>
+    <string name="filter_by_tag">По тэгу</string>
+
+    <!-- Profiles list -->
+    <string name="create_new">Создать новый</string>
+    <string name="profile_is_active">Активен</string>
+    <string name="profile_is_not_active">Не активен</string>
+    <string name="radar_profile_placeholder">Профили радара помогут вам найти устройство по нужным кретериям. Приложение отправит уведомление, если одно из устройств в эфире подходит под условия профиля радара. Нажмите \"Создать новый\" либо выберите один из шаблонов прояиля.</string>
+
+    <!-- Profile details -->
+    <string name="radar_profile_title">Профиль радара</string>
+    <string name="name">Имя</string>
+    <string name="description">Описания (не обязательно)</string>
+    <string name="is_active">Активный ли</string>
+    <string name="add_filter">Добавить фильтр</string>
+    <string name="filter_unknown">Неизвестный фильтр</string>
+    <string name="min_following_duration">Минимальная продолжительность следования</string>
+    <string name="min_interval_to_detect">Минимальный интервал между обнаружениями</string>
+    <string name="time_placeholder">ЧЧ:ММ</string>
+    <string name="filter_unknown_title">Данный фильтр не поддерживается вашей версией приложения</string>
+    <string name="placeholder_device_name">Имя устройства</string>
+    <string name="ignore_case">Игнорировать регистр</string>
+    <string name="placeholder_airdrope_contact">email/номер телефона</string>
+    <string name="airdrop_min_lost_period">Минимальный период отсутствия в эфире</string>
+    <string name="airdrop_issue_description">Airdrop не может быть привязан к конкретному устройству, поскольку BLE адрес у устройств Apple меняется каждые 15 минут. Поэтому для указания минимального интервала отсутствия в эфире используйте это поле.</string>
+    <string name="select_device">Выбрать устройство</string>
+    <string name="tap_to_select">Нажмите для выбора</string>
+    <string name="chose_time">Выбрать время</string>
+    <string name="from_date">От даты</string>
+    <string name="from_time">От времени</string>
+    <string name="to_date">До даты</string>
+    <string name="to_time">До времени</string>
+    <string name="is_favorite">В избранном</string>
+    <string name="filter_user_location_if_no_location">Пропустить этот фильтр если ваша геолокация недоступна (в противном случае значение по умолчанию False)</string>
+    <string name="change">Изменить</string>
+    <string name="cannot_save_profile">Не удается сохранить профиль. Проверьте конфигурацию</string>
+    <string name="profile_has_been_removed">Профиль был удален</string>
+    <string name="delete_profile_dialog_title">Удалить профиль %s?</string>
+    <string name="discard_changes_dialog_title">Ваши изменения будут потеряны. Продолжить?</string>
+    <string name="stay">Остаться</string>
+    <string name="discard_changes">Отменить изменения</string>
+    <string name="filter_location_has_data">Геолокация задана. Радиус: %.1f m</string>
+    <string name="filter_location_no_data">Выбрать целевую геолокацию</string>
+    <string name="select_tag">Выбрать тэг</string>
+
+    <!-- Devices List -->
+    <string name="custom_filter">Пользовательский фильтр</string>
+    <string name="create_filter">Создать фильтр</string>
+    <string name="filter_is_not_valid">Фильтр не действителен</string>
+    <string name="search_query">Поисковый запрос</string>
+    <string name="close_search">Закрыть поиск</string>
+    <string name="clear_search">Очистить поиск</string>
+    <string name="not_apple">Не Apple</string>
+    <string name="favorite">Избранное</string>
+
+    <!-- Device Details -->
+    <string name="device_details_title">Детализация устройства</string>
+    <string name="is_not_favorite">Не в избранном</string>
+    <string name="device_details_name">Имя</string>
+    <string name="not_applicable">N/A</string>
+    <string name="device_details_address">Адрес</string>
+    <string name="device_details_manufacturer">Производитель</string>
+    <string name="device_details_detect_count">Число обнаружений: </string>
+    <string name="device_details_first_detection">Первое обнаружение</string>
+    <string name="device_details_last_detection">Последнее обнаружение</string>
+    <string name="device_details_dialog_time_period_selected">%s (выбрано)</string>
+    <string name="change_history_period_dialog">Изменить период истории перемещений</string>
+    <string name="device_details_history_period">"Временной период: "</string>
+    <string name="device_details_history_period_subtitle">Отображение большого объема данных о перемещении может сказаться на производительности карты</string>
+    <string name="device_details_no_location_history_for_such_period">Нет истории перемещений за этот период</string>
+    <string name="device_details_day">День</string>
+    <string name="device_details_week">Неделя</string>
+    <string name="device_details_month">Месяц</string>
+    <string name="device_details_all_time">Все время</string>
+    <string name="time_ago">%s назад</string>
+    <string name="lifetime_data">Время жизни: %1$s | Последнее обновление: %2$s назад</string>
+    <string name="device_list_placeholder">Пока нет данных. Для начала сканирования нажмите на кнопку \"Сканировать\"</string>
+    <string name="tag_name">Имя тэга</string>
+    <string name="create_new_tag">Создать новый</string>
+    <string name="add_tag">Добавить тэг</string>
+    <string name="delete_tag_title">Удалить тэг \"%s\"?</string>
+    <string name="osm_copyright">© OpenStreetMap</string>
+
+    <!-- Main Screen -->
+    <string name="menu_device_list">Список устройств</string>
+    <string name="menu_radar_profiles">Профили радара</string>
+    <string name="menu_journal">Журнал</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="stop">Остановить сканер</string>
+    <string name="scan">Сканировать</string>
+    <string name="refresh">Обновить</string>
+
+    <!-- Notifications -->
+    <string name="ble_scanner_is_started_but_no_data">BLE сканер запущен, но данных еще нет</string>
+    <string name="known_devices_around">%s известных устройств вокруг</string>
+    <string name="total_devices_around">%s всего устройств вокруг</string>
+    <string name="there_are_no_devices_around">Нет известных устройств вокруг</string>
+    <string name="app_service_title">@string/app_name</string>
+    <string name="app_service_title_power_saving">%s · Режим энергосбережения</string>
+    <string name="notification_profile_is_near_you">обнаружен профиль: \"%s\"!</string>
+
+    <plurals name="notification_profiles_are_near_you">
+        <item quantity="one">%d обнаружен профиль!</item>
+        <item quantity="few">обнаружено %d профиля!</item>
+        <item quantity="many">обнаружено %d профилей!</item>
+        <item quantity="other">обнаружено %d профилей!</item>
+    </plurals>
+
+    <string name="devices_matched_postfix">\" устройство совпало!\"</string>
+    <string name="scanner_notification_channel_name">Уведомление о фоновой работе сканера</string>
+    <string name="device_found_notification_channel_name">Уведомление радара</string>
+    <string name="location_is_turned_off_title">Геолокация выключена</string>
+    <string name="location_is_turned_off_subtitle">BLE Radar не может выполнять сканирование, пока гелокация выключена. Это ограничение операционной системы Android.</string>
+    <string name="errors_notifications">Уведомление об ошибках</string>
+    <string name="bluetooth_is_not_available_title">Bluetooth недоступен</string>
+    <string name="bluetooth_is_not_available_content">Похоже, что Bluetooth выключен или недоступен на вашем устройстве. Включите Bluetooth чтобы продолжить.</string>
+
+    <!-- Journal -->
+    <string name="journal_device_was_removed">Данное устройство было удалено из Базы Даных</string>
+    <string name="journal_profile_detected">Обнаружен профиль: \"%s\"</string>
+    <string name="journal_profile_removed">%s (удалено)</string>
+    <string name="unknown_capital_case">НЕИЗВЕСТНО</string>
+    <string name="journal_placeholder">Это Журнал событий. Вся история радара и сообщения об ошибках будут сохранены здесь, чтобы ничего не пропустить.</string>
+
+    <!-- Permissions -->
+    <string name="permission_intro_bg_location_text">Существует две причины для доступа к геолокации: \n1. Часть функциональности приложения связано с анализом данных на основе вашего местоположения; \n2. Политика безопасности в Android требует разрешения на геолокацию для работы с Bluetooth, поскольку по данным Bluetooth можно косвенно определить ваше местоположение.</string>
+    <string name="permissions_intro_bg_location_title">Геолокация в фоне</string>
+    <string name="permissions_intro_nearby_title">Nearby (Bluetooth) access</string>
+    <string name="permissions_intro_nearby_description">Сканирование Bluetooth требует разрешения на доступ к Nearby (Bluetooth) устройствам.</string>
+    <string name="permissions_intro_doze_mode_title">Doze mode (не обязательно)</string>
+    <string name="permissions_intro_doze_mode_text">Android ограничевает работу некоторых процессов в фоновом режиме, в т.ч. для работы с Bluetooth. Данное разрешение требуется для более стабильной работы сканнера в фоновом режиме. Опционально, но очень желательно.</string>
+    <string name="permission_data_coolect_info">Приложение не собирает и не передает ваши данные. Исходный код приложения открытый и доступен на github</string>
+    <string name="grant_permissions_manually">Предоставьте необходимое разрешение вручную</string>
+    <string name="cannot_open_the_url">Не удаетс яоткрыть URL</string>
+</resources>
