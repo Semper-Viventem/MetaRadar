@@ -15,24 +15,17 @@
     <string name="report">Сообщить о проблеме</string>
 
     <plurals name="day">
-        <item quantity="one">%1$d день</item>
-        <item quantity="few">%1$d дня</item>
-        <item quantity="many">%1$d дней</item>
-        <item quantity="other">%1$d дней</item>
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дней</item>
     </plurals>
 
     <plurals name="hour">
-        <item quantity="one">%1$d час</item>
-        <item quantity="few">%1$d часа</item>
-        <item quantity="many">%1$d часов</item>
-        <item quantity="other">%1$d часов</item>
-    </plurals>
-
-    <plurals name="month">
-        <item quantity="one">%1$d месяц</item>
-        <item quantity="few">%1$d месяца</item>
-        <item quantity="many">%1$d месяцев</item>
-        <item quantity="other">%1$d месяцев</item>
+        <item quantity="one">%d час</item>
+        <item quantity="few">%d часа</item>
+        <item quantity="many">%d часов</item>
+        <item quantity="other">%d часов</item>
     </plurals>
 
     <plurals name="min">
@@ -204,10 +197,10 @@
     <string name="notification_profile_is_near_you">обнаружен профиль: \"%s\"!</string>
 
     <plurals name="notification_profiles_are_near_you">
-        <item quantity="one">%s обнаружен профиль!</item>
-        <item quantity="few">обнаружено %s профиля!</item>
-        <item quantity="many">обнаружено %s профилей!</item>
-        <item quantity="other">обнаружено %s профилей!</item>
+        <item quantity="one">%d обнаружен профиль!</item>
+        <item quantity="few">обнаружено %d профиля!</item>
+        <item quantity="many">обнаружено %d профилей!</item>
+        <item quantity="other">обнаружено %d профилей!</item>
     </plurals>
 
     <string name="devices_matched_postfix">\" устройство совпало!\"</string>

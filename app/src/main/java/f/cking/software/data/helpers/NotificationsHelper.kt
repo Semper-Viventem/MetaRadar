@@ -71,7 +71,7 @@ class NotificationsHelper(
             val profile = profiles.first()
             context.getString(R.string.notification_profile_is_near_you, profile.profile.name)
         } else {
-            context.resources.getQuantityString(R.plurals.notification_profiles_are_near_you, profiles.count())
+            context.resources.getQuantityString(R.plurals.notification_profiles_are_near_you, profiles.count(), profiles.count())
         }
 
         val content = profiles.flatMap { it.matched }
