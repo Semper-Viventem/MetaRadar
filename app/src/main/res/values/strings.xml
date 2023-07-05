@@ -16,48 +16,39 @@
     <string name="report">Report</string>
 
     <plurals name="day">
-        <item quantity="zero">%1$d days</item>
-        <item quantity="one">%1$d day</item>
-        <item quantity="two">%1$d days</item>
-        <item quantity="few">%1$d days</item>
-        <item quantity="many">%1$d days</item>
-        <item quantity="other">%1$d days</item>
+        <item quantity="zero">%d days</item>
+        <item quantity="one">%d day</item>
+        <item quantity="two">%d days</item>
+        <item quantity="few">%d days</item>
+        <item quantity="many">%d days</item>
+        <item quantity="other">%d days</item>
     </plurals>
 
     <plurals name="hour">
-        <item quantity="zero">%1$d hours</item>
-        <item quantity="one">%1$d hour</item>
-        <item quantity="two">%1$d hours</item>
-        <item quantity="few">%1$d hours</item>
-        <item quantity="many">%1$d hours</item>
-        <item quantity="other">%1$d hours</item>
-    </plurals>
-
-    <plurals name="month">
-        <item quantity="zero">%1$d months</item>
-        <item quantity="one">%1$d month</item>
-        <item quantity="two">%1$d months</item>
-        <item quantity="few">%1$d months</item>
-        <item quantity="many">%1$d months</item>
-        <item quantity="other">%1$d months</item>
+        <item quantity="zero">%d hours</item>
+        <item quantity="one">%d hour</item>
+        <item quantity="two">%d hours</item>
+        <item quantity="few">%d hours</item>
+        <item quantity="many">%d hours</item>
+        <item quantity="other">%d hours</item>
     </plurals>
 
     <plurals name="min">
-        <item quantity="zero">%1$d min</item>
-        <item quantity="one">%1$d min</item>
-        <item quantity="two">%1$d min</item>
-        <item quantity="few">%1$d min</item>
-        <item quantity="many">%1$d min</item>
-        <item quantity="other">%1$d min</item>
+        <item quantity="zero">%d min</item>
+        <item quantity="one">%d min</item>
+        <item quantity="two">%d min</item>
+        <item quantity="few">%d min</item>
+        <item quantity="many">%d min</item>
+        <item quantity="other">%d min</item>
     </plurals>
 
     <plurals name="sec">
-        <item quantity="zero">%1$d sec</item>
-        <item quantity="one">%1$d sec</item>
-        <item quantity="two">%1$d sec</item>
-        <item quantity="few">%1$d sec</item>
-        <item quantity="many">%1$d sec</item>
-        <item quantity="other">%1$d sec</item>
+        <item quantity="zero">%d sec</item>
+        <item quantity="one">%d sec</item>
+        <item quantity="two">%d sec</item>
+        <item quantity="few">%d sec</item>
+        <item quantity="many">%d sec</item>
+        <item quantity="other">%d sec</item>
     </plurals>
 
     <!-- Settings -->
@@ -217,10 +208,10 @@
     <string name="notification_profile_is_near_you">\"%s\" profile is near you!</string>
 
     <plurals name="notification_profiles_are_near_you">
-        <item quantity="one">%1$d profile is near you!</item>
-        <item quantity="few">%1$d profiles are near you!</item>
-        <item quantity="many">%1$d profiles are near you!</item>
-        <item quantity="other">%1$d profiles are near you!</item>
+        <item quantity="one">%d profile is near you!</item>
+        <item quantity="few">%d profiles are near you!</item>
+        <item quantity="many">%d profiles are near you!</item>
+        <item quantity="other">%d profiles are near you!</item>
     </plurals>
 
     <string name="devices_matched_postfix">\" devices matched!\"</string>
