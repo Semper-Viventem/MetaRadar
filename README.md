@@ -10,7 +10,6 @@ This application does not share your personal data or geolocation, all work is o
 
 <br>
 
-<img src='https://user-images.githubusercontent.com/18288554/221911079-945d912d-8efa-4d96-90d9-bc32e98114b7.jpg' width='300'/> <img src='https://user-images.githubusercontent.com/18288554/221911329-89d96c0c-124e-4ac9-9234-4cb530e95288.jpg' width='300'/>
+<img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/1ed51c54-5c99-43a5-af00-b8e758430245' width='300'/> <img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/d5154621-a66a-4bb2-8099-d1d2c27503df' width='300'/>
 
-
-<img src='https://user-images.githubusercontent.com/18288554/221911481-8178dd65-7147-462b-bc0d-5c2bb4e2859c.jpg' width='300'/> <img src='https://user-images.githubusercontent.com/18288554/221911491-f9bca86f-a0d8-48cc-95be-24343fc582f4.jpg' width='300'/>
+<img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/8a59cc0d-ccc8-47c0-a1d3-3a08f8ff347a' width='300'/> <img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/6e51793a-00ce-4e4b-9e59-c69973cde6a2' width='300'/>
