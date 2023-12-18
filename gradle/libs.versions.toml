@@ -1,17 +1,17 @@
 [versions]
 # You also need to bump the version of ksp, anvil, compose
-kotlin-general = "1.8.10"
-kotlinx = "1.6.4"
-ksp = "1.7.20-1.0.6"
+kotlin-general = "1.9.21"
+kotlinx = "1.7.3"
+ksp = "1.9.21-1.0.16"
 anvil = "2.4.2"
-android-gradle = "7.4.2"
+android-gradle = "8.2.0"
 protobuf = "3.21.7"
 protobuf-gradle = "0.9.1"
 # Protobuf JVM library https://github.com/flipperdevices/flipperzero-protobuf-jvm
 protobuf-jvm = "0.12.0-0.3.0"
-compose = "1.2.1"
+compose = "1.5.4"
 compose-wear = "1.0.2"
-compose-compiler = "1.4.4"
+compose-compiler = "1.5.6"
 compose-accompanist = "0.28.0"
 compose-constraint = "1.0.1"
 compose-navigation = "2.5.2"
@@ -21,7 +21,7 @@ wear = "1.2.0"
 wear-gms = "18.0.0"
 wear-interaction-phone = "1.1.0-alpha03"
 wear-interaction-remote = "1.0.0"
-room = "2.4.3"
+room = "2.6.1"
 dagger = "2.44"
 timber = "5.0.1"
 timber-treessence = "1.0.5"
@@ -30,10 +30,10 @@ sentry-gradle = "3.2.0"
 zip4j = "2.11.2"
 seismic = "1.0.3"
 cicerone = "7.1"
-ktx = "1.9.0"
-ktx-fragment = "1.5.3"
-ktx-activity = "1.6.0"
-ktx-testing = "1.1.3"
+ktx = "1.12.0"
+ktx-fragment = "1.6.2"
+ktx-activity = "1.8.2"
+ktx-testing = "1.1.5"
 lifecycle = "2.5.1"
 # https://github.com/vigna/fastutil/issues/136
 fastutil = "7.2.1"
@@ -66,7 +66,7 @@ compose-dialogs = "0.9.0"
 process-phoenix = "2.1.2"
 
 # Testing
-junit = "4.12"
+junit = "4.13.2"
 mockito = "4.0.0"
 roboelectric = "4.9"
 mockk = "1.13.2"
@@ -241,10 +241,11 @@ map = { module = "org.osmdroid:osmdroid-android", version.ref = "map" }
 [plugins]
 android-app = { id = "com.android.application", version.ref = "android-gradle" }
 android-lib = { id = "com.android.library", version.ref = "android-gradle" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt-gradle" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-general" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-general" }
+room = { id = "androidx.room", version.ref = "room" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradle" }
 square-anvil = { id = "com.squareup.anvil", version.ref = "anvil" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt-gradle" }

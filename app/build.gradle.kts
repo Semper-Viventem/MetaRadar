@@ -1,34 +1,32 @@
-@file:Suppress("UnstableApiUsage")
-
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
+    id("androidx.room")
 }
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 apply {
     plugin("kotlinx-serialization")
 }
 
 android {
-    compileSdkVersion(33)
+    compileSdk = 34
     namespace = "f.cking.software"
 
     defaultConfig {
         applicationId = "f.cking.software"
         minSdk = 29
-        targetSdk = 33
+        targetSdk = 34
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.18.1-beta"
+        versionName = "0.19.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas")
-            }
-        }
 
         buildConfigField("String", "REPORT_ISSUE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/issues\"")
 
@@ -85,16 +83,21 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility(JavaVersion.VERSION_1_8)
-        targetCompatibility(JavaVersion.VERSION_1_8)
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlin {
+        jvmToolchain(17)
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures.apply {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -149,7 +152,7 @@ dependencies {
     // room
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.ksp)
-    kapt(libs.room.ksp)
+    ksp(libs.room.ksp)
 
     // di
     implementation(libs.dagger)
@@ -165,5 +168,5 @@ dependencies {
 
     // tests
     testImplementation(libs.junit)
-    androidTestImplementation("androidx.test.ext:junit:1.1.4")
+    androidTestImplementation(libs.ktx.testing)
 }
