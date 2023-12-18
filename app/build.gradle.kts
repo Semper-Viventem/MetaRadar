@@ -12,13 +12,13 @@ apply {
 }
 
 android {
-    compileSdkVersion(33)
+    compileSdk = 34
     namespace = "f.cking.software"
 
     defaultConfig {
         applicationId = "f.cking.software"
         minSdk = 29
-        targetSdk = 33
+        targetSdk = 34
         versionCode = (System.currentTimeMillis() / 1000).toInt()
         versionName = "0.18.1-beta"
 
