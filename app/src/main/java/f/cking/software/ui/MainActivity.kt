@@ -74,11 +74,13 @@ class MainActivity : AppCompatActivity() {
         permissionHelper.onPermissionGranted(requestCode, permissions, grantResults)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         intentHelper.handleActivityResult(requestCode, resultCode, data)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         router.navigate(BackCommand)
     }
