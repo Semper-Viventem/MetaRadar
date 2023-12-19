@@ -48,12 +48,13 @@ class MainActivity : AppCompatActivity() {
             val focusManager = LocalFocusManager.current
             MaterialTheme(
                 colors = MaterialTheme.colors.copy(
-                    primary = colorResource(id = R.color.orange_500),
-                    primaryVariant = colorResource(id = R.color.orange_700),
-                    onPrimary = Color.White,
-                    secondary = Color.Black,
-                    secondaryVariant = Color.Black,
+                    primary = colorResource(id = R.color.primary_color),
+                    primaryVariant = colorResource(id = R.color.primary_color),
+                    onPrimary = Color.Black,
+                    secondary = colorResource(id = R.color.secondary_color),
+                    secondaryVariant = colorResource(id = R.color.secondary_color),
                     onSecondary = Color.White,
+                    surface = colorResource(id = R.color.surface_color),
                 )
             ) {
                 val stack = viewModel.navigator.stack

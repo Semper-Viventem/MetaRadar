@@ -13,6 +13,10 @@
     <color name="orange_dark_700">#E64A19</color>
     <color name="orange_dark_800">#D84315</color>
 
+    <color name="surface_color">#FFF4DA</color>
+    <color name="primary_color">#FFF4DA</color>
+    <color name="secondary_color">#F57C00</color>
+
     <color name="filter_any">#80DEEA</color>
     <color name="filter_all">#A5D6A7</color>
     <color name="filter_not">#B39DDB</color>

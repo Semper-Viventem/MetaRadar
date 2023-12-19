@@ -111,7 +111,7 @@ object MainScreen {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colors.primarySurface.copy(alpha = 0.1f)),
+                .background(MaterialTheme.colors.secondary.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center,
         ) {
             Row(
@@ -198,7 +198,7 @@ object MainScreen {
                 Image(
                     painter = painterResource(id = icon),
                     contentDescription = text,
-                    colorFilter = ColorFilter.tint(color = Color.White)
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colors.onSecondary)
                 )
             }
         )
@@ -298,12 +298,12 @@ object MainScreen {
     private fun TopBar(viewModel: MainViewModel) {
         TopAppBar(
             title = {
-                Text(text = stringResource(R.string.app_name))
+                Text(text = stringResource(R.string.app_name), color = MaterialTheme.colors.onPrimary)
             },
             actions = {
                 if (viewModel.scanStarted && viewModel.bgServiceIsActive) {
                     CircularProgressIndicator(
-                        color = Color.White,
+                        color = Color.Black,
                         modifier = Modifier
                             .size(24.dp)
                     )
@@ -316,7 +316,7 @@ object MainScreen {
                                 .size(24.dp),
                             imageVector = Icons.Filled.Refresh,
                             contentDescription = stringResource(R.string.refresh),
-                            colorFilter = ColorFilter.tint(Color.White)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
                         )
                     }
                 }
