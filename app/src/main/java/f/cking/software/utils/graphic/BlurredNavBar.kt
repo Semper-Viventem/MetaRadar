@@ -123,7 +123,7 @@ fun Modifier.blurBottom(heightPx: Float, blur: Float): Modifier = composed {
                         RenderEffect.createRuntimeShaderEffect(contentShader, "content"),
                         RenderEffect.createChainEffect(
                             RenderEffect.createRuntimeShaderEffect(blurredShader, "content"),
-                            RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.DECAL)
+                            RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.MIRROR)
                         ),
                         BlendMode.SRC_OVER,
                     )

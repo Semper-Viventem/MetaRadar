@@ -6,7 +6,6 @@ object Shaders {
     @Language("AGSL")
     val SHADER_CONTENT = """
         uniform shader content;
-        uniform shader blur;
     
         uniform float blurredHeight;
         uniform float2 iResolution;
