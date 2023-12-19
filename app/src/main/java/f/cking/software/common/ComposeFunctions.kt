@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -399,32 +400,33 @@ fun BlurredNavBar(
     blur: Float = 10f,
     zIndex: Float = 1f,
     fallbackColor: Color = MaterialTheme.colors.primary,
-    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.1f),
+    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.2f),
     navBarContent: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Box(modifier = modifier) {
-        var heightLocal = remember { height }
+        val context = LocalContext.current
+        var navbarHeightPx = remember { mutableStateOf(height?.value?.let(context::dpToPx)?.toFloat()) }
         val isRenderEffectSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .apply {
-                    if (isRenderEffectSupported) {
-                        blurBottom(height = heightLocal ?: 0.dp, blur = blur)
-                    }
+                .let {
+                    if (isRenderEffectSupported && navbarHeightPx.value != null) {
+                        it.blurBottom(heightPx = navbarHeightPx.value!!, blur = blur)
+                    } else it
                 }
         ) {
             content()
         }
         Box(
             modifier = Modifier
-                .zIndex(1f)
+                .zIndex(zIndex)
                 .fillMaxWidth()
                 .let {
                     if (height == null) {
                         it.onGloballyPositioned {
-                            heightLocal = it.size.height.dp
+                            navbarHeightPx.value = it.size.height.toFloat()
                         }
                     } else {
                         it.height(height)
@@ -446,34 +448,23 @@ fun BlurredNavBar(
                     .fillMaxWidth()
                     .height(2.dp)
                     .align(Alignment.TopCenter)
-                    .background(Color.White.copy(alpha = 0.5f))
+                    .background(Color.White.copy(alpha = 0.3f))
             )
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun Modifier.blurBottom(height: Dp, blur: Float): Modifier = composed {
-    val context = LocalContext.current
+fun Modifier.blurBottom(heightPx: Float, blur: Float): Modifier = composed {
     val contentShader = remember {
         RuntimeShader(SHADER_CONTENT).apply {
-            setFloatUniform(
-                "blurredHeight",
-                context
-                    .dpToPx(height.value)
-                    .toFloat()
-            )
+            setFloatUniform("blurredHeight", heightPx)
         }
     }
 
     val blurredShader = remember {
         RuntimeShader(SHADER_BLURRED).apply {
-            setFloatUniform(
-                "blurredHeight",
-                context
-                    .dpToPx(height.value)
-                    .toFloat()
-            )
+            setFloatUniform("blurredHeight", heightPx)
         }
     }
 
