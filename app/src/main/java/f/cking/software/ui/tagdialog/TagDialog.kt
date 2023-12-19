@@ -25,8 +25,8 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.TagChip
 import f.cking.software.data.repo.TagsRepository
+import f.cking.software.utils.graphic.TagChip
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getKoin
 

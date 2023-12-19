@@ -23,9 +23,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import f.cking.software.R
-import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.Router
 import f.cking.software.domain.model.RadarProfile
+import f.cking.software.utils.navigation.BackCommand
+import f.cking.software.utils.navigation.Router
 
 object SelectFilterScreen {
 

@@ -45,12 +45,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.BottomSpacer
-import f.cking.software.common.ContentPlaceholder
-import f.cking.software.common.DeviceListItem
-import f.cking.software.common.Divider
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.SelectFilterTypeScreen
+import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.ContentPlaceholder
+import f.cking.software.utils.graphic.DeviceListItem
+import f.cking.software.utils.graphic.Divider
 import org.koin.androidx.compose.koinViewModel
 
 object DeviceListScreen {

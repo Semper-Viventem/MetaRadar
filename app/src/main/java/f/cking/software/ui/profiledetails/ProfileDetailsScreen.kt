@@ -37,10 +37,10 @@ import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.RoundedBox
 import f.cking.software.ui.filter.FilterScreen
 import f.cking.software.ui.filter.FilterUiState
 import f.cking.software.ui.filter.SelectFilterTypeScreen
+import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 

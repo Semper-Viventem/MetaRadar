@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.utils.navigation.BackCommand
+import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.launch
 
 class SelectDeviceViewModel(

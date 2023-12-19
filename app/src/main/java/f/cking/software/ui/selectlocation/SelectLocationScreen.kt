@@ -39,10 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
 import f.cking.software.TheAppConfig
-import f.cking.software.common.MapView
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.ui.devicedetails.MapConfig
+import f.cking.software.utils.graphic.MapView
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch

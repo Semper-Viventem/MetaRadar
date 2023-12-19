@@ -28,9 +28,9 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.BuildConfig
 import f.cking.software.R
-import f.cking.software.common.BottomSpacer
-import f.cking.software.common.RoundedBox
 import f.cking.software.dateTimeStringFormat
+import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
 object SettingsScreen {

@@ -13,12 +13,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.R
-import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.Navigator
-import f.cking.software.common.navigation.RouterImpl
 import f.cking.software.data.helpers.ActivityProvider
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.utils.navigation.BackCommand
+import f.cking.software.utils.navigation.Navigator
+import f.cking.software.utils.navigation.RouterImpl
 import org.koin.android.ext.android.inject
 import org.osmdroid.config.Configuration
 

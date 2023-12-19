@@ -2,7 +2,13 @@ package f.cking.software.ui.selectdevice
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -10,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import f.cking.software.R
-import f.cking.software.common.DeviceListItem
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.utils.graphic.DeviceListItem
 import org.koin.androidx.compose.koinViewModel
 
 object SelectDeviceScreen {

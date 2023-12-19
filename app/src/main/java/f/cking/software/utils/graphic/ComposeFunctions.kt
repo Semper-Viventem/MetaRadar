@@ -1,11 +1,5 @@
-package f.cking.software.common
+package f.cking.software.utils.graphic
 
-import android.graphics.BlendMode
-import android.graphics.RenderEffect
-import android.graphics.RuntimeShader
-import android.graphics.Shader
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,17 +30,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asComposeRenderEffect
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -59,7 +48,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -74,7 +62,6 @@ import f.cking.software.openUrl
 import f.cking.software.pxToDp
 import f.cking.software.toHexString
 import f.cking.software.ui.GlobalUiState
-import org.intellij.lang.annotations.Language
 import org.osmdroid.views.MapView
 import java.time.LocalDate
 import java.time.LocalTime
@@ -369,143 +356,6 @@ fun TagChip(
     ) {
         Text(text = tagName)
     }
-}
-
-@Language("AGSL")
-val SHADER_CONTENT = """
-        uniform shader content;
-        uniform shader blur;
-    
-        uniform float blurredHeight;
-        uniform float2 iResolution;
-        
-        float4 main(float2 coord) {
-            if (coord.y > iResolution.y - blurredHeight) { // Blur the bottom part of the screen
-                return float4(1.0, 1.0, 1.0, 1.0);
-            } else {
-                return content.eval(coord);
-            }
-        }
-"""
-
-@Language("AGSL")
-val SHADER_BLURRED = """
-        uniform shader content;
-    
-        uniform float blurredHeight;
-        uniform float2 iResolution;
-        
-        float4 main(float2 coord) {
-            if (coord.y > iResolution.y - blurredHeight) { // Blur the bottom part of the screen
-                return content.eval(coord);
-            } else {
-                return float4(0.0, 0.0, 0.0, 0.0);
-            }
-        }
-    """
-
-@Composable
-fun BlurredNavBar(
-    modifier: Modifier = Modifier,
-    height: Dp? = null,
-    blur: Float = 10f,
-    zIndex: Float = 1f,
-    fallbackColor: Color = MaterialTheme.colors.primary,
-    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.2f),
-    navBarContent: @Composable () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    Box(modifier = modifier) {
-        val context = LocalContext.current
-        var navbarHeightPx = remember { mutableStateOf(height?.value?.let(context::dpToPx)?.toFloat()) }
-        val isRenderEffectSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .let {
-                    if (isRenderEffectSupported && navbarHeightPx.value != null) {
-                        it.blurBottom(heightPx = navbarHeightPx.value!!, blur = blur)
-                    } else it
-                }
-        ) {
-            content()
-        }
-        Box(
-            modifier = Modifier
-                .zIndex(zIndex)
-                .fillMaxWidth()
-                .let {
-                    if (height == null) {
-                        it.onGloballyPositioned {
-                            navbarHeightPx.value = it.size.height.toFloat()
-                        }
-                    } else {
-                        it.height(height)
-                    }
-                }
-                .let {
-                    if (!isRenderEffectSupported) {
-                        it.background(fallbackColor)
-                    } else {
-                        it.background(overlayColor)
-                    }
-                }
-                .align(Alignment.BottomCenter)
-        ) {
-            navBarContent()
-
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-                    .align(Alignment.TopCenter)
-                    .background(Color.White.copy(alpha = 0.3f))
-            )
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun Modifier.blurBottom(heightPx: Float, blur: Float): Modifier = composed {
-    val contentShader = remember {
-        RuntimeShader(SHADER_CONTENT).apply {
-            setFloatUniform("blurredHeight", heightPx)
-        }
-    }
-
-    val blurredShader = remember {
-        RuntimeShader(SHADER_BLURRED).apply {
-            setFloatUniform("blurredHeight", heightPx)
-        }
-    }
-
-    this
-        .onSizeChanged {
-            contentShader.setFloatUniform(
-                "iResolution",
-                it.width.toFloat(),
-                it.height.toFloat(),
-            )
-            blurredShader.setFloatUniform(
-                "iResolution",
-                it.width.toFloat(),
-                it.height.toFloat(),
-            )
-        }
-        .then(
-            graphicsLayer {
-                renderEffect = RenderEffect
-                    .createBlendModeEffect(
-                        RenderEffect.createRuntimeShaderEffect(contentShader, "content"),
-                        RenderEffect.createChainEffect(
-                            RenderEffect.createRuntimeShaderEffect(blurredShader, "content"),
-                            RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.DECAL)
-                        ),
-                        BlendMode.SRC_OVER,
-                    )
-                    .asComposeRenderEffect()
-            }
-        )
 }
 
 @Composable

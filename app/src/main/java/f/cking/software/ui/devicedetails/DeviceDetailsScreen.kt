@@ -52,9 +52,6 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.MapView
-import f.cking.software.common.RoundedBox
-import f.cking.software.common.TagChip
 import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
@@ -62,6 +59,9 @@ import f.cking.software.dpToPx
 import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
 import f.cking.software.ui.tagdialog.TagDialog
+import f.cking.software.utils.graphic.MapView
+import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.TagChip
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf

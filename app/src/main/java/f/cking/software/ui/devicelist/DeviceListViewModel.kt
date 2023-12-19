@@ -8,13 +8,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.ScreenNavigationCommands
+import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -34,9 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
-import f.cking.software.common.BottomSpacer
-import f.cking.software.common.ContentPlaceholder
 import f.cking.software.domain.model.RadarProfile
+import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.ContentPlaceholder
 import org.koin.androidx.compose.koinViewModel
 
 object ProfilesListScreen {
