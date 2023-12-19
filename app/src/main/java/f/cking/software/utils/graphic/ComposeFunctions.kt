@@ -150,7 +150,7 @@ fun DeviceListItem(
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
+                Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.width(4.dp))
                 device.tags.forEach {
                     Spacer(modifier = Modifier.width(4.dp))
@@ -164,17 +164,16 @@ fun DeviceListItem(
             }
             device.manufacturerInfo?.name?.let {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = it, color = MaterialTheme.colors.onSurface)
+                Text(text = it)
             }
             device.manufacturerInfo?.airdrop?.let { airdrop ->
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = airdrop.contacts.joinToString { "0x${it.sha256.toHexString().uppercase()}" }, color = MaterialTheme.colors.onSurface)
+                Text(text = airdrop.contacts.joinToString { "0x${it.sha256.toHexString().uppercase()}" })
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = device.address,
                 fontWeight = FontWeight.Light,
-                color = MaterialTheme.colors.onSurface,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -184,7 +183,6 @@ fun DeviceListItem(
                     device.lastDetectionPeriod(LocalContext.current)
                 ),
                 fontWeight = FontWeight.Light,
-                color = MaterialTheme.colors.onSurface,
             )
         }
     }
@@ -352,7 +350,7 @@ fun TagChip(
             leadingIconContentColor = Color.Black,
         ),
         onClick = onClick,
-        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null) } },
+        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colors.onSurface) } },
     ) {
         Text(text = tagName)
     }

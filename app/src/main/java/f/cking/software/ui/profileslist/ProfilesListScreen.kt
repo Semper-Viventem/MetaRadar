@@ -125,7 +125,7 @@ object ProfilesListScreen {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = profile.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
+                Text(text = profile.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(4.dp))
                 val activeText = if (profile.isActive) stringResource(R.string.profile_is_active) else stringResource(R.string.profile_is_not_active)
@@ -144,7 +144,7 @@ object ProfilesListScreen {
                 val description = profile.description
                 if (!description.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = description, color = MaterialTheme.colors.onSurface)
+                    Text(text = description)
                 }
             }
         }

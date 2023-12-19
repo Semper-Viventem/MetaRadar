@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Typography
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.ViewModel
@@ -56,6 +57,10 @@ class MainActivity : AppCompatActivity() {
                     surface = colorResource(id = R.color.surface_color),
                     onSurface = colorResource(id = R.color.on_surface),
                 ),
+                typography = Typography(
+                    body1 = MaterialTheme.typography.body1.copy(color = colorResource(id = R.color.on_surface)),
+                    body2 = MaterialTheme.typography.body2.copy(color = colorResource(id = R.color.on_surface)),
+                )
             ) {
                 val stack = viewModel.navigator.stack
                 if (stack.isEmpty()) {

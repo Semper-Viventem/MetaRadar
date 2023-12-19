@@ -72,16 +72,16 @@ object SettingsScreen {
         Column {
             val locationData = viewModel.locationData
             if (locationData == null) {
-                Text(text = stringResource(R.string.no_location_data_yet), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
+                Text(text = stringResource(R.string.no_location_data_yet), fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(R.string.location_fetches_only_if_service_is_turned_on), fontWeight = FontWeight.Light, color = MaterialTheme.colors.onSurface)
+                Text(text = stringResource(R.string.location_fetches_only_if_service_is_turned_on), fontWeight = FontWeight.Light)
             } else {
                 val formattedTime = locationData.emitTime.dateTimeStringFormat("HH:mm")
-                Text(text = stringResource(R.string.last_location_update_time, formattedTime), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
+                Text(text = stringResource(R.string.last_location_update_time, formattedTime), fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(R.string.lat_template, locationData.location.latitude), fontWeight = FontWeight.Light, color = MaterialTheme.colors.onSurface)
+                Text(text = stringResource(R.string.lat_template, locationData.location.latitude), fontWeight = FontWeight.Light)
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = stringResource(R.string.lng_template, locationData.location.longitude), fontWeight = FontWeight.Light, color = MaterialTheme.colors.onSurface)
+                Text(text = stringResource(R.string.lng_template, locationData.location.longitude), fontWeight = FontWeight.Light)
             }
         }
     }
@@ -246,7 +246,7 @@ object SettingsScreen {
     @Composable
     private fun ReportIssue(viewModel: SettingsViewModel) {
         RoundedBox {
-            Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
+            Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
                 Text(text = stringResource(R.string.report))
@@ -257,13 +257,13 @@ object SettingsScreen {
     @Composable
     private fun AppInfo() {
         RoundedBox {
-            Text(text = stringResource(R.string.app_info_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
+            Text(text = stringResource(R.string.app_info_title), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(R.string.app_info_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), color = MaterialTheme.colors.onSurface)
+            Text(text = stringResource(R.string.app_info_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release), color = MaterialTheme.colors.onSurface)
+            Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release))
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION), color = MaterialTheme.colors.onSurface)
+            Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION))
         }
     }
 
@@ -287,10 +287,10 @@ object SettingsScreen {
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(text = title, color = MaterialTheme.colors.onSurface)
+                    Text(text = title)
                     subtitle?.let {
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp, color = MaterialTheme.colors.onSurface)
+                        Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp)
                     }
                 }
                 Spacer(modifier = Modifier.width(4.dp))

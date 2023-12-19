@@ -79,10 +79,9 @@ object JournalScreen {
                         fontWeight = FontWeight.Bold,
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colors.onSurface,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin, color = MaterialTheme.colors.onSurface)
+                    Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 var isExpanded by remember { mutableStateOf(false) }
@@ -96,7 +95,6 @@ object JournalScreen {
                         fontWeight = FontWeight.Normal,
                         maxLines = if (isExpanded) Int.MAX_VALUE else 5,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colors.onSurface,
                     )
                 }
 

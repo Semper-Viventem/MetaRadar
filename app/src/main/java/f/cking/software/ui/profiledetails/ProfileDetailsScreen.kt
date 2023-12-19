@@ -174,7 +174,7 @@ object ProfileDetailsScreen {
                     .padding(horizontal = 16.dp),
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
-                placeholder = { Text(text = stringResource(R.string.name), color = MaterialTheme.colors.onSurface) },
+                placeholder = { Text(text = stringResource(R.string.name)) },
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
@@ -183,7 +183,7 @@ object ProfileDetailsScreen {
                     .padding(horizontal = 16.dp),
                 value = viewModel.description,
                 onValueChange = { viewModel.description = it },
-                placeholder = { Text(text = stringResource(R.string.description), color = MaterialTheme.colors.onSurface) }
+                placeholder = { Text(text = stringResource(R.string.description)) }
             )
             Spacer(modifier = Modifier.height(8.dp))
             RoundedBox {
@@ -194,7 +194,7 @@ object ProfileDetailsScreen {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(modifier = Modifier.weight(1f), text = stringResource(R.string.is_active), color = MaterialTheme.colors.onSurface)
+                    Text(modifier = Modifier.weight(1f), text = stringResource(R.string.is_active))
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(checked = viewModel.isActive, onCheckedChange = { viewModel.onIsActiveClick() })
                     Spacer(modifier = Modifier.width(16.dp))
