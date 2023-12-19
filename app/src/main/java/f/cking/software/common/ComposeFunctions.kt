@@ -1,10 +1,11 @@
 package f.cking.software.common
 
-import android.annotation.SuppressLint
 import android.graphics.BlendMode
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import android.graphics.Shader
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.material.Chip
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
@@ -33,6 +35,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
@@ -41,6 +44,7 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -53,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -387,10 +392,68 @@ val SHADER_BLURRED = """
         }
     """
 
-@SuppressLint("NewApi")
 @Composable
-fun Modifier.blurBottom(height: Dp, blur: Float): Modifier {
+fun BlurredNavBar(
+    modifier: Modifier = Modifier,
+    height: Dp? = null,
+    blur: Float = 10f,
+    zIndex: Float = 1f,
+    fallbackColor: Color = MaterialTheme.colors.primary,
+    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.1f),
+    navBarContent: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Box(modifier = modifier) {
+        var heightLocal = remember { height }
+        val isRenderEffectSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .apply {
+                    if (isRenderEffectSupported) {
+                        blurBottom(height = heightLocal ?: 0.dp, blur = blur)
+                    }
+                }
+        ) {
+            content()
+        }
+        Box(
+            modifier = Modifier
+                .zIndex(1f)
+                .fillMaxWidth()
+                .let {
+                    if (height == null) {
+                        it.onGloballyPositioned {
+                            heightLocal = it.size.height.dp
+                        }
+                    } else {
+                        it.height(height)
+                    }
+                }
+                .let {
+                    if (!isRenderEffectSupported) {
+                        it.background(fallbackColor)
+                    } else {
+                        it.background(overlayColor)
+                    }
+                }
+                .align(Alignment.BottomCenter)
+        ) {
+            navBarContent()
 
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .align(Alignment.TopCenter)
+                    .background(Color.White.copy(alpha = 0.5f))
+            )
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+fun Modifier.blurBottom(height: Dp, blur: Float): Modifier = composed {
     val context = LocalContext.current
     val contentShader = remember {
         RuntimeShader(SHADER_CONTENT).apply {
@@ -414,7 +477,7 @@ fun Modifier.blurBottom(height: Dp, blur: Float): Modifier {
         }
     }
 
-    return this
+    this
         .onSizeChanged {
             contentShader.setFloatUniform(
                 "iResolution",

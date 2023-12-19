@@ -27,7 +27,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.blurBottom
+import f.cking.software.common.BlurredNavBar
 import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
@@ -43,21 +43,22 @@ object MainScreen {
                 TopBar(viewModel)
             },
             content = { paddings ->
-                Box(modifier = Modifier.padding(paddings)) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .blurBottom(NAVBAR_HEIGHT_DP.dp, 20f)
-                    ) {
+                BlurredNavBar(
+                    modifier = Modifier
+                        .padding(paddings)
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    navBarContent = {
+                        BottomNavigationBar(
+                            Modifier
+                                .height(NAVBAR_HEIGHT_DP.dp),
+                            viewModel
+                        )
+                    },
+                    content = {
                         viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
-                    }
-                    BottomNavigationBar(
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .height(NAVBAR_HEIGHT_DP.dp),
-                        viewModel
-                    )
-                }
+                    },
+                )
             },
             floatingActionButtonPosition = FabPosition.Center,
             floatingActionButton = {
@@ -110,8 +111,7 @@ object MainScreen {
     private fun BottomNavigationBar(modifier: Modifier, viewModel: MainViewModel) {
         Box(
             modifier = modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colors.secondary.copy(alpha = 0.1f)),
+                .fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ) {
             Row(
@@ -124,13 +124,6 @@ object MainScreen {
                     TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
                 }
             }
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .height(4.dp)
-                    .align(Alignment.TopCenter)
-                    .background(Color.White.copy(alpha = 0.5f))
-            )
         }
     }
 
@@ -151,11 +144,11 @@ object MainScreen {
             Image(
                 painter = painterResource(id = icon),
                 contentDescription = targetTab.text,
-                colorFilter = ColorFilter.tint(Color.Black),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary),
                 modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = Color.Black)
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colors.onPrimary)
         }
     }
 

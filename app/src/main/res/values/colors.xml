@@ -19,7 +19,7 @@
 
     <color name="primary">#FFF1CF</color>
     <color name="primary_variant">@color/primary</color>
-    <color name="on_primary">@color/black</color>
+    <color name="on_primary">@color/black_90</color>
 
     <color name="secondary">#F57C00</color>
     <color name="secondary_variant">@color/secondary</color>
