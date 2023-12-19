@@ -1,9 +1,10 @@
 package f.cking.software.common
 
+import android.annotation.SuppressLint
+import android.graphics.BlendMode
 import android.graphics.RenderEffect
+import android.graphics.RuntimeShader
 import android.graphics.Shader
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -60,8 +62,10 @@ import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.dpToPx
 import f.cking.software.openUrl
 import f.cking.software.toHexString
+import org.intellij.lang.annotations.Language
 import org.osmdroid.views.MapView
 import java.time.LocalDate
 import java.time.LocalTime
@@ -350,22 +354,91 @@ fun TagChip(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
-fun Modifier.customBlur(blur: Float) = this.then(
-    graphicsLayer {
-        if (blur > 0f)
-            renderEffect = RenderEffect
-                .createBlurEffect(
-                    blur,
-                    blur,
-                    Shader.TileMode.DECAL,
-                )
-                .asComposeRenderEffect()
-    }
-)
+@Language("AGSL")
+val SHADER_CONTENT = """
+        uniform shader content;
+        uniform shader blur;
+    
+        uniform float blurredHeight;
+        uniform float2 iResolution;
+        
+        float4 main(float2 coord) {
+            if (coord.y > iResolution.y - blurredHeight) { // Blur the bottom part of the screen
+                return float4(1.0, 1.0, 1.0, 1.0);
+            } else {
+                return content.eval(coord);
+            }
+        }
+"""
 
-fun Modifier.customBlurCompat(blur: Float) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-    this.customBlur(blur)
-} else {
-    this
+@Language("AGSL")
+val SHADER_BLURRED = """
+        uniform shader content;
+    
+        uniform float blurredHeight;
+        uniform float2 iResolution;
+        
+        float4 main(float2 coord) {
+            if (coord.y > iResolution.y - blurredHeight) { // Blur the bottom part of the screen
+                return content.eval(coord);
+            } else {
+                return float4(0.0, 0.0, 0.0, 0.0);
+            }
+        }
+    """
+
+@SuppressLint("NewApi")
+@Composable
+fun Modifier.blurBottom(height: Dp, blur: Float): Modifier {
+
+    val context = LocalContext.current
+    val contentShader = remember {
+        RuntimeShader(SHADER_CONTENT).apply {
+            setFloatUniform(
+                "blurredHeight",
+                context
+                    .dpToPx(height.value)
+                    .toFloat()
+            )
+        }
+    }
+
+    val blurredShader = remember {
+        RuntimeShader(SHADER_BLURRED).apply {
+            setFloatUniform(
+                "blurredHeight",
+                context
+                    .dpToPx(height.value)
+                    .toFloat()
+            )
+        }
+    }
+
+    return this
+        .onSizeChanged {
+            contentShader.setFloatUniform(
+                "iResolution",
+                it.width.toFloat(),
+                it.height.toFloat(),
+            )
+            blurredShader.setFloatUniform(
+                "iResolution",
+                it.width.toFloat(),
+                it.height.toFloat(),
+            )
+        }
+        .then(
+            graphicsLayer {
+                renderEffect = RenderEffect
+                    .createBlendModeEffect(
+                        RenderEffect.createRuntimeShaderEffect(contentShader, "content"),
+                        RenderEffect.createChainEffect(
+                            RenderEffect.createRuntimeShaderEffect(blurredShader, "content"),
+                            RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.DECAL)
+                        ),
+                        BlendMode.SRC_OVER,
+                    )
+                    .asComposeRenderEffect()
+            }
+        )
 }

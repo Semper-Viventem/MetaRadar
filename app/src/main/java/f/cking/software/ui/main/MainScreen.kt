@@ -1,10 +1,6 @@
 package f.cking.software.ui.main
 
 import android.annotation.SuppressLint
-import android.graphics.BlendMode
-import android.graphics.RenderEffect
-import android.graphics.RuntimeShader
-import android.graphics.Shader
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,15 +12,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.asComposeRenderEffect
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,44 +27,12 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.dpToPx
-import org.intellij.lang.annotations.Language
+import f.cking.software.common.blurBottom
 import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
 
-    @Language("AGSL")
-    val SHADER_CONTENT = """
-        uniform shader content;
-        uniform shader blur;
-    
-        uniform float blurredHeight;
-        uniform float2 iResolution;
-        
-        float4 main(float2 coord) {
-            if (coord.y > iResolution.y - blurredHeight) { // Blur the bottom part of the screen
-                return float4(1.0, 1.0, 1.0, 1.0);
-            } else {
-                return content.eval(coord);
-            }
-        }
-"""
-
-    @Language("AGSL")
-    val SHADER_BLURRED = """
-        uniform shader content;
-    
-        uniform float blurredHeight;
-        uniform float2 iResolution;
-        
-        float4 main(float2 coord) {
-            if (coord.y > iResolution.y - blurredHeight) { // Blur the bottom part of the screen
-                return content.eval(coord);
-            } else {
-                return float4(0.0, 0.0, 0.0, 0.0);
-            }
-        }
-    """
+    private const val NAVBAR_HEIGHT_DP = 60f
 
     @SuppressLint("NewApi")
     @Composable
@@ -83,60 +43,19 @@ object MainScreen {
                 TopBar(viewModel)
             },
             content = { paddings ->
-                val context = LocalContext.current
-                val contentShader = remember {
-                    RuntimeShader(SHADER_CONTENT).apply {
-                        setFloatUniform(
-                            "blurredHeight",
-                            context
-                                .dpToPx(60f)
-                                .toFloat()
-                        )
-                    }
-                }
-
-                val blurredShader = remember {
-                    RuntimeShader(SHADER_BLURRED).apply {
-                        setFloatUniform(
-                            "blurredHeight",
-                            context
-                                .dpToPx(60f)
-                                .toFloat()
-                        )
-                    }
-                }
                 Box(modifier = Modifier.padding(paddings)) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .onSizeChanged {
-                                contentShader.setFloatUniform(
-                                    "iResolution",
-                                    it.width.toFloat(),
-                                    it.height.toFloat(),
-                                )
-                                blurredShader.setFloatUniform(
-                                    "iResolution",
-                                    it.width.toFloat(),
-                                    it.height.toFloat(),
-                                )
-                            }
-                            .graphicsLayer {
-                                renderEffect = RenderEffect
-                                    .createBlendModeEffect(
-                                        RenderEffect.createRuntimeShaderEffect(contentShader, "content"),
-                                        RenderEffect.createChainEffect(
-                                            RenderEffect.createRuntimeShaderEffect(blurredShader, "content"),
-                                            RenderEffect.createBlurEffect(10f, 10f, Shader.TileMode.DECAL)
-                                        ),
-                                        BlendMode.SRC_OVER,
-                                    )
-                                    .asComposeRenderEffect()
-                            }
+                            .blurBottom(NAVBAR_HEIGHT_DP.dp, 10f)
                     ) {
                         viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
                     }
-                    BottomNavigationBar(Modifier.align(Alignment.BottomCenter), viewModel)
+                    BottomNavigationBar(
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .height(NAVBAR_HEIGHT_DP.dp), viewModel
+                    )
                 }
             },
             floatingActionButtonPosition = FabPosition.Center,
@@ -188,19 +107,12 @@ object MainScreen {
 
     @Composable
     private fun BottomNavigationBar(modifier: Modifier, viewModel: MainViewModel) {
-        Box(
-            modifier = modifier
-                .background(Color.Transparent)
-                .fillMaxWidth()
-                .height(60.dp),
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = modifier.fillMaxWidth(),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                viewModel.tabs.forEach { tab ->
-                    TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
-                }
+            viewModel.tabs.forEach { tab ->
+                TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
             }
         }
     }
