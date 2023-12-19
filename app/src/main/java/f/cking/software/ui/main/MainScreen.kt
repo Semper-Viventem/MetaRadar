@@ -150,11 +150,11 @@ object MainScreen {
             Image(
                 painter = painterResource(id = icon),
                 contentDescription = targetTab.text,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary.copy(alpha = 0.7f)),
                 modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colors.onPrimary)
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colors.onPrimary.copy(alpha = 0.7f))
         }
     }
 
@@ -186,7 +186,7 @@ object MainScreen {
             modifier = Modifier
                 .padding(bottom = pxToDp(px = GlobalUiState.navbarOffsetPx.value).dp)
                 .onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
-            text = { Text(text = text, fontWeight = FontWeight.Bold) },
+            text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSecondary) },
             onClick = {
                 if (viewModel.needToShowPermissionsIntro()) {
                     permissionsIntro.show()
@@ -303,7 +303,7 @@ object MainScreen {
             actions = {
                 if (viewModel.scanStarted && viewModel.bgServiceIsActive) {
                     CircularProgressIndicator(
-                        color = Color.Black,
+                        color = MaterialTheme.colors.onPrimary,
                         modifier = Modifier
                             .size(24.dp)
                     )

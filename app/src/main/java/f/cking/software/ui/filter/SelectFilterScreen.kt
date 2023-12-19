@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -62,12 +63,13 @@ object SelectFilterScreen {
                     Surface(elevation = 12.dp) {
                         Box(
                             modifier = Modifier
-                                .background(MaterialTheme.colors.primaryVariant)
+                                .background(MaterialTheme.colors.primary)
                                 .fillMaxWidth(),
                         ) {
                             val context = LocalContext.current
                             Button(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primaryVariant),
                                 onClick = {
                                     val filter = initialFilterState
                                         .takeIf { it.isCorrect() }
@@ -81,7 +83,7 @@ object SelectFilterScreen {
                                     }
                                 }
                             ) {
-                                Text(text = stringResource(R.string.confirm))
+                                Text(text = stringResource(R.string.confirm), color = MaterialTheme.colors.onPrimary)
                             }
                         }
                     }

@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -175,13 +177,18 @@ object SelectLocationScreen {
                         .padding(horizontal = 16.dp),
                     value = radiusMeters.value,
                     onValueChange = { value -> radiusMeters.value = value },
-                    valueRange = 5f..1000f
+                    valueRange = 5f..1000f,
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colors.secondary,
+                        activeTrackColor = MaterialTheme.colors.secondary,
+                    )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primaryVariant),
                     enabled = map != null,
                     onClick = {
                         val cameraCenter = map!!.mapCenter
@@ -191,7 +198,7 @@ object SelectLocationScreen {
                         )
                     }
                 ) {
-                    Text(text = stringResource(R.string.confirm))
+                    Text(text = stringResource(R.string.confirm), color = MaterialTheme.colors.onPrimary)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
