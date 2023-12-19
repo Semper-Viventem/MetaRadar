@@ -25,6 +25,8 @@
 
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -45,6 +47,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="fullSensor"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.MetaRadar">
 
             <intent-filter>

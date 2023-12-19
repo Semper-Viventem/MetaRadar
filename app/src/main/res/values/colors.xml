@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="black_300">#4D000000</color>
+    <color name="black_90">#E6000000</color>
+    <color name="black_30">#4D000000</color>
     <color name="white">#FFFFFFFF</color>
 
     <color name="orange_500">#FF9800</color>
@@ -13,9 +14,16 @@
     <color name="orange_dark_700">#E64A19</color>
     <color name="orange_dark_800">#D84315</color>
 
-    <color name="surface_color">#FFF4DA</color>
-    <color name="primary_color">#FFF4DA</color>
-    <color name="secondary_color">#F57C00</color>
+    <color name="surface_color">#FDF7E9</color>
+    <color name="on_surface">@color/black_90</color>
+
+    <color name="primary">#FFF1CF</color>
+    <color name="primary_variant">@color/primary</color>
+    <color name="on_primary">@color/black</color>
+
+    <color name="secondary">#F57C00</color>
+    <color name="secondary_variant">@color/secondary</color>
+    <color name="on_secondary">@color/white</color>
 
     <color name="filter_any">#80DEEA</color>
     <color name="filter_all">#A5D6A7</color>

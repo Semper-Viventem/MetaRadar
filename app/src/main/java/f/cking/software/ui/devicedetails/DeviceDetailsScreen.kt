@@ -403,7 +403,7 @@ object DeviceDetailsScreen {
                         .fillMaxHeight(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Box(modifier = Modifier.background(color = colorResource(id = R.color.black_300), shape = RoundedCornerShape(8.dp))) {
+                    Box(modifier = Modifier.background(color = colorResource(id = R.color.black_30), shape = RoundedCornerShape(8.dp))) {
                         Text(
                             modifier = Modifier.padding(16.dp),
                             text = stringResource(R.string.device_details_no_location_history_for_such_period),

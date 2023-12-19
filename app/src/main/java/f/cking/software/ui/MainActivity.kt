@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.ViewModel
@@ -48,13 +47,14 @@ class MainActivity : AppCompatActivity() {
             val focusManager = LocalFocusManager.current
             MaterialTheme(
                 colors = MaterialTheme.colors.copy(
-                    primary = colorResource(id = R.color.primary_color),
-                    primaryVariant = colorResource(id = R.color.primary_color),
-                    onPrimary = Color.Black,
-                    secondary = colorResource(id = R.color.secondary_color),
-                    secondaryVariant = colorResource(id = R.color.secondary_color),
-                    onSecondary = Color.White,
+                    primary = colorResource(id = R.color.primary),
+                    primaryVariant = colorResource(id = R.color.primary_variant),
+                    onPrimary = colorResource(id = R.color.on_primary),
+                    secondary = colorResource(id = R.color.secondary),
+                    secondaryVariant = colorResource(id = R.color.secondary_variant),
+                    onSecondary = colorResource(id = R.color.on_secondary),
                     surface = colorResource(id = R.color.surface_color),
+                    onSurface = colorResource(id = R.color.on_surface),
                 )
             ) {
                 val stack = viewModel.navigator.stack
