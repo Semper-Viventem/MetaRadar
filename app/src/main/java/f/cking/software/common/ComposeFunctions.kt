@@ -128,12 +128,17 @@ fun ClickableField(
     onClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    val unfocuse = remember { mutableStateOf(false) }
+    if (unfocuse.value) {
+        focusManager.clearFocus(true)
+        unfocuse.value = false
+    }
     TextField(
         modifier = modifier
             .onFocusChanged {
                 if (it.isFocused) {
+                    unfocuse.value = true
                     onClick.invoke()
-                    focusManager.clearFocus(true)
                 }
             },
         value = text ?: "",
