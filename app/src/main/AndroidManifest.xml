@@ -47,7 +47,6 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="fullSensor"
-            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.MetaRadar">
 
             <intent-filter>

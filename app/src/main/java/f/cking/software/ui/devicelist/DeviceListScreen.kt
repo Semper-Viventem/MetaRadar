@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -142,18 +141,26 @@ object DeviceListScreen {
                     allFilters.forEach {
                         item {
                             val isSelected = viewModel.appliedFilter.contains(it)
-                            val color = if (isSelected) MaterialTheme.colors.primaryVariant else Color.LightGray
+                            val colors = if (isSelected) {
+                                ChipDefaults.chipColors(
+                                    backgroundColor = MaterialTheme.colors.primaryVariant,
+                                    contentColor = MaterialTheme.colors.onPrimary,
+                                    leadingIconContentColor = MaterialTheme.colors.onPrimary,
+                                )
+                            } else {
+                                ChipDefaults.chipColors()
+                            }
 
                             Chip(
-                                colors = ChipDefaults.chipColors(
-                                    backgroundColor = color,
-                                    contentColor = Color.Black,
-                                    leadingIconContentColor = Color.Black,
-                                ),
+                                colors = colors,
                                 onClick = { viewModel.onFilterClick(it) },
                                 leadingIcon = {
                                     if (isSelected) {
-                                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
+                                        Icon(
+                                            Icons.Filled.Delete,
+                                            contentDescription = stringResource(R.string.delete),
+                                            modifier = Modifier.size(24.dp)
+                                        )
                                     }
                                 }
                             ) {
@@ -201,11 +208,6 @@ object DeviceListScreen {
         }
 
         Chip(
-            colors = ChipDefaults.chipColors(
-                backgroundColor = Color.LightGray,
-                contentColor = Color.Black,
-                leadingIconContentColor = Color.Black,
-            ),
             leadingIcon = {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
             },
@@ -218,14 +220,18 @@ object DeviceListScreen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun SearchChip(viewModel: DeviceListViewModel) {
-        val color = if (viewModel.isSearchMode) MaterialTheme.colors.primarySurface else Color.LightGray
+        val colors = if (viewModel.isSearchMode) {
+            ChipDefaults.chipColors(
+                backgroundColor = MaterialTheme.colors.primaryVariant,
+                contentColor = MaterialTheme.colors.onPrimary,
+                leadingIconContentColor = MaterialTheme.colors.onPrimary,
+            )
+        } else {
+            ChipDefaults.chipColors()
+        }
 
         Chip(
-            colors = ChipDefaults.chipColors(
-                backgroundColor = color,
-                contentColor = Color.Black,
-                leadingIconContentColor = Color.Black,
-            ),
+            colors = colors,
             leadingIcon = {
                 val icon = if (viewModel.isSearchMode) Icons.Filled.Delete else Icons.Filled.Search
                 Icon(icon, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
