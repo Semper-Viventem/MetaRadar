@@ -47,14 +47,15 @@ object MainScreen {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .blurBottom(NAVBAR_HEIGHT_DP.dp, 10f)
+                            .blurBottom(NAVBAR_HEIGHT_DP.dp, 20f)
                     ) {
                         viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
                     }
                     BottomNavigationBar(
                         Modifier
                             .align(Alignment.BottomCenter)
-                            .height(NAVBAR_HEIGHT_DP.dp), viewModel
+                            .height(NAVBAR_HEIGHT_DP.dp),
+                        viewModel
                     )
                 }
             },
@@ -107,13 +108,29 @@ object MainScreen {
 
     @Composable
     private fun BottomNavigationBar(modifier: Modifier, viewModel: MainViewModel) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth(),
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primarySurface.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center,
         ) {
-            viewModel.tabs.forEach { tab ->
-                TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                viewModel.tabs.forEach { tab ->
+                    TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
+                }
             }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .height(4.dp)
+                    .align(Alignment.TopCenter)
+                    .background(Color.White.copy(alpha = 0.5f))
+            )
         }
     }
 
@@ -134,11 +151,11 @@ object MainScreen {
             Image(
                 painter = painterResource(id = icon),
                 contentDescription = targetTab.text,
-                colorFilter = ColorFilter.tint(Color.White),
+                colorFilter = ColorFilter.tint(Color.Black),
                 modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = Color.White)
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = Color.Black)
         }
     }
 
@@ -167,6 +184,8 @@ object MainScreen {
         )
 
         ExtendedFloatingActionButton(
+            modifier = Modifier
+                .padding(bottom = 60.dp),
             text = { Text(text = text, fontWeight = FontWeight.Bold) },
             onClick = {
                 if (viewModel.needToShowPermissionsIntro()) {
