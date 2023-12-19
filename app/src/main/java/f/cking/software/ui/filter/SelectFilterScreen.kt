@@ -38,7 +38,7 @@ object SelectFilterScreen {
         Scaffold(
             topBar = { AppBar { router.navigate(BackCommand) } },
             content = { paddings ->
-                Column(modifier = Modifier.padding(paddings)) {
+                Column(modifier = Modifier.background(MaterialTheme.colors.surface).padding(paddings)) {
                     LazyColumn(
                         Modifier
                             .fillMaxWidth()
@@ -62,13 +62,12 @@ object SelectFilterScreen {
                     Surface(elevation = 12.dp) {
                         Box(
                             modifier = Modifier
-                                .padding(16.dp)
-                                .background(MaterialTheme.colors.background)
+                                .background(MaterialTheme.colors.primaryVariant)
                                 .fillMaxWidth(),
                         ) {
                             val context = LocalContext.current
                             Button(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
                                 onClick = {
                                     val filter = initialFilterState
                                         .takeIf { it.isCorrect() }

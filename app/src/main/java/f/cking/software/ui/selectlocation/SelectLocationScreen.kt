@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -60,10 +61,16 @@ object SelectLocationScreen {
         onCloseClick: () -> Unit,
     ) {
         Scaffold(
+            modifier = Modifier
+                .background(MaterialTheme.colors.surface)
+                .fillMaxWidth()
+                .fillMaxHeight(),
             topBar = { AppBar(onCloseClick) },
             content = { paddings ->
                 Content(
-                    modifier = Modifier.padding(paddings),
+                    modifier = Modifier
+                        .background(MaterialTheme.colors.surface)
+                        .padding(paddings),
                     onSelected = onSelected,
                     initialLocationModel = initialLocationModel,
                     initialRadius = initialRadius
@@ -138,7 +145,7 @@ object SelectLocationScreen {
                         contentScale = ContentScale.FillWidth,
                         painter = painter,
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
                     )
                 }
             }
@@ -157,19 +164,24 @@ object SelectLocationScreen {
         Surface(elevation = 12.dp) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .background(MaterialTheme.colors.background)
+                    .background(MaterialTheme.colors.surface)
                     .fillMaxWidth(),
             ) {
-                Text(text = stringResource(R.string.select_location_radius, radiusMeters.value), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(modifier = Modifier.padding(horizontal = 16.dp), text = stringResource(R.string.select_location_radius, radiusMeters.value), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 Slider(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     value = radiusMeters.value,
                     onValueChange = { value -> radiusMeters.value = value },
                     valueRange = 5f..1000f
                 )
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     enabled = map != null,
                     onClick = {
                         val cameraCenter = map!!.mapCenter
@@ -181,6 +193,7 @@ object SelectLocationScreen {
                 ) {
                     Text(text = stringResource(R.string.confirm))
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
