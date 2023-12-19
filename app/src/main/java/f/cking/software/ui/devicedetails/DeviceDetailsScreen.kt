@@ -107,7 +107,7 @@ object DeviceDetailsScreen {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = iconId),
                             contentDescription = text,
-                            tint = Color.White
+                            tint = MaterialTheme.colors.onPrimary,
                         )
                     }
                 }
@@ -117,7 +117,7 @@ object DeviceDetailsScreen {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White
+                        tint = MaterialTheme.colors.onPrimary
                     )
                 }
             }
@@ -290,8 +290,8 @@ object DeviceDetailsScreen {
         }
         Chip(
             colors = ChipDefaults.chipColors(
-                backgroundColor = MaterialTheme.colors.primary,
-                contentColor = Color.White,
+                backgroundColor = MaterialTheme.colors.secondary,
+                contentColor = MaterialTheme.colors.onSecondary,
             ),
             onClick = { addTagDialog.show() },
             leadingIcon = {

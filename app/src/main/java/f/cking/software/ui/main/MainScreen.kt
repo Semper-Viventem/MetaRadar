@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +29,8 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.common.BlurredNavBar
+import f.cking.software.common.pxToDp
+import f.cking.software.ui.GlobalUiState
 import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
@@ -49,7 +51,7 @@ object MainScreen {
                         .padding(paddings)
                         .fillMaxWidth()
                         .fillMaxHeight(),
-                    overlayColor = colorResource(id = R.color.primary_dark).copy(alpha = 0.3f),
+                    overlayColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.3f),
                     navBarContent = {
                         BottomNavigationBar(
                             Modifier
@@ -113,6 +115,7 @@ object MainScreen {
     private fun BottomNavigationBar(modifier: Modifier, viewModel: MainViewModel) {
         Box(
             modifier = modifier
+                .onGloballyPositioned { GlobalUiState.setBottomOffset(navbarOffset = it.size.height.toFloat()) }
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ) {
@@ -180,7 +183,8 @@ object MainScreen {
 
         ExtendedFloatingActionButton(
             modifier = Modifier
-                .padding(bottom = 60.dp),
+                .padding(bottom = pxToDp(px = GlobalUiState.navbarOffsetPx.value).dp)
+                .onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
             text = { Text(text = text, fontWeight = FontWeight.Bold) },
             onClick = {
                 if (viewModel.needToShowPermissionsIntro()) {

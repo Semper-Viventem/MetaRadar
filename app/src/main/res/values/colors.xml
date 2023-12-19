@@ -18,8 +18,7 @@
     <color name="on_surface">@color/black_90</color>
 
     <color name="primary">#FFF1CF</color>
-    <color name="primary_dark">#F1DEAD</color>
-    <color name="primary_variant">@color/primary</color>
+    <color name="primary_variant">#F1DEAD</color>
     <color name="on_primary">@color/black_90</color>
 
     <color name="secondary">#F57C00</color>

@@ -70,7 +70,9 @@ import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.dpToPx
 import f.cking.software.openUrl
+import f.cking.software.pxToDp
 import f.cking.software.toHexString
+import f.cking.software.ui.GlobalUiState
 import org.intellij.lang.annotations.Language
 import org.osmdroid.views.MapView
 import java.time.LocalDate
@@ -495,4 +497,20 @@ fun Modifier.blurBottom(heightPx: Float, blur: Float): Modifier = composed {
                     .asComposeRenderEffect()
             }
         )
+}
+
+@Composable
+fun dpToPx(dp: Float): Float {
+    return LocalContext.current.dpToPx(dp).toFloat()
+}
+
+@Composable
+fun pxToDp(px: Float): Float {
+    return LocalContext.current.pxToDp(px)
+}
+
+@Composable
+fun BottomSpacer() {
+    val bottomOffset = remember { GlobalUiState.totalOffset }
+    Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
 }
