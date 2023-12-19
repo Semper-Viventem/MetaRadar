@@ -1,15 +1,32 @@
-package f.cking.software.common
+package f.cking.software.utils.graphic
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +41,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -39,8 +57,11 @@ import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
+import f.cking.software.dpToPx
 import f.cking.software.openUrl
+import f.cking.software.pxToDp
 import f.cking.software.toHexString
+import f.cking.software.ui.GlobalUiState
 import org.osmdroid.views.MapView
 import java.time.LocalDate
 import java.time.LocalTime
@@ -55,8 +76,8 @@ fun rememberDateDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok)) { dialogState.hide() }
-            negativeButton(stringResource(R.string.cancel)) { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
         },
     ) {
         datepicker(initialDate = initialDate) { localDate ->
@@ -75,8 +96,8 @@ fun rememberTimeDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok)) { dialogState.hide() }
-            negativeButton(stringResource(R.string.cancel)) { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
         },
     ) {
         timepicker(is24HourClock = true, initialTime = initialTime) { localDate ->
@@ -95,12 +116,17 @@ fun ClickableField(
     onClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    val unfocuse = remember { mutableStateOf(false) }
+    if (unfocuse.value) {
+        focusManager.clearFocus(true)
+        unfocuse.value = false
+    }
     TextField(
         modifier = modifier
             .onFocusChanged {
                 if (it.isFocused) {
+                    unfocuse.value = true
                     onClick.invoke()
-                    focusManager.clearFocus(true)
                 }
             },
         value = text ?: "",
@@ -132,7 +158,7 @@ fun DeviceListItem(
                 }
                 if (device.favorite) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite))
+                    Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite), tint = MaterialTheme.colors.onSurface)
                     Spacer(modifier = Modifier.width(8.dp))
                 }
             }
@@ -147,7 +173,7 @@ fun DeviceListItem(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = device.address,
-                fontWeight = FontWeight.Light
+                fontWeight = FontWeight.Light,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -156,7 +182,7 @@ fun DeviceListItem(
                     device.firstDetectionPeriod(LocalContext.current),
                     device.lastDetectionPeriod(LocalContext.current)
                 ),
-                fontWeight = FontWeight.Light
+                fontWeight = FontWeight.Light,
             )
         }
     }
@@ -244,10 +270,11 @@ fun Divider() {
 @Composable
 fun ContentPlaceholder(
     text: String,
+    modifier: Modifier = Modifier,
     icon: Painter = painterResource(R.drawable.ic_ghost),
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(),
         contentAlignment = Alignment.Center
@@ -278,7 +305,7 @@ fun RoundedBox(
         Column(
             Modifier
                 .fillMaxWidth()
-                .background(color = Color.LightGray, shape = shape)
+                .background(color = MaterialTheme.colors.primaryVariant, shape = shape)
                 .clip(shape = shape)
                 .padding(internalPaddings)
         ) { boxContent(this) }
@@ -323,8 +350,24 @@ fun TagChip(
             leadingIconContentColor = Color.Black,
         ),
         onClick = onClick,
-        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null) } },
+        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colors.onSurface) } },
     ) {
         Text(text = tagName)
     }
+}
+
+@Composable
+fun dpToPx(dp: Float): Float {
+    return LocalContext.current.dpToPx(dp).toFloat()
+}
+
+@Composable
+fun pxToDp(px: Float): Float {
+    return LocalContext.current.pxToDp(px)
+}
+
+@Composable
+fun BottomSpacer() {
+    val bottomOffset = remember { GlobalUiState.totalOffset }
+    Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
 }

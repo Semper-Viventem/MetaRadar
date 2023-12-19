@@ -1,17 +1,31 @@
 package f.cking.software.ui.profileslist
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.*
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -20,18 +34,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
-import f.cking.software.common.ContentPlaceholder
 import f.cking.software.domain.model.RadarProfile
+import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.ContentPlaceholder
 import org.koin.androidx.compose.koinViewModel
 
 object ProfilesListScreen {
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Screen() {
         val viewModel: ProfilesListViewModel = koinViewModel()
         Column(
             Modifier
+                .background(MaterialTheme.colors.surface)
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
@@ -44,6 +59,9 @@ object ProfilesListScreen {
                         .fillMaxHeight()
                 ) {
                     profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
+                    item {
+                        BottomSpacer()
+                    }
                 }
             } else {
                 ContentPlaceholder(stringResource(R.string.radar_profile_placeholder))
@@ -66,8 +84,8 @@ object ProfilesListScreen {
                     Spacer(modifier = Modifier.width(8.dp))
                     Chip(
                         colors = ChipDefaults.chipColors(
-                            backgroundColor = MaterialTheme.colors.primary,
-                            contentColor = Color.White,
+                            backgroundColor = MaterialTheme.colors.primaryVariant,
+                            contentColor = MaterialTheme.colors.onPrimary,
                         ),
                         onClick = { viewModel.createNewClick() },
                         leadingIcon = {
@@ -111,7 +129,7 @@ object ProfilesListScreen {
 
                 Spacer(modifier = Modifier.height(4.dp))
                 val activeText = if (profile.isActive) stringResource(R.string.profile_is_active) else stringResource(R.string.profile_is_not_active)
-                val color = if (profile.isActive) colorResource(id = R.color.green_600) else Color.DarkGray
+                val color = if (profile.isActive) colorResource(id = R.color.green_600) else MaterialTheme.colors.onSurface
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(12.dp),

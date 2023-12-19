@@ -1,4 +1,4 @@
-package f.cking.software.common.navigation
+package f.cking.software.utils.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

@@ -7,19 +7,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material.Typography
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import f.cking.software.R
-import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.Navigator
-import f.cking.software.common.navigation.RouterImpl
 import f.cking.software.data.helpers.ActivityProvider
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.utils.navigation.BackCommand
+import f.cking.software.utils.navigation.Navigator
+import f.cking.software.utils.navigation.RouterImpl
 import org.koin.android.ext.android.inject
 import org.osmdroid.config.Configuration
 
@@ -48,12 +48,18 @@ class MainActivity : AppCompatActivity() {
             val focusManager = LocalFocusManager.current
             MaterialTheme(
                 colors = MaterialTheme.colors.copy(
-                    primary = colorResource(id = R.color.orange_500),
-                    primaryVariant = colorResource(id = R.color.orange_700),
-                    onPrimary = Color.White,
-                    secondary = Color.Black,
-                    secondaryVariant = Color.Black,
-                    onSecondary = Color.White,
+                    primary = colorResource(id = R.color.primary),
+                    primaryVariant = colorResource(id = R.color.primary_variant),
+                    onPrimary = colorResource(id = R.color.on_primary),
+                    secondary = colorResource(id = R.color.secondary),
+                    secondaryVariant = colorResource(id = R.color.secondary_variant),
+                    onSecondary = colorResource(id = R.color.on_secondary),
+                    surface = colorResource(id = R.color.surface_color),
+                    onSurface = colorResource(id = R.color.on_surface),
+                ),
+                typography = Typography(
+                    body1 = MaterialTheme.typography.body1.copy(color = colorResource(id = R.color.on_surface)),
+                    body2 = MaterialTheme.typography.body2.copy(color = colorResource(id = R.color.on_surface)),
                 )
             ) {
                 val stack = viewModel.navigator.stack

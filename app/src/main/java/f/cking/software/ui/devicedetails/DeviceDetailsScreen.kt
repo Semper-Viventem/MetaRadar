@@ -38,11 +38,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,9 +52,6 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.MapView
-import f.cking.software.common.RoundedBox
-import f.cking.software.common.TagChip
 import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
@@ -60,6 +59,9 @@ import f.cking.software.dpToPx
 import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
 import f.cking.software.ui.tagdialog.TagDialog
+import f.cking.software.utils.graphic.MapView
+import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.TagChip
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -77,6 +79,7 @@ object DeviceDetailsScreen {
 
         Scaffold(
             modifier = Modifier
+                .background(MaterialTheme.colors.surface)
                 .fillMaxWidth()
                 .fillMaxHeight(),
             topBar = {
@@ -84,7 +87,7 @@ object DeviceDetailsScreen {
             },
             content = {
                 Content(
-                    modifier = Modifier.padding(it),
+                    modifier = Modifier.background(MaterialTheme.colors.surface).padding(it),
                     viewModel = viewModel,
                 )
             }
@@ -107,7 +110,7 @@ object DeviceDetailsScreen {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = iconId),
                             contentDescription = text,
-                            tint = Color.White
+                            tint = MaterialTheme.colors.onPrimary,
                         )
                     }
                 }
@@ -117,7 +120,7 @@ object DeviceDetailsScreen {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White
+                        tint = MaterialTheme.colors.onPrimary
                     )
                 }
             }
@@ -131,7 +134,7 @@ object DeviceDetailsScreen {
     ) {
         val deviceData = viewModel.deviceState
         if (deviceData == null) {
-            Progress()
+            Progress(modifier)
         } else {
             DeviceDetails(modifier = modifier, viewModel = viewModel, deviceData = deviceData)
         }
@@ -197,7 +200,7 @@ object DeviceDetailsScreen {
             Text(
                 text = deviceData.buildDisplayName(),
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -214,18 +217,25 @@ object DeviceDetailsScreen {
             Spacer(modifier = Modifier.height(8.dp))
 
             Row {
-                Text(text = stringResource(R.string.device_details_detect_count), fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.device_details_detect_count),
+                    fontWeight = FontWeight.Bold,
+                )
                 Spacer(Modifier.width(4.dp))
                 Text(text = deviceData.detectCount.toString())
             }
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
-            Text(text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current)))
+            Text(
+                text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current))
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
-            Text(text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current)))
+            Text(
+                text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
+            )
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -263,8 +273,11 @@ object DeviceDetailsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm)) {
+                negativeButton(
+                    text = stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onRemoveTagClick(deviceData, name)
                 }
@@ -290,12 +303,12 @@ object DeviceDetailsScreen {
         }
         Chip(
             colors = ChipDefaults.chipColors(
-                backgroundColor = MaterialTheme.colors.primary,
-                contentColor = Color.White,
+                backgroundColor = MaterialTheme.colors.secondary,
+                contentColor = MaterialTheme.colors.onSecondary,
             ),
             onClick = { addTagDialog.show() },
             leadingIcon = {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colors.onSurface)
             }
         ) { Text(text = stringResource(R.string.add_tag)) }
     }
@@ -309,7 +322,10 @@ object DeviceDetailsScreen {
         MaterialDialog(
             dialogState = dialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel)) { dialog.hide() }
+                negativeButton(
+                    stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { dialog.hide() }
             },
         ) {
             Column(
@@ -362,13 +378,14 @@ object DeviceDetailsScreen {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = stringResource(R.string.device_details_history_period_subtitle),
-                            fontWeight = FontWeight.Light
+                            fontWeight = FontWeight.Light,
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Image(
                         modifier = Modifier.size(24.dp),
                         imageVector = Icons.Default.Edit,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
                         contentDescription = stringResource(R.string.change)
                     )
                 }
@@ -403,7 +420,7 @@ object DeviceDetailsScreen {
                         .fillMaxHeight(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Box(modifier = Modifier.background(color = colorResource(id = R.color.black_300), shape = RoundedCornerShape(8.dp))) {
+                    Box(modifier = Modifier.background(color = colorResource(id = R.color.black_30), shape = RoundedCornerShape(8.dp))) {
                         Text(
                             modifier = Modifier.padding(16.dp),
                             text = stringResource(R.string.device_details_no_location_history_for_such_period),
