@@ -2,7 +2,6 @@ package f.cking.software.ui.journal
 
 import android.app.Application
 import android.widget.Toast
-import androidx.annotation.ColorRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -117,7 +116,7 @@ class JournalViewModel(
 
     data class JournalEntryUiModel(
         val dateTime: String,
-        @ColorRes val color: Int,
+        val color: Int,
         val title: String,
         val subtitle: String?,
         val items: List<ListItemUiModel>?,

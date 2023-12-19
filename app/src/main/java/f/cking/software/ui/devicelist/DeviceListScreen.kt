@@ -1,6 +1,7 @@
 package f.cking.software.ui.devicelist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +36,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -58,6 +58,7 @@ object DeviceListScreen {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Screen() {
+        val modifier = Modifier.background(MaterialTheme.colors.surface)
         val viewModel: DeviceListViewModel = koinViewModel()
         val focusManager = LocalFocusManager.current
         val nestedScroll = remember {
@@ -72,18 +73,18 @@ object DeviceListScreen {
         val list = viewModel.devicesViewState
 
         if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
-            ContentPlaceholder(stringResource(R.string.device_list_placeholder))
+            ContentPlaceholder(stringResource(R.string.device_list_placeholder), modifier)
             if (viewModel.isLoading) {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp),
-                    color = Color.Black
+                    color = MaterialTheme.colors.onPrimary
                 )
             }
         } else {
             LazyColumn(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .nestedScroll(nestedScroll),
@@ -96,7 +97,7 @@ object DeviceListScreen {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(4.dp),
-                                color = Color.Black
+                                color = MaterialTheme.colors.onPrimary
                             )
                         }
                     }

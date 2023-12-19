@@ -1,5 +1,6 @@
 package f.cking.software.ui.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ object SettingsScreen {
         val viewModel: SettingsViewModel = koinViewModel()
         LazyColumn(
             modifier = Modifier
+                .background(MaterialTheme.colors.surface)
                 .fillMaxWidth()
                 .fillMaxHeight(),
         ) {
@@ -70,16 +72,16 @@ object SettingsScreen {
         Column {
             val locationData = viewModel.locationData
             if (locationData == null) {
-                Text(text = stringResource(R.string.no_location_data_yet), fontWeight = FontWeight.SemiBold)
+                Text(text = stringResource(R.string.no_location_data_yet), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(R.string.location_fetches_only_if_service_is_turned_on), fontWeight = FontWeight.Light)
+                Text(text = stringResource(R.string.location_fetches_only_if_service_is_turned_on), fontWeight = FontWeight.Light, color = MaterialTheme.colors.onSurface)
             } else {
                 val formattedTime = locationData.emitTime.dateTimeStringFormat("HH:mm")
-                Text(text = stringResource(R.string.last_location_update_time, formattedTime), fontWeight = FontWeight.SemiBold)
+                Text(text = stringResource(R.string.last_location_update_time, formattedTime), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(R.string.lat_template, locationData.location.latitude), fontWeight = FontWeight.Light)
+                Text(text = stringResource(R.string.lat_template, locationData.location.latitude), fontWeight = FontWeight.Light, color = MaterialTheme.colors.onSurface)
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = stringResource(R.string.lng_template, locationData.location.longitude), fontWeight = FontWeight.Light)
+                Text(text = stringResource(R.string.lng_template, locationData.location.longitude), fontWeight = FontWeight.Light, color = MaterialTheme.colors.onSurface)
             }
         }
     }
@@ -130,7 +132,10 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                negativeButton(
+                    text = stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { dialogState.hide() }
                 positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onRestoreDBClick()
@@ -159,7 +164,10 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                negativeButton(
+                    text = stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { dialogState.hide() }
                 positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onBackupDBClick()
@@ -189,7 +197,10 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                negativeButton(
+                    text = stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { dialogState.hide() }
                 positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onClearLocationsClick()
@@ -235,7 +246,7 @@ object SettingsScreen {
     @Composable
     private fun ReportIssue(viewModel: SettingsViewModel) {
         RoundedBox {
-            Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
+            Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
                 Text(text = stringResource(R.string.report))
@@ -246,13 +257,13 @@ object SettingsScreen {
     @Composable
     private fun AppInfo() {
         RoundedBox {
-            Text(text = stringResource(R.string.app_info_title), fontWeight = FontWeight.SemiBold)
+            Text(text = stringResource(R.string.app_info_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colors.onSurface)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(R.string.app_info_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
+            Text(text = stringResource(R.string.app_info_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), color = MaterialTheme.colors.onSurface)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release))
+            Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release), color = MaterialTheme.colors.onSurface)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION))
+            Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION), color = MaterialTheme.colors.onSurface)
         }
     }
 
@@ -276,10 +287,10 @@ object SettingsScreen {
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(text = title)
+                    Text(text = title, color = MaterialTheme.colors.onSurface)
                     subtitle?.let {
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp)
+                        Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp, color = MaterialTheme.colors.onSurface)
                     }
                 }
                 Spacer(modifier = Modifier.width(4.dp))

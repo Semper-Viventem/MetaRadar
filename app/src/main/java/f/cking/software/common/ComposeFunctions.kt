@@ -163,7 +163,7 @@ fun DeviceListItem(
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
                 Spacer(modifier = Modifier.width(4.dp))
                 device.tags.forEach {
                     Spacer(modifier = Modifier.width(4.dp))
@@ -171,22 +171,23 @@ fun DeviceListItem(
                 }
                 if (device.favorite) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite))
+                    Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite), tint = MaterialTheme.colors.onSurface)
                     Spacer(modifier = Modifier.width(8.dp))
                 }
             }
             device.manufacturerInfo?.name?.let {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = it)
+                Text(text = it, color = MaterialTheme.colors.onSurface)
             }
             device.manufacturerInfo?.airdrop?.let { airdrop ->
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = airdrop.contacts.joinToString { "0x${it.sha256.toHexString().uppercase()}" })
+                Text(text = airdrop.contacts.joinToString { "0x${it.sha256.toHexString().uppercase()}" }, color = MaterialTheme.colors.onSurface)
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = device.address,
-                fontWeight = FontWeight.Light
+                fontWeight = FontWeight.Light,
+                color = MaterialTheme.colors.onSurface,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -195,7 +196,8 @@ fun DeviceListItem(
                     device.firstDetectionPeriod(LocalContext.current),
                     device.lastDetectionPeriod(LocalContext.current)
                 ),
-                fontWeight = FontWeight.Light
+                fontWeight = FontWeight.Light,
+                color = MaterialTheme.colors.onSurface,
             )
         }
     }
@@ -283,10 +285,11 @@ fun Divider() {
 @Composable
 fun ContentPlaceholder(
     text: String,
+    modifier: Modifier = Modifier,
     icon: Painter = painterResource(R.drawable.ic_ghost),
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(),
         contentAlignment = Alignment.Center
@@ -317,7 +320,7 @@ fun RoundedBox(
         Column(
             Modifier
                 .fillMaxWidth()
-                .background(color = Color.LightGray, shape = shape)
+                .background(color = MaterialTheme.colors.primaryVariant, shape = shape)
                 .clip(shape = shape)
                 .padding(internalPaddings)
         ) { boxContent(this) }

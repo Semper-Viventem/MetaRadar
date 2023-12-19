@@ -1,5 +1,6 @@
 package f.cking.software.ui.profileslist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -46,6 +46,7 @@ object ProfilesListScreen {
         val viewModel: ProfilesListViewModel = koinViewModel()
         Column(
             Modifier
+                .background(MaterialTheme.colors.surface)
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
@@ -124,11 +125,11 @@ object ProfilesListScreen {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = profile.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(text = profile.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
 
                 Spacer(modifier = Modifier.height(4.dp))
                 val activeText = if (profile.isActive) stringResource(R.string.profile_is_active) else stringResource(R.string.profile_is_not_active)
-                val color = if (profile.isActive) colorResource(id = R.color.green_600) else Color.DarkGray
+                val color = if (profile.isActive) colorResource(id = R.color.green_600) else MaterialTheme.colors.onSurface
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(12.dp),
@@ -143,7 +144,7 @@ object ProfilesListScreen {
                 val description = profile.description
                 if (!description.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = description)
+                    Text(text = description, color = MaterialTheme.colors.onSurface)
                 }
             }
         }
