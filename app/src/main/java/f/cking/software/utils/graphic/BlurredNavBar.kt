@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
@@ -84,7 +85,7 @@ fun BlurredNavBar(
                     .fillMaxWidth()
                     .height(2.dp)
                     .align(Alignment.TopCenter)
-                    .background(Color.White.copy(alpha = 0.3f))
+                    .background(Brush.horizontalGradient(listOf(Color.White.copy(alpha = 0.1f), Color.White.copy(alpha = 0.2f), Color.Transparent)))
             )
         }
     }
