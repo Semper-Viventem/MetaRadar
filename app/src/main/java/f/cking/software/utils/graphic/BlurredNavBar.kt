@@ -34,7 +34,8 @@ import f.cking.software.dpToPx
 fun BlurredNavBar(
     modifier: Modifier = Modifier,
     height: Dp? = null,
-    blur: Float = 10f,
+    blur: Float = 5f,
+    glassCurveSizeDp: Float = 3f,
     zIndex: Float = 1f,
     fallbackColor: Color = MaterialTheme.colors.primary,
     overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.2f),
@@ -50,7 +51,7 @@ fun BlurredNavBar(
                 .fillMaxWidth()
                 .let {
                     if (isRenderEffectSupported && navbarHeightPx.value != null) {
-                        it.blurBottom(heightPx = navbarHeightPx.value!!, blur = blur)
+                        it.blurBottom(heightPx = navbarHeightPx.value!!, blur = blur, glassCurveSizeDp = glassCurveSizeDp)
                     } else it
                 }
         ) {
@@ -92,7 +93,8 @@ fun BlurredNavBar(
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun Modifier.blurBottom(heightPx: Float, blur: Float): Modifier = composed {
+fun Modifier.blurBottom(heightPx: Float, blur: Float, glassCurveSizeDp: Float): Modifier = composed {
+    val context = LocalContext.current
     val contentShader = remember {
         RuntimeShader(Shaders.SHADER_CONTENT).apply {
             setFloatUniform("blurredHeight", heightPx)
@@ -105,13 +107,25 @@ fun Modifier.blurBottom(heightPx: Float, blur: Float): Modifier = composed {
         }
     }
 
-    this.onSizeChanged {
+    val glassShader = remember {
+        RuntimeShader(Shaders.GLASS_SHADER).apply {
+            setFloatUniform("horizontalSquareSize", context.dpToPx(glassCurveSizeDp).toFloat())
+        }
+    }
+
+    this
+        .onSizeChanged {
             contentShader.setFloatUniform(
                 "iResolution",
                 it.width.toFloat(),
                 it.height.toFloat(),
             )
             blurredShader.setFloatUniform(
+                "iResolution",
+                it.width.toFloat(),
+                it.height.toFloat(),
+            )
+            glassShader.setFloatUniform(
                 "iResolution",
                 it.width.toFloat(),
                 it.height.toFloat(),
@@ -124,7 +138,10 @@ fun Modifier.blurBottom(heightPx: Float, blur: Float): Modifier = composed {
                         RenderEffect.createRuntimeShaderEffect(contentShader, "content"),
                         RenderEffect.createChainEffect(
                             RenderEffect.createRuntimeShaderEffect(blurredShader, "content"),
-                            RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.MIRROR)
+                            RenderEffect.createChainEffect(
+                                RenderEffect.createRuntimeShaderEffect(glassShader, "content"),
+                                RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.MIRROR),
+                            )
                         ),
                         BlendMode.SRC_OVER,
                     )
