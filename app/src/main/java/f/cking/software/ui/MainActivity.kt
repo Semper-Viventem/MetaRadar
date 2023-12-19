@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     onSecondary = colorResource(id = R.color.on_secondary),
                     surface = colorResource(id = R.color.surface_color),
                     onSurface = colorResource(id = R.color.on_surface),
-                )
+                ),
             ) {
                 val stack = viewModel.navigator.stack
                 if (stack.isEmpty()) {

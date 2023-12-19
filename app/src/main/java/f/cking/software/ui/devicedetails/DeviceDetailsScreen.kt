@@ -38,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -85,7 +86,7 @@ object DeviceDetailsScreen {
             },
             content = {
                 Content(
-                    modifier = Modifier.padding(it),
+                    modifier = Modifier.background(MaterialTheme.colors.surface).padding(it),
                     viewModel = viewModel,
                 )
             }
@@ -198,35 +199,46 @@ object DeviceDetailsScreen {
             Text(
                 text = deviceData.buildDisplayName(),
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colors.onSurface,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
+            Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
+            Text(text = deviceData.name ?: stringResource(R.string.not_applicable), color = MaterialTheme.colors.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.address)
+            Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
+            Text(text = deviceData.address, color = MaterialTheme.colors.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
+            Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
+            Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable), color = MaterialTheme.colors.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
 
             Row {
-                Text(text = stringResource(R.string.device_details_detect_count), fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.device_details_detect_count),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.onSurface
+                )
                 Spacer(Modifier.width(4.dp))
-                Text(text = deviceData.detectCount.toString())
+                Text(text = deviceData.detectCount.toString(), color = MaterialTheme.colors.onSurface)
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
-            Text(text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current)))
+            Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
+            Text(
+                text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current)),
+                color = MaterialTheme.colors.onSurface
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
-            Text(text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current)))
+            Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSurface)
+            Text(
+                text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current)),
+                color = MaterialTheme.colors.onSurface
+            )
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -264,7 +276,10 @@ object DeviceDetailsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                negativeButton(
+                    text = stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { dialogState.hide() }
                 positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onRemoveTagClick(deviceData, name)
@@ -310,7 +325,10 @@ object DeviceDetailsScreen {
         MaterialDialog(
             dialogState = dialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialog.hide() }
+                negativeButton(
+                    stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { dialog.hide() }
             },
         ) {
             Column(
@@ -357,19 +375,21 @@ object DeviceDetailsScreen {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Row {
-                            Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
-                            Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp, color = MaterialTheme.colors.onSurface)
+                            Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colors.onSurface)
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = stringResource(R.string.device_details_history_period_subtitle),
-                            fontWeight = FontWeight.Light
+                            fontWeight = FontWeight.Light,
+                            color = MaterialTheme.colors.onSurface,
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Image(
                         modifier = Modifier.size(24.dp),
                         imageVector = Icons.Default.Edit,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
                         contentDescription = stringResource(R.string.change)
                     )
                 }

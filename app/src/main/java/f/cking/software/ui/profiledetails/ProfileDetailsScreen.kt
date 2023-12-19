@@ -1,11 +1,13 @@
 package f.cking.software.ui.profiledetails
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
+import f.cking.software.common.RoundedBox
 import f.cking.software.ui.filter.FilterScreen
 import f.cking.software.ui.filter.FilterUiState
 import f.cking.software.ui.filter.SelectFilterTypeScreen
@@ -54,7 +57,10 @@ object ProfileDetailsScreen {
                 AppBar(viewModel)
             },
             content = {
-                Box(modifier = Modifier.padding(it)) {
+                Box(modifier = Modifier
+                    .background(MaterialTheme.colors.surface)
+                    .fillMaxSize()
+                    .padding(it)) {
                     Content(viewModel)
                 }
             }
@@ -168,7 +174,7 @@ object ProfileDetailsScreen {
                     .padding(horizontal = 16.dp),
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
-                placeholder = { Text(text = stringResource(R.string.name)) },
+                placeholder = { Text(text = stringResource(R.string.name), color = MaterialTheme.colors.onSurface) },
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
@@ -177,20 +183,22 @@ object ProfileDetailsScreen {
                     .padding(horizontal = 16.dp),
                 value = viewModel.description,
                 onValueChange = { viewModel.description = it },
-                placeholder = { Text(text = stringResource(R.string.description)) }
+                placeholder = { Text(text = stringResource(R.string.description), color = MaterialTheme.colors.onSurface) }
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { viewModel.onIsActiveClick() },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(modifier = Modifier.weight(1f), text = stringResource(R.string.is_active))
-                Spacer(modifier = Modifier.width(8.dp))
-                Switch(checked = viewModel.isActive, onCheckedChange = { viewModel.onIsActiveClick() })
-                Spacer(modifier = Modifier.width(16.dp))
+            RoundedBox {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.onIsActiveClick() },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(modifier = Modifier.weight(1f), text = stringResource(R.string.is_active), color = MaterialTheme.colors.onSurface)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Switch(checked = viewModel.isActive, onCheckedChange = { viewModel.onIsActiveClick() })
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
             }
         }
     }
