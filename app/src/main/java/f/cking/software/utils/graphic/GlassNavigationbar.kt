@@ -31,7 +31,7 @@ import f.cking.software.dpToPx
 
 
 @Composable
-fun BlurredNavBar(
+fun GlassNavigationbar(
     modifier: Modifier = Modifier,
     height: Dp? = null,
     blur: Float = 5f,

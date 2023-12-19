@@ -30,7 +30,7 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.GlobalUiState
-import f.cking.software.utils.graphic.BlurredNavBar
+import f.cking.software.utils.graphic.GlassNavigationbar
 import f.cking.software.utils.graphic.pxToDp
 import org.koin.androidx.compose.koinViewModel
 
@@ -47,7 +47,7 @@ object MainScreen {
                 TopBar(viewModel)
             },
             content = { paddings ->
-                BlurredNavBar(
+                GlassNavigationbar(
                     modifier = Modifier
                         .padding(paddings)
                         .fillMaxWidth()
