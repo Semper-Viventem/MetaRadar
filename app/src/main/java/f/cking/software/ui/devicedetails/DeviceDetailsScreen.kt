@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -263,8 +264,8 @@ object DeviceDetailsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm)) {
+                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onRemoveTagClick(deviceData, name)
                 }
@@ -309,7 +310,7 @@ object DeviceDetailsScreen {
         MaterialDialog(
             dialogState = dialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel)) { dialog.hide() }
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialog.hide() }
             },
         ) {
             Column(

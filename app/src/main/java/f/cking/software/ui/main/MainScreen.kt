@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,8 +79,8 @@ object MainScreen {
         MaterialDialog(
             dialogState = viewModel.showLocationDisabledDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel))
-                positiveButton(stringResource(R.string.turn_on)) {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     viewModel.onTurnOnLocationClick()
                 }
             },
@@ -97,8 +98,8 @@ object MainScreen {
         MaterialDialog(
             dialogState = viewModel.showBluetoothDisabledDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel))
-                positiveButton(stringResource(R.string.turn_on)) {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     viewModel.onTurnOnBluetoothClick()
                 }
             },
@@ -212,11 +213,11 @@ object MainScreen {
         MaterialDialog(
             dialogState = state,
             buttons = {
-                positiveButton(stringResource(id = R.string.confirm)) {
+                positiveButton(stringResource(id = R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     state.hide()
                     onPassed.invoke()
                 }
-                negativeButton(stringResource(id = R.string.decline)) {
+                negativeButton(stringResource(id = R.string.decline), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     state.hide()
                     onDeclined.invoke()
                 }

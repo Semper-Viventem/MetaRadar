@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -128,8 +130,8 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm)) {
+                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onRestoreDBClick()
                 }
@@ -157,8 +159,8 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm)) {
+                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onBackupDBClick()
                 }
@@ -187,8 +189,8 @@ object SettingsScreen {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                negativeButton(text = stringResource(R.string.cancel)) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm)) {
+                negativeButton(text = stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     dialogState.hide()
                     viewModel.onClearLocationsClick()
                 }

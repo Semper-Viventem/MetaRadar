@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -88,8 +89,8 @@ fun rememberDateDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok)) { dialogState.hide() }
-            negativeButton(stringResource(R.string.cancel)) { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
         },
     ) {
         datepicker(initialDate = initialDate) { localDate ->
@@ -108,8 +109,8 @@ fun rememberTimeDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok)) { dialogState.hide() }
-            negativeButton(stringResource(R.string.cancel)) { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
         },
     ) {
         timepicker(is24HourClock = true, initialTime = initialTime) { localDate ->

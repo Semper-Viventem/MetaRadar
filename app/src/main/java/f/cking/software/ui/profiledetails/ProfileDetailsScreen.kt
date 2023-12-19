@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,8 +68,11 @@ object ProfileDetailsScreen {
         MaterialDialog(
             dialogState = discardChangesDialog,
             buttons = {
-                negativeButton(stringResource(R.string.stay)) { discardChangesDialog.hide() }
-                positiveButton(stringResource(R.string.discard_changes)) {
+                negativeButton(
+                    stringResource(R.string.stay),
+                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                ) { discardChangesDialog.hide() }
+                positiveButton(stringResource(R.string.discard_changes), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     discardChangesDialog.hide()
                     viewModel.back()
                 }
@@ -102,7 +106,11 @@ object ProfileDetailsScreen {
             actions = {
                 if (viewModel.profileId != null) {
                     IconButton(onClick = { deleteDialog.show() }) {
-                        Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), tint = MaterialTheme.colors.onPrimary)
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            tint = MaterialTheme.colors.onPrimary
+                        )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
@@ -118,7 +126,11 @@ object ProfileDetailsScreen {
                         viewModel.back()
                     }
                 }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colors.onPrimary)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = MaterialTheme.colors.onPrimary
+                    )
                 }
             }
         )
