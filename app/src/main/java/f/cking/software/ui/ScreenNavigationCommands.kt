@@ -1,7 +1,5 @@
 package f.cking.software.ui
 
-import f.cking.software.common.navigation.AddToStackCommand
-import f.cking.software.common.navigation.BackCommand
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.model.ManufacturerInfo
@@ -14,6 +12,8 @@ import f.cking.software.ui.profiledetails.ProfileDetailsScreen
 import f.cking.software.ui.selectdevice.SelectDeviceScreen
 import f.cking.software.ui.selectlocation.SelectLocationScreen
 import f.cking.software.ui.selectmanufacturer.SelectManufacturerScreen
+import f.cking.software.utils.navigation.AddToStackCommand
+import f.cking.software.utils.navigation.BackCommand
 
 object ScreenNavigationCommands {
 

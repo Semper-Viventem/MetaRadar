@@ -1,5 +1,6 @@
 package f.cking.software.ui.main
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,10 +29,16 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
+import f.cking.software.ui.GlobalUiState
+import f.cking.software.utils.graphic.GlassNavigationbar
+import f.cking.software.utils.graphic.pxToDp
 import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
 
+    private const val NAVBAR_HEIGHT_DP = 60f
+
+    @SuppressLint("NewApi")
     @Composable
     fun Screen() {
         val viewModel: MainViewModel = koinViewModel()
@@ -38,17 +47,28 @@ object MainScreen {
                 TopBar(viewModel)
             },
             content = { paddings ->
-                Box(modifier = Modifier.padding(paddings)) {
-                    viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
-                }
+                GlassNavigationbar(
+                    modifier = Modifier
+                        .padding(paddings)
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    overlayColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.3f),
+                    navBarContent = {
+                        BottomNavigationBar(
+                            Modifier
+                                .height(NAVBAR_HEIGHT_DP.dp),
+                            viewModel
+                        )
+                    },
+                    content = {
+                        viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
+                    },
+                )
             },
             floatingActionButtonPosition = FabPosition.Center,
             floatingActionButton = {
                 ScanFab(viewModel)
             },
-            bottomBar = {
-                BottomNavigationBar(viewModel)
-            }
         )
         LocationDisabledDialog(viewModel)
         BluetoothDisabledDialog(viewModel)
@@ -56,21 +76,21 @@ object MainScreen {
 
     @Composable
     private fun LocationDisabledDialog(viewModel: MainViewModel) {
-            MaterialDialog(
-                dialogState = viewModel.showLocationDisabledDialog,
-                buttons = {
-                    negativeButton(stringResource(R.string.cancel))
-                    positiveButton(stringResource(R.string.turn_on)) {
-                        viewModel.onTurnOnLocationClick()
-                    }
-                },
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(text = stringResource(id = R.string.location_is_turned_off_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(id = R.string.location_is_turned_off_subtitle))
+        MaterialDialog(
+            dialogState = viewModel.showLocationDisabledDialog,
+            buttons = {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                    viewModel.onTurnOnLocationClick()
                 }
+            },
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(text = stringResource(id = R.string.location_is_turned_off_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.location_is_turned_off_subtitle))
             }
+        }
     }
 
     @Composable
@@ -78,8 +98,8 @@ object MainScreen {
         MaterialDialog(
             dialogState = viewModel.showBluetoothDisabledDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel))
-                positiveButton(stringResource(R.string.turn_on)) {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     viewModel.onTurnOnBluetoothClick()
                 }
             },
@@ -93,11 +113,18 @@ object MainScreen {
     }
 
     @Composable
-    private fun BottomNavigationBar(viewModel: MainViewModel) {
-        BottomAppBar {
+    private fun BottomNavigationBar(modifier: Modifier, viewModel: MainViewModel) {
+        Box(
+            modifier = modifier
+                .onGloballyPositioned { GlobalUiState.setBottomOffset(navbarOffset = it.size.height.toFloat()) }
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth(),
             ) {
                 viewModel.tabs.forEach { tab ->
                     TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
@@ -123,11 +150,11 @@ object MainScreen {
             Image(
                 painter = painterResource(id = icon),
                 contentDescription = targetTab.text,
-                colorFilter = ColorFilter.tint(Color.White),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary.copy(alpha = 0.7f)),
                 modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = Color.White)
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colors.onPrimary.copy(alpha = 0.7f))
         }
     }
 
@@ -156,7 +183,10 @@ object MainScreen {
         )
 
         ExtendedFloatingActionButton(
-            text = { Text(text = text, fontWeight = FontWeight.Bold) },
+            modifier = Modifier
+                .padding(bottom = pxToDp(px = GlobalUiState.navbarOffsetPx.value).dp)
+                .onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
+            text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSecondary) },
             onClick = {
                 if (viewModel.needToShowPermissionsIntro()) {
                     permissionsIntro.show()
@@ -168,7 +198,7 @@ object MainScreen {
                 Image(
                     painter = painterResource(id = icon),
                     contentDescription = text,
-                    colorFilter = ColorFilter.tint(color = Color.White)
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colors.onSecondary)
                 )
             }
         )
@@ -183,11 +213,11 @@ object MainScreen {
         MaterialDialog(
             dialogState = state,
             buttons = {
-                positiveButton(stringResource(id = R.string.confirm)) {
+                positiveButton(stringResource(id = R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     state.hide()
                     onPassed.invoke()
                 }
-                negativeButton(stringResource(id = R.string.decline)) {
+                negativeButton(stringResource(id = R.string.decline), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
                     state.hide()
                     onDeclined.invoke()
                 }
@@ -259,7 +289,7 @@ object MainScreen {
                     Text(text = title, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text =subtitle)
+                Text(text = subtitle)
             }
         }
     }
@@ -268,12 +298,12 @@ object MainScreen {
     private fun TopBar(viewModel: MainViewModel) {
         TopAppBar(
             title = {
-                Text(text = stringResource(R.string.app_name))
+                Text(text = stringResource(R.string.app_name), color = MaterialTheme.colors.onPrimary)
             },
             actions = {
                 if (viewModel.scanStarted && viewModel.bgServiceIsActive) {
                     CircularProgressIndicator(
-                        color = Color.White,
+                        color = MaterialTheme.colors.onPrimary,
                         modifier = Modifier
                             .size(24.dp)
                     )
@@ -286,7 +316,7 @@ object MainScreen {
                                 .size(24.dp),
                             imageVector = Icons.Filled.Refresh,
                             contentDescription = stringResource(R.string.refresh),
-                            colorFilter = ColorFilter.tint(Color.White)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
                         )
                     }
                 }

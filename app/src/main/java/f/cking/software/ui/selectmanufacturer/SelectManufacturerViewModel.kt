@@ -3,10 +3,10 @@ package f.cking.software.ui.selectmanufacturer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.Router
 import f.cking.software.data.helpers.BluetoothSIG
 import f.cking.software.domain.model.ManufacturerInfo
+import f.cking.software.utils.navigation.BackCommand
+import f.cking.software.utils.navigation.Router
 
 class SelectManufacturerViewModel(
     private val router: Router,

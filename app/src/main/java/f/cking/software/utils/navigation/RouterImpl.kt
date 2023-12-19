@@ -1,4 +1,4 @@
-package f.cking.software.common.navigation
+package f.cking.software.utils.navigation
 
 class RouterImpl : Router {
 

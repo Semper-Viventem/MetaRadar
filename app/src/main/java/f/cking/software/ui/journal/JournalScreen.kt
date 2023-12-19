@@ -2,15 +2,26 @@ package f.cking.software.ui.journal
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -18,8 +29,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import f.cking.software.R
-import f.cking.software.common.ContentPlaceholder
-import f.cking.software.common.Divider
+import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.ContentPlaceholder
+import f.cking.software.utils.graphic.Divider
 import org.koin.androidx.compose.koinViewModel
 
 object JournalScreen {
@@ -28,11 +40,12 @@ object JournalScreen {
     fun Screen() {
         val viewModel: JournalViewModel = koinViewModel()
         val journal = viewModel.journal
+        val modifier = Modifier.background(MaterialTheme.colors.surface)
         if (journal.isEmpty()) {
-            ContentPlaceholder(text = stringResource(R.string.journal_placeholder))
+            ContentPlaceholder(text = stringResource(R.string.journal_placeholder), modifier = modifier)
         } else {
             LazyColumn(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
@@ -40,6 +53,7 @@ object JournalScreen {
                     item { JournalEntry(uiModel = it, viewModel) }
                     item { Divider() }
                 }
+                item { BottomSpacer() }
             }
         }
     }
@@ -64,7 +78,7 @@ object JournalScreen {
                         text = uiModel.title,
                         fontWeight = FontWeight.Bold,
                         maxLines = 4,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin)
@@ -80,7 +94,7 @@ object JournalScreen {
                         text = uiModel.subtitle,
                         fontWeight = FontWeight.Normal,
                         maxLines = if (isExpanded) Int.MAX_VALUE else 5,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
@@ -91,11 +105,6 @@ object JournalScreen {
                         items.forEach { item ->
                             Chip(
                                 onClick = { viewModel.onJournalListItemClick(item.payload) },
-                                colors = ChipDefaults.chipColors(
-                                    backgroundColor = Color.LightGray,
-                                    contentColor = Color.Black,
-                                    leadingIconContentColor = Color.Black
-                                ),
                             ) {
                                 Text(text = item.displayName)
                             }

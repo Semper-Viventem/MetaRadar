@@ -10,7 +10,11 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import java.security.MessageDigest
-import java.time.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 
@@ -99,6 +103,8 @@ fun Context.openUrl(url: String) {
 
 fun Context.dpToPx(value: Float): Int =
     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
+
+fun Context.pxToDp(value: Float): Float = value / resources.displayMetrics.density
 
 fun <T> List<T>.splitToBatches(batchSize: Int): List<List<T>> {
     if (size <= batchSize) return listOf(this)

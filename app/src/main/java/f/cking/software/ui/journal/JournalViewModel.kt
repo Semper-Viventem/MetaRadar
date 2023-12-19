@@ -2,20 +2,19 @@ package f.cking.software.ui.journal
 
 import android.app.Application
 import android.widget.Toast
-import androidx.annotation.ColorRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.JournalRepository
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.JournalEntry
 import f.cking.software.ui.ScreenNavigationCommands
+import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.launch
 
 class JournalViewModel(
@@ -117,7 +116,7 @@ class JournalViewModel(
 
     data class JournalEntryUiModel(
         val dateTime: String,
-        @ColorRes val color: Int,
+        val color: Int,
         val title: String,
         val subtitle: String?,
         val items: List<ListItemUiModel>?,

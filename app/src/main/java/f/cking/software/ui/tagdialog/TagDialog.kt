@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -17,14 +18,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.TagChip
 import f.cking.software.data.repo.TagsRepository
+import f.cking.software.utils.graphic.TagChip
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getKoin
 
@@ -39,7 +41,7 @@ object TagDialog {
         MaterialDialog(
             dialogState = dialog,
             buttons = {
-                negativeButton("Cancel") { dialog.hide() }
+                negativeButton("Cancel", textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialog.hide() }
             },
             onCloseRequest = { dialog.hide() },
         ) {

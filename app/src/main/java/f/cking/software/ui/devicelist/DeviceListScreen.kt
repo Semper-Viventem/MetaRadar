@@ -1,11 +1,28 @@
 package f.cking.software.ui.devicelist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.*
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -19,7 +36,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -29,11 +45,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.common.ContentPlaceholder
-import f.cking.software.common.DeviceListItem
-import f.cking.software.common.Divider
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.SelectFilterTypeScreen
+import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.ContentPlaceholder
+import f.cking.software.utils.graphic.DeviceListItem
+import f.cking.software.utils.graphic.Divider
 import org.koin.androidx.compose.koinViewModel
 
 object DeviceListScreen {
@@ -41,6 +58,7 @@ object DeviceListScreen {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Screen() {
+        val modifier = Modifier.background(MaterialTheme.colors.surface)
         val viewModel: DeviceListViewModel = koinViewModel()
         val focusManager = LocalFocusManager.current
         val nestedScroll = remember {
@@ -55,18 +73,18 @@ object DeviceListScreen {
         val list = viewModel.devicesViewState
 
         if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
-            ContentPlaceholder(stringResource(R.string.device_list_placeholder))
+            ContentPlaceholder(stringResource(R.string.device_list_placeholder), modifier)
             if (viewModel.isLoading) {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp),
-                    color = Color.Black
+                    color = MaterialTheme.colors.onPrimary
                 )
             }
         } else {
             LazyColumn(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .nestedScroll(nestedScroll),
@@ -79,7 +97,7 @@ object DeviceListScreen {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(4.dp),
-                                color = Color.Black
+                                color = MaterialTheme.colors.onPrimary
                             )
                         }
                     }
@@ -97,6 +115,10 @@ object DeviceListScreen {
                     if (showDivider) {
                         item { Divider() }
                     }
+                }
+
+                item {
+                    BottomSpacer()
                 }
             }
         }
@@ -120,18 +142,26 @@ object DeviceListScreen {
                     allFilters.forEach {
                         item {
                             val isSelected = viewModel.appliedFilter.contains(it)
-                            val color = if (isSelected) MaterialTheme.colors.primarySurface else Color.LightGray
+                            val colors = if (isSelected) {
+                                ChipDefaults.chipColors(
+                                    backgroundColor = MaterialTheme.colors.primaryVariant,
+                                    contentColor = MaterialTheme.colors.onPrimary,
+                                    leadingIconContentColor = MaterialTheme.colors.onPrimary,
+                                )
+                            } else {
+                                ChipDefaults.chipColors()
+                            }
 
                             Chip(
-                                colors = ChipDefaults.chipColors(
-                                    backgroundColor = color,
-                                    contentColor = Color.Black,
-                                    leadingIconContentColor = Color.Black,
-                                ),
+                                colors = colors,
                                 onClick = { viewModel.onFilterClick(it) },
                                 leadingIcon = {
                                     if (isSelected) {
-                                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
+                                        Icon(
+                                            Icons.Filled.Delete,
+                                            contentDescription = stringResource(R.string.delete),
+                                            modifier = Modifier.size(24.dp)
+                                        )
                                     }
                                 }
                             ) {
@@ -179,11 +209,6 @@ object DeviceListScreen {
         }
 
         Chip(
-            colors = ChipDefaults.chipColors(
-                backgroundColor = Color.LightGray,
-                contentColor = Color.Black,
-                leadingIconContentColor = Color.Black,
-            ),
             leadingIcon = {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
             },
@@ -196,14 +221,18 @@ object DeviceListScreen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun SearchChip(viewModel: DeviceListViewModel) {
-        val color = if (viewModel.isSearchMode) MaterialTheme.colors.primarySurface else Color.LightGray
+        val colors = if (viewModel.isSearchMode) {
+            ChipDefaults.chipColors(
+                backgroundColor = MaterialTheme.colors.primaryVariant,
+                contentColor = MaterialTheme.colors.onPrimary,
+                leadingIconContentColor = MaterialTheme.colors.onPrimary,
+            )
+        } else {
+            ChipDefaults.chipColors()
+        }
 
         Chip(
-            colors = ChipDefaults.chipColors(
-                backgroundColor = color,
-                contentColor = Color.Black,
-                leadingIconContentColor = Color.Black,
-            ),
+            colors = colors,
             leadingIcon = {
                 val icon = if (viewModel.isSearchMode) Icons.Filled.Delete else Icons.Filled.Search
                 Icon(icon, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))

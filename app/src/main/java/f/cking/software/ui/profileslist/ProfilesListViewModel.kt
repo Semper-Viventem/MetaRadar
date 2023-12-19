@@ -7,11 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.Router
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.FilterUiState
+import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 

@@ -7,8 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
-import f.cking.software.common.navigation.BackCommand
-import f.cking.software.common.navigation.Router
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.DevicesRepository
@@ -19,6 +17,8 @@ import f.cking.software.domain.interactor.RemoveTagFromDeviceInteractor
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.toDomain
+import f.cking.software.utils.navigation.BackCommand
+import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 

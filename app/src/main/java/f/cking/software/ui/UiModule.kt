@@ -1,7 +1,5 @@
 package f.cking.software.ui
 
-import f.cking.software.common.navigation.Router
-import f.cking.software.common.navigation.RouterImpl
 import f.cking.software.ui.devicedetails.DeviceDetailsViewModel
 import f.cking.software.ui.devicelist.DeviceListViewModel
 import f.cking.software.ui.journal.JournalViewModel
@@ -11,6 +9,8 @@ import f.cking.software.ui.profileslist.ProfilesListViewModel
 import f.cking.software.ui.selectdevice.SelectDeviceViewModel
 import f.cking.software.ui.selectmanufacturer.SelectManufacturerViewModel
 import f.cking.software.ui.settings.SettingsViewModel
+import f.cking.software.utils.navigation.Router
+import f.cking.software.utils.navigation.RouterImpl
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
