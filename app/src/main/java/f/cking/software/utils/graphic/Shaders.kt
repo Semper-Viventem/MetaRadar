@@ -38,6 +38,7 @@ object Shaders {
     @Language("AGSL")
     val GLASS_SHADER = """
         uniform shader content;
+        uniform float blurredHeight;
         uniform float2 iResolution;
         
         uniform float horizontalSquareSize;
@@ -46,6 +47,27 @@ object Shaders {
         const float horizontalOffset = 0.05;
         
         const float amt = 0.1;
+        
+        float4 gradient(float2 coordOriginal) {
+            float2 coord = float2(coordOriginal.x, coordOriginal.y - iResolution.y * 0.5 + blurredHeight);
+            float2 pos_ndc = 2.0 * coord.xy / iResolution.xy - 1.0;
+            float dist = length(pos_ndc);
+        
+            vec4 color1 = vec4(0.0, 0.0, 0.0, 1.0);
+            vec4 color2 = vec4(0.95, 0.95, 0.95, 1.0);
+            vec4 color3 = vec4(0.0, 0.0, 0.0, 1.0);
+            vec4 color4 = vec4(0.95, 0.95, 1.0, 0.95);
+            float step1 = 0.0;
+            float step2 = 0.33;
+            float step3 = 0.66;
+            float step4 = 1.0;
+        
+            vec4 color = mix(color1, color2, smoothstep(step1, step2, dist));
+            color = mix(color, color3, smoothstep(step2, step3, dist));
+            color = mix(color, color4, smoothstep(step3, step4, dist));
+        
+            return color;
+        }
 
         float4 main(float2 fragCoord) {
             float2 offset = float2(horizontalOffset, verticalOffset);
@@ -58,7 +80,9 @@ object Shaders {
             float2 tile = fract(tc * squares);
             
             float4 color = content.eval((uv + (tile * amt) - offset) * iResolution.xy);
-        	return color;
+            float4 white = float4(1.0, 1.0, 1.0, 1.0);
+            float4 colorModificator = 0.04 * gradient((uv + (tile * amt) - offset) * iResolution.xy);
+        	return min(color + colorModificator, white);
         }
     """
 }

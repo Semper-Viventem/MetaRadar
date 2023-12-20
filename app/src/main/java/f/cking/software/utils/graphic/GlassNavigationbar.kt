@@ -32,7 +32,7 @@ import f.cking.software.dpToPx
 @Composable
 fun GlassSystemNavbar(
     modifier: Modifier = Modifier,
-    blur: Float = 5f,
+    blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
     content: @Composable () -> Unit,
 ) {
@@ -51,11 +51,11 @@ fun GlassSystemNavbar(
 fun GlassNavigationbar(
     modifier: Modifier = Modifier,
     height: Dp? = null,
-    blur: Float = 5f,
+    blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
     zIndex: Float = 1f,
     fallbackColor: Color = MaterialTheme.colors.primary,
-    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.2f),
+    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.3f),
     navBarContent: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -119,6 +119,7 @@ fun Modifier.blurBottom(heightPx: Float, blur: Float, glassCurveSizeDp: Float): 
 
     contentShader.setFloatUniform("blurredHeight", heightPx)
     blurredShader.setFloatUniform("blurredHeight", heightPx)
+    glassShader.setFloatUniform("blurredHeight", heightPx)
     glassShader.setFloatUniform("horizontalSquareSize", context.dpToPx(glassCurveSizeDp).toFloat())
 
     this
