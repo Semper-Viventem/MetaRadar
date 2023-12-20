@@ -59,6 +59,7 @@ import f.cking.software.dpToPx
 import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
 import f.cking.software.ui.tagdialog.TagDialog
+import f.cking.software.utils.graphic.GlassSystemNavbar
 import f.cking.software.utils.graphic.MapView
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.SystemNavbarSpacer
@@ -87,10 +88,14 @@ object DeviceDetailsScreen {
                 AppBar(viewModel = viewModel)
             },
             content = {
-                Content(
-                    modifier = Modifier.background(MaterialTheme.colors.surface).padding(it),
-                    viewModel = viewModel,
-                )
+                GlassSystemNavbar {
+                    Content(
+                        modifier = Modifier
+                            .background(MaterialTheme.colors.surface)
+                            .padding(it),
+                        viewModel = viewModel,
+                    )
+                }
             }
         )
     }

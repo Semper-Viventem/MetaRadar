@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import f.cking.software.R
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.toHexString
+import f.cking.software.utils.graphic.GlassSystemNavbar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 
@@ -39,15 +40,19 @@ object SelectManufacturerScreen {
                 .fillMaxWidth(),
             topBar = { AppBar(viewModel) },
             content = { paddings ->
-                LazyColumn(modifier = Modifier.background(MaterialTheme.colors.surface).padding(paddings)) {
-                    viewModel.manufacturers.forEach { type ->
-                        item {
-                            TypeItem(item = type) {
-                                onSelected.invoke(type)
-                                viewModel.back()
+                GlassSystemNavbar {
+                    LazyColumn(modifier = Modifier
+                        .background(MaterialTheme.colors.surface)
+                        .padding(paddings)) {
+                        viewModel.manufacturers.forEach { type ->
+                            item {
+                                TypeItem(item = type) {
+                                    onSelected.invoke(type)
+                                    viewModel.back()
+                                }
                             }
+                            item { SystemNavbarSpacer() }
                         }
-                        item { SystemNavbarSpacer() }
                     }
                 }
             }

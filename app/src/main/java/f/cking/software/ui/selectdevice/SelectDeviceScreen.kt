@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.utils.graphic.DeviceListItem
+import f.cking.software.utils.graphic.GlassSystemNavbar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 
@@ -32,6 +33,7 @@ object SelectDeviceScreen {
             first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
             first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
                 first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
+
             else -> first.address.compareTo(second.address)
         }
     }
@@ -44,40 +46,50 @@ object SelectDeviceScreen {
         Scaffold(
             topBar = { AppBar(viewModel) },
             content = { paddings ->
-                LazyColumn(
-                    modifier = Modifier
-                        .background(MaterialTheme.colors.surface)
-                        .fillMaxSize()
-                        .padding(paddings)
-                ) {
-                    val list = viewModel.devices.asSequence()
-                        .filter { device ->
-                            viewModel.searchStr.takeIf { it.isNotBlank() }?.let { searchStr ->
-                                (device.name?.contains(searchStr, true) ?: false)
-                                        || (device.customName?.contains(searchStr, true) ?: false)
-                                        || (device.manufacturerInfo?.name?.contains(searchStr, true) ?: false)
-                                        || device.address.contains(searchStr, true)
-                            } ?: true
-                        }
-                        .sortedWith(generalComparator)
-                        .toList()
-
-                    list.forEachIndexed { index, device ->
-                        item {
-                            DeviceListItem(device = device) {
-                                onSelected.invoke(device)
-                                viewModel.back()
-                            }
-                        }
-                        val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != device.lastDetectTimeMs
-                        if (showDivider) {
-                            item { Divider() }
-                        }
-                        item { SystemNavbarSpacer() }
-                    }
+                GlassSystemNavbar {
+                    Content(Modifier.padding(paddings), viewModel, onSelected)
                 }
             }
         )
+    }
+
+    @Composable
+    private fun Content(
+        modifier: Modifier,
+        viewModel: SelectDeviceViewModel,
+        onSelected: (deviceData: DeviceData) -> Unit
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .background(MaterialTheme.colors.surface)
+                .fillMaxSize()
+        ) {
+            val list = viewModel.devices.asSequence()
+                .filter { device ->
+                    viewModel.searchStr.takeIf { it.isNotBlank() }?.let { searchStr ->
+                        (device.name?.contains(searchStr, true) ?: false)
+                                || (device.customName?.contains(searchStr, true) ?: false)
+                                || (device.manufacturerInfo?.name?.contains(searchStr, true) ?: false)
+                                || device.address.contains(searchStr, true)
+                    } ?: true
+                }
+                .sortedWith(generalComparator)
+                .toList()
+
+            list.forEachIndexed { index, device ->
+                item {
+                    DeviceListItem(device = device) {
+                        onSelected.invoke(device)
+                        viewModel.back()
+                    }
+                }
+                val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != device.lastDetectTimeMs
+                if (showDivider) {
+                    item { Divider() }
+                }
+                item { SystemNavbarSpacer() }
+            }
+        }
     }
 
     @Composable

@@ -29,6 +29,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import f.cking.software.dpToPx
 
+@Composable
+fun GlassSystemNavbar(
+    modifier: Modifier = Modifier,
+    blur: Float = 5f,
+    glassCurveSizeDp: Float = 3f,
+    content: @Composable () -> Unit,
+) {
+    GlassNavigationbar(
+        modifier = modifier,
+        blur = blur,
+        glassCurveSizeDp = glassCurveSizeDp,
+        fallbackColor = Color.Transparent,
+        navBarContent = { SystemNavbarSpacer() }
+    ) {
+        content()
+    }
+}
 
 @Composable
 fun GlassNavigationbar(
