@@ -46,7 +46,7 @@
             android:name="f.cking.software.ui.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="user"
             android:theme="@style/Theme.MetaRadar">
 
             <intent-filter>

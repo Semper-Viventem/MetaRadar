@@ -121,3 +121,8 @@ fun <T> List<T>.splitToBatches(batchSize: Int): List<List<T>> {
 
     return result
 }
+
+fun Context.isDarkModeOn(): Boolean {
+    val nightModeFlags = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+    return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+}
