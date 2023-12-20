@@ -40,7 +40,9 @@ import f.cking.software.R
 import f.cking.software.ui.filter.FilterScreen
 import f.cking.software.ui.filter.FilterUiState
 import f.cking.software.ui.filter.SelectFilterTypeScreen
+import f.cking.software.utils.graphic.GlassSystemNavbar
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -57,11 +59,13 @@ object ProfileDetailsScreen {
                 AppBar(viewModel)
             },
             content = {
-                Box(modifier = Modifier
-                    .background(MaterialTheme.colors.surface)
-                    .fillMaxSize()
-                    .padding(it)) {
-                    Content(viewModel)
+                GlassSystemNavbar {
+                    Box(modifier = Modifier
+                        .background(MaterialTheme.colors.surface)
+                        .fillMaxSize()
+                        .padding(it)) {
+                        Content(viewModel)
+                    }
                 }
             }
         )
@@ -157,6 +161,8 @@ object ProfileDetailsScreen {
             } else {
                 item { CreateFilter(viewModel = viewModel) }
             }
+
+            item { SystemNavbarSpacer() }
         }
     }
 

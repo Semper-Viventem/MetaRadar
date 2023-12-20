@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Chip
@@ -77,7 +80,10 @@ fun rememberDateDialog(
         dialogState = dialogState,
         buttons = {
             positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
-            negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            negativeButton(
+                stringResource(R.string.cancel),
+                textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+            ) { dialogState.hide() }
         },
     ) {
         datepicker(initialDate = initialDate) { localDate ->
@@ -97,7 +103,10 @@ fun rememberTimeDialog(
         dialogState = dialogState,
         buttons = {
             positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
-            negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            negativeButton(
+                stringResource(R.string.cancel),
+                textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+            ) { dialogState.hide() }
         },
     ) {
         timepicker(is24HourClock = true, initialTime = initialTime) { localDate ->
@@ -158,7 +167,11 @@ fun DeviceListItem(
                 }
                 if (device.favorite) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(imageVector = Icons.Filled.Star, contentDescription = stringResource(R.string.is_favorite), tint = MaterialTheme.colors.onSurface)
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = stringResource(R.string.is_favorite),
+                        tint = MaterialTheme.colors.onSurface
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
             }
@@ -369,5 +382,13 @@ fun pxToDp(px: Float): Float {
 @Composable
 fun BottomSpacer() {
     val bottomOffset = remember { GlobalUiState.totalOffset }
-    Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
+    Column {
+        Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
+        SystemNavbarSpacer()
+    }
+}
+
+@Composable
+fun SystemNavbarSpacer() {
+    Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
 }

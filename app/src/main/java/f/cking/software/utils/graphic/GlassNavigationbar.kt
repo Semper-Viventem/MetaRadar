@@ -29,6 +29,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import f.cking.software.dpToPx
 
+@Composable
+fun GlassSystemNavbar(
+    modifier: Modifier = Modifier,
+    blur: Float = 5f,
+    glassCurveSizeDp: Float = 3f,
+    content: @Composable () -> Unit,
+) {
+    GlassNavigationbar(
+        modifier = modifier,
+        blur = blur,
+        glassCurveSizeDp = glassCurveSizeDp,
+        fallbackColor = Color.Transparent,
+        navBarContent = { SystemNavbarSpacer() }
+    ) {
+        content()
+    }
+}
 
 @Composable
 fun GlassNavigationbar(
@@ -95,23 +112,14 @@ fun GlassNavigationbar(
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun Modifier.blurBottom(heightPx: Float, blur: Float, glassCurveSizeDp: Float): Modifier = composed {
     val context = LocalContext.current
-    val contentShader = remember {
-        RuntimeShader(Shaders.SHADER_CONTENT).apply {
-            setFloatUniform("blurredHeight", heightPx)
-        }
-    }
 
-    val blurredShader = remember {
-        RuntimeShader(Shaders.SHADER_BLURRED).apply {
-            setFloatUniform("blurredHeight", heightPx)
-        }
-    }
+    val contentShader = remember { RuntimeShader(Shaders.SHADER_CONTENT) }
+    val blurredShader = remember { RuntimeShader(Shaders.SHADER_BLURRED) }
+    val glassShader = remember { RuntimeShader(Shaders.GLASS_SHADER) }
 
-    val glassShader = remember {
-        RuntimeShader(Shaders.GLASS_SHADER).apply {
-            setFloatUniform("horizontalSquareSize", context.dpToPx(glassCurveSizeDp).toFloat())
-        }
-    }
+    contentShader.setFloatUniform("blurredHeight", heightPx)
+    blurredShader.setFloatUniform("blurredHeight", heightPx)
+    glassShader.setFloatUniform("horizontalSquareSize", context.dpToPx(glassCurveSizeDp).toFloat())
 
     this
         .onSizeChanged {
