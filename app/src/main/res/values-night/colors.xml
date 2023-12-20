@@ -5,7 +5,7 @@
     <color name="on_surface">@color/white_90</color>
 
     <color name="primary">#6B5B39</color>
-    <color name="primary_surface">#7B6E50</color>
+    <color name="primary_surface">#685F45</color>
     <color name="primary_variant">#7F7150</color>
     <color name="on_primary">@color/white_90</color>
 

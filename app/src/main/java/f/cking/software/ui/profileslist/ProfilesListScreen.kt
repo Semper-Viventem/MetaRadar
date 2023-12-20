@@ -78,7 +78,9 @@ object ProfilesListScreen {
             elevation = 4.dp,
         ) {
             LazyRow(
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier
+                    .background(colorResource(id = R.color.primary_surface))
+                    .padding(vertical = 8.dp),
             ) {
                 item {
                     Spacer(modifier = Modifier.width(8.dp))

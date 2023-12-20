@@ -83,6 +83,9 @@
     <string name="app_info_build_type_release">Build type: Release</string>
     <string name="app_info_build_type_debug">Build type: Debug</string>
     <string name="app_info_distribution">Distribution: %s</string>
+    <string name="project_github_title">%s is an open-source project. You can find the source on GitHub. Feel free to ask your questions, contribute, and star the repository!</string>
+    <string name="open_github">Go to GitHub</string>
+    <string name="secret_cat">A secret cat photo</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>
@@ -160,6 +163,13 @@
     <string name="clear_search">Clear search</string>
     <string name="not_apple">Not apple</string>
     <string name="favorite">Favorite</string>
+    <string name="enjoy_the_app_question">Do you like this app?</string>
+    <string name="enjoy_the_app_yes">Yes</string>
+    <string name="enjoy_the_app_not_really">Not really</string>
+    <string name="rate_the_app">Glad to hear this, can you rate the app?</string>
+    <string name="rate_the_app_google_play">Google Play</string>
+    <string name="rate_the_app_github">GitHub</string>
+    <string name="report_the_problem">We are sorry to hear this. You can provide your feedback in the GitHub issues</string>
 
     <!-- Device Details -->
     <string name="device_details_title">Device details</string>
