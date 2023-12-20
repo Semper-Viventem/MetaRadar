@@ -1,5 +1,6 @@
 package f.cking.software.ui.settings
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,6 +68,7 @@ object SettingsScreen {
                     LocationBlock(viewModel = viewModel)
                     Spacer(modifier = Modifier.height(8.dp))
                     AppInfo()
+                    SecretCatPhoto()
                     BottomSpacer()
                 }
             }
@@ -188,6 +194,33 @@ object SettingsScreen {
             enabled = !viewModel.backupDbInProgress
         ) {
             Text(text = stringResource(R.string.settings_backup_database))
+        }
+    }
+
+    @Composable
+    private fun SecretCatPhoto() {
+        Column {
+            Spacer(modifier = Modifier.height(16.dp))
+            repeat(50) {
+                Image(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .alpha(0.3f)
+                        .width(30.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                    painter = painterResource(id = R.drawable.cat_footprint),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Image(
+                painter = painterResource(id = R.drawable.appa),
+                contentDescription = stringResource(id = R.string.secret_cat),
+                contentScale = ContentScale.FillWidth
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(id = R.string.secret_cat), fontWeight = FontWeight.Light)
         }
     }
 

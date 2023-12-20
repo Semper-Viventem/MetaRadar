@@ -85,6 +85,7 @@
     <string name="app_info_distribution">Distribution: %s</string>
     <string name="project_github_title">%s is an open-source project. You can find the source on GitHub. Feel free to ask your questions, contribute, and star the repository!</string>
     <string name="open_github">Go to GitHub</string>
+    <string name="secret_cat">A secret cat photo</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>
