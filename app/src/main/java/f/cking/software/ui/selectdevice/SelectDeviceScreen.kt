@@ -1,10 +1,13 @@
 package f.cking.software.ui.selectdevice
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -18,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.utils.graphic.DeviceListItem
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 
 object SelectDeviceScreen {
@@ -40,7 +44,12 @@ object SelectDeviceScreen {
         Scaffold(
             topBar = { AppBar(viewModel) },
             content = { paddings ->
-                LazyColumn(modifier = Modifier.padding(paddings)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .background(MaterialTheme.colors.surface)
+                        .fillMaxSize()
+                        .padding(paddings)
+                ) {
                     val list = viewModel.devices.asSequence()
                         .filter { device ->
                             viewModel.searchStr.takeIf { it.isNotBlank() }?.let { searchStr ->
@@ -64,6 +73,7 @@ object SelectDeviceScreen {
                         if (showDivider) {
                             item { Divider() }
                         }
+                        item { SystemNavbarSpacer() }
                     }
                 }
             }

@@ -61,6 +61,7 @@ import f.cking.software.ui.AsyncBatchProcessor
 import f.cking.software.ui.tagdialog.TagDialog
 import f.cking.software.utils.graphic.MapView
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.TagChip
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
@@ -237,6 +238,7 @@ object DeviceDetailsScreen {
                 text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
             )
             Spacer(modifier = Modifier.height(8.dp))
+            SystemNavbarSpacer()
         }
     }
 

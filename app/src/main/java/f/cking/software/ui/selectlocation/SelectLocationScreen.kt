@@ -46,6 +46,7 @@ import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.ui.devicedetails.MapConfig
 import f.cking.software.utils.graphic.MapView
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -166,7 +167,7 @@ object SelectLocationScreen {
         Surface(elevation = 12.dp) {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colors.surface)
+                    .background(MaterialTheme.colors.primary)
                     .fillMaxWidth(),
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -201,6 +202,7 @@ object SelectLocationScreen {
                     Text(text = stringResource(R.string.confirm), color = MaterialTheme.colors.onPrimary)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+                SystemNavbarSpacer()
             }
         }
     }

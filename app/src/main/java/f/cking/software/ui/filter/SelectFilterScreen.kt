@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import f.cking.software.R
 import f.cking.software.domain.model.RadarProfile
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.navigation.BackCommand
 import f.cking.software.utils.navigation.Router
 
@@ -39,7 +40,9 @@ object SelectFilterScreen {
         Scaffold(
             topBar = { AppBar { router.navigate(BackCommand) } },
             content = { paddings ->
-                Column(modifier = Modifier.background(MaterialTheme.colors.surface).padding(paddings)) {
+                Column(modifier = Modifier
+                    .background(MaterialTheme.colors.surface)
+                    .padding(paddings)) {
                     LazyColumn(
                         Modifier
                             .fillMaxWidth()
@@ -61,14 +64,16 @@ object SelectFilterScreen {
                     }
 
                     Surface(elevation = 12.dp) {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .background(MaterialTheme.colors.primary)
                                 .fillMaxWidth(),
                         ) {
                             val context = LocalContext.current
                             Button(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
                                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primaryVariant),
                                 onClick = {
                                     val filter = initialFilterState
@@ -85,6 +90,8 @@ object SelectFilterScreen {
                             ) {
                                 Text(text = stringResource(R.string.confirm), color = MaterialTheme.colors.onPrimary)
                             }
+
+                            SystemNavbarSpacer()
                         }
                     }
                 }

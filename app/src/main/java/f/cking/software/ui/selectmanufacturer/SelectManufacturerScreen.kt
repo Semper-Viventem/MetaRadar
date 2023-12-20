@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import f.cking.software.R
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.toHexString
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 
 object SelectManufacturerScreen {
@@ -46,6 +47,7 @@ object SelectManufacturerScreen {
                                 viewModel.back()
                             }
                         }
+                        item { SystemNavbarSpacer() }
                     }
                 }
             }

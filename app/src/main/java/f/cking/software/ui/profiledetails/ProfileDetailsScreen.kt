@@ -41,6 +41,7 @@ import f.cking.software.ui.filter.FilterScreen
 import f.cking.software.ui.filter.FilterUiState
 import f.cking.software.ui.filter.SelectFilterTypeScreen
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -157,6 +158,8 @@ object ProfileDetailsScreen {
             } else {
                 item { CreateFilter(viewModel = viewModel) }
             }
+
+            item { SystemNavbarSpacer() }
         }
     }
 
