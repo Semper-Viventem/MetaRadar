@@ -2,8 +2,11 @@ package f.cking.software.ui
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
@@ -17,6 +20,7 @@ import f.cking.software.R
 import f.cking.software.data.helpers.ActivityProvider
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.isDarkModeOn
 import f.cking.software.utils.navigation.BackCommand
 import f.cking.software.utils.navigation.Navigator
 import f.cking.software.utils.navigation.RouterImpl
@@ -38,6 +42,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val navigationBarStyle = if (isDarkModeOn()) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(navigationBarStyle = navigationBarStyle)
+
         Configuration.getInstance().load(this, sharedPreferences)
 
         router.attachNavigator(viewModel.navigator)

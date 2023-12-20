@@ -31,13 +31,13 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.GlobalUiState
 import f.cking.software.utils.graphic.GlassNavigationbar
+import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.pxToDp
 import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
 
-    private const val NAVBAR_HEIGHT_DP = 60f
-
+    @OptIn(ExperimentalLayoutApi::class)
     @SuppressLint("NewApi")
     @Composable
     fun Screen() {
@@ -46,19 +46,15 @@ object MainScreen {
             topBar = {
                 TopBar(viewModel)
             },
-            content = { paddings ->
+            content = { innerPaddings ->
                 GlassNavigationbar(
                     modifier = Modifier
-                        .padding(paddings)
+                        .consumeWindowInsets(innerPaddings)
                         .fillMaxWidth()
                         .fillMaxHeight(),
                     overlayColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.3f),
                     navBarContent = {
-                        BottomNavigationBar(
-                            Modifier
-                                .height(NAVBAR_HEIGHT_DP.dp),
-                            viewModel
-                        )
+                        BottomNavigationBar(Modifier, viewModel)
                     },
                     content = {
                         viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
@@ -114,11 +110,11 @@ object MainScreen {
 
     @Composable
     private fun BottomNavigationBar(modifier: Modifier, viewModel: MainViewModel) {
-        Box(
+        Column(
             modifier = modifier
                 .onGloballyPositioned { GlobalUiState.setBottomOffset(navbarOffset = it.size.height.toFloat()) }
                 .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -130,6 +126,7 @@ object MainScreen {
                     TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
                 }
             }
+            SystemNavbarSpacer()
         }
     }
 
