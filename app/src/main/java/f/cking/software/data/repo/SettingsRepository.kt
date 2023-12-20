@@ -39,11 +39,30 @@ class SettingsRepository(
         sharedPreferences.edit().putBoolean(KEY_RUN_ON_STARTUP, value).apply()
     }
 
+    fun getFirstAppLaunchTime(): Long {
+        return sharedPreferences.getLong(KEY_FIRST_APP_LAUNCH_TIME, NO_APP_LAUNCH_TIME)
+    }
+
+    fun setFirstAppLaunchTime(value: Long) {
+        sharedPreferences.edit().putLong(KEY_FIRST_APP_LAUNCH_TIME, value).apply()
+    }
+
+    fun getEnjoyTheAppAnswered(): Boolean {
+        return sharedPreferences.getBoolean(KEY_ENJOY_THE_APP_ANSWERED, false)
+    }
+
+    fun setEnjoyTheAppAnswered(value: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_ENJOY_THE_APP_ANSWERED, value).apply()
+    }
 
     companion object {
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"
         private const val KEY_USE_GPS_ONLY = "key_use_gps_location_only"
         private const val KEY_PERMISSIONS_INTRO_WAS_SHOWN = "key_permissions_intro_was_shown"
         private const val KEY_RUN_ON_STARTUP = "key_run_on_startup"
+        private const val KEY_FIRST_APP_LAUNCH_TIME = "key_first_app_launch_time"
+        private const val KEY_ENJOY_THE_APP_ANSWERED = "key_enjoy_the_app_answered"
+
+        const val NO_APP_LAUNCH_TIME = -1L
     }
 }

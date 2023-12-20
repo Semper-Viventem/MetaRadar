@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.Button
 import androidx.compose.material.Chip
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
@@ -51,6 +53,7 @@ import f.cking.software.utils.graphic.BottomSpacer
 import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
+import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
 object DeviceListScreen {
@@ -124,9 +127,70 @@ object DeviceListScreen {
         }
     }
 
+    @Composable
+    private fun EnjoyTheApp(viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
+        RoundedBox {
+            when (enjoyTheAppState) {
+                DeviceListViewModel.EnjoyTheAppState.QUESTION -> EnjoyTheAppQuestion(viewModel)
+                DeviceListViewModel.EnjoyTheAppState.LIKE -> EnjoyTheAppLike(viewModel)
+                DeviceListViewModel.EnjoyTheAppState.DISLIKE -> EnjoyTheAppDislike(viewModel)
+                DeviceListViewModel.EnjoyTheAppState.NONE -> throw IllegalStateException("EnjoyTheAppState.NONE is not supported here")
+            }
+        }
+    }
+
+    @Composable
+    private fun EnjoyTheAppQuestion(viewModel: DeviceListViewModel) {
+        Column {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(R.string.enjoy_the_app_question))
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { viewModel.onEnjoyTheAppAnswered(true) }) {
+                Text(text = stringResource(R.string.enjoy_the_app_yes))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { viewModel.onEnjoyTheAppAnswered(true) }) {
+                Text(text = stringResource(R.string.enjoy_the_app_yes))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    @Composable
+    private fun EnjoyTheAppLike(viewModel: DeviceListViewModel) {
+        Column {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(R.string.rate_the_app))
+            Spacer(modifier = Modifier.height(8.dp))
+            Row {
+                Button(onClick = { viewModel.onEnjoyTheAppRatePlayStoreClick() }) {
+                    Text(text = stringResource(R.string.rate_the_app_google_play))
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = { viewModel.onEnjoyTheAppRateGithubClick() }) {
+                    Text(text = stringResource(R.string.rate_the_app_github))
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    @Composable
+    private fun EnjoyTheAppDislike(viewModel: DeviceListViewModel) {
+        Column {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(R.string.report_the_problem))
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { viewModel.onEnjoyTheAppReportClick() }) {
+                Text(text = stringResource(R.string.report))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun Filters(viewModel: DeviceListViewModel) {
+    private fun Filters(viewModel: DeviceListViewModel) {
         Surface(elevation = 4.dp) {
             Column(
                 modifier = Modifier

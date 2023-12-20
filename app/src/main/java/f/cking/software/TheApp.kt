@@ -3,7 +3,9 @@ package f.cking.software
 import android.app.Application
 import f.cking.software.data.DataModule
 import f.cking.software.domain.interactor.InteractorsModule
+import f.cking.software.domain.interactor.SaveFirstAppLaunchTimeInteractor
 import f.cking.software.ui.UiModule
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -16,6 +18,11 @@ class TheApp : Application() {
         instance = this
         initDi()
         initTimber()
+        saveFirstLaunchTime()
+    }
+
+    private fun saveFirstLaunchTime() {
+        getKoin().get<SaveFirstAppLaunchTimeInteractor>().execute()
     }
 
     private fun initDi() {
