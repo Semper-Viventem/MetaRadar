@@ -24,11 +24,13 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.20.1-beta"
+        versionName = "0.20.2-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "REPORT_ISSUE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/issues\"")
+        buildConfigField("String", "GITHUB_URL", "\"https://github.com/Semper-Viventem/MetaRadar\"")
+        buildConfigField("String", "GOOGLE_PLAY_URL", "\"https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=web_share\"")
 
         buildConfigField("String", "DISTRIBUTION", "\"Not specified\"")
     }

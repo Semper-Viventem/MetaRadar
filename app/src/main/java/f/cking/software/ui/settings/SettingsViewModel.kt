@@ -14,7 +14,12 @@ import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
-import f.cking.software.domain.interactor.*
+import f.cking.software.domain.interactor.BackupDatabaseInteractor
+import f.cking.software.domain.interactor.ClearGarbageInteractor
+import f.cking.software.domain.interactor.CreateBackupFileInteractor
+import f.cking.software.domain.interactor.RestoreDatabaseInteractor
+import f.cking.software.domain.interactor.SaveReportInteractor
+import f.cking.software.domain.interactor.SelectBackupFileInteractor
 import f.cking.software.domain.model.JournalEntry
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -127,6 +132,10 @@ class SettingsViewModel(
 
     fun opReportIssueClick() {
         intentHelper.openUrl(BuildConfig.REPORT_ISSUE_URL)
+    }
+
+    fun onGithubClick() {
+        intentHelper.openUrl(BuildConfig.GITHUB_URL)
     }
 
     private fun observeLocationData() {

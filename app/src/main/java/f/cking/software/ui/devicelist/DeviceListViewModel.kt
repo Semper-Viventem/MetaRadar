@@ -7,8 +7,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import f.cking.software.BuildConfig
 import f.cking.software.R
+import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.repo.DevicesRepository
+import f.cking.software.data.repo.SettingsRepository
+import f.cking.software.domain.interactor.GetAppUsageDaysInteractor
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
@@ -24,6 +28,9 @@ class DeviceListViewModel(
     private val devicesRepository: DevicesRepository,
     private val filterCheckerImpl: FilterCheckerImpl,
     val router: Router,
+    private val getAppUsageDaysInteractor: GetAppUsageDaysInteractor,
+    private val settingsRepository: SettingsRepository,
+    private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
@@ -37,6 +44,7 @@ class DeviceListViewModel(
             DefaultFilters.isFavorite(context),
         )
     )
+    var enjoyTheAppState: EnjoyTheAppState by mutableStateOf(EnjoyTheAppState.NONE)
 
     private val generalComparator = Comparator<DeviceData> { second, first ->
         when {
@@ -133,10 +141,51 @@ class DeviceListViewModel(
             devices
                 .filter { checkFilter(it, filter) && filterQuery(it, query) }
                 .sortedWith(generalComparator)
+                .apply {
+                    if (size >= MIN_DEVICES_FOR_ENJOY_THE_APP) {
+                        checkEnjoyTheApp()
+                    }
+                }
         }
     }
 
-    private fun filterQuery(device: DeviceData, query: String?): Boolean {
+    private fun checkEnjoyTheApp() {
+        enjoyTheAppState = if (enjoyTheAppState == EnjoyTheAppState.NONE
+            && !settingsRepository.getEnjoyTheAppAnswered()
+            && getAppUsageDaysInteractor.execute() >= MIN_DAYS_FOR_ENJOY_THE_APP
+        ) {
+            EnjoyTheAppState.QUESTION
+        } else {
+            EnjoyTheAppState.NONE
+        }
+    }
+
+    fun onEnjoyTheAppAnswered(answer: Boolean) {
+        enjoyTheAppState = if (answer) {
+            EnjoyTheAppState.LIKE
+        } else {
+            EnjoyTheAppState.DISLIKE
+        }
+    }
+
+    fun onEnjoyTheAppRatePlayStoreClick() {
+        settingsRepository.setEnjoyTheAppAnswered(true)
+        enjoyTheAppState = EnjoyTheAppState.NONE
+        intentHelper.openUrl(BuildConfig.GOOGLE_PLAY_URL)
+    }
+
+    fun onEnjoyTheAppRateGithubClick() {
+        settingsRepository.setEnjoyTheAppAnswered(true)
+        intentHelper.openUrl(BuildConfig.GITHUB_URL)
+    }
+
+    fun onEnjoyTheAppReportClick() {
+        settingsRepository.setEnjoyTheAppAnswered(true)
+        enjoyTheAppState = EnjoyTheAppState.NONE
+        intentHelper.openUrl(BuildConfig.REPORT_ISSUE_URL)
+    }
+
+    fun filterQuery(device: DeviceData, query: String?): Boolean {
         return query?.takeIf { it.isNotBlank() }?.let { searchStr ->
             (device.name?.contains(searchStr, true) ?: false)
                     || (device.customName?.contains(searchStr, true) ?: false)
@@ -158,6 +207,10 @@ class DeviceListViewModel(
         val filter: RadarProfile.Filter,
     )
 
+    enum class EnjoyTheAppState {
+        NONE, QUESTION, LIKE, DISLIKE
+    }
+
     object DefaultFilters {
 
         fun notApple(context: Context) = FilterHolder(
@@ -171,5 +224,10 @@ class DeviceListViewModel(
             displayName = context.getString(R.string.favorite),
             filter = RadarProfile.Filter.IsFavorite(favorite = true)
         )
+    }
+
+    companion object {
+        private const val MIN_DEVICES_FOR_ENJOY_THE_APP = 10
+        private const val MIN_DAYS_FOR_ENJOY_THE_APP = 3
     }
 }
