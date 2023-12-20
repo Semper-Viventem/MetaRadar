@@ -150,8 +150,7 @@ class DeviceListViewModel(
     }
 
     private fun checkEnjoyTheApp() {
-        enjoyTheAppState = if (
-            enjoyTheAppState == EnjoyTheAppState.NONE
+        enjoyTheAppState = if (enjoyTheAppState == EnjoyTheAppState.NONE
             && !settingsRepository.getEnjoyTheAppAnswered()
             && getAppUsageDaysInteractor.execute() >= MIN_DAYS_FOR_ENJOY_THE_APP
         ) {
@@ -162,7 +161,6 @@ class DeviceListViewModel(
     }
 
     fun onEnjoyTheAppAnswered(answer: Boolean) {
-        settingsRepository.setEnjoyTheAppAnswered(true)
         enjoyTheAppState = if (answer) {
             EnjoyTheAppState.LIKE
         } else {
@@ -171,14 +169,19 @@ class DeviceListViewModel(
     }
 
     fun onEnjoyTheAppRatePlayStoreClick() {
+        settingsRepository.setEnjoyTheAppAnswered(true)
+        enjoyTheAppState = EnjoyTheAppState.NONE
         intentHelper.openUrl(BuildConfig.GOOGLE_PLAY_URL)
     }
 
     fun onEnjoyTheAppRateGithubClick() {
+        settingsRepository.setEnjoyTheAppAnswered(true)
         intentHelper.openUrl(BuildConfig.GITHUB_URL)
     }
 
     fun onEnjoyTheAppReportClick() {
+        settingsRepository.setEnjoyTheAppAnswered(true)
+        enjoyTheAppState = EnjoyTheAppState.NONE
         intentHelper.openUrl(BuildConfig.REPORT_ISSUE_URL)
     }
 

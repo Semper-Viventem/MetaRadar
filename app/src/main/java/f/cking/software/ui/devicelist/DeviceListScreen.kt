@@ -42,6 +42,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -106,6 +107,13 @@ object DeviceListScreen {
                     }
                 }
 
+                if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.NONE) {
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
+                    }
+                }
+
                 list.mapIndexed { index, deviceData ->
                     item {
                         DeviceListItem(
@@ -142,49 +150,45 @@ object DeviceListScreen {
     @Composable
     private fun EnjoyTheAppQuestion(viewModel: DeviceListViewModel) {
         Column {
+            Text(text = stringResource(R.string.enjoy_the_app_question), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(R.string.enjoy_the_app_question))
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { viewModel.onEnjoyTheAppAnswered(true) }) {
-                Text(text = stringResource(R.string.enjoy_the_app_yes))
+            Row {
+                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppAnswered(true) }) {
+                    Text(text = stringResource(R.string.enjoy_the_app_yes))
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppAnswered(false) }) {
+                    Text(text = stringResource(R.string.enjoy_the_app_not_really))
+                }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { viewModel.onEnjoyTheAppAnswered(true) }) {
-                Text(text = stringResource(R.string.enjoy_the_app_yes))
-            }
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 
     @Composable
     private fun EnjoyTheAppLike(viewModel: DeviceListViewModel) {
         Column {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(R.string.rate_the_app))
+            Text(text = stringResource(R.string.rate_the_app), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Row {
-                Button(onClick = { viewModel.onEnjoyTheAppRatePlayStoreClick() }) {
+                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppRatePlayStoreClick() }) {
                     Text(text = stringResource(R.string.rate_the_app_google_play))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { viewModel.onEnjoyTheAppRateGithubClick() }) {
+                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppRateGithubClick() }) {
                     Text(text = stringResource(R.string.rate_the_app_github))
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 
     @Composable
     private fun EnjoyTheAppDislike(viewModel: DeviceListViewModel) {
         Column {
+            Text(text = stringResource(R.string.report_the_problem), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(R.string.report_the_problem))
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { viewModel.onEnjoyTheAppReportClick() }) {
+            Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onEnjoyTheAppReportClick() }) {
                 Text(text = stringResource(R.string.report))
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 
@@ -194,6 +198,7 @@ object DeviceListScreen {
         Surface(elevation = 4.dp) {
             Column(
                 modifier = Modifier
+                    .background(colorResource(id = R.color.primary_surface))
                     .fillMaxWidth()
             ) {
                 LazyRow(

@@ -50,15 +50,17 @@ object SettingsScreen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    ClearDatabaseBlock(viewModel = viewModel)
+                    ProjectGithub(viewModel = viewModel)
                     Spacer(modifier = Modifier.height(8.dp))
-                    LocationBlock(viewModel = viewModel)
+                    ReportIssue(viewModel = viewModel)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ClearDatabaseBlock(viewModel = viewModel)
                     Spacer(modifier = Modifier.height(8.dp))
                     BackupDatabaseBlock(viewModel = viewModel)
                     Spacer(modifier = Modifier.height(8.dp))
                     RunOnStartup(viewModel = viewModel)
                     Spacer(modifier = Modifier.height(8.dp))
-                    ReportIssue(viewModel = viewModel)
+                    LocationBlock(viewModel = viewModel)
                     Spacer(modifier = Modifier.height(8.dp))
                     AppInfo()
                     BottomSpacer()
@@ -264,6 +266,17 @@ object SettingsScreen {
             Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release))
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION))
+        }
+    }
+
+    @Composable
+    private fun ProjectGithub(viewModel: SettingsViewModel) {
+        RoundedBox {
+            Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
+                Text(text = stringResource(R.string.open_github))
+            }
         }
     }
 

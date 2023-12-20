@@ -83,6 +83,8 @@
     <string name="app_info_build_type_release">Build type: Release</string>
     <string name="app_info_build_type_debug">Build type: Debug</string>
     <string name="app_info_distribution">Distribution: %s</string>
+    <string name="project_github_title">%s is an open-source project. You can find the source on GitHub. Feel free to ask your questions, contribute, and star the repository!</string>
+    <string name="open_github">Go to GitHub</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Select manufacturer</string>
