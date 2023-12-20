@@ -9,8 +9,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.ViewModel
@@ -79,8 +88,22 @@ class MainActivity : AppCompatActivity() {
                     finish()
                 } else {
                     focusManager.clearFocus(true)
-                    stack.forEach { screen ->
-                        screen()
+                    Column {
+                        Box(
+                            modifier = Modifier
+                                .windowInsetsTopHeight(WindowInsets.statusBars)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colors.primary)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                        ) {
+                            stack.forEach { screen ->
+                                screen()
+                            }
+                        }
                     }
                 }
             }

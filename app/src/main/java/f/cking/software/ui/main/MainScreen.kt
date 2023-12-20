@@ -37,19 +37,19 @@ import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
 
-    @OptIn(ExperimentalLayoutApi::class)
     @SuppressLint("NewApi")
     @Composable
     fun Screen() {
         val viewModel: MainViewModel = koinViewModel()
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             topBar = {
                 TopBar(viewModel)
             },
             content = { innerPaddings ->
                 GlassNavigationbar(
                     modifier = Modifier
-                        .consumeWindowInsets(innerPaddings)
+                        .padding(innerPaddings)
                         .fillMaxWidth()
                         .fillMaxHeight(),
                     overlayColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.3f),
@@ -116,6 +116,7 @@ object MainScreen {
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
