@@ -76,7 +76,7 @@ object ProfilesListScreen {
         ) {
             LazyRow(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(vertical = 8.dp),
             ) {
                 item {

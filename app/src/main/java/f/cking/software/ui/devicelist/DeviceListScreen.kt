@@ -198,7 +198,7 @@ object DeviceListScreen {
         Surface(shadowElevation = 4.dp) {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .fillMaxWidth()
             ) {
                 LazyRow(

@@ -58,6 +58,8 @@ object MainScreen {
             content = { innerPaddings ->
                 GlassBottomNavBar(
                     modifier = Modifier.fillMaxSize(),
+                    fallbackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    overlayColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
                     content = {
                         Box(Modifier.padding(top = innerPaddings.calculateTopPadding())) {
                             viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
@@ -188,10 +190,8 @@ object MainScreen {
         )
 
         ExtendedFloatingActionButton(
-            containerColor = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier
-                .onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
-            text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondary) },
+            modifier = Modifier.onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
+            text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer) },
             onClick = {
                 if (viewModel.needToShowPermissionsIntro()) {
                     permissionsIntro.show()
@@ -203,7 +203,7 @@ object MainScreen {
                 Image(
                     painter = painterResource(id = icon),
                     contentDescription = text,
-                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSecondary)
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer)
                 )
             }
         )
@@ -303,12 +303,12 @@ object MainScreen {
     @Composable
     private fun TopBar(viewModel: MainViewModel) {
         TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            title = { Text(text = stringResource(R.string.app_name), color = MaterialTheme.colorScheme.onSurfaceVariant) },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest),
+            title = { Text(text = stringResource(R.string.app_name), color = MaterialTheme.colorScheme.onSurface) },
             actions = {
                 if (viewModel.scanStarted && viewModel.bgServiceIsActive) {
                     CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(24.dp)
                     )
@@ -321,7 +321,7 @@ object MainScreen {
                                 .size(24.dp),
                             imageVector = Icons.Filled.Refresh,
                             contentDescription = stringResource(R.string.refresh),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
                         )
                     }
                 }

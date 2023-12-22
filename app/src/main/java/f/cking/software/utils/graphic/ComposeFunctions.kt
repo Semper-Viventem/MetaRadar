@@ -323,7 +323,7 @@ fun RoundedBox(
         Column(
             Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primaryContainer, shape = shape)
+                .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = shape)
                 .clip(shape = shape)
                 .padding(internalPaddings)
         ) { boxContent(this) }
