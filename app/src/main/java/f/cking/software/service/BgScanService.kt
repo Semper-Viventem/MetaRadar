@@ -3,18 +3,29 @@ package f.cking.software.service
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import f.cking.software.data.helpers.*
+import f.cking.software.data.helpers.BleScannerHelper
+import f.cking.software.data.helpers.LocationProvider
+import f.cking.software.data.helpers.NotificationsHelper
+import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.data.helpers.PowerModeHelper
 import f.cking.software.domain.interactor.AnalyseScanBatchInteractor
 import f.cking.software.domain.interactor.CheckProfileDetectionInteractor
 import f.cking.software.domain.interactor.SaveReportInteractor
 import f.cking.software.domain.interactor.SaveScanBatchInteractor
 import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.JournalEntry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -85,7 +96,8 @@ class BgScanService : Service() {
                 notificationsHelper.buildForegroundNotification(
                     NotificationsHelper.ServiceNotificationContent.NoDataYet,
                     createCloseServiceIntent(this)
-                )
+                ),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION,
             )
 
             permissionHelper.checkBlePermissions(
