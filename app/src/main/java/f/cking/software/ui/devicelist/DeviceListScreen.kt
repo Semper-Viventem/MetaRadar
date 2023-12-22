@@ -63,7 +63,7 @@ object DeviceListScreen {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Screen() {
-        val modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         val viewModel: DeviceListViewModel = koinViewModel()
         val focusManager = LocalFocusManager.current
         val nestedScroll = remember {
@@ -198,7 +198,7 @@ object DeviceListScreen {
         Surface(shadowElevation = 4.dp) {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                     .fillMaxWidth()
             ) {
                 LazyRow(

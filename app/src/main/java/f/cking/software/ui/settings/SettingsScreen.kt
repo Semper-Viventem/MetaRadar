@@ -7,12 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -43,35 +44,28 @@ object SettingsScreen {
     @Composable
     fun Screen() {
         val viewModel: SettingsViewModel = koinViewModel()
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxWidth()
-                .fillMaxHeight(),
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ProjectGithub(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ReportIssue(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ClearDatabaseBlock(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    BackupDatabaseBlock(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    RunOnStartup(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    LocationBlock(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AppInfo()
-                    SecretCatPhoto()
-                    BottomOffsetWithFAB()
-                }
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            ProjectGithub(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ReportIssue(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ClearDatabaseBlock(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            BackupDatabaseBlock(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            RunOnStartup(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            LocationBlock(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            AppInfo()
+            SecretCatPhoto()
+            BottomOffsetWithFAB()
         }
     }
 

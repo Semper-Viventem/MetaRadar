@@ -44,7 +44,7 @@ object ProfilesListScreen {
         val viewModel: ProfilesListViewModel = koinViewModel()
         Column(
             Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
@@ -76,7 +76,7 @@ object ProfilesListScreen {
         ) {
             LazyRow(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                     .padding(vertical = 8.dp),
             ) {
                 item {
