@@ -5,9 +5,9 @@
     <monochrome>
         <inset
             android:drawable="@drawable/ic_monochrome"
-            android:insetLeft="200dp"
-            android:insetTop="200dp"
-            android:insetRight="200dp"
-            android:insetBottom="200dp" />
+            android:insetLeft="20dp"
+            android:insetTop="20dp"
+            android:insetRight="20dp"
+            android:insetBottom="20dp" />
     </monochrome>
 </adaptive-icon>
