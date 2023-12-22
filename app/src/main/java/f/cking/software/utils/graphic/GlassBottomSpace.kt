@@ -30,34 +30,58 @@ import androidx.compose.ui.zIndex
 import f.cking.software.dpToPx
 
 @Composable
-fun GlassSystemNavbar(
+fun GlassBottomNavBar(
     modifier: Modifier = Modifier,
     blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
+    fallbackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
     content: @Composable () -> Unit,
 ) {
-    GlassNavigationbar(
+    GlassBottomSpace(
         modifier = modifier,
         blur = blur,
         glassCurveSizeDp = glassCurveSizeDp,
-        fallbackColor = Color.Transparent,
-        navBarContent = { SystemNavbarSpacer() }
+        fallbackColor = fallbackColor,
+        overlayColor = overlayColor,
+        bottomContent = { NavbarOffset() }
     ) {
         content()
     }
 }
 
 @Composable
-fun GlassNavigationbar(
+fun GlassSystemNavbar(
+    modifier: Modifier = Modifier,
+    blur: Float = 3f,
+    glassCurveSizeDp: Float = 3f,
+    fallbackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    overlayColor: Color = Color.Transparent,
+    content: @Composable () -> Unit,
+) {
+    GlassBottomSpace(
+        modifier = modifier,
+        blur = blur,
+        glassCurveSizeDp = glassCurveSizeDp,
+        fallbackColor = fallbackColor,
+        overlayColor = overlayColor,
+        bottomContent = { SystemNavbarSpacer() }
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun GlassBottomSpace(
     modifier: Modifier = Modifier,
     height: Dp? = null,
     blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
     zIndex: Float = 1f,
-    fallbackColor: Color = MaterialTheme.colorScheme.primary,
-    overlayColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-    navBarContent: @Composable () -> Unit,
-    content: @Composable () -> Unit,
+    fallbackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+    bottomContent: @Composable () -> Unit,
+    globalContent: @Composable () -> Unit,
 ) {
     Box(modifier = modifier) {
         val context = LocalContext.current
@@ -72,7 +96,7 @@ fun GlassNavigationbar(
                     } else it
                 }
         ) {
-            content()
+            globalContent()
         }
         Box(
             modifier = Modifier
@@ -96,7 +120,7 @@ fun GlassNavigationbar(
                 }
                 .align(Alignment.BottomCenter)
         ) {
-            navBarContent()
+            bottomContent()
 
             Box(
                 Modifier

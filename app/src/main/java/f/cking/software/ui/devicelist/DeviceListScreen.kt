@@ -51,7 +51,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.SelectFilterTypeScreen
-import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.BottomOffsetWithFAB
 import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
@@ -130,7 +130,7 @@ object DeviceListScreen {
                 }
 
                 item {
-                    BottomSpacer()
+                    BottomOffsetWithFAB()
                 }
             }
         }

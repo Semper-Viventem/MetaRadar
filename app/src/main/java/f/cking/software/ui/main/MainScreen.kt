@@ -40,9 +40,8 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.GlobalUiState
-import f.cking.software.utils.graphic.GlassNavigationbar
+import f.cking.software.utils.graphic.GlassBottomNavBar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
-import f.cking.software.utils.graphic.pxToDp
 import org.koin.androidx.compose.koinViewModel
 
 object MainScreen {
@@ -57,17 +56,8 @@ object MainScreen {
                 TopBar(viewModel)
             },
             content = { innerPaddings ->
-                GlassNavigationbar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    overlayColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    fallbackColor = MaterialTheme.colorScheme.surfaceVariant,
-                    navBarContent = {
-                        Column {
-                            Spacer(modifier = Modifier.height(pxToDp(GlobalUiState.navbarOffsetPx.value).dp))
-                        }
-                    },
+                GlassBottomNavBar(
+                    modifier = Modifier.fillMaxSize(),
                     content = {
                         Box(Modifier.padding(top = innerPaddings.calculateTopPadding())) {
                             viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()

@@ -34,7 +34,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.BuildConfig
 import f.cking.software.R
 import f.cking.software.dateTimeStringFormat
-import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.BottomOffsetWithFAB
 import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
@@ -69,7 +69,7 @@ object SettingsScreen {
                     Spacer(modifier = Modifier.height(8.dp))
                     AppInfo()
                     SecretCatPhoto()
-                    BottomSpacer()
+                    BottomOffsetWithFAB()
                 }
             }
         }

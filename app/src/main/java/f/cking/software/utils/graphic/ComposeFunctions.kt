@@ -387,7 +387,15 @@ fun pxToDp(px: Float): Float {
 }
 
 @Composable
-fun BottomSpacer() {
+fun NavbarOffset() {
+    val bottomOffset = remember { GlobalUiState.navbarOffsetPx }
+    Column {
+        Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
+    }
+}
+
+@Composable
+fun BottomOffsetWithFAB() {
     val bottomOffset = remember { GlobalUiState.totalOffset }
     Column {
         Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))

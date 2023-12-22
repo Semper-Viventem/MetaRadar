@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.BottomOffsetWithFAB
 import f.cking.software.utils.graphic.ContentPlaceholder
 import org.koin.androidx.compose.koinViewModel
 
@@ -58,7 +58,7 @@ object ProfilesListScreen {
                 ) {
                     profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
                     item {
-                        BottomSpacer()
+                        BottomOffsetWithFAB()
                     }
                 }
             } else {

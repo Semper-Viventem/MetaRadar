@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import f.cking.software.R
-import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.BottomOffsetWithFAB
 import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.Divider
 import org.koin.androidx.compose.koinViewModel
@@ -52,7 +52,7 @@ object JournalScreen {
                     item { JournalEntry(uiModel = it, viewModel) }
                     item { Divider() }
                 }
-                item { BottomSpacer() }
+                item { BottomOffsetWithFAB() }
             }
         }
     }
