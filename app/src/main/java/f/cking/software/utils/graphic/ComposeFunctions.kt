@@ -18,15 +18,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -79,7 +78,10 @@ fun rememberDateDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) { dialogState.hide() }
+            positiveButton(
+                stringResource(R.string.ok),
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+            ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
                 textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
@@ -102,7 +104,10 @@ fun rememberTimeDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) { dialogState.hide() }
+            positiveButton(
+                stringResource(R.string.ok),
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+            ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
                 textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
@@ -349,24 +354,26 @@ fun colorByHash(hash: Int): Color {
     return colors[abs(hash % colors.size)]
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TagChip(
     tagName: String,
     tagIcon: ImageVector? = null,
     onClick: () -> Unit = {},
 ) {
-    Chip(
-        colors = ChipDefaults.chipColors(
-            backgroundColor = colorByHash(tagName.hashCode()),
-            contentColor = Color.Black,
+    AssistChip(
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = colorByHash(tagName.hashCode()),
+            labelColor = Color.Black,
             leadingIconContentColor = Color.Black,
         ),
+        border = null,
+        shape = RoundedCornerShape(corner = CornerSize(Int.MAX_VALUE.dp)),
         onClick = onClick,
         leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface) } },
-    ) {
-        Text(text = tagName)
-    }
+        label = {
+            Text(text = tagName)
+        }
+    )
 }
 
 @Composable

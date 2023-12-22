@@ -84,7 +84,7 @@ object DeviceListScreen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } else {
@@ -102,7 +102,7 @@ object DeviceListScreen {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(4.dp),
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

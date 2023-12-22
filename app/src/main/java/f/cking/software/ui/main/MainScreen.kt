@@ -165,11 +165,11 @@ object MainScreen {
             Image(
                 painter = painterResource(id = icon),
                 contentDescription = targetTab.text,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
                 modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 
