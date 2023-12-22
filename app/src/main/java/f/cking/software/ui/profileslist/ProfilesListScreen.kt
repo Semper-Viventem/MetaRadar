@@ -14,13 +14,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +44,7 @@ object ProfilesListScreen {
         val viewModel: ProfilesListViewModel = koinViewModel()
         Column(
             Modifier
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
@@ -72,11 +72,11 @@ object ProfilesListScreen {
         Surface(
             modifier = Modifier
                 .fillMaxWidth(),
-            elevation = 4.dp,
+            shadowElevation = 4.dp,
         ) {
             LazyRow(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(vertical = 8.dp),
             ) {
                 item {
@@ -124,7 +124,7 @@ object ProfilesListScreen {
 
                 Spacer(modifier = Modifier.height(4.dp))
                 val activeText = if (profile.isActive) stringResource(R.string.profile_is_active) else stringResource(R.string.profile_is_not_active)
-                val color = if (profile.isActive) colorResource(id = R.color.green_600) else MaterialTheme.colorScheme.onSurface
+                val color = if (profile.isActive) colorResource(id = R.color.green_600) else MaterialTheme.colorScheme.onBackground
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(12.dp),
