@@ -3,23 +3,19 @@ package f.cking.software.ui
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsTopHeight
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.ViewModel
@@ -67,20 +63,45 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             val focusManager = LocalFocusManager.current
+            val dynamicColorsAreSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+            val darkMode = isSystemInDarkTheme()
+            val colors = when {
+                dynamicColorsAreSupported && darkMode -> dynamicDarkColorScheme(this)
+                dynamicColorsAreSupported && !darkMode -> dynamicLightColorScheme(this)
+                darkMode -> darkColorScheme(
+                    primary = colorResource(id = R.color.theme_dark_primary),
+                    primaryContainer = colorResource(id = R.color.theme_dark_primary_variant),
+                    onPrimary = colorResource(id = R.color.theme_dark_on_primary),
+                    surface = colorResource(id = R.color.theme_dark_surface_color),
+                    surfaceVariant = colorResource(id = R.color.theme_dark_primary_variant),
+                    onSurface = colorResource(id = R.color.theme_dark_on_surface),
+                    secondary = colorResource(id = R.color.theme_dark_secondary),
+                    secondaryContainer = colorResource(id = R.color.theme_dark_secondary_variant),
+                    onSecondary = colorResource(id = R.color.theme_dark_on_secondary),
+                    error = colorResource(id = R.color.theme_dark_error),
+                    onError = colorResource(id = R.color.theme_dark_on_error),
+                )
+                !darkMode -> darkColorScheme(
+                    primary = colorResource(id = R.color.theme_light_primary),
+                    primaryContainer = colorResource(id = R.color.theme_light_primary_variant),
+                    onPrimary = colorResource(id = R.color.theme_light_on_primary),
+                    surface = colorResource(id = R.color.theme_light_surface_color),
+                    surfaceVariant = colorResource(id = R.color.theme_light_primary_variant),
+                    onSurface = colorResource(id = R.color.theme_light_on_surface),
+                    secondary = colorResource(id = R.color.theme_light_secondary),
+                    secondaryContainer = colorResource(id = R.color.theme_light_secondary_variant),
+                    onSecondary = colorResource(id = R.color.theme_light_on_secondary),
+                    error = colorResource(id = R.color.theme_light_error),
+                    onError = colorResource(id = R.color.theme_light_on_error),
+                )
+                else -> throw IllegalStateException("This state is unreachable")
+            }
             MaterialTheme(
-                colors = MaterialTheme.colors.copy(
-                    primary = colorResource(id = R.color.primary),
-                    primaryVariant = colorResource(id = R.color.primary_variant),
-                    onPrimary = colorResource(id = R.color.on_primary),
-                    secondary = colorResource(id = R.color.secondary),
-                    secondaryVariant = colorResource(id = R.color.secondary_variant),
-                    onSecondary = colorResource(id = R.color.on_secondary),
-                    surface = colorResource(id = R.color.surface_color),
-                    onSurface = colorResource(id = R.color.on_surface),
-                ),
+                colorScheme = colors,
                 typography = Typography(
-                    body1 = MaterialTheme.typography.body1.copy(color = colorResource(id = R.color.on_surface)),
-                    body2 = MaterialTheme.typography.body2.copy(color = colorResource(id = R.color.on_surface)),
+                    bodyMedium = MaterialTheme.typography.bodyMedium.copy(color = colors.onSurface),
+                    bodyLarge = MaterialTheme.typography.bodyLarge.copy(color = colors.onSurface),
+                    bodySmall = MaterialTheme.typography.bodySmall.copy(color = colors.onSurface),
                 )
             ) {
                 val stack = viewModel.navigator.stack
@@ -88,22 +109,8 @@ class MainActivity : AppCompatActivity() {
                     finish()
                 } else {
                     focusManager.clearFocus(true)
-                    Column {
-                        Box(
-                            modifier = Modifier
-                                .windowInsetsTopHeight(WindowInsets.statusBars)
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colors.primary)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                        ) {
-                            stack.forEach { screen ->
-                                screen()
-                            }
-                        }
+                    stack.forEach { screen ->
+                        screen()
                     }
                 }
             }

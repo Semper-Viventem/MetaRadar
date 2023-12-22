@@ -15,6 +15,7 @@ compose-compiler = "1.5.6"
 compose-accompanist = "0.28.0"
 compose-constraint = "1.0.1"
 compose-navigation = "2.5.2"
+compose-material3 = "1.1.2"
 horologist = "0.1.13"
 serialization-json = "1.4.0"
 wear = "1.2.0"
@@ -103,6 +104,7 @@ datastore = { module = "androidx.datastore:datastore", version.ref = "datastore"
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "ktx-activity" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }

@@ -10,7 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,8 +54,8 @@ fun GlassNavigationbar(
     blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
     zIndex: Float = 1f,
-    fallbackColor: Color = MaterialTheme.colors.primary,
-    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.3f),
+    fallbackColor: Color = MaterialTheme.colorScheme.primary,
+    overlayColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
     navBarContent: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {

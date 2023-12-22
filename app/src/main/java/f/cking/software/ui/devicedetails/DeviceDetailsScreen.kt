@@ -23,7 +23,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -32,6 +31,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -81,7 +81,7 @@ object DeviceDetailsScreen {
 
         Scaffold(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .fillMaxHeight(),
             topBar = {
@@ -91,7 +91,7 @@ object DeviceDetailsScreen {
                 GlassSystemNavbar {
                     Content(
                         modifier = Modifier
-                            .background(MaterialTheme.colors.surface)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(it),
                         viewModel = viewModel,
                     )
@@ -116,7 +116,7 @@ object DeviceDetailsScreen {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = iconId),
                             contentDescription = text,
-                            tint = MaterialTheme.colors.onPrimary,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }
@@ -126,7 +126,7 @@ object DeviceDetailsScreen {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = MaterialTheme.colors.onPrimary
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -282,9 +282,9 @@ object DeviceDetailsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onRemoveTagClick(deviceData, name)
                 }
@@ -310,12 +310,12 @@ object DeviceDetailsScreen {
         }
         Chip(
             colors = ChipDefaults.chipColors(
-                backgroundColor = MaterialTheme.colors.secondary,
-                contentColor = MaterialTheme.colors.onSecondary,
+                backgroundColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
             ),
             onClick = { addTagDialog.show() },
             leadingIcon = {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colors.onSurface)
+                Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
             }
         ) { Text(text = stringResource(R.string.add_tag)) }
     }
@@ -331,7 +331,7 @@ object DeviceDetailsScreen {
             buttons = {
                 negativeButton(
                     stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialog.hide() }
             },
         ) {
@@ -392,7 +392,7 @@ object DeviceDetailsScreen {
                     Image(
                         modifier = Modifier.size(24.dp),
                         imageVector = Icons.Default.Edit,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                         contentDescription = stringResource(R.string.change)
                     )
                 }

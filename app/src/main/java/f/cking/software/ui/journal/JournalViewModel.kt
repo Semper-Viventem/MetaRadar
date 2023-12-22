@@ -2,9 +2,12 @@ package f.cking.software.ui.journal
 
 import android.app.Application
 import android.widget.Toast
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.R
@@ -75,7 +78,8 @@ class JournalViewModel(
         }
         return JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
-            color = R.color.error_background,
+            color = { MaterialTheme.colorScheme.error },
+            colorForeground = { MaterialTheme.colorScheme.onError },
             title = title,
             subtitle = description,
             journalEntry = journalEntry,
@@ -89,7 +93,8 @@ class JournalViewModel(
     ): JournalEntryUiModel {
         return JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
-            color = R.color.profile_report_background,
+            color = { MaterialTheme.colorScheme.surface },
+            colorForeground = { MaterialTheme.colorScheme.onSurface },
             title = context.getString(R.string.journal_profile_detected, getProfileName(report.profileId)),
             subtitle = null,
             journalEntry = journalEntry,
@@ -116,7 +121,8 @@ class JournalViewModel(
 
     data class JournalEntryUiModel(
         val dateTime: String,
-        val color: Int,
+        val color: @Composable () -> Color,
+        val colorForeground: @Composable () -> Color,
         val title: String,
         val subtitle: String?,
         val items: List<ListItemUiModel>?,

@@ -13,19 +13,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,7 +62,7 @@ object ProfileDetailsScreen {
             content = {
                 GlassSystemNavbar {
                     Box(modifier = Modifier
-                        .background(MaterialTheme.colors.surface)
+                        .background(MaterialTheme.colorScheme.surface)
                         .fillMaxSize()
                         .padding(it)) {
                         Content(viewModel)
@@ -71,6 +72,7 @@ object ProfileDetailsScreen {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun AppBar(viewModel: ProfileDetailsViewModel) {
 
@@ -80,9 +82,9 @@ object ProfileDetailsScreen {
             buttons = {
                 negativeButton(
                     stringResource(R.string.stay),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { discardChangesDialog.hide() }
-                positiveButton(stringResource(R.string.discard_changes), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(stringResource(R.string.discard_changes), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     discardChangesDialog.hide()
                     viewModel.back()
                 }
@@ -119,13 +121,13 @@ object ProfileDetailsScreen {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.delete),
-                            tint = MaterialTheme.colors.onPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 IconButton(onClick = { viewModel.onSaveClick() }) {
-                    Icon(imageVector = Icons.Filled.Done, contentDescription = stringResource(R.string.save), tint = MaterialTheme.colors.onPrimary)
+                    Icon(imageVector = Icons.Filled.Done, contentDescription = stringResource(R.string.save), tint = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             navigationIcon = {
@@ -139,7 +141,7 @@ object ProfileDetailsScreen {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = MaterialTheme.colors.onPrimary
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }

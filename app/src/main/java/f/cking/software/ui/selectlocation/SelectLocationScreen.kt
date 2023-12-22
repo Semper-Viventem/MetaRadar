@@ -12,19 +12,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderDefaults
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,7 @@ import org.koin.androidx.compose.getKoin
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
+@OptIn(ExperimentalMaterial3Api::class)
 object SelectLocationScreen {
 
     @Composable
@@ -65,14 +67,14 @@ object SelectLocationScreen {
     ) {
         Scaffold(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .fillMaxHeight(),
             topBar = { AppBar(onCloseClick) },
             content = { paddings ->
                 Content(
                     modifier = Modifier
-                        .background(MaterialTheme.colors.surface)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(paddings),
                     onSelected = onSelected,
                     initialLocationModel = initialLocationModel,
@@ -148,7 +150,7 @@ object SelectLocationScreen {
                         contentScale = ContentScale.FillWidth,
                         painter = painter,
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
                     )
                 }
             }
@@ -164,10 +166,10 @@ object SelectLocationScreen {
     ) {
         val radiusMeters = remember { mutableStateOf(initialRadius ?: TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS) }
 
-        Surface(elevation = 12.dp) {
+        Surface(shadowElevation = 12.dp) {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colors.primary)
+                    .background(MaterialTheme.colorScheme.primary)
                     .fillMaxWidth(),
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -180,8 +182,8 @@ object SelectLocationScreen {
                     onValueChange = { value -> radiusMeters.value = value },
                     valueRange = 5f..1000f,
                     colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colors.secondary,
-                        activeTrackColor = MaterialTheme.colors.secondary,
+                        thumbColor = MaterialTheme.colorScheme.secondary,
+                        activeTrackColor = MaterialTheme.colorScheme.secondary,
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -189,7 +191,7 @@ object SelectLocationScreen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primaryVariant),
+                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.primaryContainer),
                     enabled = map != null,
                     onClick = {
                         val cameraCenter = map!!.mapCenter
@@ -199,7 +201,7 @@ object SelectLocationScreen {
                         )
                     }
                 ) {
-                    Text(text = stringResource(R.string.confirm), color = MaterialTheme.colors.onPrimary)
+                    Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.onPrimary)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 SystemNavbarSpacer()

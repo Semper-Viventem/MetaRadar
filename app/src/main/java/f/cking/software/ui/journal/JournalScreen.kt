@@ -14,15 +14,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +39,7 @@ object JournalScreen {
     fun Screen() {
         val viewModel: JournalViewModel = koinViewModel()
         val journal = viewModel.journal
-        val modifier = Modifier.background(MaterialTheme.colors.surface)
+        val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         if (journal.isEmpty()) {
             ContentPlaceholder(text = stringResource(R.string.journal_placeholder), modifier = modifier)
         } else {
@@ -64,7 +63,7 @@ object JournalScreen {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colorResource(id = uiModel.color))
+                .background(uiModel.color())
                 .clickable { viewModel.onEntryClick(uiModel.journalEntry) }
         ) {
             Column(
@@ -79,9 +78,10 @@ object JournalScreen {
                         fontWeight = FontWeight.Bold,
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis,
+                        color = uiModel.colorForeground()
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin)
+                    Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin, color = uiModel.colorForeground())
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 var isExpanded by remember { mutableStateOf(false) }
@@ -95,6 +95,7 @@ object JournalScreen {
                         fontWeight = FontWeight.Normal,
                         maxLines = if (isExpanded) Int.MAX_VALUE else 5,
                         overflow = TextOverflow.Ellipsis,
+                        color = uiModel.colorForeground()
                     )
                 }
 

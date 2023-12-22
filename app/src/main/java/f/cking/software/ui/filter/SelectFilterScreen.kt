@@ -7,17 +7,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +42,7 @@ object SelectFilterScreen {
             topBar = { AppBar { router.navigate(BackCommand) } },
             content = { paddings ->
                 Column(modifier = Modifier
-                    .background(MaterialTheme.colors.surface)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(paddings)) {
                     LazyColumn(
                         Modifier
@@ -63,10 +64,10 @@ object SelectFilterScreen {
                         }
                     }
 
-                    Surface(elevation = 12.dp) {
+                    Surface(shadowElevation = 12.dp) {
                         Column(
                             modifier = Modifier
-                                .background(MaterialTheme.colors.primary)
+                                .background(MaterialTheme.colorScheme.primary)
                                 .fillMaxWidth(),
                         ) {
                             val context = LocalContext.current
@@ -74,7 +75,7 @@ object SelectFilterScreen {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primaryVariant),
+                                colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.primaryContainer),
                                 onClick = {
                                     val filter = initialFilterState
                                         .takeIf { it.isCorrect() }
@@ -88,7 +89,7 @@ object SelectFilterScreen {
                                     }
                                 }
                             ) {
-                                Text(text = stringResource(R.string.confirm), color = MaterialTheme.colors.onPrimary)
+                                Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.onPrimary)
                             }
 
                             SystemNavbarSpacer()
@@ -99,6 +100,7 @@ object SelectFilterScreen {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun AppBar(onBackClick: () -> Unit) {
         TopAppBar(

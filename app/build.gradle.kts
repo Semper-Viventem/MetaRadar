@@ -150,6 +150,7 @@ dependencies {
     implementation(libs.ktx)
     debugImplementation(libs.compose.tooling)
     implementation(libs.compose.tooling.preview)
+    implementation(libs.compose.material3)
 
     // room
     implementation(libs.room.runtime)

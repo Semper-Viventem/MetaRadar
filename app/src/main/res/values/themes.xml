@@ -1,20 +1,28 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.MetaRadar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_variant</item>
-        <item name="colorOnPrimary">@color/on_primary</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="colorSecondaryVariant">@color/secondary_variant</item>
-        <item name="colorOnSecondary">@color/on_secondary</item>
+    <style name="Theme.MetaRadar" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/theme_light_primary</item>
+        <item name="colorOnPrimary">@color/theme_light_on_primary</item>
+        <item name="colorPrimaryVariant">@color/theme_light_primary_variant</item>
+        <item name="colorPrimaryContainer">@color/theme_light_primary_variant</item>
+        <item name="colorOnPrimaryContainer">@color/theme_light_on_primary</item>
+        <item name="colorSecondary">@color/theme_light_secondary</item>
+        <item name="colorSecondaryVariant">@color/theme_light_secondary_variant</item>
+        <item name="colorOnSecondary">@color/theme_light_on_secondary</item>
+        <item name="colorError">@color/theme_light_error</item>
+        <item name="colorOnError">@color/theme_light_on_error</item>
+        <item name="colorSurface">@color/theme_light_surface_color</item>
+        <item name="colorSurfaceVariant">@color/theme_light_primary_surface</item>
+        <item name="colorOnSurface">@color/theme_light_on_surface</item>
+
+
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
         <item name="android:windowLightStatusBar">true</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:windowBackground">@color/surface_color</item>
+        <item name="android:windowBackground">@color/theme_light_surface_color</item>
     </style>
 </resources>

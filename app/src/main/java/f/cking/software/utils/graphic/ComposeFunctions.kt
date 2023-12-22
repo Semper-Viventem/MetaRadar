@@ -22,11 +22,11 @@ import androidx.compose.material.Chip
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -79,10 +79,10 @@ fun rememberDateDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
             ) { dialogState.hide() }
         },
     ) {
@@ -102,10 +102,10 @@ fun rememberTimeDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
             ) { dialogState.hide() }
         },
     ) {
@@ -170,7 +170,7 @@ fun DeviceListItem(
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = stringResource(R.string.is_favorite),
-                        tint = MaterialTheme.colors.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
@@ -318,7 +318,7 @@ fun RoundedBox(
         Column(
             Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colors.primaryVariant, shape = shape)
+                .background(color = MaterialTheme.colorScheme.primaryContainer, shape = shape)
                 .clip(shape = shape)
                 .padding(internalPaddings)
         ) { boxContent(this) }
@@ -363,7 +363,7 @@ fun TagChip(
             leadingIconContentColor = Color.Black,
         ),
         onClick = onClick,
-        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colors.onSurface) } },
+        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface) } },
     ) {
         Text(text = tagName)
     }

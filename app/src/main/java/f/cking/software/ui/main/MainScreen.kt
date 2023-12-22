@@ -8,9 +8,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,19 +59,26 @@ object MainScreen {
             content = { innerPaddings ->
                 GlassNavigationbar(
                     modifier = Modifier
-                        .padding(innerPaddings)
                         .fillMaxWidth()
                         .fillMaxHeight(),
-                    overlayColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.3f),
+                    overlayColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    fallbackColor = MaterialTheme.colorScheme.surfaceVariant,
                     navBarContent = {
-                        BottomNavigationBar(Modifier, viewModel)
+                        Column {
+                            Spacer(modifier = Modifier.height(pxToDp(GlobalUiState.navbarOffsetPx.value).dp))
+                        }
                     },
                     content = {
-                        viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
+                        Box(Modifier.padding(top = innerPaddings.calculateTopPadding())) {
+                            viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
+                        }
                     },
                 )
             },
             floatingActionButtonPosition = FabPosition.Center,
+            bottomBar = {
+                BottomNavigationBar(Modifier, viewModel)
+            },
             floatingActionButton = {
                 ScanFab(viewModel)
             },
@@ -75,8 +92,8 @@ object MainScreen {
         MaterialDialog(
             dialogState = viewModel.showLocationDisabledDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant))
-                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     viewModel.onTurnOnLocationClick()
                 }
             },
@@ -94,8 +111,8 @@ object MainScreen {
         MaterialDialog(
             dialogState = viewModel.showBluetoothDisabledDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant))
-                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     viewModel.onTurnOnBluetoothClick()
                 }
             },
@@ -148,11 +165,11 @@ object MainScreen {
             Image(
                 painter = painterResource(id = icon),
                 contentDescription = targetTab.text,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary.copy(alpha = 0.7f)),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)),
                 modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colors.onPrimary.copy(alpha = 0.7f))
+            Text(text = targetTab.text, fontSize = 12.sp, fontWeight = font, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
         }
     }
 
@@ -181,10 +198,10 @@ object MainScreen {
         )
 
         ExtendedFloatingActionButton(
+            containerColor = MaterialTheme.colorScheme.secondary,
             modifier = Modifier
-                .padding(bottom = pxToDp(px = GlobalUiState.navbarOffsetPx.value).dp)
                 .onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
-            text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colors.onSecondary) },
+            text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondary) },
             onClick = {
                 if (viewModel.needToShowPermissionsIntro()) {
                     permissionsIntro.show()
@@ -196,7 +213,7 @@ object MainScreen {
                 Image(
                     painter = painterResource(id = icon),
                     contentDescription = text,
-                    colorFilter = ColorFilter.tint(color = MaterialTheme.colors.onSecondary)
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSecondary)
                 )
             }
         )
@@ -211,11 +228,11 @@ object MainScreen {
         MaterialDialog(
             dialogState = state,
             buttons = {
-                positiveButton(stringResource(id = R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(stringResource(id = R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     state.hide()
                     onPassed.invoke()
                 }
-                negativeButton(stringResource(id = R.string.decline), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                negativeButton(stringResource(id = R.string.decline), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     state.hide()
                     onDeclined.invoke()
                 }
@@ -292,16 +309,16 @@ object MainScreen {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun TopBar(viewModel: MainViewModel) {
         TopAppBar(
-            title = {
-                Text(text = stringResource(R.string.app_name), color = MaterialTheme.colors.onPrimary)
-            },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            title = { Text(text = stringResource(R.string.app_name), color = MaterialTheme.colorScheme.onSurfaceVariant) },
             actions = {
                 if (viewModel.scanStarted && viewModel.bgServiceIsActive) {
                     CircularProgressIndicator(
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .size(24.dp)
                     )
@@ -314,7 +331,7 @@ object MainScreen {
                                 .size(24.dp),
                             imageVector = Icons.Filled.Refresh,
                             contentDescription = stringResource(R.string.refresh),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }

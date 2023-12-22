@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +45,7 @@ object SettingsScreen {
         val viewModel: SettingsViewModel = koinViewModel()
         LazyColumn(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .fillMaxHeight(),
         ) {
@@ -142,9 +142,9 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onRestoreDBClick()
                 }
@@ -174,9 +174,9 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onBackupDBClick()
                 }
@@ -207,7 +207,7 @@ object SettingsScreen {
                         .align(Alignment.CenterHorizontally)
                         .alpha(0.3f)
                         .width(30.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                     painter = painterResource(id = R.drawable.cat_footprint),
                     contentDescription = null
                 )
@@ -234,9 +234,9 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onClearLocationsClick()
                 }
