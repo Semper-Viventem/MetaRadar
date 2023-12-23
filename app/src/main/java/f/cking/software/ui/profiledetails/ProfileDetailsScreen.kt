@@ -6,15 +6,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
@@ -27,9 +27,12 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -47,24 +50,29 @@ import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+@OptIn(ExperimentalMaterial3Api::class)
 object ProfileDetailsScreen {
 
     @Composable
     fun Screen(profileId: Int?, template: FilterUiState?, key: String) {
         val viewModel: ProfileDetailsViewModel = koinViewModel(key = key) { parametersOf(profileId, template) }
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
         Scaffold(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .fillMaxSize(),
             topBar = {
-                AppBar(viewModel)
+                AppBar(viewModel, scrollBehavior)
             },
             content = {
-                GlassSystemNavbar {
-                    Box(modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .fillMaxSize()
-                        .padding(it)) {
+                GlassSystemNavbar(Modifier.padding(top = it.calculateTopPadding())) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .background(MaterialTheme.colorScheme.surface)
+                    ) {
                         Content(viewModel)
                     }
                 }
@@ -74,7 +82,7 @@ object ProfileDetailsScreen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun AppBar(viewModel: ProfileDetailsViewModel) {
+    private fun AppBar(viewModel: ProfileDetailsViewModel, scrollBehavior: TopAppBarScrollBehavior) {
 
         val discardChangesDialog = rememberMaterialDialogState()
         MaterialDialog(
@@ -84,7 +92,10 @@ object ProfileDetailsScreen {
                     stringResource(R.string.stay),
                     textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { discardChangesDialog.hide() }
-                positiveButton(stringResource(R.string.discard_changes), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                positiveButton(
+                    stringResource(R.string.discard_changes),
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                ) {
                     discardChangesDialog.hide()
                     viewModel.back()
                 }
@@ -112,6 +123,10 @@ object ProfileDetailsScreen {
         }
 
         TopAppBar(
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(
+                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            ),
             title = {
                 Text(text = stringResource(R.string.radar_profile_title))
             },
@@ -121,13 +136,17 @@ object ProfileDetailsScreen {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.delete),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 IconButton(onClick = { viewModel.onSaveClick() }) {
-                    Icon(imageVector = Icons.Filled.Done, contentDescription = stringResource(R.string.save), tint = MaterialTheme.colorScheme.onPrimary)
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = stringResource(R.string.save),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             },
             navigationIcon = {
@@ -139,9 +158,9 @@ object ProfileDetailsScreen {
                     }
                 }) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -150,22 +169,18 @@ object ProfileDetailsScreen {
 
     @Composable
     private fun Content(viewModel: ProfileDetailsViewModel) {
-        LazyColumn(Modifier.fillMaxWidth()) {
-            item { Header(viewModel) }
+        Header(viewModel)
 
-            val filter = viewModel.filter
-            if (filter != null) {
-                item {
-                    Box(modifier = Modifier.padding(8.dp)) {
-                        FilterScreen.Filter(filterState = filter, router = viewModel.router, onDeleteClick = { viewModel.filter = null })
-                    }
-                }
-            } else {
-                item { CreateFilter(viewModel = viewModel) }
+        val filter = viewModel.filter
+        if (filter != null) {
+            Box(modifier = Modifier.padding(16.dp)) {
+                FilterScreen.Filter(filterState = filter, router = viewModel.router, onDeleteClick = { viewModel.filter = null })
             }
-
-            item { SystemNavbarSpacer() }
+        } else {
+            CreateFilter(viewModel = viewModel)
         }
+
+        SystemNavbarSpacer()
     }
 
     @Composable

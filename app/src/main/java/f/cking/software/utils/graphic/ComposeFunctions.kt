@@ -21,10 +21,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -403,4 +405,8 @@ fun FABSpacer() {
 @Composable
 fun SystemNavbarSpacer() {
     Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+}
+
+fun ColorScheme.surfaceEvaluated(evaluation: Dp = 3.dp): Color {
+    return this.surfaceColorAtElevation(evaluation)
 }
