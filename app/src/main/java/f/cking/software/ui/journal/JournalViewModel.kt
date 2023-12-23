@@ -18,6 +18,7 @@ import f.cking.software.dateTimeStringFormat
 import f.cking.software.domain.model.JournalEntry
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.utils.navigation.Router
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
@@ -30,6 +31,7 @@ class JournalViewModel(
 ) : ViewModel() {
 
     var journal: List<JournalEntryUiModel> by mutableStateOf(emptyList())
+    var loading by mutableStateOf(true)
 
     init {
         observeJournal()
@@ -50,8 +52,11 @@ class JournalViewModel(
     private fun observeJournal() {
         viewModelScope.launch {
             journalRepository.observe()
+                .onStart { loading = true }
                 .collect { update ->
+                    loading = true
                     journal = update.sortedBy { it.timestamp }.reversed().map { map(it) }
+                    loading = false
                 }
         }
     }

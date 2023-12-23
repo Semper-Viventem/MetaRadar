@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -79,10 +80,15 @@ object ProfilesListScreen {
                     .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                     .padding(vertical = 8.dp),
             ) {
+                item { Spacer(modifier = Modifier.width(16.dp)) }
                 item {
-                    Spacer(modifier = Modifier.width(8.dp))
                     SuggestionChip(
                         onClick = { viewModel.createNewClick() },
+                        colors = SuggestionChipDefaults.suggestionChipColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            iconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
                         icon = {
                             Icon(imageVector = Icons.Default.Add, contentDescription = null)
                         },
@@ -97,6 +103,7 @@ object ProfilesListScreen {
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                 }
+                item { Spacer(modifier = Modifier.width(8.dp)) }
             }
         }
     }

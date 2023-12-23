@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -38,19 +39,33 @@ object JournalScreen {
     fun Screen() {
         val viewModel: JournalViewModel = koinViewModel()
         val journal = viewModel.journal
-        val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        val modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
-        if (journal.isEmpty()) {
-            ContentPlaceholder(text = stringResource(R.string.journal_placeholder), modifier = modifier)
-        } else {
-            LazyColumn(
-                modifier = modifier
-            ) {
-                journal.map {
-                    item { JournalEntry(uiModel = it, viewModel) }
-                    item { Divider() }
+        Box(modifier = modifier) {
+            if (journal.isEmpty()) {
+                ContentPlaceholder(
+                    modifier = Modifier.fillMaxSize(),
+                    text = stringResource(R.string.journal_placeholder)
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    journal.map {
+                        item { JournalEntry(uiModel = it, viewModel) }
+                        item { Divider() }
+                    }
+                    item { FABSpacer() }
                 }
-                item { FABSpacer() }
+            }
+            if (viewModel.loading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
         }
     }

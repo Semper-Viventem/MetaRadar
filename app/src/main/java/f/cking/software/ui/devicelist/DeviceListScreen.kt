@@ -201,7 +201,12 @@ object DeviceListScreen {
                 ) {
                     val allFilters = (viewModel.quickFilters + viewModel.appliedFilter).toSet()
 
-                    item { Spacer(modifier = Modifier.width(8.dp)) }
+                    item { Spacer(modifier = Modifier.width(16.dp)) }
+
+                    item {
+                        SearchChip(viewModel)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
 
                     allFilters.forEach {
                         item {
@@ -228,13 +233,8 @@ object DeviceListScreen {
                     }
 
                     item {
-                        SearchChip(viewModel)
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-
-                    item {
                         AddFilterChip(viewModel)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                     }
                 }
 
