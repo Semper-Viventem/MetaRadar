@@ -1,5 +1,6 @@
 package f.cking.software.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -99,9 +100,9 @@ class MainActivity : AppCompatActivity() {
         intentHelper.handleActivityResult(requestCode, resultCode, data)
     }
 
+    @SuppressLint("MissingSuperCall")
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        super.onBackPressed()
         router.navigate(BackCommand)
     }
 
