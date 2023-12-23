@@ -172,11 +172,11 @@ object DeviceDetailsScreen {
                 deviceData = deviceData,
                 viewModel = viewModel
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Tags(deviceData = deviceData, viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            DeviceContent(modifier = Modifier.weight(1.5f), deviceData = deviceData)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            DeviceContent(modifier = Modifier.weight(1f), deviceData = deviceData)
+            Spacer(modifier = Modifier.height(16.dp))
             SystemNavbarSpacer()
         }
     }
@@ -353,41 +353,35 @@ object DeviceDetailsScreen {
                 }
             }
         }
-
-        RoundedBox(
-            modifier = Modifier.fillMaxWidth(),
-            internalPaddings = 0.dp
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { dialog.show() },
         ) {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { dialog.show() },
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row {
-                            Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
-                            Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.device_details_history_period_subtitle),
-                            fontWeight = FontWeight.Light,
-                        )
+                Column(modifier = Modifier.weight(1f)) {
+                    Row {
+                        Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
+                        Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Image(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Default.Edit,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-                        contentDescription = stringResource(R.string.change)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.device_details_history_period_subtitle),
+                        fontWeight = FontWeight.Light,
                     )
                 }
+                Spacer(modifier = Modifier.width(8.dp))
+                Image(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.Edit,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                    contentDescription = stringResource(R.string.change)
+                )
             }
         }
     }
@@ -395,14 +389,16 @@ object DeviceDetailsScreen {
     @Composable
     private fun LocationHistory(modifier: Modifier = Modifier, deviceData: DeviceData, viewModel: DeviceDetailsViewModel) {
         RoundedBox(modifier = modifier, internalPaddings = 0.dp) {
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)) {
                 Map(
+                    Modifier.fillMaxSize(),
                     viewModel = viewModel,
                     isLoading = { viewModel.markersInLoadingState = it }
                 )
                 MapOverlay(viewModel = viewModel)
             }
-            Spacer(modifier = Modifier.height(8.dp))
             HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
         }
     }
@@ -446,6 +442,7 @@ object DeviceDetailsScreen {
 
     @Composable
     private fun Map(
+        modifier: Modifier,
         viewModel: DeviceDetailsViewModel,
         isLoading: (isLoading: Boolean) -> Unit,
     ) {
@@ -486,9 +483,7 @@ object DeviceDetailsScreen {
         }
 
         MapView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
+            modifier = modifier,
             onLoad = { map -> initMapState(map) },
             onUpdate = { map -> refreshMap(map, viewModel, batchProcessor) }
         )
