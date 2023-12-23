@@ -44,7 +44,7 @@ fun GlassBottomNavBar(
         glassCurveSizeDp = glassCurveSizeDp,
         fallbackColor = fallbackColor,
         overlayColor = overlayColor,
-        bottomContent = { NavbarOffset() }
+        bottomContent = { BottomNavigationSpacer() }
     ) {
         content()
     }

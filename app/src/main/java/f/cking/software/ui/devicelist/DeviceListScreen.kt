@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -51,10 +51,10 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.SelectFilterTypeScreen
-import f.cking.software.utils.graphic.BottomOffsetWithFAB
 import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
+import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
@@ -64,6 +64,7 @@ object DeviceListScreen {
     @Composable
     fun Screen() {
         val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            .fillMaxSize()
         val viewModel: DeviceListViewModel = koinViewModel()
         val focusManager = LocalFocusManager.current
         val nestedScroll = remember {
@@ -89,10 +90,7 @@ object DeviceListScreen {
             }
         } else {
             LazyColumn(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .nestedScroll(nestedScroll),
+                modifier = modifier.nestedScroll(nestedScroll),
             ) {
                 stickyHeader {
                     Box() {
@@ -130,7 +128,7 @@ object DeviceListScreen {
                 }
 
                 item {
-                    BottomOffsetWithFAB()
+                    FABSpacer()
                 }
             }
         }

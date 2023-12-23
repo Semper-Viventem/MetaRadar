@@ -35,7 +35,8 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.BuildConfig
 import f.cking.software.R
 import f.cking.software.dateTimeStringFormat
-import f.cking.software.utils.graphic.BottomOffsetWithFAB
+import f.cking.software.utils.graphic.BottomNavigationSpacer
+import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,7 +66,7 @@ object SettingsScreen {
             Spacer(modifier = Modifier.height(8.dp))
             AppInfo()
             SecretCatPhoto()
-            BottomOffsetWithFAB()
+            FABSpacer()
         }
     }
 
@@ -193,8 +194,8 @@ object SettingsScreen {
 
     @Composable
     private fun SecretCatPhoto() {
-        Column {
-            Spacer(modifier = Modifier.height(16.dp))
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            BottomNavigationSpacer()
             repeat(50) {
                 Image(
                     modifier = Modifier
@@ -208,13 +209,15 @@ object SettingsScreen {
                 Spacer(modifier = Modifier.height(4.dp))
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Image(
-                painter = painterResource(id = R.drawable.appa),
-                contentDescription = stringResource(id = R.string.secret_cat),
-                contentScale = ContentScale.FillWidth
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(id = R.string.secret_cat), fontWeight = FontWeight.Light)
+            Column {
+                Image(
+                    painter = painterResource(id = R.drawable.appa),
+                    contentDescription = stringResource(id = R.string.secret_cat),
+                    contentScale = ContentScale.FillWidth
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = stringResource(id = R.string.secret_cat), fontWeight = FontWeight.Light)
+            }
         }
     }
 

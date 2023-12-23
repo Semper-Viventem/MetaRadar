@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.utils.graphic.BottomOffsetWithFAB
 import f.cking.software.utils.graphic.ContentPlaceholder
+import f.cking.software.utils.graphic.FABSpacer
 import org.koin.androidx.compose.koinViewModel
 
 object ProfilesListScreen {
@@ -45,8 +46,7 @@ object ProfilesListScreen {
         Column(
             Modifier
                 .background(MaterialTheme.colorScheme.surface)
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxSize()
         ) {
             Header(viewModel = viewModel)
             val profiles = viewModel.profiles
@@ -58,11 +58,11 @@ object ProfilesListScreen {
                 ) {
                     profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
                     item {
-                        BottomOffsetWithFAB()
+                        FABSpacer()
                     }
                 }
             } else {
-                ContentPlaceholder(stringResource(R.string.radar_profile_placeholder))
+                ContentPlaceholder(stringResource(R.string.radar_profile_placeholder), Modifier.fillMaxSize())
             }
         }
     }

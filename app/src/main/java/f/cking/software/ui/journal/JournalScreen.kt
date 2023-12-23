@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,9 +28,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import f.cking.software.R
-import f.cking.software.utils.graphic.BottomOffsetWithFAB
 import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.Divider
+import f.cking.software.utils.graphic.FABSpacer
 import org.koin.androidx.compose.koinViewModel
 
 object JournalScreen {
@@ -40,19 +40,18 @@ object JournalScreen {
         val viewModel: JournalViewModel = koinViewModel()
         val journal = viewModel.journal
         val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            .fillMaxSize()
         if (journal.isEmpty()) {
             ContentPlaceholder(text = stringResource(R.string.journal_placeholder), modifier = modifier)
         } else {
             LazyColumn(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
             ) {
                 journal.map {
                     item { JournalEntry(uiModel = it, viewModel) }
                     item { Divider() }
                 }
-                item { BottomOffsetWithFAB() }
+                item { FABSpacer() }
             }
         }
     }

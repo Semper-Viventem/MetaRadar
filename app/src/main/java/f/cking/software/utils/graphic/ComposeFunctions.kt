@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -292,9 +291,7 @@ fun ContentPlaceholder(
     icon: Painter = painterResource(R.drawable.ic_ghost),
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -387,7 +384,7 @@ fun pxToDp(px: Float): Float {
 }
 
 @Composable
-fun NavbarOffset() {
+fun BottomNavigationSpacer() {
     val bottomOffset = remember { GlobalUiState.navbarOffsetPx }
     Column {
         Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
@@ -395,7 +392,7 @@ fun NavbarOffset() {
 }
 
 @Composable
-fun BottomOffsetWithFAB() {
+fun FABSpacer() {
     val bottomOffset = remember { GlobalUiState.totalOffset }
     Column {
         Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
