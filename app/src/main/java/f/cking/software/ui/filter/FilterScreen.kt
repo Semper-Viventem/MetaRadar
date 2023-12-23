@@ -693,7 +693,6 @@ object FilterScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterGroup(
         title: String,

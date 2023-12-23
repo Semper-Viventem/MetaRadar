@@ -245,7 +245,7 @@ object ProfileDetailsScreen {
                     selectFilterDialog.show()
                 },
                 content = {
-                    Text(text = stringResource(R.string.add_filter))
+                    Text(text = stringResource(R.string.add_filter), color = MaterialTheme.colorScheme.onPrimary)
                 }
             )
         }
