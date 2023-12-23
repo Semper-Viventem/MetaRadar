@@ -3,11 +3,12 @@ package f.cking.software.ui.selectmanufacturer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,8 +16,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +31,7 @@ import f.cking.software.utils.graphic.GlassSystemNavbar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 object SelectManufacturerScreen {
 
     @Composable
@@ -34,12 +39,13 @@ object SelectManufacturerScreen {
         onSelected: (type: ManufacturerInfo) -> Unit
     ) {
         val viewModel: SelectManufacturerViewModel = koinViewModel()
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
             modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .background(MaterialTheme.colorScheme.surface)
-                .fillMaxWidth()
-                .fillMaxWidth(),
-            topBar = { AppBar(viewModel) },
+                .fillMaxSize(),
+            topBar = { AppBar(viewModel, scrollBehavior) },
             content = { paddings ->
                 GlassSystemNavbar {
                     LazyColumn(modifier = Modifier
@@ -60,16 +66,19 @@ object SelectManufacturerScreen {
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun AppBar(viewModel: SelectManufacturerViewModel) {
+    private fun AppBar(viewModel: SelectManufacturerViewModel, scrollBehavior: TopAppBarScrollBehavior) {
         TopAppBar(
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(
+                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            ),
             title = {
                 Text(text = stringResource(R.string.select_manufacturer))
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             }
         )

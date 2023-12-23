@@ -47,6 +47,7 @@ object SelectFilterScreen {
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 AppBar(scrollBehavior) { router.navigate(BackCommand) }
             },
@@ -81,7 +82,6 @@ object SelectFilterScreen {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .nestedScroll(scrollBehavior.nestedScrollConnection)
                                 .verticalScroll(rememberScrollState())
                                 .background(MaterialTheme.colorScheme.surface)
                                 .padding(top = paddings.calculateTopPadding())

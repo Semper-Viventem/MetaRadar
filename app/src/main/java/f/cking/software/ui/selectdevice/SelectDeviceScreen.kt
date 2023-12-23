@@ -42,10 +42,11 @@ object SelectDeviceScreen {
         val viewModel: SelectDeviceViewModel = koinViewModel()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = { AppBar(viewModel, scrollBehavior) },
             content = { paddings ->
                 GlassSystemNavbar {
-                    Content(Modifier.padding(paddings), viewModel, onSelected, scrollBehavior)
+                    Content(Modifier.padding(paddings), viewModel, onSelected)
                 }
             }
         )
@@ -56,12 +57,10 @@ object SelectDeviceScreen {
         modifier: Modifier,
         viewModel: SelectDeviceViewModel,
         onSelected: (deviceData: DeviceData) -> Unit,
-        scrollBehavior: TopAppBarScrollBehavior,
     ) {
         LazyColumn(
             modifier = modifier
                 .background(MaterialTheme.colorScheme.surface)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .fillMaxSize()
         ) {
             if (viewModel.loading) {
@@ -97,6 +96,9 @@ object SelectDeviceScreen {
     private fun AppBar(viewModel: SelectDeviceViewModel, scrollBehavior: TopAppBarScrollBehavior) {
         TopAppBar(
             scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(
+                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            ),
             title = {
                 TextField(
                     value = viewModel.searchStr,
