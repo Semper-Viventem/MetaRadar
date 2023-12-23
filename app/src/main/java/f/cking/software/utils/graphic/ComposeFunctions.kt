@@ -262,6 +262,7 @@ fun MapView(
         Text(
             text = stringResource(R.string.osm_copyright),
             modifier = Modifier
+                .padding(start = 4.dp)
                 .align(Alignment.BottomStart)
                 .alpha(0.9f)
                 .clickable { context.openUrl("https://www.openstreetmap.org/copyright") },
@@ -364,7 +365,6 @@ fun TagChip(
             leadingIconContentColor = Color.Black,
         ),
         border = null,
-        shape = RoundedCornerShape(corner = CornerSize(Int.MAX_VALUE.dp)),
         onClick = onClick,
         leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface) } },
         label = {

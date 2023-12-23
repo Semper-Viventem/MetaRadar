@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
-
 package f.cking.software.ui.devicelist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -23,7 +21,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -58,9 +55,9 @@ import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 object DeviceListScreen {
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Screen() {
         val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
@@ -196,7 +193,7 @@ object DeviceListScreen {
         Surface(shadowElevation = 4.dp) {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                     .fillMaxWidth()
             ) {
                 LazyRow(

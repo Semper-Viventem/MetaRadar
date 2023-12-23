@@ -44,6 +44,7 @@ import f.cking.software.utils.graphic.GlassBottomNavBar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 object MainScreen {
 
     @SuppressLint("NewApi")
@@ -58,8 +59,6 @@ object MainScreen {
             content = { innerPaddings ->
                 GlassBottomNavBar(
                     modifier = Modifier.fillMaxSize(),
-                    fallbackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    overlayColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
                     content = {
                         Box(Modifier.padding(top = innerPaddings.calculateTopPadding())) {
                             viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
@@ -299,7 +298,6 @@ object MainScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun TopBar(viewModel: MainViewModel) {
         TopAppBar(

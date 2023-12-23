@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -56,7 +55,6 @@ object JournalScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun JournalEntry(uiModel: JournalViewModel.JournalEntryUiModel, viewModel: JournalViewModel) {
         Box(
