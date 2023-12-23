@@ -434,7 +434,7 @@ object DeviceDetailsScreen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(5.dp),
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
