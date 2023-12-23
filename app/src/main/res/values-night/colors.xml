@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="filter_any">#006064</color>
+    <color name="filter_all">#004D40</color>
+    <color name="filter_not">#371165</color>
+    <color name="filter_address">#CD5C04</color>
+    <color name="filter_name">#815244</color>
+    <color name="filter_manufacturer">#8F576A</color>
+    <color name="filter_last_seen">#56958F</color>
+    <color name="filter_first_seen">#C17D7D</color>
+    <color name="filter_lost_time">#4E718E</color>
+    <color name="filter_is_favorite">#C19D68</color>
+    <color name="filter_airdrop_contact">#7E8541</color>
+    <color name="filter_is_following">#7D4E85</color>
+    <color name="filter_unknown">#616161</color>
+    <color name="error_background">#9F5E5E</color>
+    <color name="filter_device_location">#875647</color>
+    <color name="filter_user_location">#575C27</color>
+    <color name="filter_tag">#376561</color>
+    <color name="profile_report_background">#0000</color>
+</resources>

@@ -2,6 +2,7 @@ package f.cking.software.utils.graphic
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -330,7 +331,7 @@ fun RoundedBox(
     }
 }
 
-private val colors = listOf(
+private val colorsLight = listOf(
     Color(0xFFE57373),
     Color(0xFFF06292),
     Color(0xFFBA68C8),
@@ -350,7 +351,29 @@ private val colors = listOf(
     Color(0xFF90A4AE),
 )
 
+private val colorsDark = listOf(
+    Color(0xFF813535),
+    Color(0xFF742A43),
+    Color(0xFF5E2F66),
+    Color(0xFF443066),
+    Color(0xFF363E69),
+    Color(0xFF2F5574),
+    Color(0xFF275A70),
+    Color(0xFF2D6A72),
+    Color(0xFF235E58),
+    Color(0xFF457047),
+    Color(0xFF546D37),
+    Color(0xFF885241),
+    Color(0xFF6A7030),
+    Color(0xFF776426),
+    Color(0xFF7C643F),
+    Color(0xFF7A5446),
+    Color(0xFF3D545F),
+)
+
+@Composable
 fun colorByHash(hash: Int): Color {
+    val colors = if (isSystemInDarkTheme()) colorsDark else colorsLight
     return colors[abs(hash % colors.size)]
 }
 
@@ -370,7 +393,7 @@ fun TagChip(
         onClick = onClick,
         leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface) } },
         label = {
-            Text(text = tagName)
+            Text(text = tagName, color = MaterialTheme.colorScheme.onSurface)
         }
     )
 }

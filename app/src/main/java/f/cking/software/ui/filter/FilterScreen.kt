@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -23,6 +22,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -613,7 +613,6 @@ object FilterScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterNot(
         filter: FilterUiState.Not,
@@ -661,13 +660,13 @@ object FilterScreen {
         ) {
             Box(Modifier.clickable { minimize.value = !minimize.value }) {
                 Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     val icon = if (!minimize.value) painterResource(R.drawable.ic_drop_down) else painterResource(R.drawable.ic_drop_up)
                     Icon(
                         painter = icon,
                         contentDescription = stringResource(R.string.delete),
                         modifier = Modifier.size(24.dp),
-                        tint = Color.Black,
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = onDeleteButtonClick) {
@@ -675,7 +674,7 @@ object FilterScreen {
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.delete),
                             modifier = Modifier.size(24.dp),
-                            tint = Color.Black,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
