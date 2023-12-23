@@ -5,26 +5,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderDefaults
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +44,7 @@ import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.ui.devicedetails.MapConfig
 import f.cking.software.utils.graphic.MapView
+import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
@@ -54,6 +53,7 @@ import org.koin.androidx.compose.getKoin
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
+@OptIn(ExperimentalMaterial3Api::class)
 object SelectLocationScreen {
 
     @Composable
@@ -65,15 +65,14 @@ object SelectLocationScreen {
     ) {
         Scaffold(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
-                .fillMaxWidth()
-                .fillMaxHeight(),
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize(),
             topBar = { AppBar(onCloseClick) },
             content = { paddings ->
                 Content(
                     modifier = Modifier
-                        .background(MaterialTheme.colors.surface)
-                        .padding(paddings),
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(top = paddings.calculateTopPadding()),
                     onSelected = onSelected,
                     initialLocationModel = initialLocationModel,
                     initialRadius = initialRadius
@@ -107,49 +106,49 @@ object SelectLocationScreen {
 
         Column(
             modifier = modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .fillMaxSize()
         ) {
-            Box(
+            RoundedBox(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                contentAlignment = Alignment.Center,
+                internalPaddings = 0.dp,
             ) {
-                Map(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    initialLocationModel = initialLocationModel,
-                    onMapReady = { map.value = it }
-                )
-                Box(
-                    modifier = Modifier
-                        .size(width = 20.dp, height = 10.dp)
-                        .blur(2.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Map(
+                        modifier = Modifier.fillMaxSize(),
+                        initialLocationModel = initialLocationModel,
+                        onMapReady = { map.value = it }
+                    )
                     Box(
                         modifier = Modifier
-                            .size(width = 10.dp, height = 5.dp)
-                            .background(color = Color.DarkGray, shape = AbsoluteCutCornerShape(10.dp))
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .height(120.dp)
-                        .width(60.dp)
-                ) {
-                    val painter = painterResource(R.drawable.ic_location)
-                    Image(
+                            .size(width = 20.dp, height = 10.dp)
+                            .blur(2.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(width = 10.dp, height = 5.dp)
+                                .background(color = Color.DarkGray, shape = AbsoluteCutCornerShape(10.dp))
+                        )
+                    }
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        contentScale = ContentScale.FillWidth,
-                        painter = painter,
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
-                    )
+                            .height(120.dp)
+                            .width(60.dp)
+                    ) {
+                        val painter = painterResource(R.drawable.ic_location)
+                        Image(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            contentScale = ContentScale.FillWidth,
+                            painter = painter,
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                        )
+                    }
                 }
             }
             BottomPanel(map.value, initialRadius, onSelected)
@@ -164,46 +163,41 @@ object SelectLocationScreen {
     ) {
         val radiusMeters = remember { mutableStateOf(initialRadius ?: TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS) }
 
-        Surface(elevation = 12.dp) {
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = stringResource(R.string.select_location_radius, radiusMeters.value),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+            Slider(
                 modifier = Modifier
-                    .background(MaterialTheme.colors.primary)
                     .fillMaxWidth(),
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(modifier = Modifier.padding(horizontal = 16.dp), text = stringResource(R.string.select_location_radius, radiusMeters.value), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                Slider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    value = radiusMeters.value,
-                    onValueChange = { value -> radiusMeters.value = value },
-                    valueRange = 5f..1000f,
-                    colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colors.secondary,
-                        activeTrackColor = MaterialTheme.colors.secondary,
+                value = radiusMeters.value,
+                onValueChange = { value -> radiusMeters.value = value },
+                valueRange = 5f..1000f,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                enabled = map != null,
+                onClick = {
+                    val cameraCenter = map!!.mapCenter
+                    onSelected.invoke(
+                        LocationModel(cameraCenter.latitude, cameraCenter.longitude, System.currentTimeMillis()),
+                        radiusMeters.value
                     )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primaryVariant),
-                    enabled = map != null,
-                    onClick = {
-                        val cameraCenter = map!!.mapCenter
-                        onSelected.invoke(
-                            LocationModel(cameraCenter.latitude, cameraCenter.longitude, System.currentTimeMillis()),
-                            radiusMeters.value
-                        )
-                    }
-                ) {
-                    Text(text = stringResource(R.string.confirm), color = MaterialTheme.colors.onPrimary)
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                SystemNavbarSpacer()
+            ) {
+                Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.onPrimary)
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            SystemNavbarSpacer()
         }
     }
 

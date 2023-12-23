@@ -10,7 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,34 +30,58 @@ import androidx.compose.ui.zIndex
 import f.cking.software.dpToPx
 
 @Composable
-fun GlassSystemNavbar(
+fun GlassBottomNavBar(
     modifier: Modifier = Modifier,
     blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
+    fallbackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
     content: @Composable () -> Unit,
 ) {
-    GlassNavigationbar(
+    GlassBottomSpace(
         modifier = modifier,
         blur = blur,
         glassCurveSizeDp = glassCurveSizeDp,
-        fallbackColor = Color.Transparent,
-        navBarContent = { SystemNavbarSpacer() }
+        fallbackColor = fallbackColor,
+        overlayColor = overlayColor,
+        bottomContent = { BottomNavigationSpacer() }
     ) {
         content()
     }
 }
 
 @Composable
-fun GlassNavigationbar(
+fun GlassSystemNavbar(
+    modifier: Modifier = Modifier,
+    blur: Float = 3f,
+    glassCurveSizeDp: Float = 3f,
+    fallbackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    overlayColor: Color = Color.Transparent,
+    content: @Composable () -> Unit,
+) {
+    GlassBottomSpace(
+        modifier = modifier,
+        blur = blur,
+        glassCurveSizeDp = glassCurveSizeDp,
+        fallbackColor = fallbackColor,
+        overlayColor = overlayColor,
+        bottomContent = { SystemNavbarSpacer() }
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun GlassBottomSpace(
     modifier: Modifier = Modifier,
     height: Dp? = null,
     blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
     zIndex: Float = 1f,
-    fallbackColor: Color = MaterialTheme.colors.primary,
-    overlayColor: Color = MaterialTheme.colors.primary.copy(alpha = 0.3f),
-    navBarContent: @Composable () -> Unit,
-    content: @Composable () -> Unit,
+    fallbackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
+    bottomContent: @Composable () -> Unit,
+    globalContent: @Composable () -> Unit,
 ) {
     Box(modifier = modifier) {
         val context = LocalContext.current
@@ -72,7 +96,7 @@ fun GlassNavigationbar(
                     } else it
                 }
         ) {
-            content()
+            globalContent()
         }
         Box(
             modifier = Modifier
@@ -96,7 +120,7 @@ fun GlassNavigationbar(
                 }
                 .align(Alignment.BottomCenter)
         ) {
-            navBarContent()
+            bottomContent()
 
             Box(
                 Modifier

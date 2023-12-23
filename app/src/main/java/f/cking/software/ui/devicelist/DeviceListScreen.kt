@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,21 +15,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.Button
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -42,7 +41,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,19 +48,20 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.SelectFilterTypeScreen
-import f.cking.software.utils.graphic.BottomSpacer
 import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
+import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 object DeviceListScreen {
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Screen() {
-        val modifier = Modifier.background(MaterialTheme.colors.surface)
+        val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            .fillMaxSize()
         val viewModel: DeviceListViewModel = koinViewModel()
         val focusManager = LocalFocusManager.current
         val nestedScroll = remember {
@@ -83,15 +82,12 @@ object DeviceListScreen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp),
-                    color = MaterialTheme.colors.onPrimary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } else {
             LazyColumn(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .nestedScroll(nestedScroll),
+                modifier = modifier.nestedScroll(nestedScroll),
             ) {
                 stickyHeader {
                     Box() {
@@ -101,7 +97,7 @@ object DeviceListScreen {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(4.dp),
-                                color = MaterialTheme.colors.onPrimary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -129,7 +125,7 @@ object DeviceListScreen {
                 }
 
                 item {
-                    BottomSpacer()
+                    FABSpacer()
                 }
             }
         }
@@ -192,13 +188,12 @@ object DeviceListScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun Filters(viewModel: DeviceListViewModel) {
-        Surface(elevation = 4.dp) {
+        Surface(shadowElevation = 4.dp) {
             Column(
                 modifier = Modifier
-                    .background(colorResource(id = R.color.primary_surface))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                     .fillMaxWidth()
             ) {
                 LazyRow(
@@ -206,23 +201,18 @@ object DeviceListScreen {
                 ) {
                     val allFilters = (viewModel.quickFilters + viewModel.appliedFilter).toSet()
 
-                    item { Spacer(modifier = Modifier.width(8.dp)) }
+                    item { Spacer(modifier = Modifier.width(16.dp)) }
+
+                    item {
+                        SearchChip(viewModel)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
 
                     allFilters.forEach {
                         item {
                             val isSelected = viewModel.appliedFilter.contains(it)
-                            val colors = if (isSelected) {
-                                ChipDefaults.chipColors(
-                                    backgroundColor = MaterialTheme.colors.primaryVariant,
-                                    contentColor = MaterialTheme.colors.onPrimary,
-                                    leadingIconContentColor = MaterialTheme.colors.onPrimary,
-                                )
-                            } else {
-                                ChipDefaults.chipColors()
-                            }
 
-                            Chip(
-                                colors = colors,
+                            FilterChip(
                                 onClick = { viewModel.onFilterClick(it) },
                                 leadingIcon = {
                                     if (isSelected) {
@@ -232,22 +222,19 @@ object DeviceListScreen {
                                             modifier = Modifier.size(24.dp)
                                         )
                                     }
+                                },
+                                selected = isSelected,
+                                label = {
+                                    Text(text = it.displayName)
                                 }
-                            ) {
-                                Text(text = it.displayName)
-                            }
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                     }
 
                     item {
-                        SearchChip(viewModel)
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-
-                    item {
                         AddFilterChip(viewModel)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                     }
                 }
 
@@ -258,7 +245,6 @@ object DeviceListScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun AddFilterChip(viewModel: DeviceListViewModel) {
 
@@ -277,39 +263,30 @@ object DeviceListScreen {
             })
         }
 
-        Chip(
-            leadingIcon = {
+        SuggestionChip(
+            icon = {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
             },
             onClick = { selectFilterDialog.show() },
-        ) {
-            Text(text = stringResource(R.string.add_filter))
-        }
+            label = {
+                Text(text = stringResource(R.string.add_filter))
+            }
+        )
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun SearchChip(viewModel: DeviceListViewModel) {
-        val colors = if (viewModel.isSearchMode) {
-            ChipDefaults.chipColors(
-                backgroundColor = MaterialTheme.colors.primaryVariant,
-                contentColor = MaterialTheme.colors.onPrimary,
-                leadingIconContentColor = MaterialTheme.colors.onPrimary,
-            )
-        } else {
-            ChipDefaults.chipColors()
-        }
-
-        Chip(
-            colors = colors,
+        FilterChip(
             leadingIcon = {
                 val icon = if (viewModel.isSearchMode) Icons.Filled.Delete else Icons.Filled.Search
                 Icon(icon, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(24.dp))
             },
             onClick = { viewModel.onOpenSearchClick() },
-        ) {
-            Text(text = viewModel.searchQuery?.takeIf { it.isNotBlank() } ?: stringResource(R.string.search))
-        }
+            selected = viewModel.isSearchMode,
+            label = {
+                Text(text = viewModel.searchQuery?.takeIf { it.isNotBlank() } ?: stringResource(R.string.search))
+            }
+        )
     }
 
     @Composable

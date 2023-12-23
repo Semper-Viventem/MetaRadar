@@ -7,16 +7,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +35,8 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.BuildConfig
 import f.cking.software.R
 import f.cking.software.dateTimeStringFormat
-import f.cking.software.utils.graphic.BottomSpacer
+import f.cking.software.utils.graphic.BottomNavigationSpacer
+import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
@@ -43,35 +45,28 @@ object SettingsScreen {
     @Composable
     fun Screen() {
         val viewModel: SettingsViewModel = koinViewModel()
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
-                .fillMaxWidth()
-                .fillMaxHeight(),
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ProjectGithub(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ReportIssue(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ClearDatabaseBlock(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    BackupDatabaseBlock(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    RunOnStartup(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    LocationBlock(viewModel = viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AppInfo()
-                    SecretCatPhoto()
-                    BottomSpacer()
-                }
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            ProjectGithub(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ReportIssue(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ClearDatabaseBlock(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            BackupDatabaseBlock(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            RunOnStartup(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            LocationBlock(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            AppInfo()
+            SecretCatPhoto()
+            FABSpacer()
         }
     }
 
@@ -129,7 +124,7 @@ object SettingsScreen {
             onClick = { viewModel.onRemoveGarbageClick() },
             enabled = !viewModel.garbageRemovingInProgress
         ) {
-            Text(text = stringResource(R.string.clear_garbage))
+            Text(text = stringResource(R.string.clear_garbage), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
@@ -142,9 +137,9 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onRestoreDBClick()
                 }
@@ -161,7 +156,7 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
-            Text(text = stringResource(R.string.settings_restore_database))
+            Text(text = stringResource(R.string.settings_restore_database), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
@@ -174,9 +169,9 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onBackupDBClick()
                 }
@@ -193,34 +188,36 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
-            Text(text = stringResource(R.string.settings_backup_database))
+            Text(text = stringResource(R.string.settings_backup_database), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
     @Composable
     private fun SecretCatPhoto() {
-        Column {
-            Spacer(modifier = Modifier.height(16.dp))
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            BottomNavigationSpacer()
             repeat(50) {
                 Image(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .alpha(0.3f)
                         .width(30.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                     painter = painterResource(id = R.drawable.cat_footprint),
                     contentDescription = null
                 )
                 Spacer(modifier = Modifier.height(4.dp))
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Image(
-                painter = painterResource(id = R.drawable.appa),
-                contentDescription = stringResource(id = R.string.secret_cat),
-                contentScale = ContentScale.FillWidth
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(id = R.string.secret_cat), fontWeight = FontWeight.Light)
+            Column {
+                Image(
+                    painter = painterResource(id = R.drawable.appa),
+                    contentDescription = stringResource(id = R.string.secret_cat),
+                    contentScale = ContentScale.FillWidth
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = stringResource(id = R.string.secret_cat), fontWeight = FontWeight.Light)
+            }
         }
     }
 
@@ -234,9 +231,9 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onClearLocationsClick()
                 }
@@ -252,7 +249,7 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.locationRemovingInProgress
         ) {
-            Text(text = stringResource(R.string.settings_clear_all_location_history))
+            Text(text = stringResource(R.string.settings_clear_all_location_history), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
@@ -284,7 +281,7 @@ object SettingsScreen {
             Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
-                Text(text = stringResource(R.string.report))
+                Text(text = stringResource(R.string.report), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }
@@ -308,7 +305,7 @@ object SettingsScreen {
             Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
-                Text(text = stringResource(R.string.open_github))
+                Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }

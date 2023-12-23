@@ -8,30 +8,31 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,7 +60,6 @@ import f.cking.software.dpToPx
 import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
 import f.cking.software.ui.tagdialog.TagDialog
-import f.cking.software.utils.graphic.GlassSystemNavbar
 import f.cking.software.utils.graphic.MapView
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.SystemNavbarSpacer
@@ -73,6 +73,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import timber.log.Timber
 
+@OptIn(ExperimentalMaterial3Api::class)
 object DeviceDetailsScreen {
 
     @Composable
@@ -81,21 +82,18 @@ object DeviceDetailsScreen {
 
         Scaffold(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
-                .fillMaxWidth()
-                .fillMaxHeight(),
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize(),
             topBar = {
                 AppBar(viewModel = viewModel)
             },
             content = {
-                GlassSystemNavbar {
-                    Content(
-                        modifier = Modifier
-                            .background(MaterialTheme.colors.surface)
-                            .padding(it),
-                        viewModel = viewModel,
-                    )
-                }
+                Content(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(it),
+                    viewModel = viewModel,
+                )
             }
         )
     }
@@ -116,7 +114,7 @@ object DeviceDetailsScreen {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = iconId),
                             contentDescription = text,
-                            tint = MaterialTheme.colors.onPrimary,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -124,9 +122,9 @@ object DeviceDetailsScreen {
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = MaterialTheme.colors.onPrimary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -149,9 +147,7 @@ object DeviceDetailsScreen {
     @Composable
     private fun Progress(modifier: Modifier = Modifier) {
         Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
+            modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
@@ -166,21 +162,22 @@ object DeviceDetailsScreen {
     ) {
         Column(
             modifier = modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .fillMaxSize()
         ) {
             LocationHistory(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(), viewModel = viewModel
+                    .fillMaxWidth(),
+                deviceData = deviceData,
+                viewModel = viewModel
             )
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.5f)
-            ) {
-                item { DeviceContent(deviceData = deviceData, viewModel = viewModel) }
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Tags(deviceData = deviceData, viewModel = viewModel)
+            Spacer(modifier = Modifier.height(16.dp))
+            DeviceContent(modifier = Modifier.weight(1f), deviceData = deviceData)
+            Spacer(modifier = Modifier.height(16.dp))
+            SystemNavbarSpacer()
         }
     }
 
@@ -188,62 +185,61 @@ object DeviceDetailsScreen {
     private fun DeviceContent(
         modifier: Modifier = Modifier,
         deviceData: DeviceData,
-        viewModel: DeviceDetailsViewModel,
     ) {
 
-        Column(
+        RoundedBox(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
+            internalPaddings = 0.dp,
         ) {
-
-            HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Tags(deviceData = deviceData, viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = deviceData.buildDisplayName(),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.address)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
-            Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = stringResource(R.string.device_details_detect_count),
+                    text = deviceData.buildDisplayName(),
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                 )
-                Spacer(Modifier.width(4.dp))
-                Text(text = deviceData.detectCount.toString())
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
+                Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
+                Text(text = deviceData.address)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
+                Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row {
+                    Text(
+                        text = stringResource(R.string.device_details_detect_count),
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(text = deviceData.detectCount.toString())
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current))
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
+                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
-            Text(
-                text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current))
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
-            Text(
-                text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            SystemNavbarSpacer()
         }
     }
 
@@ -282,9 +278,9 @@ object DeviceDetailsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
                     dialogState.hide()
                     viewModel.onRemoveTagClick(deviceData, name)
                 }
@@ -299,7 +295,6 @@ object DeviceDetailsScreen {
         TagChip(tagName = name, tagIcon = Icons.Filled.Delete) { dialogState.show() }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun AddTag(
         deviceData: DeviceData,
@@ -308,16 +303,13 @@ object DeviceDetailsScreen {
         val addTagDialog = TagDialog.rememberDialog {
             viewModel.onNewTagSelected(deviceData, it)
         }
-        Chip(
-            colors = ChipDefaults.chipColors(
-                backgroundColor = MaterialTheme.colors.secondary,
-                contentColor = MaterialTheme.colors.onSecondary,
-            ),
+        SuggestionChip(
             onClick = { addTagDialog.show() },
-            leadingIcon = {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colors.onSurface)
-            }
-        ) { Text(text = stringResource(R.string.add_tag)) }
+            icon = {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
+            },
+            label = { Text(text = stringResource(R.string.add_tag)) }
+        )
     }
 
     @Composable
@@ -331,7 +323,7 @@ object DeviceDetailsScreen {
             buttons = {
                 negativeButton(
                     stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
                 ) { dialog.hide() }
             },
         ) {
@@ -361,53 +353,53 @@ object DeviceDetailsScreen {
                 }
             }
         }
-
-        RoundedBox(
-            modifier = Modifier.fillMaxWidth(),
-            internalPaddings = 0.dp
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { dialog.show() },
         ) {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { dialog.show() },
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row {
-                            Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
-                            Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.device_details_history_period_subtitle),
-                            fontWeight = FontWeight.Light,
-                        )
+                Column(modifier = Modifier.weight(1f)) {
+                    Row {
+                        Text(text = stringResource(R.string.device_details_history_period), fontSize = 18.sp)
+                        Text(text = stringResource(viewModel.historyPeriod.displayNameRes), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Image(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Default.Edit,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
-                        contentDescription = stringResource(R.string.change)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.device_details_history_period_subtitle),
+                        fontWeight = FontWeight.Light,
                     )
                 }
+                Spacer(modifier = Modifier.width(8.dp))
+                Image(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.Edit,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                    contentDescription = stringResource(R.string.change)
+                )
             }
         }
     }
 
     @Composable
-    private fun LocationHistory(modifier: Modifier = Modifier, viewModel: DeviceDetailsViewModel) {
-        Box(modifier = modifier) {
-            Map(
-                viewModel = viewModel,
-                isLoading = { viewModel.markersInLoadingState = it }
-            )
-            MapOverlay(viewModel = viewModel)
+    private fun LocationHistory(modifier: Modifier = Modifier, deviceData: DeviceData, viewModel: DeviceDetailsViewModel) {
+        RoundedBox(modifier = modifier, internalPaddings = 0.dp) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)) {
+                Map(
+                    Modifier.fillMaxSize(),
+                    viewModel = viewModel,
+                    isLoading = { viewModel.markersInLoadingState = it }
+                )
+                MapOverlay(viewModel = viewModel)
+            }
+            HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
         }
     }
 
@@ -442,7 +434,7 @@ object DeviceDetailsScreen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(5.dp),
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -450,6 +442,7 @@ object DeviceDetailsScreen {
 
     @Composable
     private fun Map(
+        modifier: Modifier,
         viewModel: DeviceDetailsViewModel,
         isLoading: (isLoading: Boolean) -> Unit,
     ) {
@@ -490,9 +483,7 @@ object DeviceDetailsScreen {
         }
 
         MapView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
+            modifier = modifier,
             onLoad = { map -> initMapState(map) },
             onUpdate = { map -> refreshMap(map, viewModel, batchProcessor) }
         )

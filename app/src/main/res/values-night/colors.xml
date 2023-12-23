@@ -1,35 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <color name="surface_color">#464237</color>
-    <color name="on_surface">@color/white_90</color>
-
-    <color name="primary">#6B5B39</color>
-    <color name="primary_surface">#685F45</color>
-    <color name="primary_variant">#7F7150</color>
-    <color name="on_primary">@color/white_90</color>
-
-    <color name="secondary">#A95C0E</color>
-    <color name="secondary_variant">@color/secondary</color>
-    <color name="on_secondary">@color/white_90</color>
-
-    <color name="filter_any">#80DEEA</color>
-    <color name="filter_all">#A5D6A7</color>
-    <color name="filter_not">#B39DDB</color>
-    <color name="filter_address">#FFE082</color>
-    <color name="filter_name">#FFAB91</color>
-    <color name="filter_manufacturer">#F48FB1</color>
-    <color name="filter_last_seen">#80CBC4</color>
-    <color name="filter_first_seen">#EF9A9A</color>
-    <color name="filter_lost_time">#90CAF9</color>
-    <color name="filter_is_favorite">#FFCC80</color>
-    <color name="filter_airdrop_contact">#E6EE9C</color>
-    <color name="filter_is_following">#CE93D8</color>
-    <color name="filter_unknown">#FFFFFF</color>
-    <color name="filter_device_location">#FFAB91</color>
-    <color name="filter_user_location">#E6EE9C</color>
-    <color name="filter_tag">#80CBC4</color>
+    <color name="filter_any">#006064</color>
+    <color name="filter_all">#004D40</color>
+    <color name="filter_not">#371165</color>
+    <color name="filter_address">#CD5C04</color>
+    <color name="filter_name">#815244</color>
+    <color name="filter_manufacturer">#8F576A</color>
+    <color name="filter_last_seen">#56958F</color>
+    <color name="filter_first_seen">#C17D7D</color>
+    <color name="filter_lost_time">#4E718E</color>
+    <color name="filter_is_favorite">#C19D68</color>
+    <color name="filter_airdrop_contact">#7E8541</color>
+    <color name="filter_is_following">#7D4E85</color>
+    <color name="filter_unknown">#616161</color>
+    <color name="error_background">#9F5E5E</color>
+    <color name="filter_device_location">#875647</color>
+    <color name="filter_user_location">#575C27</color>
+    <color name="filter_tag">#376561</color>
     <color name="profile_report_background">#0000</color>
-
-    <color name="error_background">#9B5C5C</color>
 </resources>
