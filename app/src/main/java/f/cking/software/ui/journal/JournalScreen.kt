@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -90,7 +90,7 @@ object JournalScreen {
                         modifier = Modifier.clickable {
                             isExpanded = !isExpanded
                         },
-                        text = uiModel.subtitle,
+                        text = if (isExpanded) uiModel.subtitle else uiModel.subtitleCollapsed.orEmpty(),
                         fontWeight = FontWeight.Normal,
                         maxLines = if (isExpanded) Int.MAX_VALUE else 5,
                         overflow = TextOverflow.Ellipsis,
@@ -103,11 +103,10 @@ object JournalScreen {
                         mainAxisSpacing = 8.dp,
                     ) {
                         items.forEach { item ->
-                            Chip(
+                            SuggestionChip(
                                 onClick = { viewModel.onJournalListItemClick(item.payload) },
-                            ) {
-                                Text(text = item.displayName)
-                            }
+                                label = { Text(text = item.displayName) }
+                            )
                         }
                     }
                 }

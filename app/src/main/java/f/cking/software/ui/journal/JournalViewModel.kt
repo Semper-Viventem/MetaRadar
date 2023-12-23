@@ -19,6 +19,7 @@ import f.cking.software.domain.model.JournalEntry
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 class JournalViewModel(
     private val journalRepository: JournalRepository,
@@ -71,17 +72,14 @@ class JournalViewModel(
         } else {
             report.title
         }
-        val description = if (report.stackTrace.length > MAX_ERROR_DESCRIPTION_LENGTH) {
-            report.stackTrace.substring(0 until MAX_ERROR_DESCRIPTION_LENGTH)
-        } else {
-            report.stackTrace
-        }
+        val description = report.stackTrace
         return JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
             color = { MaterialTheme.colorScheme.error },
             colorForeground = { MaterialTheme.colorScheme.onError },
             title = title,
             subtitle = description,
+            subtitleCollapsed = description.substring(0 until min(MAX_ERROR_DESCRIPTION_COLLAPSED_LENGTH, description.length)),
             journalEntry = journalEntry,
             items = null,
         )
@@ -97,6 +95,7 @@ class JournalViewModel(
             colorForeground = { MaterialTheme.colorScheme.onSurface },
             title = context.getString(R.string.journal_profile_detected, getProfileName(report.profileId)),
             subtitle = null,
+            subtitleCollapsed = null,
             journalEntry = journalEntry,
             items = mapListItems(report.deviceAddresses),
         )
@@ -125,6 +124,7 @@ class JournalViewModel(
         val colorForeground: @Composable () -> Color,
         val title: String,
         val subtitle: String?,
+        val subtitleCollapsed: String?,
         val items: List<ListItemUiModel>?,
         val journalEntry: JournalEntry,
     ) {
@@ -136,6 +136,6 @@ class JournalViewModel(
 
     companion object {
         private const val MAX_ERROR_TITLE_LENGTH = 256
-        private const val MAX_ERROR_DESCRIPTION_LENGTH = 10000
+        private const val MAX_ERROR_DESCRIPTION_COLLAPSED_LENGTH = 500
     }
 }
