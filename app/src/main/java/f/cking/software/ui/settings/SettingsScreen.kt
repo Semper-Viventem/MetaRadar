@@ -124,7 +124,7 @@ object SettingsScreen {
             onClick = { viewModel.onRemoveGarbageClick() },
             enabled = !viewModel.garbageRemovingInProgress
         ) {
-            Text(text = stringResource(R.string.clear_garbage))
+            Text(text = stringResource(R.string.clear_garbage), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
@@ -156,7 +156,7 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
-            Text(text = stringResource(R.string.settings_restore_database))
+            Text(text = stringResource(R.string.settings_restore_database), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
@@ -188,7 +188,7 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.backupDbInProgress
         ) {
-            Text(text = stringResource(R.string.settings_backup_database))
+            Text(text = stringResource(R.string.settings_backup_database), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
@@ -249,7 +249,7 @@ object SettingsScreen {
             onClick = { dialogState.show() },
             enabled = !viewModel.locationRemovingInProgress
         ) {
-            Text(text = stringResource(R.string.settings_clear_all_location_history))
+            Text(text = stringResource(R.string.settings_clear_all_location_history), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 
@@ -281,7 +281,7 @@ object SettingsScreen {
             Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
-                Text(text = stringResource(R.string.report))
+                Text(text = stringResource(R.string.report), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }
@@ -305,7 +305,7 @@ object SettingsScreen {
             Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
-                Text(text = stringResource(R.string.open_github))
+                Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }
