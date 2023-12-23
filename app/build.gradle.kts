@@ -24,7 +24,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.20.3-beta"
+        versionName = "0.21.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -150,6 +150,7 @@ dependencies {
     implementation(libs.ktx)
     debugImplementation(libs.compose.tooling)
     implementation(libs.compose.tooling.preview)
+    implementation(libs.compose.material3)
 
     // room
     implementation(libs.room.runtime)

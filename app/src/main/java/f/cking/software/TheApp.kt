@@ -1,6 +1,7 @@
 package f.cking.software
 
 import android.app.Application
+import com.google.android.material.color.DynamicColors
 import f.cking.software.data.DataModule
 import f.cking.software.domain.interactor.InteractorsModule
 import f.cking.software.domain.interactor.SaveFirstAppLaunchTimeInteractor
@@ -16,9 +17,14 @@ class TheApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        applyDynamicColors()
         initDi()
         initTimber()
         saveFirstLaunchTime()
+    }
+
+    private fun applyDynamicColors() {
+        DynamicColors.applyToActivitiesIfAvailable(this)
     }
 
     private fun saveFirstLaunchTime() {

@@ -2,13 +2,13 @@ package f.cking.software.utils.graphic
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -18,15 +18,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -79,10 +80,13 @@ fun rememberDateDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            positiveButton(
+                stringResource(R.string.ok),
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+            ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
             ) { dialogState.hide() }
         },
     ) {
@@ -102,10 +106,13 @@ fun rememberTimeDialog(
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
-            positiveButton(stringResource(R.string.ok), textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)) { dialogState.hide() }
+            positiveButton(
+                stringResource(R.string.ok),
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+            ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colors.secondaryVariant)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
             ) { dialogState.hide() }
         },
     ) {
@@ -170,7 +177,7 @@ fun DeviceListItem(
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = stringResource(R.string.is_favorite),
-                        tint = MaterialTheme.colors.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
@@ -258,6 +265,7 @@ fun MapView(
         Text(
             text = stringResource(R.string.osm_copyright),
             modifier = Modifier
+                .padding(start = 4.dp)
                 .align(Alignment.BottomStart)
                 .alpha(0.9f)
                 .clickable { context.openUrl("https://www.openstreetmap.org/copyright") },
@@ -275,7 +283,7 @@ fun Divider() {
             modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth()
-                .background(Color.LightGray)
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
         )
     }
 }
@@ -287,9 +295,7 @@ fun ContentPlaceholder(
     icon: Painter = painterResource(R.drawable.ic_ghost),
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -318,14 +324,14 @@ fun RoundedBox(
         Column(
             Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colors.primaryVariant, shape = shape)
+                .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = shape)
                 .clip(shape = shape)
                 .padding(internalPaddings)
         ) { boxContent(this) }
     }
 }
 
-private val colors = listOf(
+private val colorsLight = listOf(
     Color(0xFFE57373),
     Color(0xFFF06292),
     Color(0xFFBA68C8),
@@ -345,28 +351,51 @@ private val colors = listOf(
     Color(0xFF90A4AE),
 )
 
+private val colorsDark = listOf(
+    Color(0xFF813535),
+    Color(0xFF742A43),
+    Color(0xFF5E2F66),
+    Color(0xFF443066),
+    Color(0xFF363E69),
+    Color(0xFF2F5574),
+    Color(0xFF275A70),
+    Color(0xFF2D6A72),
+    Color(0xFF235E58),
+    Color(0xFF457047),
+    Color(0xFF546D37),
+    Color(0xFF885241),
+    Color(0xFF6A7030),
+    Color(0xFF776426),
+    Color(0xFF7C643F),
+    Color(0xFF7A5446),
+    Color(0xFF3D545F),
+)
+
+@Composable
 fun colorByHash(hash: Int): Color {
+    val colors = if (isSystemInDarkTheme()) colorsDark else colorsLight
     return colors[abs(hash % colors.size)]
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TagChip(
     tagName: String,
     tagIcon: ImageVector? = null,
     onClick: () -> Unit = {},
 ) {
-    Chip(
-        colors = ChipDefaults.chipColors(
-            backgroundColor = colorByHash(tagName.hashCode()),
-            contentColor = Color.Black,
+    AssistChip(
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = colorByHash(tagName.hashCode()),
+            labelColor = Color.Black,
             leadingIconContentColor = Color.Black,
         ),
+        border = null,
         onClick = onClick,
-        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colors.onSurface) } },
-    ) {
-        Text(text = tagName)
-    }
+        leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface) } },
+        label = {
+            Text(text = tagName, color = MaterialTheme.colorScheme.onSurface)
+        }
+    )
 }
 
 @Composable
@@ -380,7 +409,15 @@ fun pxToDp(px: Float): Float {
 }
 
 @Composable
-fun BottomSpacer() {
+fun BottomNavigationSpacer() {
+    val bottomOffset = remember { GlobalUiState.navbarOffsetPx }
+    Column {
+        Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
+    }
+}
+
+@Composable
+fun FABSpacer() {
     val bottomOffset = remember { GlobalUiState.totalOffset }
     Column {
         Spacer(modifier = Modifier.height(pxToDp(bottomOffset.value).dp))
@@ -391,4 +428,8 @@ fun BottomSpacer() {
 @Composable
 fun SystemNavbarSpacer() {
     Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+}
+
+fun ColorScheme.surfaceEvaluated(evaluation: Dp = 3.dp): Color {
+    return this.surfaceColorAtElevation(evaluation)
 }

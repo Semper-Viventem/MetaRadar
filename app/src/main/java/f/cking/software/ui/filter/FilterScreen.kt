@@ -14,20 +14,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -168,7 +166,6 @@ object FilterScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterTag(
         filter: FilterUiState.Tag,
@@ -186,16 +183,13 @@ object FilterScreen {
             val tag = filter.tag
 
             if (tag == null) {
-                Chip(
-                    colors = ChipDefaults.chipColors(
-                        backgroundColor = MaterialTheme.colors.primary,
-                        contentColor = Color.White,
-                    ),
+                SuggestionChip(
                     onClick = { addTagDialog.show() },
-                    leadingIcon = {
+                    icon = {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
-                    }
-                ) { Text(text = stringResource(R.string.select_tag)) }
+                    },
+                    label = { Text(text = stringResource(R.string.select_tag)) }
+                )
             } else {
                 TagChip(tagName = tag, tagIcon = Icons.Filled.Delete) { filter.tag = null }
             }
@@ -586,8 +580,8 @@ object FilterScreen {
                     Checkbox(
                         checked = filter.defaultValueIfNoLocation,
                         onCheckedChange = {
-                        filter.defaultValueIfNoLocation = it
-                    })
+                            filter.defaultValueIfNoLocation = it
+                        })
                     Spacer(modifier = Modifier.width(16.dp))
                 }
             }
@@ -619,7 +613,6 @@ object FilterScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterNot(
         filter: FilterUiState.Not,
@@ -639,19 +632,13 @@ object FilterScreen {
             if (filter.filter != null) {
                 Filter(filter.filter!!, router = router, onDeleteClick = filter::delete)
             } else {
-                Chip(
+                SuggestionChip(
                     onClick = { selectFilterDialog.show() },
-                    colors = ChipDefaults.chipColors(
-                        backgroundColor = colorResource(R.color.filter_not),
-                        contentColor = Color.Black,
-                        leadingIconContentColor = Color.Black
-                    ),
-                    leadingIcon = {
+                    icon = {
                         Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.add_filter))
-                    }
-                ) {
-                    Text(text = stringResource(R.string.select))
-                }
+                    },
+                    label = { Text(text = stringResource(R.string.select)) },
+                )
             }
         }
     }
@@ -673,13 +660,13 @@ object FilterScreen {
         ) {
             Box(Modifier.clickable { minimize.value = !minimize.value }) {
                 Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     val icon = if (!minimize.value) painterResource(R.drawable.ic_drop_down) else painterResource(R.drawable.ic_drop_up)
                     Icon(
                         painter = icon,
                         contentDescription = stringResource(R.string.delete),
                         modifier = Modifier.size(24.dp),
-                        tint = Color.Black,
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = onDeleteButtonClick) {
@@ -687,7 +674,7 @@ object FilterScreen {
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.delete),
                             modifier = Modifier.size(24.dp),
-                            tint = Color.Black,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -705,7 +692,6 @@ object FilterScreen {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun FilterGroup(
         title: String,
@@ -719,19 +705,13 @@ object FilterScreen {
             Column {
                 content.invoke()
                 Spacer(modifier = Modifier.height(4.dp))
-                Chip(
+                SuggestionChip(
                     onClick = addClick,
-                    colors = ChipDefaults.chipColors(
-                        backgroundColor = color,
-                        contentColor = Color.Black,
-                        leadingIconContentColor = Color.Black
-                    ),
-                    leadingIcon = {
+                    icon = {
                         Icon(imageVector = Icons.Default.Add, contentDescription = addText)
-                    }
-                ) {
-                    Text(text = addText)
-                }
+                    },
+                    label = { Text(text = addText) },
+                )
             }
         }
     }

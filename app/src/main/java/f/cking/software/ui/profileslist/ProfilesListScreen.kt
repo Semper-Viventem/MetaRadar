@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,15 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import f.cking.software.R
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.utils.graphic.BottomSpacer
 import f.cking.software.utils.graphic.ContentPlaceholder
+import f.cking.software.utils.graphic.FABSpacer
 import org.koin.androidx.compose.koinViewModel
 
 object ProfilesListScreen {
@@ -46,9 +46,8 @@ object ProfilesListScreen {
         val viewModel: ProfilesListViewModel = koinViewModel()
         Column(
             Modifier
-                .background(MaterialTheme.colors.surface)
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
         ) {
             Header(viewModel = viewModel)
             val profiles = viewModel.profiles
@@ -60,40 +59,41 @@ object ProfilesListScreen {
                 ) {
                     profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
                     item {
-                        BottomSpacer()
+                        FABSpacer()
                     }
                 }
             } else {
-                ContentPlaceholder(stringResource(R.string.radar_profile_placeholder))
+                ContentPlaceholder(stringResource(R.string.radar_profile_placeholder), Modifier.fillMaxSize())
             }
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun Header(viewModel: ProfilesListViewModel) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth(),
-            elevation = 4.dp,
+            shadowElevation = 4.dp,
         ) {
             LazyRow(
                 modifier = Modifier
-                    .background(colorResource(id = R.color.primary_surface))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                     .padding(vertical = 8.dp),
             ) {
+                item { Spacer(modifier = Modifier.width(16.dp)) }
                 item {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Chip(
-                        colors = ChipDefaults.chipColors(
-                            backgroundColor = MaterialTheme.colors.primaryVariant,
-                            contentColor = MaterialTheme.colors.onPrimary,
-                        ),
+                    SuggestionChip(
                         onClick = { viewModel.createNewClick() },
-                        leadingIcon = {
+                        colors = SuggestionChipDefaults.suggestionChipColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            iconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
+                        icon = {
                             Icon(imageVector = Icons.Default.Add, contentDescription = null)
-                        }
-                    ) { Text(text = stringResource(R.string.create_new)) }
+                        },
+                        label = { Text(text = stringResource(R.string.create_new)) }
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
 
@@ -103,16 +103,16 @@ object ProfilesListScreen {
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                 }
+                item { Spacer(modifier = Modifier.width(8.dp)) }
             }
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun DefaultFilterChip(filter: ProfilesListViewModel.FilterTemplate, viewModel: ProfilesListViewModel) {
-        Chip(onClick = { viewModel.selectFilterTemplate(filter) }) {
+        SuggestionChip(onClick = { viewModel.selectFilterTemplate(filter) }, label = {
             Text(text = stringResource(filter.displayNameRes))
-        }
+        })
     }
 
     @Composable
@@ -131,7 +131,7 @@ object ProfilesListScreen {
 
                 Spacer(modifier = Modifier.height(4.dp))
                 val activeText = if (profile.isActive) stringResource(R.string.profile_is_active) else stringResource(R.string.profile_is_not_active)
-                val color = if (profile.isActive) colorResource(id = R.color.green_600) else MaterialTheme.colors.onSurface
+                val color = if (profile.isActive) colorResource(id = R.color.green_600) else MaterialTheme.colorScheme.onBackground
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(12.dp),
