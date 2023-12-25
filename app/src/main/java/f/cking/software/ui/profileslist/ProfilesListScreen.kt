@@ -85,10 +85,11 @@ object ProfilesListScreen {
                     SuggestionChip(
                         onClick = { viewModel.createNewClick() },
                         colors = SuggestionChipDefaults.suggestionChipColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            iconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            iconContentColor = MaterialTheme.colorScheme.onPrimary,
+                            labelColor = MaterialTheme.colorScheme.onPrimary,
                         ),
+                        border = null,
                         icon = {
                             Icon(imageVector = Icons.Default.Add, contentDescription = null)
                         },

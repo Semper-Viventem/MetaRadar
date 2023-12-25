@@ -189,6 +189,7 @@ object MainScreen {
         )
 
         ExtendedFloatingActionButton(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
             modifier = Modifier.onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
             text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer) },
             onClick = {

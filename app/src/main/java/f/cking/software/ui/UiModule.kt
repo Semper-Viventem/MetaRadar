@@ -19,7 +19,7 @@ object UiModule {
         single { RouterImpl() }
         single<Router> { get<RouterImpl>() }
         viewModel { MainViewModel(get(), get(), get(), get(), get(), get()) }
-        viewModel { DeviceListViewModel(get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { DeviceListViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { ProfilesListViewModel(get(), get()) }
         viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get(), get(), get()) }
