@@ -12,7 +12,8 @@ import f.cking.software.R
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.SettingsRepository
-import f.cking.software.domain.interactor.GetAppUsageDaysInteractor
+import f.cking.software.domain.interactor.CheckNeedToShowEnjoyTheAppInteractor
+import f.cking.software.domain.interactor.EnjoyTheAppAskLaterInteractor
 import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
@@ -28,7 +29,8 @@ class DeviceListViewModel(
     private val devicesRepository: DevicesRepository,
     private val filterCheckerImpl: FilterCheckerImpl,
     val router: Router,
-    private val getAppUsageDaysInteractor: GetAppUsageDaysInteractor,
+    private val checkNeedToShowEnjoyTheAppInteractor: CheckNeedToShowEnjoyTheAppInteractor,
+    private val enjoyTheAppAskLaterInteractor: EnjoyTheAppAskLaterInteractor,
     private val settingsRepository: SettingsRepository,
     private val intentHelper: IntentHelper,
 ) : ViewModel() {
@@ -143,28 +145,28 @@ class DeviceListViewModel(
                 .sortedWith(generalComparator)
                 .apply {
                     if (size >= MIN_DEVICES_FOR_ENJOY_THE_APP) {
-                        checkEnjoyTheApp()
+                        showEnjoyTheAppIfNeeded()
                     }
                 }
         }
     }
 
-    private fun checkEnjoyTheApp() {
-        enjoyTheAppState = if (enjoyTheAppState == EnjoyTheAppState.NONE
-            && !settingsRepository.getEnjoyTheAppAnswered()
-            && getAppUsageDaysInteractor.execute() >= MIN_DAYS_FOR_ENJOY_THE_APP
+    private fun showEnjoyTheAppIfNeeded() {
+        if (enjoyTheAppState == EnjoyTheAppState.NONE
+            && checkNeedToShowEnjoyTheAppInteractor.execute()
         ) {
-            EnjoyTheAppState.QUESTION
-        } else {
-            EnjoyTheAppState.NONE
+            enjoyTheAppState = EnjoyTheAppState.QUESTION
         }
     }
 
-    fun onEnjoyTheAppAnswered(answer: Boolean) {
-        enjoyTheAppState = if (answer) {
-            EnjoyTheAppState.LIKE
-        } else {
-            EnjoyTheAppState.DISLIKE
+    fun onEnjoyTheAppAnswered(answer: EnjoyTheAppAnswer) {
+        enjoyTheAppState = when (answer) {
+            EnjoyTheAppAnswer.LIKE -> EnjoyTheAppState.LIKE
+            EnjoyTheAppAnswer.DISLIKE -> EnjoyTheAppState.DISLIKE
+            EnjoyTheAppAnswer.ASK_LATER -> {
+                enjoyTheAppAskLaterInteractor.execute()
+                EnjoyTheAppState.NONE
+            }
         }
     }
 
@@ -211,6 +213,10 @@ class DeviceListViewModel(
         NONE, QUESTION, LIKE, DISLIKE
     }
 
+    enum class EnjoyTheAppAnswer {
+        LIKE, DISLIKE, ASK_LATER
+    }
+
     object DefaultFilters {
 
         fun notApple(context: Context) = FilterHolder(
@@ -228,6 +234,5 @@ class DeviceListViewModel(
 
     companion object {
         private const val MIN_DEVICES_FOR_ENJOY_THE_APP = 10
-        private const val MIN_DAYS_FOR_ENJOY_THE_APP = 3
     }
 }
