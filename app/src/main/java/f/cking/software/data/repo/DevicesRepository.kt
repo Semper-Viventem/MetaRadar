@@ -50,6 +50,10 @@ class DevicesRepository(
         }
     }
 
+    fun clearLastBatch() {
+        lastBatch.value = emptyList()
+    }
+
     suspend fun observeAllDevices(): StateFlow<List<DeviceData>> {
         return allDevices.apply {
             if (allDevices.value.isEmpty()) {

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -34,6 +35,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -46,8 +48,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
+import f.cking.software.domain.model.DeviceData
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.SelectFilterTypeScreen
 import f.cking.software.utils.graphic.ContentPlaceholder
@@ -85,7 +89,7 @@ object DeviceListScreen {
                 object : NestedScrollConnection {
                     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                         focusManager.clearFocus(true)
-                        if (list.isNotEmpty() && state.layoutInfo.visibleItemsInfo.lastOrNull()?.contentType == DeviceListKey.LAST_ITEM) {
+                        if (list.isNotEmpty() && state.layoutInfo.visibleItemsInfo.any { it.contentType == ListContentType.PAGINATION_PROGRESS }) {
                             viewModel.onScrollEnd()
                         }
                         return super.onPreScroll(available, source)
@@ -111,15 +115,21 @@ object DeviceListScreen {
                 }
 
                 if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.NONE) {
-                    item {
+                    item(contentType = ListContentType.ENJOY_THE_APP) {
                         Spacer(modifier = Modifier.height(8.dp))
                         EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
                     }
                 }
 
+                val currentBatch = viewModel.currentBatchViewState
+                if (currentBatch != null) {
+                    item(contentType = ListContentType.CURRENT_BATCH) {
+                        CurrentBatch(currentBatch, viewModel)
+                    }
+                }
+
                 list.mapIndexed { index, deviceData ->
-                    val key = if (index == list.lastIndex) DeviceListKey.LAST_ITEM else DeviceListKey.REGULAR
-                    item(contentType = key) {
+                    item(contentType = ListContentType.DEVICE) {
                         DeviceListItem(
                             device = deviceData,
                             onClick = { viewModel.onDeviceClick(deviceData) },
@@ -129,19 +139,64 @@ object DeviceListScreen {
                     }
                     val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                     if (showDivider) {
-                        item { Divider() }
+                        item(contentType = ListContentType.DIVIDER) { Divider() }
                     }
                 }
 
-                item {
+                if (viewModel.isPaginationEnabled) {
+                    item(contentType = ListContentType.PAGINATION_PROGRESS) {
+                        Box(modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+
+                item(contentType = ListContentType.BOTTOM_SPACER) {
                     FABSpacer()
                 }
             }
         }
     }
 
-    enum class DeviceListKey {
-        REGULAR, LAST_ITEM
+    enum class ListContentType {
+        ENJOY_THE_APP, CURRENT_BATCH, DEVICE, DIVIDER, PAGINATION_PROGRESS, BOTTOM_SPACER,
+    }
+
+    @Composable
+    fun CurrentBatch(
+        currentBatch: List<DeviceData>,
+        viewModel: DeviceListViewModel,
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        RoundedBox(internalPaddings = 0.dp) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = stringResource(R.string.current_batch_title),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            if (currentBatch.isNotEmpty()) {
+                currentBatch.forEach { deviceData ->
+                    DeviceListItem(
+                        device = deviceData,
+                        onClick = { viewModel.onDeviceClick(deviceData) },
+                        onTagSelected = { viewModel.onTagSelected(it) },
+                    )
+                }
+            } else {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(R.string.current_batch_empty),
+                    fontWeight = FontWeight.Light,
+                    fontSize = 16.sp,
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 
     @Composable

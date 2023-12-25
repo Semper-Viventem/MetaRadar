@@ -46,7 +46,6 @@ class DeviceListViewModel(
     var isSearchMode: Boolean by mutableStateOf(false)
     var isLoading: Boolean by mutableStateOf(false)
     var isPaginationEnabled: Boolean by mutableStateOf(false)
-    var currentPage: Int by mutableStateOf(INITIAL_PAGE)
     var quickFilters: List<FilterHolder> by mutableStateOf(
         listOf(
             DefaultFilters.notApple(context),
@@ -55,7 +54,9 @@ class DeviceListViewModel(
     )
     var enjoyTheAppState: EnjoyTheAppState by mutableStateOf(EnjoyTheAppState.NONE)
 
-    var scannerObservingJob: Job? = null
+    private var scannerObservingJob: Job? = null
+    private var lastBatchJob: Job? = null
+    private var currentPage: Int by mutableStateOf(INITIAL_PAGE)
 
     private val generalComparator = Comparator<DeviceData> { second, first ->
         when {
@@ -132,6 +133,16 @@ class DeviceListViewModel(
         } else {
             enablePagination()
         }
+
+        lastBatchJob?.cancel()
+        if (isScannerEnabled) {
+            currentBatchViewState = emptyList()
+            lastBatchJob = observeCurrentBatch()
+        } else {
+            devicesRepository.clearLastBatch()
+            currentBatchViewState = null
+            lastBatchJob = null
+        }
     }
 
     private fun enablePagination() {
@@ -144,32 +155,31 @@ class DeviceListViewModel(
     }
 
     fun onScrollEnd() {
-        if (isPaginationEnabled) {
+        if (isPaginationEnabled && !isLoading) {
             currentPage++
             loadNextPage()
         }
     }
 
     private fun loadNextPage() {
-        if (isLoading) {
-            return
-        }
-
         viewModelScope.launch {
             isLoading = true
-            val offset = currentPage * 20
-            val limit = 20
+            val offset = currentPage * PAGE_SIZE
+            val limit = PAGE_SIZE
             val devices = devicesRepository.getPaginated(offset, limit)
             devicesViewState = devicesViewState + devices
-            Timber.d("loadNextPage page: $currentPage, offset: $offset, limit: $limit, devices: ${devices.size}")
+            if (devices.isEmpty()) {
+                isPaginationEnabled = false
+            }
             isLoading = false
+            Timber.d("Load next page: $currentPage, offset: $offset, limit: $limit, devices: ${devices.size}")
         }
     }
 
     private fun observeCurrentBatch(): Job {
         return viewModelScope.launch {
+            isLoading = true
             devicesRepository.observeLastBatch()
-                .onStart { isLoading = true }
                 .collect { devices ->
                     isLoading = true
                     currentBatchViewState = devices.sortedWith(generalComparator)
@@ -181,7 +191,9 @@ class DeviceListViewModel(
     private fun observeAllDevices(): Job {
         return viewModelScope.launch {
             devicesRepository.observeAllDevices()
-                .onStart { isLoading = true }
+                .onStart {
+                    isLoading = true
+                }
                 .collect { devices ->
                     isLoading = true
                     applyDevices(devices)
@@ -308,7 +320,7 @@ class DeviceListViewModel(
 
     companion object {
         private const val MIN_DEVICES_FOR_ENJOY_THE_APP = 10
-        private const val PAGE_SIZE = 20
+        private const val PAGE_SIZE = 40
         private const val INITIAL_PAGE = 0
     }
 }

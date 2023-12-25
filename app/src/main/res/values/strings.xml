@@ -171,6 +171,8 @@
     <string name="rate_the_app_google_play">Google Play</string>
     <string name="rate_the_app_github">GitHub</string>
     <string name="report_the_problem">We are sorry to hear this. You can provide your feedback in the GitHub issues</string>
+    <string name="current_batch_title">Devices around you</string>
+    <string name="current_batch_empty">No devices have been found yet</string>
 
     <!-- Device Details -->
     <string name="device_details_title">Device details</string>
