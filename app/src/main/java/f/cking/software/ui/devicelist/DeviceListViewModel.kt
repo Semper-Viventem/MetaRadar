@@ -18,11 +18,15 @@ import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
+import f.cking.software.service.BgScanService
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class DeviceListViewModel(
     context: Application,
@@ -36,10 +40,13 @@ class DeviceListViewModel(
 ) : ViewModel() {
 
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
+    var currentBatchViewState by mutableStateOf<List<DeviceData>?>(null)
     var appliedFilter: List<FilterHolder> by mutableStateOf(emptyList())
     var searchQuery: String? by mutableStateOf(null)
     var isSearchMode: Boolean by mutableStateOf(false)
     var isLoading: Boolean by mutableStateOf(false)
+    var isPaginationEnabled: Boolean by mutableStateOf(false)
+    var currentPage: Int by mutableStateOf(INITIAL_PAGE)
     var quickFilters: List<FilterHolder> by mutableStateOf(
         listOf(
             DefaultFilters.notApple(context),
@@ -47,6 +54,8 @@ class DeviceListViewModel(
         )
     )
     var enjoyTheAppState: EnjoyTheAppState by mutableStateOf(EnjoyTheAppState.NONE)
+
+    var scannerObservingJob: Job? = null
 
     private val generalComparator = Comparator<DeviceData> { second, first ->
         when {
@@ -66,7 +75,7 @@ class DeviceListViewModel(
     }
 
     init {
-        observeDevices()
+        observeIsScannerEnabled()
     }
 
     fun onFilterClick(filter: FilterHolder) {
@@ -105,10 +114,74 @@ class DeviceListViewModel(
         onFilterClick(tagFilter)
     }
 
-    private fun observeDevices() {
+    private fun observeIsScannerEnabled() {
+        viewModelScope.launch {
+            BgScanService.isActive
+                .collect { checkScreenMode() }
+        }
+    }
+
+    private fun checkScreenMode() {
+        val isScannerEnabled = BgScanService.isActive.value
+        val anyFilterApplyed = isSearchMode || appliedFilter.isNotEmpty()
+
+        scannerObservingJob?.cancel()
+        if (isScannerEnabled || anyFilterApplyed) {
+            isPaginationEnabled = false
+            scannerObservingJob = observeAllDevices()
+        } else {
+            enablePagination()
+        }
+    }
+
+    private fun enablePagination() {
+        isPaginationEnabled = true
+        currentPage = INITIAL_PAGE
+        devicesViewState = emptyList()
+        viewModelScope.launch {
+            loadNextPage()
+        }
+    }
+
+    fun onScrollEnd() {
+        if (isPaginationEnabled) {
+            currentPage++
+            loadNextPage()
+        }
+    }
+
+    private fun loadNextPage() {
+        if (isLoading) {
+            return
+        }
+
         viewModelScope.launch {
             isLoading = true
-            devicesRepository.observeDevices()
+            val offset = currentPage * 20
+            val limit = 20
+            val devices = devicesRepository.getPaginated(offset, limit)
+            devicesViewState = devicesViewState + devices
+            Timber.d("loadNextPage page: $currentPage, offset: $offset, limit: $limit, devices: ${devices.size}")
+            isLoading = false
+        }
+    }
+
+    private fun observeCurrentBatch(): Job {
+        return viewModelScope.launch {
+            devicesRepository.observeLastBatch()
+                .onStart { isLoading = true }
+                .collect { devices ->
+                    isLoading = true
+                    currentBatchViewState = devices.sortedWith(generalComparator)
+                    isLoading = false
+                }
+        }
+    }
+
+    private fun observeAllDevices(): Job {
+        return viewModelScope.launch {
+            devicesRepository.observeAllDevices()
+                .onStart { isLoading = true }
                 .collect { devices ->
                     isLoading = true
                     applyDevices(devices)
@@ -118,6 +191,7 @@ class DeviceListViewModel(
     }
 
     private fun fetchDevices() {
+        checkScreenMode()
         viewModelScope.launch {
             isLoading = true
             val devices = devicesRepository.getDevices()
@@ -234,5 +308,7 @@ class DeviceListViewModel(
 
     companion object {
         private const val MIN_DEVICES_FOR_ENJOY_THE_APP = 10
+        private const val PAGE_SIZE = 20
+        private const val INITIAL_PAGE = 0
     }
 }

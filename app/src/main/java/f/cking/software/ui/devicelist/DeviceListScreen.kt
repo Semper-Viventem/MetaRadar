@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -66,17 +67,8 @@ object DeviceListScreen {
             .fillMaxSize()
         val viewModel: DeviceListViewModel = koinViewModel()
         val focusManager = LocalFocusManager.current
-        val nestedScroll = remember {
-            object : NestedScrollConnection {
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    focusManager.clearFocus(true)
-                    return super.onPreScroll(available, source)
-                }
-            }
-        }
 
         val list = viewModel.devicesViewState
-
         if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
             ContentPlaceholder(stringResource(R.string.device_list_placeholder), modifier)
             if (viewModel.isLoading) {
@@ -88,8 +80,21 @@ object DeviceListScreen {
                 )
             }
         } else {
+            val state = rememberLazyListState()
+            val nestedScroll = remember {
+                object : NestedScrollConnection {
+                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                        focusManager.clearFocus(true)
+                        if (list.isNotEmpty() && state.layoutInfo.visibleItemsInfo.lastOrNull()?.contentType == DeviceListKey.LAST_ITEM) {
+                            viewModel.onScrollEnd()
+                        }
+                        return super.onPreScroll(available, source)
+                    }
+                }
+            }
             LazyColumn(
                 modifier = modifier.nestedScroll(nestedScroll),
+                state = state,
             ) {
                 stickyHeader {
                     Box() {
@@ -113,12 +118,14 @@ object DeviceListScreen {
                 }
 
                 list.mapIndexed { index, deviceData ->
-                    item {
+                    val key = if (index == list.lastIndex) DeviceListKey.LAST_ITEM else DeviceListKey.REGULAR
+                    item(contentType = key) {
                         DeviceListItem(
                             device = deviceData,
                             onClick = { viewModel.onDeviceClick(deviceData) },
                             onTagSelected = { viewModel.onTagSelected(it) },
                         )
+
                     }
                     val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                     if (showDivider) {
@@ -131,6 +138,10 @@ object DeviceListScreen {
                 }
             }
         }
+    }
+
+    enum class DeviceListKey {
+        REGULAR, LAST_ITEM
     }
 
     @Composable
@@ -163,7 +174,10 @@ object DeviceListScreen {
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { viewModel.onEnjoyTheAppAnswered(DeviceListViewModel.EnjoyTheAppAnswer.ASK_LATER) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh, contentColor = MaterialTheme.colorScheme.onSurface)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
             ) {
                 Text(text = stringResource(R.string.enjoy_the_app_ask_later), color = MaterialTheme.colorScheme.onSurface)
             }
