@@ -139,7 +139,6 @@ class DeviceListViewModel(
             currentBatchViewState = emptyList()
             lastBatchJob = observeCurrentBatch()
         } else {
-            devicesRepository.clearLastBatch()
             currentBatchViewState = null
             lastBatchJob = null
         }
@@ -148,7 +147,6 @@ class DeviceListViewModel(
     private fun enablePagination() {
         isPaginationEnabled = true
         currentPage = INITIAL_PAGE
-        devicesViewState = emptyList()
         viewModelScope.launch {
             loadNextPage()
         }
@@ -167,7 +165,11 @@ class DeviceListViewModel(
             val offset = currentPage * PAGE_SIZE
             val limit = PAGE_SIZE
             val devices = devicesRepository.getPaginated(offset, limit)
-            devicesViewState = devicesViewState + devices
+            if (currentPage == INITIAL_PAGE) {
+                devicesViewState = devices.sortedWith(generalComparator)
+            } else {
+                devicesViewState = (devicesViewState + devices).sortedWith(generalComparator)
+            }
             if (devices.isEmpty()) {
                 isPaginationEnabled = false
             }
@@ -178,8 +180,12 @@ class DeviceListViewModel(
 
     private fun observeCurrentBatch(): Job {
         return viewModelScope.launch {
-            isLoading = true
             devicesRepository.observeLastBatch()
+                .onStart {
+                    isLoading = true
+                    currentBatchViewState = emptyList()
+                    devicesRepository.clearLastBatch()
+                }
                 .collect { devices ->
                     isLoading = true
                     currentBatchViewState = devices.sortedWith(generalComparator)
