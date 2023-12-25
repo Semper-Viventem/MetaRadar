@@ -33,5 +33,7 @@ object InteractorsModule {
         factory { ChangeFavoriteInteractor(get()) }
         factory { GetAppUsageDaysInteractor(get()) }
         factory { SaveFirstAppLaunchTimeInteractor(get()) }
+        factory { CheckNeedToShowEnjoyTheAppInteractor(get()) }
+        factory { EnjoyTheAppAskLaterInteractor(get()) }
     }
 }

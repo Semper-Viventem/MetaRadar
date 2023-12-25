@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -60,7 +61,8 @@ object DeviceListScreen {
 
     @Composable
     fun Screen() {
-        val modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        val modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
         val viewModel: DeviceListViewModel = koinViewModel()
         val focusManager = LocalFocusManager.current
@@ -149,13 +151,21 @@ object DeviceListScreen {
             Text(text = stringResource(R.string.enjoy_the_app_question), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Row {
-                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppAnswered(true) }) {
-                    Text(text = stringResource(R.string.enjoy_the_app_yes))
+                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppAnswered(DeviceListViewModel.EnjoyTheAppAnswer.LIKE) }) {
+                    Text(text = stringResource(R.string.enjoy_the_app_yes), color = MaterialTheme.colorScheme.onPrimary)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppAnswered(false) }) {
-                    Text(text = stringResource(R.string.enjoy_the_app_not_really))
+                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppAnswered(DeviceListViewModel.EnjoyTheAppAnswer.DISLIKE) }) {
+                    Text(text = stringResource(R.string.enjoy_the_app_not_really), color = MaterialTheme.colorScheme.onPrimary)
                 }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { viewModel.onEnjoyTheAppAnswered(DeviceListViewModel.EnjoyTheAppAnswer.ASK_LATER) },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh, contentColor = MaterialTheme.colorScheme.onSurface)
+            ) {
+                Text(text = stringResource(R.string.enjoy_the_app_ask_later), color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }
@@ -167,11 +177,11 @@ object DeviceListScreen {
             Spacer(modifier = Modifier.height(8.dp))
             Row {
                 Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppRatePlayStoreClick() }) {
-                    Text(text = stringResource(R.string.rate_the_app_google_play))
+                    Text(text = stringResource(R.string.rate_the_app_google_play), color = MaterialTheme.colorScheme.onPrimary)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppRateGithubClick() }) {
-                    Text(text = stringResource(R.string.rate_the_app_github))
+                    Text(text = stringResource(R.string.rate_the_app_github), color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         }
@@ -183,7 +193,7 @@ object DeviceListScreen {
             Text(text = stringResource(R.string.report_the_problem), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onEnjoyTheAppReportClick() }) {
-                Text(text = stringResource(R.string.report))
+                Text(text = stringResource(R.string.report), color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }
