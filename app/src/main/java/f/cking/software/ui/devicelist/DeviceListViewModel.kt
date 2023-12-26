@@ -165,11 +165,11 @@ class DeviceListViewModel(
             val offset = currentPage * PAGE_SIZE
             val limit = PAGE_SIZE
             val devices = devicesRepository.getPaginated(offset, limit)
-            if (currentPage == INITIAL_PAGE) {
-                devicesViewState = devices.sortedWith(generalComparator)
+            devicesViewState = if (currentPage == INITIAL_PAGE) {
+                devices
             } else {
-                devicesViewState = (devicesViewState + devices).sortedWith(generalComparator)
-            }
+                (devicesViewState + devices)
+            }.sortedWith(generalComparator)
             if (devices.isEmpty()) {
                 isPaginationEnabled = false
             }
