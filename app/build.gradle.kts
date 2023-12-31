@@ -23,8 +23,8 @@ android {
         applicationId = "f.cking.software"
         minSdk = 29
         targetSdk = 34
-        versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.21.2-beta"
+        versionCode = 1704045671
+        versionName = "0.21.3-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -77,23 +77,25 @@ android {
 
     flavorDimensions += "distribution"
     productFlavors {
-        create("googlePlay") {
+        create("github") {
+            isDefault = true
             dimension = "distribution"
+            versionCode = (System.currentTimeMillis() / 1000).toInt()
+
+            buildConfigField("String", "DISTRIBUTION", "\"Github\"")
+        }
+        create("googlePlay") {
             isDefault = false
+            dimension = "distribution"
+            versionCode = (System.currentTimeMillis() / 1000).toInt()
 
             buildConfigField("String", "DISTRIBUTION", "\"Google play\"")
         }
         create("fdroid") {
-            dimension = "distribution"
             isDefault = false
+            dimension = "distribution"
 
             buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
-        }
-        create("github") {
-            dimension = "distribution"
-            isDefault = true
-
-            buildConfigField("String", "DISTRIBUTION", "\"Github\"")
         }
     }
 
