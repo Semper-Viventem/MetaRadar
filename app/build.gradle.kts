@@ -24,7 +24,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.21.1-beta"
+        versionName = "0.21.2-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -37,6 +37,8 @@ android {
 
     val DEBUG = "debug"
     val RELEASE = "release"
+
+    val NO_SIGNING_CONFIG = "no_signing_store"
 
     signingConfigs {
         maybeCreate(DEBUG).apply {
@@ -65,7 +67,10 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             isDebuggable = false
-            signingConfig = signingConfigs[RELEASE]
+
+            val hasSignConfig = gradleLocalProperties(rootDir).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: NO_SIGNING_CONFIG) != NO_SIGNING_CONFIG
+
+            signingConfig = if (hasSignConfig) signingConfigs[RELEASE] else null
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -74,11 +79,19 @@ android {
     productFlavors {
         create("googlePlay") {
             dimension = "distribution"
+            isDefault = false
 
             buildConfigField("String", "DISTRIBUTION", "\"Google play\"")
         }
+        create("fdroid") {
+            dimension = "distribution"
+            isDefault = false
+
+            buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
+        }
         create("github") {
             dimension = "distribution"
+            isDefault = true
 
             buildConfigField("String", "DISTRIBUTION", "\"Github\"")
         }
