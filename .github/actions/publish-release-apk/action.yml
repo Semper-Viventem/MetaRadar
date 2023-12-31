@@ -14,6 +14,10 @@ inputs:
   BUILD_FLAVOR:
     required: true
     description: "Choose build flavor [github/googlePlay]"
+  TAG_SUFFIX:
+    required: false
+    description: "Suffix to append to tag name"
+    default: ""
 runs:
   using: "docker"
   image: "Dockerfile"
