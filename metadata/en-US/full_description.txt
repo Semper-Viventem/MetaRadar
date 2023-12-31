@@ -1,0 +1,3 @@
+Bluetooth Radar in the background scans and analyzes Bluetooth Low Energy devices around you (eg smartwatches, headphones, speakers) and allows you to set complex rules to search for devices by specified filters. For example, by device name, address, location and time of discovery, manufacturer, and if an unknown device has been chasing you for a long time. Can be used to find missing devices, or notify you if the device of the person you are looking for is nearby.
+
+Bluetooth Radar does not collect or send your personal or geolocation data. The project is fully opensource and available on GitHub.

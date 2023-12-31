@@ -32,3 +32,4 @@ jobs:
           REPO_BRANCH: master
           BUILD_TYPE: debug
           BUILD_FLAVOR: github
+          TAG_SUFFIX: "-debug"
