@@ -50,7 +50,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.flowlayout.FlowRow
-import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.dateTimeStringFormat
@@ -64,6 +63,7 @@ import f.cking.software.utils.graphic.MapView
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.TagChip
+import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -273,14 +273,14 @@ object DeviceDetailsScreen {
     ) {
         val dialogState = rememberMaterialDialogState()
 
-        MaterialDialog(
+        ThemedDialog(
             dialogState = dialogState,
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     dialogState.hide()
                     viewModel.onRemoveTagClick(deviceData, name)
                 }
@@ -318,12 +318,12 @@ object DeviceDetailsScreen {
         viewModel: DeviceDetailsViewModel,
     ) {
         val dialog = rememberMaterialDialogState()
-        MaterialDialog(
+        ThemedDialog(
             dialogState = dialog,
             buttons = {
                 negativeButton(
                     stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
                 ) { dialog.hide() }
             },
         ) {

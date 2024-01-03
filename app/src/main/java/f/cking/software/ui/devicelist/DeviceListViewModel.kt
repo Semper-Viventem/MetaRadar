@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DeviceListViewModel(
-    context: Application,
+    private val context: Application,
     private val devicesRepository: DevicesRepository,
     private val filterCheckerImpl: FilterCheckerImpl,
     val router: Router,
@@ -46,7 +46,7 @@ class DeviceListViewModel(
             DefaultFilters.isFavorite(context),
         )
     )
-    var enjoyTheAppState: EnjoyTheAppState by mutableStateOf(EnjoyTheAppState.NONE)
+    var enjoyTheAppState: EnjoyTheAppState by mutableStateOf(EnjoyTheAppState.None)
 
     private val generalComparator = Comparator<DeviceData> { second, first ->
         when {
@@ -152,38 +152,56 @@ class DeviceListViewModel(
     }
 
     private fun showEnjoyTheAppIfNeeded() {
-        if (enjoyTheAppState == EnjoyTheAppState.NONE
+        if (enjoyTheAppState is EnjoyTheAppState.None
             && checkNeedToShowEnjoyTheAppInteractor.execute()
         ) {
-            enjoyTheAppState = EnjoyTheAppState.QUESTION
+            enjoyTheAppState = EnjoyTheAppState.Question
         }
     }
 
     fun onEnjoyTheAppAnswered(answer: EnjoyTheAppAnswer) {
         enjoyTheAppState = when (answer) {
-            EnjoyTheAppAnswer.LIKE -> EnjoyTheAppState.LIKE
-            EnjoyTheAppAnswer.DISLIKE -> EnjoyTheAppState.DISLIKE
+            EnjoyTheAppAnswer.LIKE -> buildLikeTheAppState()
+            EnjoyTheAppAnswer.DISLIKE -> EnjoyTheAppState.Dislike
             EnjoyTheAppAnswer.ASK_LATER -> {
                 enjoyTheAppAskLaterInteractor.execute()
-                EnjoyTheAppState.NONE
+                EnjoyTheAppState.None
             }
         }
     }
 
-    fun onEnjoyTheAppRatePlayStoreClick() {
-        settingsRepository.setEnjoyTheAppAnswered(true)
-        enjoyTheAppState = EnjoyTheAppState.NONE
-        intentHelper.openUrl(BuildConfig.GOOGLE_PLAY_URL)
+    private fun buildLikeTheAppState(): EnjoyTheAppState.Like {
+        val actions = mutableListOf<EnjoyTheAppState.RateAppAction>()
+        if (BuildConfig.STORE_RATING_IS_APPLICABLE) {
+            actions.add(
+                EnjoyTheAppState.RateAppAction(
+                    title = BuildConfig.DISTRIBUTION,
+                    url = BuildConfig.STORE_PAGE_URL,
+                    saveAnswer = true,
+                )
+            )
+        }
+        actions.add(
+            EnjoyTheAppState.RateAppAction(
+                title = context.getString(R.string.rate_the_app_github),
+                url = BuildConfig.GITHUB_URL,
+                saveAnswer = !BuildConfig.STORE_RATING_IS_APPLICABLE,
+            )
+        )
+        return EnjoyTheAppState.Like(actions)
     }
 
-    fun onEnjoyTheAppRateGithubClick() {
-        settingsRepository.setEnjoyTheAppAnswered(true)
-        intentHelper.openUrl(BuildConfig.GITHUB_URL)
+    fun onRateButtonClick(rateAction: EnjoyTheAppState.RateAppAction) {
+        if (rateAction.saveAnswer) {
+            settingsRepository.setEnjoyTheAppAnswered(true)
+            enjoyTheAppState = EnjoyTheAppState.None
+        }
+        intentHelper.openUrl(rateAction.url)
     }
 
     fun onEnjoyTheAppReportClick() {
         settingsRepository.setEnjoyTheAppAnswered(true)
-        enjoyTheAppState = EnjoyTheAppState.NONE
+        enjoyTheAppState = EnjoyTheAppState.None
         intentHelper.openUrl(BuildConfig.REPORT_ISSUE_URL)
     }
 
@@ -209,8 +227,21 @@ class DeviceListViewModel(
         val filter: RadarProfile.Filter,
     )
 
-    enum class EnjoyTheAppState {
-        NONE, QUESTION, LIKE, DISLIKE
+    sealed interface EnjoyTheAppState {
+        data object None : EnjoyTheAppState
+        data object Question : EnjoyTheAppState
+
+        data class Like(
+            val actions: List<RateAppAction>
+        ) : EnjoyTheAppState
+
+        data object Dislike : EnjoyTheAppState
+
+        data class RateAppAction(
+            val title: String,
+            val url: String,
+            val saveAnswer: Boolean,
+        )
     }
 
     enum class EnjoyTheAppAnswer {

@@ -23,14 +23,14 @@ android {
         applicationId = "f.cking.software"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1704045671
-        versionName = "0.21.3-beta"
+        versionCode = 1704045672
+        versionName = "0.21.4-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "REPORT_ISSUE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/issues\"")
         buildConfigField("String", "GITHUB_URL", "\"https://github.com/Semper-Viventem/MetaRadar\"")
-        buildConfigField("String", "GOOGLE_PLAY_URL", "\"https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=web_share\"")
+        buildConfigField("String", "STORE_PAGE_URL", "\"Not specified\"")
 
         buildConfigField("String", "DISTRIBUTION", "\"Not specified\"")
     }
@@ -83,6 +83,8 @@ android {
             versionCode = (System.currentTimeMillis() / 1000).toInt()
 
             buildConfigField("String", "DISTRIBUTION", "\"Github\"")
+            buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "false")
+            buildConfigField("String", "STORE_PAGE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/releases?q=release+build\"")
         }
         create("googlePlay") {
             isDefault = false
@@ -90,11 +92,14 @@ android {
             versionCode = (System.currentTimeMillis() / 1000).toInt()
 
             buildConfigField("String", "DISTRIBUTION", "\"Google play\"")
+            buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "true")
+            buildConfigField("String", "STORE_PAGE_URL", "\"https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=web_share\"")
         }
         create("fdroid") {
             isDefault = false
             dimension = "distribution"
 
+            buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "false")
             buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
         }
     }
@@ -155,7 +160,6 @@ dependencies {
     // compose
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
-    implementation(libs.compose.material)
     implementation(libs.compose.tooling)
     implementation(libs.lifecycle.compose)
     implementation(libs.compose.activity)

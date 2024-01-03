@@ -35,13 +35,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.GlobalUiState
 import f.cking.software.utils.graphic.GlassBottomNavBar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
+import f.cking.software.utils.graphic.ThemedDialog
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,11 +80,11 @@ object MainScreen {
 
     @Composable
     private fun LocationDisabledDialog(viewModel: MainViewModel) {
-        MaterialDialog(
+        ThemedDialog(
             dialogState = viewModel.showLocationDisabledDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer))
-                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     viewModel.onTurnOnLocationClick()
                 }
             },
@@ -99,11 +99,11 @@ object MainScreen {
 
     @Composable
     private fun BluetoothDisabledDialog(viewModel: MainViewModel) {
-        MaterialDialog(
+        ThemedDialog(
             dialogState = viewModel.showBluetoothDisabledDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer))
-                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface))
+                positiveButton(stringResource(R.string.turn_on), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     viewModel.onTurnOnBluetoothClick()
                 }
             },
@@ -215,14 +215,14 @@ object MainScreen {
         onDeclined: () -> Unit,
     ): MaterialDialogState {
         val state = rememberMaterialDialogState()
-        MaterialDialog(
+        ThemedDialog(
             dialogState = state,
             buttons = {
-                positiveButton(stringResource(id = R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                positiveButton(stringResource(id = R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     state.hide()
                     onPassed.invoke()
                 }
-                negativeButton(stringResource(id = R.string.decline), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                negativeButton(stringResource(id = R.string.decline), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     state.hide()
                     onDeclined.invoke()
                 }
