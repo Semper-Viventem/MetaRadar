@@ -12,6 +12,7 @@ import f.cking.software.BuildConfig
 import f.cking.software.R
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.LocationProvider
+import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.data.repo.LocationRepository
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.BackupDatabaseInteractor
@@ -37,6 +38,7 @@ class SettingsViewModel(
     private val selectBackupFileInteractor: SelectBackupFileInteractor,
     private val restoreDatabaseInteractor: RestoreDatabaseInteractor,
     private val intentHelper: IntentHelper,
+    private val permissionHelper: PermissionHelper,
 ) : ViewModel() {
 
     private val TAG = "SettingsViewModel"
@@ -84,7 +86,7 @@ class SettingsViewModel(
             if (locationProvider.isActive()) {
                 locationProvider.stopLocationListening()
                 locationProvider.startLocationFetching()
-            } else {
+            } else if (permissionHelper.checkLocationPermission()) {
                 locationProvider.fetchOnce()
             }
         }

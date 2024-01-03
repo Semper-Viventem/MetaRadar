@@ -200,7 +200,7 @@ object SettingsScreen {
                 Image(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .alpha(0.3f)
+                        .alpha(0.1f)
                         .width(30.dp),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                     painter = painterResource(id = R.drawable.cat_footprint),
