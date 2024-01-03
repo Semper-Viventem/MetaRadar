@@ -61,7 +61,11 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogButtons
 import com.vanpra.composematerialdialogs.MaterialDialogScope
 import com.vanpra.composematerialdialogs.MaterialDialogState
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerColors
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.time.TimePickerColors
+import com.vanpra.composematerialdialogs.datetime.time.TimePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
@@ -79,6 +83,15 @@ import kotlin.math.abs
 @Composable
 fun rememberDateDialog(
     initialDate: LocalDate = LocalDate.now(),
+    datePickerColors: DatePickerColors = DatePickerDefaults.colors(
+        headerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        headerTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        calendarHeaderTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        dateActiveBackgroundColor = MaterialTheme.colorScheme.primary,
+        dateActiveTextColor = MaterialTheme.colorScheme.onPrimary,
+        dateInactiveBackgroundColor = Color.Transparent,
+        dateInactiveTextColor = MaterialTheme.colorScheme.onSurface,
+    ),
     dateResult: (date: LocalDate) -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
@@ -87,15 +100,15 @@ fun rememberDateDialog(
         buttons = {
             positiveButton(
                 stringResource(R.string.ok),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
             ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
             ) { dialogState.hide() }
         },
     ) {
-        datepicker(initialDate = initialDate) { localDate ->
+        datepicker(initialDate = initialDate, colors = datePickerColors) { localDate ->
             dateResult.invoke(localDate)
         }
     }
@@ -105,6 +118,17 @@ fun rememberDateDialog(
 @Composable
 fun rememberTimeDialog(
     initialTime: LocalTime = LocalTime.now(),
+    timePickerColors: TimePickerColors = TimePickerDefaults.colors(
+        activeBackgroundColor = MaterialTheme.colorScheme.primary,
+        activeTextColor = MaterialTheme.colorScheme.onPrimary,
+        inactiveBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        inactiveTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        inactivePeriodBackground = Color.Transparent,
+        selectorColor = MaterialTheme.colorScheme.primary,
+        selectorTextColor = MaterialTheme.colorScheme.onPrimary,
+        headerTextColor = MaterialTheme.colorScheme.onSurface,
+        borderColor = Color.Transparent,
+    ),
     dateResult: (date: LocalTime) -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
@@ -113,15 +137,15 @@ fun rememberTimeDialog(
         buttons = {
             positiveButton(
                 stringResource(R.string.ok),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
             ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
             ) { dialogState.hide() }
         },
     ) {
-        timepicker(is24HourClock = true, initialTime = initialTime) { localDate ->
+        timepicker(is24HourClock = true, initialTime = initialTime, colors = timePickerColors) { localDate ->
             dateResult.invoke(localDate)
         }
     }
