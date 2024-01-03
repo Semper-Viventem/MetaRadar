@@ -4,8 +4,10 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,16 +24,20 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import f.cking.software.R
 import f.cking.software.domain.model.RadarProfile
-import f.cking.software.utils.graphic.BottomNavigationSpacer
 import f.cking.software.utils.graphic.GlassBottomSpace
 import f.cking.software.utils.graphic.SystemNavbarSpacer
+import f.cking.software.utils.graphic.pxToDp
 import f.cking.software.utils.navigation.BackCommand
 import f.cking.software.utils.navigation.Router
 
@@ -52,32 +58,9 @@ object SelectFilterScreen {
                 AppBar(scrollBehavior) { router.navigate(BackCommand) }
             },
             content = { paddings ->
+                var bottomBarHeight by mutableStateOf(0f)
                 GlassBottomSpace(
                     modifier = Modifier.fillMaxSize(),
-                    bottomContent = {
-                        val context = LocalContext.current
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            onClick = {
-                                val filter = initialFilterState
-                                    .takeIf { it.isCorrect() }
-                                    ?.let { FilterUiMapper.mapToDomain(it) }
-
-                                if (filter != null) {
-                                    router.navigate(BackCommand)
-                                    onConfirm.invoke(filter)
-                                } else {
-                                    Toast.makeText(context, context.getString(R.string.filter_is_not_valid), Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        ) {
-                            Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.onPrimary)
-                        }
-
-                        SystemNavbarSpacer()
-                    },
                     globalContent = {
                         Column(
                             modifier = Modifier
@@ -96,9 +79,37 @@ object SelectFilterScreen {
                                     onDeleteClick = { router.navigate(BackCommand) }
                                 )
                             }
-                            BottomNavigationSpacer()
+                            Spacer(modifier = Modifier.height(pxToDp(px = bottomBarHeight).dp))
                         }
-                    }
+                    },
+                    bottomContent = {
+                        val context = LocalContext.current
+                        Column(
+                            modifier = Modifier
+                                .onGloballyPositioned { bottomBarHeight = it.size.height.toFloat() }
+                        ) {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                onClick = {
+                                    val filter = initialFilterState
+                                        .takeIf { it.isCorrect() }
+                                        ?.let { FilterUiMapper.mapToDomain(it) }
+
+                                    if (filter != null) {
+                                        router.navigate(BackCommand)
+                                        onConfirm.invoke(filter)
+                                    } else {
+                                        Toast.makeText(context, context.getString(R.string.filter_is_not_valid), Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            ) {
+                                Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.onPrimary)
+                            }
+                            SystemNavbarSpacer()
+                        }
+                    },
                 )
             }
         )
