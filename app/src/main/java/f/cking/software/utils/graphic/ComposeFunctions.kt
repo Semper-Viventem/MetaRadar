@@ -1,5 +1,6 @@
 package f.cking.software.utils.graphic
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -38,6 +39,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -52,9 +54,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.MaterialDialogButtons
+import com.vanpra.composematerialdialogs.MaterialDialogScope
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -77,7 +82,7 @@ fun rememberDateDialog(
     dateResult: (date: LocalDate) -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
-    MaterialDialog(
+    ThemedDialog(
         dialogState = dialogState,
         buttons = {
             positiveButton(
@@ -103,7 +108,7 @@ fun rememberTimeDialog(
     dateResult: (date: LocalTime) -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
-    MaterialDialog(
+    ThemedDialog(
         dialogState = dialogState,
         buttons = {
             positiveButton(
@@ -121,6 +126,33 @@ fun rememberTimeDialog(
         }
     }
     return dialogState
+}
+
+@Composable
+fun ThemedDialog(
+    dialogState: MaterialDialogState = rememberMaterialDialogState(),
+    properties: DialogProperties = DialogProperties(),
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    shape: Shape = MaterialTheme.shapes.medium,
+    border: BorderStroke? = null,
+    elevation: Dp = 24.dp,
+    autoDismiss: Boolean = true,
+    onCloseRequest: (MaterialDialogState) -> Unit = { it.hide() },
+    buttons: @Composable MaterialDialogButtons.() -> Unit = {},
+    content: @Composable MaterialDialogScope.() -> Unit
+) {
+    MaterialDialog(
+        dialogState = dialogState,
+        properties = properties,
+        backgroundColor = backgroundColor,
+        shape = shape,
+        border = border,
+        elevation = elevation,
+        autoDismiss = autoDismiss,
+        onCloseRequest = onCloseRequest,
+        buttons = buttons,
+        content = content
+    )
 }
 
 @Composable

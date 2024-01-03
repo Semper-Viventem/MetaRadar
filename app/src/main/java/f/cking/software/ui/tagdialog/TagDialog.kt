@@ -21,12 +21,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
-import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.data.repo.TagsRepository
 import f.cking.software.utils.graphic.TagChip
+import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getKoin
 
@@ -38,10 +38,10 @@ object TagDialog {
     ): MaterialDialogState {
         val dialog = rememberMaterialDialogState()
         val inputState = remember { mutableStateOf("") }
-        MaterialDialog(
+        ThemedDialog(
             dialogState = dialog,
             buttons = {
-                negativeButton("Cancel", textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) { dialog.hide() }
+                negativeButton("Cancel", textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) { dialog.hide() }
             },
             onCloseRequest = { dialog.hide() },
         ) {

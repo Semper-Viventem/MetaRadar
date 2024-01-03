@@ -30,7 +30,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.BuildConfig
 import f.cking.software.R
@@ -38,6 +37,7 @@ import f.cking.software.dateTimeStringFormat
 import f.cking.software.utils.graphic.BottomNavigationSpacer
 import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.ThemedDialog
 import org.koin.androidx.compose.koinViewModel
 
 object SettingsScreen {
@@ -132,14 +132,14 @@ object SettingsScreen {
     private fun RestoreDB(viewModel: SettingsViewModel) {
         val dialogState = rememberMaterialDialogState()
 
-        MaterialDialog(
+        ThemedDialog(
             dialogState = dialogState,
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     dialogState.hide()
                     viewModel.onRestoreDBClick()
                 }
@@ -164,14 +164,14 @@ object SettingsScreen {
     private fun BackupDB(viewModel: SettingsViewModel) {
         val dialogState = rememberMaterialDialogState()
 
-        MaterialDialog(
+        ThemedDialog(
             dialogState = dialogState,
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     dialogState.hide()
                     viewModel.onBackupDBClick()
                 }
@@ -226,14 +226,14 @@ object SettingsScreen {
 
         val dialogState = rememberMaterialDialogState()
 
-        MaterialDialog(
+        ThemedDialog(
             dialogState = dialogState,
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.secondaryContainer)) {
+                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     dialogState.hide()
                     viewModel.onClearLocationsClick()
                 }
