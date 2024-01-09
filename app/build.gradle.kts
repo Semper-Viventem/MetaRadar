@@ -23,8 +23,8 @@ android {
         applicationId = "f.cking.software"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1704045673
-        versionName = "0.21.5-beta"
+        versionCode = 1704045674
+        versionName = "0.21.6-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
