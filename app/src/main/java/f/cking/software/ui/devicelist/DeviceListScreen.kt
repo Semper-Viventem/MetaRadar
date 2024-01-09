@@ -114,7 +114,7 @@ object DeviceListScreen {
                     }
                 }
 
-                if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.NONE) {
+                if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
                     item(contentType = ListContentType.ENJOY_THE_APP) {
                         Spacer(modifier = Modifier.height(8.dp))
                         EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
@@ -203,10 +203,10 @@ object DeviceListScreen {
     private fun EnjoyTheApp(viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
         RoundedBox {
             when (enjoyTheAppState) {
-                DeviceListViewModel.EnjoyTheAppState.QUESTION -> EnjoyTheAppQuestion(viewModel)
-                DeviceListViewModel.EnjoyTheAppState.LIKE -> EnjoyTheAppLike(viewModel)
-                DeviceListViewModel.EnjoyTheAppState.DISLIKE -> EnjoyTheAppDislike(viewModel)
-                DeviceListViewModel.EnjoyTheAppState.NONE -> throw IllegalStateException("EnjoyTheAppState.NONE is not supported here")
+                is DeviceListViewModel.EnjoyTheAppState.Question -> EnjoyTheAppQuestion(viewModel)
+                is DeviceListViewModel.EnjoyTheAppState.Like -> EnjoyTheAppLike(enjoyTheAppState, viewModel)
+                is DeviceListViewModel.EnjoyTheAppState.Dislike -> EnjoyTheAppDislike(viewModel)
+                is DeviceListViewModel.EnjoyTheAppState.None -> throw IllegalStateException("EnjoyTheAppState.NONE is not supported here")
             }
         }
     }
@@ -240,17 +240,18 @@ object DeviceListScreen {
     }
 
     @Composable
-    private fun EnjoyTheAppLike(viewModel: DeviceListViewModel) {
+    private fun EnjoyTheAppLike(state: DeviceListViewModel.EnjoyTheAppState.Like, viewModel: DeviceListViewModel) {
         Column {
             Text(text = stringResource(R.string.rate_the_app), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Row {
-                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppRatePlayStoreClick() }) {
-                    Text(text = stringResource(R.string.rate_the_app_google_play), color = MaterialTheme.colorScheme.onPrimary)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(modifier = Modifier.weight(1f), onClick = { viewModel.onEnjoyTheAppRateGithubClick() }) {
-                    Text(text = stringResource(R.string.rate_the_app_github), color = MaterialTheme.colorScheme.onPrimary)
+                state.actions.forEachIndexed { i, action ->
+                    Button(modifier = Modifier.weight(1f), onClick = { viewModel.onRateButtonClick(action) }) {
+                        Text(text = action.title, color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                    if (i < state.actions.lastIndex) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
                 }
             }
         }

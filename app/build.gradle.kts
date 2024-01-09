@@ -23,20 +23,22 @@ android {
         applicationId = "f.cking.software"
         minSdk = 29
         targetSdk = 34
-        versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.21.1-beta"
+        versionCode = 1704045673
+        versionName = "0.21.5-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "REPORT_ISSUE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/issues\"")
         buildConfigField("String", "GITHUB_URL", "\"https://github.com/Semper-Viventem/MetaRadar\"")
-        buildConfigField("String", "GOOGLE_PLAY_URL", "\"https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=web_share\"")
+        buildConfigField("String", "STORE_PAGE_URL", "\"Not specified\"")
 
         buildConfigField("String", "DISTRIBUTION", "\"Not specified\"")
     }
 
     val DEBUG = "debug"
     val RELEASE = "release"
+
+    val NO_SIGNING_CONFIG = "no_signing_store"
 
     signingConfigs {
         maybeCreate(DEBUG).apply {
@@ -65,22 +67,40 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             isDebuggable = false
-            signingConfig = signingConfigs[RELEASE]
+
+            val hasSignConfig = gradleLocalProperties(rootDir).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: NO_SIGNING_CONFIG) != NO_SIGNING_CONFIG
+
+            signingConfig = if (hasSignConfig) signingConfigs[RELEASE] else null
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
     flavorDimensions += "distribution"
     productFlavors {
-        create("googlePlay") {
-            dimension = "distribution"
-
-            buildConfigField("String", "DISTRIBUTION", "\"Google play\"")
-        }
         create("github") {
+            isDefault = true
             dimension = "distribution"
+            versionCode = (System.currentTimeMillis() / 1000).toInt()
 
             buildConfigField("String", "DISTRIBUTION", "\"Github\"")
+            buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "false")
+            buildConfigField("String", "STORE_PAGE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/releases?q=release+build\"")
+        }
+        create("googlePlay") {
+            isDefault = false
+            dimension = "distribution"
+            versionCode = (System.currentTimeMillis() / 1000).toInt()
+
+            buildConfigField("String", "DISTRIBUTION", "\"Google play\"")
+            buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "true")
+            buildConfigField("String", "STORE_PAGE_URL", "\"https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=web_share\"")
+        }
+        create("fdroid") {
+            isDefault = false
+            dimension = "distribution"
+
+            buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "false")
+            buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
         }
     }
 
@@ -140,7 +160,6 @@ dependencies {
     // compose
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
-    implementation(libs.compose.material)
     implementation(libs.compose.tooling)
     implementation(libs.lifecycle.compose)
     implementation(libs.compose.activity)
