@@ -63,6 +63,7 @@ class NotificationsHelper(
             .setSound(null)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setSilent(true)
             .build()
     }
 
@@ -91,7 +92,7 @@ class NotificationsHelper(
             .setContentIntent(openAppPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setGroup(RADAR_PROFILE_GROUP)
             .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_ALL)
             .build()
@@ -148,7 +149,7 @@ class NotificationsHelper(
             .setContentIntent(openAppPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
             .build()
 
         notificationManager.notify(Random.nextInt(), notification)
