@@ -119,9 +119,11 @@ class BleScannerHelper(
                 Timber.d("BLE Scan finished ${batch.count()} devices found")
                 scanListener?.onSuccess(batch.values.toList())
             }
+
             is ScanResultInternal.Failure -> {
-                scanListener?.onFailure(BLEScanFailure(scanResult.errorCode))
+                scanListener?.onFailure(BLEScanFailure(scanResult.errorCode, BleScanErrorMapper.map(scanResult.errorCode)))
             }
+
             is ScanResultInternal.Canceled -> {
                 // do nothing
             }
@@ -155,7 +157,8 @@ class BleScannerHelper(
         object Canceled : ScanResultInternal
     }
 
-    class BLEScanFailure(errorCode: Int) : RuntimeException("BLE Scan failed with error code: $errorCode")
+    class BLEScanFailure(errorCode: Int, errorDescription: String) :
+        RuntimeException("BLE Scan failed with error code: $errorCode (${errorDescription})")
 
     class BluetoothIsNotInitialized : RuntimeException("Bluetooth is turned off or not available on this device")
 }
