@@ -50,6 +50,7 @@ fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
         },
         lastFollowingDetectionTimeMs = lastFollowingDetectionMs,
         tags = tags.toSet(),
+        rssi = lastSeenRssi,
     )
 }
 
@@ -66,6 +67,7 @@ fun DeviceData.toData(): DeviceEntity {
         manufacturerName = manufacturerInfo?.name,
         lastFollowingDetectionMs = lastFollowingDetectionTimeMs,
         tags = tags.toList(),
+        lastSeenRssi = rssi,
     )
 }
 

@@ -14,6 +14,7 @@ data class DeviceData(
     val favorite: Boolean,
     val tags: Set<String>,
     val lastFollowingDetectionTimeMs: Long?,
+    val rssi: Int?,
 ) {
 
     fun buildDisplayName(): String {

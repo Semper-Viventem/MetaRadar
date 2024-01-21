@@ -41,9 +41,10 @@ import java.io.File
         AutoMigration(from = 7, to = 8),
         AutoMigration(from = 9, to = 10),
         AutoMigration(from = 10, to = 11),
+        AutoMigration(from = 11, to = 12),
     ],
     exportSchema = true,
-    version = 11,
+    version = 12,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
