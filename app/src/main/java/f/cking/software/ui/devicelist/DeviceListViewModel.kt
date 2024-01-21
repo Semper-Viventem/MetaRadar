@@ -118,30 +118,36 @@ class DeviceListViewModel(
     private fun observeIsScannerEnabled() {
         viewModelScope.launch {
             BgScanService.isActive
-                .collect { checkScreenMode() }
+                .collect { checkScreenMode(true) }
         }
     }
 
-    private fun checkScreenMode() {
+    private fun checkScreenMode(invalidateCurrentBatch: Boolean) {
         val isScannerEnabled = BgScanService.isActive.value
         val anyFilterApplyed = isSearchMode || appliedFilter.isNotEmpty()
 
         scannerObservingJob?.cancel()
         if (isScannerEnabled || anyFilterApplyed) {
-            isPaginationEnabled = false
-            scannerObservingJob = observeAllDevices()
+            disablePagination()
         } else {
             enablePagination()
         }
 
-        lastBatchJob?.cancel()
-        if (isScannerEnabled) {
-            currentBatchViewState = emptyList()
-            lastBatchJob = observeCurrentBatch()
-        } else {
-            currentBatchViewState = null
-            lastBatchJob = null
+        if (invalidateCurrentBatch) {
+            lastBatchJob?.cancel()
+            if (isScannerEnabled) {
+                currentBatchViewState = emptyList()
+                lastBatchJob = observeCurrentBatch()
+            } else {
+                currentBatchViewState = null
+                lastBatchJob = null
+            }
         }
+    }
+
+    private fun disablePagination() {
+        isPaginationEnabled = false
+        scannerObservingJob = observeAllDevices()
     }
 
     private fun enablePagination() {
@@ -174,6 +180,7 @@ class DeviceListViewModel(
                 isPaginationEnabled = false
             }
             isLoading = false
+            showEnjoyTheAppIfNeeded()
             Timber.d("Load next page: $currentPage, offset: $offset, limit: $limit, devices: ${devices.size}")
         }
     }
@@ -209,13 +216,7 @@ class DeviceListViewModel(
     }
 
     private fun fetchDevices() {
-        checkScreenMode()
-        viewModelScope.launch {
-            isLoading = true
-            val devices = devicesRepository.getDevices()
-            applyDevices(devices)
-            isLoading = false
-        }
+        checkScreenMode(false)
     }
 
     private suspend fun applyDevices(devices: List<DeviceData>) {
@@ -236,14 +237,12 @@ class DeviceListViewModel(
                 .filter { checkFilter(it, filter) && filterQuery(it, query) }
                 .sortedWith(generalComparator)
                 .apply {
-                    if (size >= MIN_DEVICES_FOR_ENJOY_THE_APP) {
-                        showEnjoyTheAppIfNeeded()
-                    }
+                    showEnjoyTheAppIfNeeded()
                 }
         }
     }
 
-    private fun showEnjoyTheAppIfNeeded() {
+    private suspend fun showEnjoyTheAppIfNeeded() {
         if (enjoyTheAppState is EnjoyTheAppState.None
             && checkNeedToShowEnjoyTheAppInteractor.execute()
         ) {
@@ -356,7 +355,6 @@ class DeviceListViewModel(
     }
 
     companion object {
-        private const val MIN_DEVICES_FOR_ENJOY_THE_APP = 10
         private const val PAGE_SIZE = 40
         private const val INITIAL_PAGE = 0
     }
