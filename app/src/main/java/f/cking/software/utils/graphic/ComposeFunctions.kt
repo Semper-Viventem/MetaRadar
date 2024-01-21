@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ColorScheme
@@ -57,6 +58,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogButtons
 import com.vanpra.composematerialdialogs.MaterialDialogScope
@@ -153,6 +155,30 @@ fun rememberTimeDialog(
 }
 
 @Composable
+fun infoDialog(
+    title: String,
+    content: String,
+): MaterialDialogState {
+    val dialogState = rememberMaterialDialogState()
+    ThemedDialog(
+        dialogState = dialogState,
+        buttons = {
+            positiveButton(
+                stringResource(R.string.ok),
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+            ) { dialogState.hide() }
+        },
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = title, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = content)
+        }
+    }
+    return dialogState
+}
+
+@Composable
 fun ThemedDialog(
     dialogState: MaterialDialogState = rememberMaterialDialogState(),
     properties: DialogProperties = DialogProperties(),
@@ -212,6 +238,7 @@ fun ClickableField(
 @Composable
 fun DeviceListItem(
     device: DeviceData,
+    showSignalData: Boolean = false,
     onTagSelected: (tag: String) -> Unit = {},
     onClick: () -> Unit,
 ) {
@@ -221,21 +248,61 @@ fun DeviceListItem(
             .clickable { onClick.invoke() },
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(4.dp))
-                device.tags.forEach {
-                    Spacer(modifier = Modifier.width(4.dp))
-                    TagChip(tagName = it, onClick = { onTagSelected.invoke(it) })
-                }
+            Row(verticalAlignment = Alignment.Top) {
                 if (device.favorite) {
-                    Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = stringResource(R.string.is_favorite),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
+                }
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = device.name ?: stringResource(R.string.not_applicable),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                if (showSignalData) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column(horizontalAlignment = Alignment.End) {
+                        device.distance()?.let { distance ->
+                            val distanceStr = if (distance < 2) "%.1f".format(distance) else distance.toInt().toString()
+                            val infoDialog = infoDialog(
+                                title = stringResource(id = R.string.disclaimer),
+                                content = stringResource(id = R.string.device_distance_disclaimer)
+                            )
+                            Row(modifier = Modifier.clickable { infoDialog.show() }, verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = stringResource(id = R.string.distance_to_device, distanceStr),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                Icon(
+                                    modifier = Modifier.size(16.dp).alpha(0.5f),
+                                    imageVector = Icons.Outlined.Info,
+                                    contentDescription = stringResource(R.string.is_favorite),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        device.rssi?.let { rssi ->
+                            Text(text = stringResource(id = R.string.rssi_value, rssi), fontSize = 14.sp, fontWeight = FontWeight.Light)
+                        }
+                    }
+                }
+            }
+            device.tags.takeIf { it.isNotEmpty() }?.let { tags ->
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    mainAxisSpacing = 4.dp,
+                ) {
+                    tags.forEachIndexed { index, tag ->
+                        TagChip(tagName = tag, onClick = { onTagSelected.invoke(tag) })
+                    }
                 }
             }
             device.manufacturerInfo?.name?.let {

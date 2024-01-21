@@ -1,6 +1,11 @@
 package f.cking.software.ui.devicelist
 
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -22,8 +28,11 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
@@ -32,7 +41,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -42,9 +55,11 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.ScreenNavigationCommands
@@ -54,6 +69,9 @@ import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
 import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.ThemedDialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -65,19 +83,8 @@ object DeviceListScreen {
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
         val viewModel: DeviceListViewModel = koinViewModel()
-        val focusManager = LocalFocusManager.current
-        val nestedScroll = remember {
-            object : NestedScrollConnection {
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    focusManager.clearFocus(true)
-                    return super.onPreScroll(available, source)
-                }
-            }
-        }
 
-        val list = viewModel.devicesViewState
-
-        if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
+        if (viewModel.devicesViewState.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty() && viewModel.currentBatchViewState == null) {
             ContentPlaceholder(stringResource(R.string.device_list_placeholder), modifier)
             if (viewModel.isLoading) {
                 LinearProgressIndicator(
@@ -88,48 +95,206 @@ object DeviceListScreen {
                 )
             }
         } else {
-            LazyColumn(
-                modifier = modifier.nestedScroll(nestedScroll),
-            ) {
-                stickyHeader {
-                    Box() {
-                        Filters(viewModel)
-                        if (viewModel.isLoading) {
-                            LinearProgressIndicator(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(4.dp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+            DevicesListContent(modifier, viewModel)
+        }
+    }
+
+    @Composable
+    fun DevicesListContent(modifier: Modifier, viewModel: DeviceListViewModel) {
+        val focusManager = LocalFocusManager.current
+        val state = rememberLazyListState()
+        val nestedScroll = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    focusManager.clearFocus(true)
+                    if (viewModel.devicesViewState.isNotEmpty() && state.layoutInfo.visibleItemsInfo.any { it.contentType == ListContentType.PAGINATION_PROGRESS }) {
+                        viewModel.onScrollEnd()
+                    }
+                    return super.onPreScroll(available, source)
+                }
+            }
+        }
+        LazyColumn(
+            modifier = modifier.nestedScroll(nestedScroll),
+            state = state,
+        ) {
+            stickyHeader {
+                Box() {
+                    Filters(viewModel)
+                    if (viewModel.isLoading) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
+                item(contentType = ListContentType.ENJOY_THE_APP) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
+                }
+            }
+
+            if (viewModel.currentBatchViewState != null) {
+                item(contentType = ListContentType.CURRENT_BATCH) {
+                    CurrentBatch(viewModel)
+                }
+            }
+
+            viewModel.devicesViewState.mapIndexed { index, deviceData ->
+                item(contentType = ListContentType.DEVICE) {
+                    DeviceListItem(
+                        device = deviceData,
+                        onClick = { viewModel.onDeviceClick(deviceData) },
+                        onTagSelected = { viewModel.onTagSelected(it) },
+                    )
+
+                }
+                val showDivider = viewModel.devicesViewState.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
+                if (showDivider) {
+                    item(contentType = ListContentType.DIVIDER) { Divider() }
+                }
+            }
+
+            if (viewModel.isPaginationEnabled) {
+                item(contentType = ListContentType.PAGINATION_PROGRESS) {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(), contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+            item(contentType = ListContentType.BOTTOM_SPACER) {
+                FABSpacer()
+            }
+        }
+    }
+
+    enum class ListContentType {
+        ENJOY_THE_APP, CURRENT_BATCH, DEVICE, DIVIDER, PAGINATION_PROGRESS, BOTTOM_SPACER,
+    }
+
+    @Composable
+    fun CurrentBatch(
+        viewModel: DeviceListViewModel,
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        RoundedBox(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            internalPaddings = 0.dp,
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.width(16.dp))
+                RadarIcon()
+
+                val sortByDialog = rememberMaterialDialogState()
+                ThemedDialog(sortByDialog) {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(16.dp),
+                            text = stringResource(R.string.sort_by_title),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp
+                        )
+                        DeviceListViewModel.CurrentBatchSortingStrategy.entries.forEach { strategy ->
+                            fun selectStrategy() {
+                                viewModel.applyCurrentBatchSortingStrategy(strategy)
+                                sortByDialog.hide()
+                            }
+                            Box(modifier = Modifier.clickable { selectStrategy() }) {
+                                Row(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(checked = viewModel.currentBatchSortingStrategy == strategy, onCheckedChange = { selectStrategy() })
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(text = stringResource(id = strategy.displayNameRes), color = MaterialTheme.colorScheme.onSurface)
+                                }
+                            }
                         }
                     }
                 }
-
-                if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
-                    }
-                }
-
-                list.mapIndexed { index, deviceData ->
-                    item {
-                        DeviceListItem(
-                            device = deviceData,
-                            onClick = { viewModel.onDeviceClick(deviceData) },
-                            onTagSelected = { viewModel.onTagSelected(it) },
-                        )
-                    }
-                    val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
-                    if (showDivider) {
-                        item { Divider() }
-                    }
-                }
-
-                item {
-                    FABSpacer()
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { sortByDialog.show() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_sort),
+                        contentDescription = stringResource(R.string.sort_by_title),
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            CurrentBatchList(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    @OptIn(ExperimentalAnimationGraphicsApi::class)
+    @Composable
+    private fun RadarIcon() {
+        var atEnd by remember { mutableStateOf(false) }
+        val radarIcon = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
+        val painter = rememberAnimatedVectorPainter(radarIcon, atEnd)
+        val animatedPainter = rememberAnimatedVectorPainter(radarIcon, !atEnd)
+        Image(
+            painter = if (atEnd) painter else animatedPainter,
+            contentDescription = null,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.current_batch_title),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        LaunchedEffect(key1 = radarIcon) {
+            while (isActive) {
+                delay(1200)
+                atEnd = !atEnd
+            }
+        }
+    }
+
+    @Composable
+    private fun CurrentBatchList(viewModel: DeviceListViewModel) {
+        val currentBatch = viewModel.currentBatchViewState!!
+        if (currentBatch.isNotEmpty()) {
+            currentBatch.forEachIndexed { index, deviceData ->
+                DeviceListItem(
+                    device = deviceData,
+                    showSignalData = true,
+                    onClick = { viewModel.onDeviceClick(deviceData) },
+                    onTagSelected = { viewModel.onTagSelected(it) },
+                )
+                if (index < currentBatch.lastIndex) {
+                    Divider()
+                }
+            }
+        } else {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = stringResource(R.string.current_batch_empty),
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp,
+            )
         }
     }
 
@@ -163,7 +328,10 @@ object DeviceListScreen {
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { viewModel.onEnjoyTheAppAnswered(DeviceListViewModel.EnjoyTheAppAnswer.ASK_LATER) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh, contentColor = MaterialTheme.colorScheme.onSurface)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
             ) {
                 Text(text = stringResource(R.string.enjoy_the_app_ask_later), color = MaterialTheme.colorScheme.onSurface)
             }

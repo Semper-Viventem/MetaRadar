@@ -47,6 +47,7 @@ class BleScannerHelper(
                 name = result.device.name,
                 scanTimeMs = currentScanTimeMs,
                 scanRecordRaw = result.scanRecord?.bytes,
+                rssi = result.rssi,
             )
 
             batch.put(device.address, device)

@@ -10,8 +10,10 @@ import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
 import f.cking.software.splitToBatches
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DevicesRepository(
@@ -20,6 +22,7 @@ class DevicesRepository(
 
     private val deviceDao: DeviceDao = appDatabase.deviceDao()
     private val appleContactsDao = appDatabase.appleContactDao()
+    private val lastBatch = MutableStateFlow(emptyList<DeviceData>())
     private val allDevices = MutableStateFlow(emptyList<DeviceData>())
 
     suspend fun getDevices(): List<DeviceData> {
@@ -28,9 +31,40 @@ class DevicesRepository(
         }
     }
 
-    suspend fun observeDevices(): StateFlow<List<DeviceData>> {
+    suspend fun getPaginated(offset: Int, limit: Int): List<DeviceData> {
+        return withContext(Dispatchers.IO) {
+            deviceDao.getPaginated(offset, limit).toDomainWithAirDrop()
+        }
+    }
+
+    suspend fun getLastBatch(): List<DeviceData> {
+        return withContext(Dispatchers.IO) {
+            val lastDevice = deviceDao.getPaginated(0, 1).firstOrNull()
+
+            if (lastDevice == null) {
+                emptyList()
+            } else {
+                val scanTime = lastDevice.lastDetectTimeMs
+                deviceDao.getByLastDetectTime(scanTime).toDomainWithAirDrop()
+            }
+        }
+    }
+
+    fun clearLastBatch() {
+        lastBatch.value = emptyList()
+    }
+
+    suspend fun observeAllDevices(): StateFlow<List<DeviceData>> {
         return allDevices.apply {
             if (allDevices.value.isEmpty()) {
+                notifyListeners()
+            }
+        }
+    }
+
+    suspend fun observeLastBatch(): StateFlow<List<DeviceData>> {
+        return lastBatch.apply {
+            if (lastBatch.value.isEmpty()) {
                 notifyListeners()
             }
         }
@@ -121,8 +155,16 @@ class DevicesRepository(
     }
 
     private suspend fun notifyListeners() {
-        val data = getDevices()
-        allDevices.emit(data)
+        coroutineScope {
+            launch {
+                val data = getLastBatch()
+                lastBatch.emit(data)
+            }
+            launch {
+                val data = getDevices()
+                allDevices.emit(data)
+            }
+        }
     }
 
     private suspend fun mergeWithExistingDevices(devices: List<DeviceData>): List<DeviceData> {
