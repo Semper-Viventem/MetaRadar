@@ -11,6 +11,6 @@ This application does not share your personal data or geolocation, all work is o
 
 <br>
 
-<img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/e307d2f3-63ed-4401-8828-194f6b67fa24' width='300'/> <img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/6991f8ba-6375-4c3f-8784-059e0d04f9ac' width='300'/>
+<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_2.png' width='300'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_4.png' width='300'/>
 
-<img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/9383851d-0dc5-4244-91b3-f902cb777892' width='300'/> <img src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/9b9bedd2-c96f-4ff2-82bd-0d84424467d6' width='300'/>
+<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_5.png' width='300'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_7.png' width='300'/>
