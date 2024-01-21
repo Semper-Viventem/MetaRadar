@@ -195,6 +195,9 @@
     <!-- Main Screen -->
     <string name="rssi_value">%s dBm</string>
     <string name="distance_to_device">%s м</string>
+    <string name="sort_by_title">Сортировка</string>
+    <string name="sort_type_standart">По умолчанию</string>
+    <string name="sort_type_by_distance">По дистанции</string>
     <string name="menu_device_list">Список устройств</string>
     <string name="menu_radar_profiles">Профили радара</string>
     <string name="menu_journal">Журнал</string>

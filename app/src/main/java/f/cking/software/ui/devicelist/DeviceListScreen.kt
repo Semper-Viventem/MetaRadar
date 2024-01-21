@@ -31,6 +31,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
@@ -53,6 +54,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,6 +68,7 @@ import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
 import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
@@ -153,9 +156,11 @@ object DeviceListScreen {
 
                 if (viewModel.isPaginationEnabled) {
                     item(contentType = ListContentType.PAGINATION_PROGRESS) {
-                        Box(modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(), contentAlignment = Alignment.Center
+                        ) {
                             CircularProgressIndicator()
                         }
                     }
@@ -178,9 +183,14 @@ object DeviceListScreen {
         viewModel: DeviceListViewModel,
     ) {
         Spacer(modifier = Modifier.height(8.dp))
-        RoundedBox(internalPaddings = 0.dp) {
+        RoundedBox(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            internalPaddings = 0.dp,
+        ) {
             Spacer(modifier = Modifier.height(8.dp))
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(16.dp))
                 var atEnd by remember { mutableStateOf(false) }
                 val radarIcon = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
@@ -202,6 +212,44 @@ object DeviceListScreen {
                         delay(1000)
                         atEnd = !atEnd
                     }
+                }
+
+                val sortByDialog = rememberMaterialDialogState()
+                ThemedDialog(sortByDialog) {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text(text = stringResource(R.string.sort_by_title), fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DeviceListViewModel.CurrentBatchSortingStrategy.entries.forEach { strategy ->
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    viewModel.applyCurrentBatchSortingStrategy(strategy)
+                                    sortByDialog.hide()
+                                },
+                                enabled = viewModel.currentBatchSortingStrategy != strategy,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            ) {
+                                Text(text = stringResource(id = strategy.displayNameRes), color = MaterialTheme.colorScheme.onPrimary)
+                            }
+
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { sortByDialog.show() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_sort),
+                        contentDescription = stringResource(R.string.sort_by_title),
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))

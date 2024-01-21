@@ -2,6 +2,7 @@ package f.cking.software.ui.devicelist
 
 import android.app.Application
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,6 +40,7 @@ class DeviceListViewModel(
     private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
+    var currentBatchSortingStrategy by mutableStateOf(CurrentBatchSortingStrategy.GENERAL)
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
     var currentBatchViewState by mutableStateOf<List<DeviceData>?>(null)
     var appliedFilter: List<FilterHolder> by mutableStateOf(emptyList())
@@ -57,23 +59,6 @@ class DeviceListViewModel(
     private var scannerObservingJob: Job? = null
     private var lastBatchJob: Job? = null
     private var currentPage: Int by mutableStateOf(INITIAL_PAGE)
-
-    private val generalComparator = Comparator<DeviceData> { second, first ->
-        when {
-            first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
-
-            first.tags.size != second.tags.size -> first.tags.size.compareTo(second.tags.size)
-            first.favorite && !second.favorite -> 1
-            !first.favorite && second.favorite -> -1
-
-            first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
-
-            first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
-                first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
-
-            else -> first.address.compareTo(second.address)
-        }
-    }
 
     init {
         observeIsScannerEnabled()
@@ -165,6 +150,11 @@ class DeviceListViewModel(
         }
     }
 
+    fun applyCurrentBatchSortingStrategy(strategy: CurrentBatchSortingStrategy) {
+        currentBatchSortingStrategy = strategy
+        currentBatchViewState = currentBatchViewState?.sortedWith(strategy.comparator)
+    }
+
     private fun loadNextPage() {
         viewModelScope.launch {
             isLoading = true
@@ -175,7 +165,7 @@ class DeviceListViewModel(
                 devices
             } else {
                 (devicesViewState + devices)
-            }.sortedWith(generalComparator)
+            }.sortedWith(GENERAL_COMPARATOR)
             if (devices.isEmpty()) {
                 isPaginationEnabled = false
             }
@@ -195,7 +185,7 @@ class DeviceListViewModel(
                 }
                 .collect { devices ->
                     isLoading = true
-                    currentBatchViewState = devices.sortedWith(generalComparator)
+                    currentBatchViewState = devices.sortedWith(currentBatchSortingStrategy.comparator)
                     isLoading = false
                 }
         }
@@ -235,7 +225,7 @@ class DeviceListViewModel(
         devicesViewState = withContext(Dispatchers.Default) {
             devices
                 .filter { checkFilter(it, filter) && filterQuery(it, query) }
-                .sortedWith(generalComparator)
+                .sortedWith(GENERAL_COMPARATOR)
                 .apply {
                     showEnjoyTheAppIfNeeded()
                 }
@@ -354,8 +344,40 @@ class DeviceListViewModel(
         )
     }
 
+    enum class CurrentBatchSortingStrategy(
+        val comparator: Comparator<DeviceData>,
+        @StringRes val displayNameRes: Int,
+    ) {
+        GENERAL(GENERAL_COMPARATOR, R.string.sort_type_standart),
+        BY_DISTANCE(Comparator { second, first ->
+            when {
+                first.distance() != second.distance() -> second.distance()?.compareTo(first.distance() ?: return@Comparator 1) ?: -1
+                else -> GENERAL_COMPARATOR.compare(first, second)
+            }
+        }, R.string.sort_type_by_distance)
+    }
+
     companion object {
         private const val PAGE_SIZE = 40
         private const val INITIAL_PAGE = 0
+
+        private val GENERAL_COMPARATOR = Comparator<DeviceData> { second, first ->
+            when {
+                first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
+
+                first.tags.size != second.tags.size -> first.tags.size.compareTo(second.tags.size)
+                first.favorite && !second.favorite -> 1
+                !first.favorite && second.favorite -> -1
+
+                first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
+
+                first.rssi != second.rssi -> first.rssi?.compareTo(second.rssi ?: return@Comparator 1) ?: -1
+
+                first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
+                    first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
+
+                else -> first.address.compareTo(second.address)
+            }
+        }
     }
 }

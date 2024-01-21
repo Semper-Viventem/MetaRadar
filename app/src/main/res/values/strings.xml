@@ -204,6 +204,9 @@
     <string name="distance_to_device">%s m</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="device_distance_disclaimer">Distance to device is calculated based on RSSI value. It\'s not accurate</string>
+    <string name="sort_by_title">Sort by</string>
+    <string name="sort_type_standart">Default</string>
+    <string name="sort_type_by_distance">Distance</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>
