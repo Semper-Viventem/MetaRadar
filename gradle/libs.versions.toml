@@ -112,6 +112,7 @@ compose-material = { module = "androidx.compose.material:material", version.ref 
 compose-dialogs = { module = "io.github.vanpra.compose-material-dialogs:core", version.ref = "compose-dialogs"}
 compose-dialogs-datetime = { module = "io.github.vanpra.compose-material-dialogs:datetime", version.ref = "compose-dialogs"}
 compose-flow-row = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "compose-accompanist"}
+compose-animation = { module = "androidx.compose.animation:animation-graphics", version.ref = "compose" }
 
 # UI - Wear
 compose-wear-material = { module = "androidx.wear.compose:compose-material", version.ref = "compose-wear" }

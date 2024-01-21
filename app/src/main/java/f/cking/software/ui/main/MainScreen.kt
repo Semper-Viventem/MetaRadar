@@ -24,7 +24,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -259,7 +258,7 @@ object MainScreen {
             item {
                 PermissionDisclaimer(
                     title = stringResource(R.string.permissions_intro_doze_mode_title),
-                    subtitle = stringResource(R.string.permissions_intro_doze_mode_title),
+                    subtitle = stringResource(R.string.permissions_intro_doze_mode_text),
                     icon = painterResource(R.drawable.ic_charge),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -280,7 +279,7 @@ object MainScreen {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color.LightGray, shape = RoundedCornerShape(8.dp))
+                .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(8.dp))
                 .padding(8.dp)
         ) {
             Column() {
@@ -288,13 +287,13 @@ object MainScreen {
                     Icon(
                         painter = icon,
                         contentDescription = title,
-                        tint = Color.Black
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = title, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = subtitle)
+                Text(text = subtitle, color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }

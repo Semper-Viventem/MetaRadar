@@ -24,6 +24,7 @@ class BuildDeviceFromScanDataInteractor(
             },
             lastFollowingDetectionTimeMs = null,
             tags = emptySet(),
+            rssi = scanData.rssi,
         )
     }
 }

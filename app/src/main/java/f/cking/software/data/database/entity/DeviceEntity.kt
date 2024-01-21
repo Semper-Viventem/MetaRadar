@@ -17,4 +17,5 @@ data class DeviceEntity(
     @ColumnInfo(name = "manufacturer_name") val manufacturerName: String? = null,
     @ColumnInfo(name = "last_following_detection_ms") val lastFollowingDetectionMs: Long? = null,
     @ColumnInfo(name = "tags", defaultValue = "") val tags: List<String>,
+    @ColumnInfo(name = "last_seen_rssi") val lastSeenRssi: Int? = null,
 )

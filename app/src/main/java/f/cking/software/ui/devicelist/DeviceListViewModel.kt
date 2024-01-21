@@ -2,6 +2,7 @@ package f.cking.software.ui.devicelist
 
 import android.app.Application
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,11 +19,15 @@ import f.cking.software.domain.interactor.filterchecker.FilterCheckerImpl
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.RadarProfile
+import f.cking.software.service.BgScanService
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class DeviceListViewModel(
     private val context: Application,
@@ -35,11 +40,14 @@ class DeviceListViewModel(
     private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
+    var currentBatchSortingStrategy by mutableStateOf(CurrentBatchSortingStrategy.GENERAL)
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
+    var currentBatchViewState by mutableStateOf<List<DeviceData>?>(null)
     var appliedFilter: List<FilterHolder> by mutableStateOf(emptyList())
     var searchQuery: String? by mutableStateOf(null)
     var isSearchMode: Boolean by mutableStateOf(false)
     var isLoading: Boolean by mutableStateOf(false)
+    var isPaginationEnabled: Boolean by mutableStateOf(false)
     var quickFilters: List<FilterHolder> by mutableStateOf(
         listOf(
             DefaultFilters.notApple(context),
@@ -48,25 +56,12 @@ class DeviceListViewModel(
     )
     var enjoyTheAppState: EnjoyTheAppState by mutableStateOf(EnjoyTheAppState.None)
 
-    private val generalComparator = Comparator<DeviceData> { second, first ->
-        when {
-            first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
-
-            first.tags.size != second.tags.size -> first.tags.size.compareTo(second.tags.size)
-            first.favorite && !second.favorite -> 1
-            !first.favorite && second.favorite -> -1
-
-            first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
-
-            first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
-                first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
-
-            else -> first.address.compareTo(second.address)
-        }
-    }
+    private var scannerObservingJob: Job? = null
+    private var lastBatchJob: Job? = null
+    private var currentPage: Int by mutableStateOf(INITIAL_PAGE)
 
     init {
-        observeDevices()
+        observeIsScannerEnabled()
     }
 
     fun onFilterClick(filter: FilterHolder) {
@@ -105,10 +100,103 @@ class DeviceListViewModel(
         onFilterClick(tagFilter)
     }
 
-    private fun observeDevices() {
+    private fun observeIsScannerEnabled() {
+        viewModelScope.launch {
+            BgScanService.isActive
+                .collect { checkScreenMode(true) }
+        }
+    }
+
+    private fun checkScreenMode(invalidateCurrentBatch: Boolean) {
+        val isScannerEnabled = BgScanService.isActive.value
+        val anyFilterApplyed = isSearchMode || appliedFilter.isNotEmpty()
+
+        scannerObservingJob?.cancel()
+        if (isScannerEnabled || anyFilterApplyed) {
+            disablePagination()
+        } else {
+            enablePagination()
+        }
+
+        if (invalidateCurrentBatch) {
+            lastBatchJob?.cancel()
+            if (isScannerEnabled) {
+                currentBatchViewState = emptyList()
+                lastBatchJob = observeCurrentBatch()
+            } else {
+                currentBatchViewState = null
+                lastBatchJob = null
+            }
+        }
+    }
+
+    private fun disablePagination() {
+        isPaginationEnabled = false
+        scannerObservingJob = observeAllDevices()
+    }
+
+    private fun enablePagination() {
+        isPaginationEnabled = true
+        currentPage = INITIAL_PAGE
+        viewModelScope.launch {
+            loadNextPage()
+        }
+    }
+
+    fun onScrollEnd() {
+        if (isPaginationEnabled && !isLoading) {
+            currentPage++
+            loadNextPage()
+        }
+    }
+
+    fun applyCurrentBatchSortingStrategy(strategy: CurrentBatchSortingStrategy) {
+        currentBatchSortingStrategy = strategy
+        currentBatchViewState = currentBatchViewState?.sortedWith(strategy.comparator)
+    }
+
+    private fun loadNextPage() {
         viewModelScope.launch {
             isLoading = true
-            devicesRepository.observeDevices()
+            val offset = currentPage * PAGE_SIZE
+            val limit = PAGE_SIZE
+            val devices = devicesRepository.getPaginated(offset, limit)
+            devicesViewState = if (currentPage == INITIAL_PAGE) {
+                devices
+            } else {
+                (devicesViewState + devices)
+            }.sortedWith(GENERAL_COMPARATOR)
+            if (devices.isEmpty()) {
+                isPaginationEnabled = false
+            }
+            isLoading = false
+            showEnjoyTheAppIfNeeded()
+            Timber.d("Load next page: $currentPage, offset: $offset, limit: $limit, devices: ${devices.size}")
+        }
+    }
+
+    private fun observeCurrentBatch(): Job {
+        return viewModelScope.launch {
+            devicesRepository.observeLastBatch()
+                .onStart {
+                    isLoading = true
+                    currentBatchViewState = emptyList()
+                    devicesRepository.clearLastBatch()
+                }
+                .collect { devices ->
+                    isLoading = true
+                    currentBatchViewState = devices.sortedWith(currentBatchSortingStrategy.comparator)
+                    isLoading = false
+                }
+        }
+    }
+
+    private fun observeAllDevices(): Job {
+        return viewModelScope.launch {
+            devicesRepository.observeAllDevices()
+                .onStart {
+                    isLoading = true
+                }
                 .collect { devices ->
                     isLoading = true
                     applyDevices(devices)
@@ -118,12 +206,7 @@ class DeviceListViewModel(
     }
 
     private fun fetchDevices() {
-        viewModelScope.launch {
-            isLoading = true
-            val devices = devicesRepository.getDevices()
-            applyDevices(devices)
-            isLoading = false
-        }
+        checkScreenMode(false)
     }
 
     private suspend fun applyDevices(devices: List<DeviceData>) {
@@ -139,19 +222,17 @@ class DeviceListViewModel(
             searchQuery
         }
 
-        devicesViewState = withContext(Dispatchers.Default) {
-            devices
+        withContext(Dispatchers.Default) {
+            devicesViewState = devices
                 .filter { checkFilter(it, filter) && filterQuery(it, query) }
-                .sortedWith(generalComparator)
+                .sortedWith(GENERAL_COMPARATOR)
                 .apply {
-                    if (size >= MIN_DEVICES_FOR_ENJOY_THE_APP) {
-                        showEnjoyTheAppIfNeeded()
-                    }
+                    showEnjoyTheAppIfNeeded()
                 }
         }
     }
 
-    private fun showEnjoyTheAppIfNeeded() {
+    private suspend fun showEnjoyTheAppIfNeeded() {
         if (enjoyTheAppState is EnjoyTheAppState.None
             && checkNeedToShowEnjoyTheAppInteractor.execute()
         ) {
@@ -263,7 +344,40 @@ class DeviceListViewModel(
         )
     }
 
+    enum class CurrentBatchSortingStrategy(
+        val comparator: Comparator<DeviceData>,
+        @StringRes val displayNameRes: Int,
+    ) {
+        GENERAL(GENERAL_COMPARATOR, R.string.sort_type_standart),
+        BY_DISTANCE(Comparator { second, first ->
+            when {
+                first.distance() != second.distance() -> second.distance()?.compareTo(first.distance() ?: return@Comparator 1) ?: -1
+                else -> GENERAL_COMPARATOR.compare(first, second)
+            }
+        }, R.string.sort_type_by_distance)
+    }
+
     companion object {
-        private const val MIN_DEVICES_FOR_ENJOY_THE_APP = 10
+        private const val PAGE_SIZE = 40
+        private const val INITIAL_PAGE = 0
+
+        private val GENERAL_COMPARATOR = Comparator<DeviceData> { second, first ->
+            when {
+                first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
+
+                first.tags.size != second.tags.size -> first.tags.size.compareTo(second.tags.size)
+                first.favorite && !second.favorite -> 1
+                !first.favorite && second.favorite -> -1
+
+                first.name != second.name -> first.name?.compareTo(second.name ?: return@Comparator 1) ?: -1
+
+                first.rssi != second.rssi -> first.rssi?.compareTo(second.rssi ?: return@Comparator 1) ?: -1
+
+                first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
+                    first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
+
+                else -> first.address.compareTo(second.address)
+            }
+        }
     }
 }
