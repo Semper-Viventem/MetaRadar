@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -219,26 +220,31 @@ object DeviceListScreen {
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(vertical = 16.dp)
                     ) {
-                        Text(text = stringResource(R.string.sort_by_title), fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            modifier = Modifier.padding(16.dp),
+                            text = stringResource(R.string.sort_by_title),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp
+                        )
                         DeviceListViewModel.CurrentBatchSortingStrategy.entries.forEach { strategy ->
-                            Button(
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    viewModel.applyCurrentBatchSortingStrategy(strategy)
-                                    sortByDialog.hide()
-                                },
-                                enabled = viewModel.currentBatchSortingStrategy != strategy,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                )
-                            ) {
-                                Text(text = stringResource(id = strategy.displayNameRes), color = MaterialTheme.colorScheme.onPrimary)
+                            fun selectStrategy() {
+                                viewModel.applyCurrentBatchSortingStrategy(strategy)
+                                sortByDialog.hide()
                             }
-
+                            Box(modifier = Modifier.clickable { selectStrategy() }) {
+                                Row(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(checked = viewModel.currentBatchSortingStrategy == strategy, onCheckedChange = { selectStrategy() })
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(text = stringResource(id = strategy.displayNameRes), color = MaterialTheme.colorScheme.onSurface)
+                                }
+                            }
                         }
                     }
                 }
