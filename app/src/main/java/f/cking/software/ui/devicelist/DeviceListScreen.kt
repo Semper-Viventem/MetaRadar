@@ -183,6 +183,7 @@ object DeviceListScreen {
                 currentBatch.forEach { deviceData ->
                     DeviceListItem(
                         device = deviceData,
+                        showSignalData = true,
                         onClick = { viewModel.onDeviceClick(deviceData) },
                         onTagSelected = { viewModel.onTagSelected(it) },
                     )

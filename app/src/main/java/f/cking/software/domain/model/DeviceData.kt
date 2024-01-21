@@ -35,6 +35,7 @@ data class DeviceData(
             lastDetectTimeMs = new.lastDetectTimeMs,
             name = new.name,
             manufacturerInfo = new.manufacturerInfo,
+            rssi = new.rssi,
         )
     }
 }

@@ -57,6 +57,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogButtons
 import com.vanpra.composematerialdialogs.MaterialDialogScope
@@ -212,6 +213,7 @@ fun ClickableField(
 @Composable
 fun DeviceListItem(
     device: DeviceData,
+    showSignalData: Boolean = false,
     onTagSelected: (tag: String) -> Unit = {},
     onClick: () -> Unit,
 ) {
@@ -224,10 +226,6 @@ fun DeviceListItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = device.name ?: stringResource(R.string.not_applicable), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.width(4.dp))
-                device.tags.forEach {
-                    Spacer(modifier = Modifier.width(4.dp))
-                    TagChip(tagName = it, onClick = { onTagSelected.invoke(it) })
-                }
                 if (device.favorite) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
@@ -236,6 +234,21 @@ fun DeviceListItem(
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
+                }
+                if (showSignalData) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(modifier = Modifier, text = "${device.rssi} dBm", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+            device.tags.takeIf { it.isNotEmpty() }?.let { tags ->
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    mainAxisSpacing = 4.dp,
+                ) {
+                    tags.forEachIndexed { index, tag ->
+                        TagChip(tagName = tag, onClick = { onTagSelected.invoke(tag) })
+                    }
                 }
             }
             device.manufacturerInfo?.name?.let {
