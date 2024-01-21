@@ -222,8 +222,8 @@ class DeviceListViewModel(
             searchQuery
         }
 
-        devicesViewState = withContext(Dispatchers.Default) {
-            devices
+        withContext(Dispatchers.Default) {
+            devicesViewState = devices
                 .filter { checkFilter(it, filter) && filterQuery(it, query) }
                 .sortedWith(GENERAL_COMPARATOR)
                 .apply {

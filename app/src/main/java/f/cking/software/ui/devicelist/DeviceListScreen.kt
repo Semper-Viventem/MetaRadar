@@ -83,10 +83,8 @@ object DeviceListScreen {
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
         val viewModel: DeviceListViewModel = koinViewModel()
-        val focusManager = LocalFocusManager.current
 
-        val list = viewModel.devicesViewState
-        if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty() && viewModel.currentBatchViewState == null) {
+        if (viewModel.devicesViewState.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty() && viewModel.currentBatchViewState == null) {
             ContentPlaceholder(stringResource(R.string.device_list_placeholder), modifier)
             if (viewModel.isLoading) {
                 LinearProgressIndicator(
@@ -97,79 +95,85 @@ object DeviceListScreen {
                 )
             }
         } else {
-            val state = rememberLazyListState()
-            val nestedScroll = remember {
-                object : NestedScrollConnection {
-                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                        focusManager.clearFocus(true)
-                        if (list.isNotEmpty() && state.layoutInfo.visibleItemsInfo.any { it.contentType == ListContentType.PAGINATION_PROGRESS }) {
-                            viewModel.onScrollEnd()
-                        }
-                        return super.onPreScroll(available, source)
+            DevicesListContent(modifier, viewModel)
+        }
+    }
+
+    @Composable
+    fun DevicesListContent(modifier: Modifier, viewModel: DeviceListViewModel) {
+        val focusManager = LocalFocusManager.current
+        val state = rememberLazyListState()
+        val nestedScroll = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    focusManager.clearFocus(true)
+                    if (viewModel.devicesViewState.isNotEmpty() && state.layoutInfo.visibleItemsInfo.any { it.contentType == ListContentType.PAGINATION_PROGRESS }) {
+                        viewModel.onScrollEnd()
+                    }
+                    return super.onPreScroll(available, source)
+                }
+            }
+        }
+        LazyColumn(
+            modifier = modifier.nestedScroll(nestedScroll),
+            state = state,
+        ) {
+            stickyHeader {
+                Box() {
+                    Filters(viewModel)
+                    if (viewModel.isLoading) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
-            LazyColumn(
-                modifier = modifier.nestedScroll(nestedScroll),
-                state = state,
-            ) {
-                stickyHeader {
-                    Box() {
-                        Filters(viewModel)
-                        if (viewModel.isLoading) {
-                            LinearProgressIndicator(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(4.dp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+
+            if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
+                item(contentType = ListContentType.ENJOY_THE_APP) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
+                }
+            }
+
+            if (viewModel.currentBatchViewState != null) {
+                item(contentType = ListContentType.CURRENT_BATCH) {
+                    CurrentBatch(viewModel)
+                }
+            }
+
+            viewModel.devicesViewState.mapIndexed { index, deviceData ->
+                item(contentType = ListContentType.DEVICE) {
+                    DeviceListItem(
+                        device = deviceData,
+                        onClick = { viewModel.onDeviceClick(deviceData) },
+                        onTagSelected = { viewModel.onTagSelected(it) },
+                    )
+
+                }
+                val showDivider = viewModel.devicesViewState.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
+                if (showDivider) {
+                    item(contentType = ListContentType.DIVIDER) { Divider() }
+                }
+            }
+
+            if (viewModel.isPaginationEnabled) {
+                item(contentType = ListContentType.PAGINATION_PROGRESS) {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(), contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
+            }
 
-                if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
-                    item(contentType = ListContentType.ENJOY_THE_APP) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
-                    }
-                }
-
-                if (viewModel.currentBatchViewState != null) {
-                    item(contentType = ListContentType.CURRENT_BATCH) {
-                        CurrentBatch(viewModel)
-                    }
-                }
-
-                list.mapIndexed { index, deviceData ->
-                    item(contentType = ListContentType.DEVICE) {
-                        DeviceListItem(
-                            device = deviceData,
-                            onClick = { viewModel.onDeviceClick(deviceData) },
-                            onTagSelected = { viewModel.onTagSelected(it) },
-                        )
-
-                    }
-                    val showDivider = list.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
-                    if (showDivider) {
-                        item(contentType = ListContentType.DIVIDER) { Divider() }
-                    }
-                }
-
-                if (viewModel.isPaginationEnabled) {
-                    item(contentType = ListContentType.PAGINATION_PROGRESS) {
-                        Box(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(), contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                }
-
-                item(contentType = ListContentType.BOTTOM_SPACER) {
-                    FABSpacer()
-                }
+            item(contentType = ListContentType.BOTTOM_SPACER) {
+                FABSpacer()
             }
         }
     }
@@ -178,7 +182,6 @@ object DeviceListScreen {
         ENJOY_THE_APP, CURRENT_BATCH, DEVICE, DIVIDER, PAGINATION_PROGRESS, BOTTOM_SPACER,
     }
 
-    @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
     fun CurrentBatch(
         viewModel: DeviceListViewModel,
@@ -193,27 +196,7 @@ object DeviceListScreen {
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(16.dp))
-                var atEnd by remember { mutableStateOf(false) }
-                val radarIcon = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
-                val painter = rememberAnimatedVectorPainter(radarIcon, atEnd)
-                val animatedPainter = rememberAnimatedVectorPainter(radarIcon, !atEnd)
-                Image(
-                    painter = if (atEnd) painter else animatedPainter,
-                    contentDescription = null,
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.current_batch_title),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                LaunchedEffect(key1 = radarIcon) {
-                    while (isActive) {
-                        delay(1000)
-                        atEnd = !atEnd
-                    }
-                }
+                RadarIcon()
 
                 val sortByDialog = rememberMaterialDialogState()
                 ThemedDialog(sortByDialog) {
@@ -261,6 +244,32 @@ object DeviceListScreen {
             Spacer(modifier = Modifier.height(8.dp))
             CurrentBatchList(viewModel)
             Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    @OptIn(ExperimentalAnimationGraphicsApi::class)
+    @Composable
+    private fun RadarIcon() {
+        var atEnd by remember { mutableStateOf(false) }
+        val radarIcon = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
+        val painter = rememberAnimatedVectorPainter(radarIcon, atEnd)
+        val animatedPainter = rememberAnimatedVectorPainter(radarIcon, !atEnd)
+        Image(
+            painter = if (atEnd) painter else animatedPainter,
+            contentDescription = null,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.current_batch_title),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        LaunchedEffect(key1 = radarIcon) {
+            while (isActive) {
+                delay(1200)
+                atEnd = !atEnd
+            }
         }
     }
 
