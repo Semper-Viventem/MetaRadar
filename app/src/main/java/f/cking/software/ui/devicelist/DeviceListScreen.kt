@@ -187,12 +187,7 @@ object DeviceListScreen {
         viewModel: DeviceListViewModel,
     ) {
         Spacer(modifier = Modifier.height(8.dp))
-        RoundedBox(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            internalPaddings = 0.dp,
-        ) {
+        RoundedBox(internalPaddings = 0.dp) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(16.dp))
