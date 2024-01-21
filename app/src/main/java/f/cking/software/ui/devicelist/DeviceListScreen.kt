@@ -82,7 +82,7 @@ object DeviceListScreen {
         val focusManager = LocalFocusManager.current
 
         val list = viewModel.devicesViewState
-        if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty()) {
+        if (list.isEmpty() && !viewModel.isSearchMode && viewModel.appliedFilter.isEmpty() && viewModel.currentBatchViewState == null) {
             ContentPlaceholder(stringResource(R.string.device_list_placeholder), modifier)
             if (viewModel.isLoading) {
                 LinearProgressIndicator(
@@ -214,13 +214,16 @@ object DeviceListScreen {
     private fun CurrentBatchList(viewModel: DeviceListViewModel) {
         val currentBatch = viewModel.currentBatchViewState!!
         if (currentBatch.isNotEmpty()) {
-            currentBatch.forEach { deviceData ->
+            currentBatch.forEachIndexed { index, deviceData ->
                 DeviceListItem(
                     device = deviceData,
                     showSignalData = true,
                     onClick = { viewModel.onDeviceClick(deviceData) },
                     onTagSelected = { viewModel.onTagSelected(it) },
                 )
+                if (index < currentBatch.lastIndex) {
+                    Divider()
+                }
             }
         } else {
             Text(
