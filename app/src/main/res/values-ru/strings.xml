@@ -46,6 +46,8 @@
     <string name="no_location_data_yet">Нет данных геолокации</string>
     <string name="location_fetches_only_if_service_is_turned_on">Геолокация обновляется, когда работает сканер.</string>
     <string name="last_location_update_time">Время последнего обновления геолокации: %s.</string>
+    <string name="lat_template">Широта: %s</string>
+    <string name="lng_template">Долгота: %s</string>
     <string name="clear_garbage">Очистить мусор</string>
     <string name="restore_data_from_file_title">Восстановить Базу Данных из файла?</string>
     <string name="restore_data_from_file_subtitle">Текущая База Данных будет перезаписана. Данные будут удалены.</string>
@@ -74,6 +76,9 @@
     <string name="app_info_distribution">Доставка сборки: %s</string>
 
     <!-- Select manufacturer -->
+    <string name="project_github_title">%s — это проект с открытым исходным кодом. Вы можете найти исходники на Github, задать свой вопрос или оценить репозиторий!</string>
+    <string name="open_github">Открыть GitHub</string>
+    <string name="secret_cat">Секретный кот</string>
     <string name="select_manufacturer">Выбор производителя</string>
 
     <!-- Select location -->
@@ -151,6 +156,15 @@
     <string name="favorite">Избранное</string>
 
     <!-- Device Details -->
+    <string name="enjoy_the_app_question">Вам нравится приложение?</string>
+    <string name="enjoy_the_app_yes">Да</string>
+    <string name="enjoy_the_app_not_really">Не очень</string>
+    <string name="enjoy_the_app_ask_later">Напомнить позже</string>
+    <string name="rate_the_app">Рад это слышать! Можете поставить оценку?</string>
+    <string name="rate_the_app_github">GitHub</string>
+    <string name="report_the_problem">Жаль это слышать. Вы можете рассказать о своей проблеме в issue на Github.</string>
+    <string name="current_batch_title">Устройства вокруг</string>
+    <string name="current_batch_empty">Устройства еще не обнаружены</string>
     <string name="device_details_title">Детализация устройства</string>
     <string name="is_not_favorite">Не в избранном</string>
     <string name="device_details_name">Имя</string>
@@ -179,6 +193,8 @@
     <string name="osm_copyright">© OpenStreetMap</string>
 
     <!-- Main Screen -->
+    <string name="rssi_value">%s dBm</string>
+    <string name="distance_to_device">%s м</string>
     <string name="menu_device_list">Список устройств</string>
     <string name="menu_radar_profiles">Профили радара</string>
     <string name="menu_journal">Журнал</string>
@@ -229,4 +245,6 @@
     <string name="permission_data_coolect_info">Приложение не собирает и не передает ваши данные. Исходный код приложения открытый и доступен на github</string>
     <string name="grant_permissions_manually">Предоставьте необходимое разрешение вручную</string>
     <string name="cannot_open_the_url">Не удаетс яоткрыть URL</string>
+    <string name="disclaimer">Внимание</string>
+    <string name="device_distance_disclaimer">Расстояние до устройства считается на основе RSSI и является приблизительным</string>
 </resources>

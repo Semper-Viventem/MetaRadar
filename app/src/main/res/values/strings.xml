@@ -200,6 +200,10 @@
     <string name="add_tag">Add tag</string>
     <string name="delete_tag_title">Delete tag \"%s\"?</string>
     <string name="osm_copyright">© OpenStreetMap</string>
+    <string name="rssi_value">%s dBm</string>
+    <string name="distance_to_device">%s m</string>
+    <string name="disclaimer">Disclaimer</string>
+    <string name="device_distance_disclaimer">Distance to device is calculated based on RSSI value. It\'s not accurate</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>

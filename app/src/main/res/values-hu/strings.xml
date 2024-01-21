@@ -10,7 +10,6 @@
     <string name="app_info_distribution">Terjesztés: %s</string>
     <string name="app_info_title">Információ</string>
     <string name="app_info_version">Verzió: %1$s (%2$s)</string>
-    <string name="app_name">BLE Radar</string>
     <string name="app_service_title">@string/app_name</string>
     <string name="app_service_title_power_saving">%s · Energiatakarékos</string>
     <string name="back">Vissza</string>

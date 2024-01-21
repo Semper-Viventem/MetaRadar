@@ -29,6 +29,21 @@ data class DeviceData(
         return (System.currentTimeMillis() - lastDetectTimeMs).getTimePeriodStr(context)
     }
 
+    fun distance(): Float? {
+        return if (rssi != null) {
+            val txPower = -59 //hard coded power value. Usually ranges between -59 to -65
+            val ratio = rssi * 1.0 / txPower
+            val distance = if (ratio < 1.0) {
+                Math.pow(ratio, 10.0)
+            } else {
+                (0.89976) * Math.pow(ratio, 7.7095) + 0.111
+            }
+            distance.toFloat()
+        } else {
+            null
+        }
+    }
+
     fun mergeWithNewDetected(new: DeviceData): DeviceData {
         return this.copy(
             detectCount = detectCount + 1,
