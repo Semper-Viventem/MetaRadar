@@ -173,6 +173,7 @@ dependencies {
     debugImplementation(libs.compose.tooling)
     implementation(libs.compose.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.compose.animation)
 
     // room
     implementation(libs.room.runtime)

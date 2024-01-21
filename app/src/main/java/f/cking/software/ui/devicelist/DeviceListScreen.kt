@@ -1,6 +1,11 @@
 package f.cking.software.ui.devicelist
 
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -34,7 +39,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -51,7 +59,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
-import f.cking.software.domain.model.DeviceData
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.ui.filter.SelectFilterTypeScreen
 import f.cking.software.utils.graphic.ContentPlaceholder
@@ -59,6 +66,8 @@ import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
 import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -121,10 +130,9 @@ object DeviceListScreen {
                     }
                 }
 
-                val currentBatch = viewModel.currentBatchViewState
-                if (currentBatch != null) {
+                if (viewModel.currentBatchViewState != null) {
                     item(contentType = ListContentType.CURRENT_BATCH) {
-                        CurrentBatch(currentBatch, viewModel)
+                        CurrentBatch(viewModel)
                     }
                 }
 
@@ -164,39 +172,63 @@ object DeviceListScreen {
         ENJOY_THE_APP, CURRENT_BATCH, DEVICE, DIVIDER, PAGINATION_PROGRESS, BOTTOM_SPACER,
     }
 
+    @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
     fun CurrentBatch(
-        currentBatch: List<DeviceData>,
         viewModel: DeviceListViewModel,
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         RoundedBox(internalPaddings = 0.dp) {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = stringResource(R.string.current_batch_title),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            if (currentBatch.isNotEmpty()) {
-                currentBatch.forEach { deviceData ->
-                    DeviceListItem(
-                        device = deviceData,
-                        showSignalData = true,
-                        onClick = { viewModel.onDeviceClick(deviceData) },
-                        onTagSelected = { viewModel.onTagSelected(it) },
-                    )
-                }
-            } else {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.current_batch_empty),
-                    fontWeight = FontWeight.Light,
-                    fontSize = 16.sp,
+            Row {
+                Spacer(modifier = Modifier.width(16.dp))
+                var atEnd by remember { mutableStateOf(false) }
+                val radarIcon = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
+                val painter = rememberAnimatedVectorPainter(radarIcon, atEnd)
+                val animatedPainter = rememberAnimatedVectorPainter(radarIcon, !atEnd)
+                Image(
+                    painter = if (atEnd) painter else animatedPainter,
+                    contentDescription = null,
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.current_batch_title),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                LaunchedEffect(key1 = radarIcon) {
+                    while (isActive) {
+                        delay(1000)
+                        atEnd = !atEnd
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
+            CurrentBatchList(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    @Composable
+    private fun CurrentBatchList(viewModel: DeviceListViewModel) {
+        val currentBatch = viewModel.currentBatchViewState!!
+        if (currentBatch.isNotEmpty()) {
+            currentBatch.forEach { deviceData ->
+                DeviceListItem(
+                    device = deviceData,
+                    showSignalData = true,
+                    onClick = { viewModel.onDeviceClick(deviceData) },
+                    onTagSelected = { viewModel.onTagSelected(it) },
+                )
+            }
+        } else {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = stringResource(R.string.current_batch_empty),
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp,
+            )
         }
     }
 
