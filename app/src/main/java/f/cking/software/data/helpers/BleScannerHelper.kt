@@ -7,7 +7,6 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import f.cking.software.domain.interactor.GetKnownDevicesInteractor
 import f.cking.software.domain.model.BleScanDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,7 @@ import timber.log.Timber
 import java.util.*
 
 class BleScannerHelper(
-    private val getKnownDevicesInteractor: GetKnownDevicesInteractor,
+    private val bleFiltersProvider: BleFiltersProvider,
     private val appContext: Context,
     private val powerModeHelper: PowerModeHelper,
 ) {
@@ -26,7 +25,6 @@ class BleScannerHelper(
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val batch = hashMapOf<String, BleScanDevice>()
     private var currentScanTimeMs: Long = System.currentTimeMillis()
-    private val bleFiltersProvider = BleFiltersProvider(getKnownDevicesInteractor)
 
     var inProgress = MutableStateFlow(false)
 
@@ -84,10 +82,9 @@ class BleScannerHelper(
             inProgress.tryEmit(true)
             currentScanTimeMs = System.currentTimeMillis()
 
-            val scanFilters = if (powerModeHelper.powerMode().useRestrictedBleConfig) {
-                bleFiltersProvider.getBGFilters() +
-                        bleFiltersProvider.getPopularServiceUUIDS() +
-                        bleFiltersProvider.getManufacturerFilter()
+            val powerMode = powerModeHelper.powerMode()
+            val scanFilters = if (powerMode.useRestrictedBleConfig) {
+                bleFiltersProvider.getBackgroundFilters()
             } else {
                 listOf(ScanFilter.Builder().build())
             }

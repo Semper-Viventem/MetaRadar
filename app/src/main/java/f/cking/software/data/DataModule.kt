@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import f.cking.software.data.database.AppDatabase
 import f.cking.software.data.helpers.ActivityProvider
+import f.cking.software.data.helpers.BleFiltersProvider
 import f.cking.software.data.helpers.BleScannerHelper
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.LocationProvider
@@ -24,6 +25,7 @@ class DataModule(
 ) {
     val module = module {
         single { BleScannerHelper(get(), get(), get()) }
+        single { BleFiltersProvider(get()) }
         single { get<Context>().getSharedPreferences(sharedPreferencesName, MODE_PRIVATE) }
         single { SettingsRepository(get()) }
         single { AppDatabase.build(get(), appDatabaseName) }
