@@ -1,3 +1,5 @@
+<img src='/metadata/en-US/images/header.png'/>
+
 # Bluetooth Radar
 
 <a href='https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/dd3fc41a-9b51-4747-9a2c-57b37d4706aa' width='200'/></a>
