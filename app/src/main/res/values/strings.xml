@@ -193,7 +193,8 @@
     <string name="device_details_month">Month</string>
     <string name="device_details_all_time">All time</string>
     <string name="time_ago">%s ago</string>
-    <string name="lifetime_data">lifetime: %1$s | last update: %2$s ago</string>
+    <string name="lifetime_data_last_update">lifetime: %1$s | last update: %2$s ago</string>
+    <string name="lifetime_data">lifetime: %1$s</string>
     <string name="device_list_placeholder">No data yet. To start scanning, click on the Scan button</string>
     <string name="tag_name">Tag name</string>
     <string name="create_new_tag">Create new</string>
@@ -207,6 +208,7 @@
     <string name="sort_by_title">Sort by</string>
     <string name="sort_type_standart">Default</string>
     <string name="sort_type_by_distance">Distance</string>
+    <string name="active_mode_show_all">Show all %s online devices</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>

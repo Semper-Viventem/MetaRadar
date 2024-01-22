@@ -104,7 +104,7 @@
     <string name="last_location_update_time">Legutóbbi helyzet-frissítés: %s</string>
     <string name="lat_template">szélesség: %s</string>
     <string name="launch_on_system_startup_title">Indítás a rendszer indításával</string>
-    <string name="lifetime_data">örök: %1$s | legutóbbi frissítés: %2$s ideje</string>
+    <string name="lifetime_data">örök: %1$s</string>
     <string name="lng_template">hosszúság: %s</string>
     <string name="location_fetches_only_if_service_is_turned_on">A hely csak akkor jelenik meg, ha a szkenner elindul</string>
     <string name="location_is_turned_off_subtitle">A Bluetooth radar nem tud szkennelni, ha a helyszolgáltatások ki vannak kapcsolva, az android korlátozásai miatt</string>
@@ -169,4 +169,5 @@
     <string name="total_devices_around">%s összes eszköz a közelben</string>
     <string name="turn_on">Bekapcsolás</string>
     <string name="unknown_capital_case">ISMERETLEN</string>
+    <string name="lifetime_data_last_update">örök: %1$s | legutóbbi frissítés: %2$s ideje</string>
 </resources>
