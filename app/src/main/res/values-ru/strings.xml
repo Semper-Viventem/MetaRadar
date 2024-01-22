@@ -184,7 +184,7 @@
     <string name="device_details_month">Месяц</string>
     <string name="device_details_all_time">Все время</string>
     <string name="time_ago">%s назад</string>
-    <string name="lifetime_data">Время жизни: %1$s | Последнее обновление: %2$s назад</string>
+    <string name="lifetime_data">Время жизни: %1$s</string>
     <string name="device_list_placeholder">Пока нет данных. Для начала сканирования нажмите на кнопку \"Сканировать\"</string>
     <string name="tag_name">Имя тэга</string>
     <string name="create_new_tag">Создать новый</string>
@@ -250,4 +250,5 @@
     <string name="cannot_open_the_url">Не удаетс яоткрыть URL</string>
     <string name="disclaimer">Внимание</string>
     <string name="device_distance_disclaimer">Расстояние до устройства считается на основе RSSI и является приблизительным</string>
+    <string name="lifetime_data_last_update">Время жизни: %1$s | Последнее обновление: %2$s назад</string>
 </resources>
