@@ -214,8 +214,8 @@ object DeviceListScreen {
     private fun ExpandIcon(viewModel: DeviceListViewModel) {
         val state = viewModel.activeScannerExpandedState
         val icon = when (state) {
-            DeviceListViewModel.ActiveScannerExpandedState.COLLAPSED -> painterResource(id = R.drawable.ic_drop_up)
-            DeviceListViewModel.ActiveScannerExpandedState.EXPANDED -> painterResource(id = R.drawable.ic_drop_down)
+            DeviceListViewModel.ActiveScannerExpandedState.COLLAPSED -> painterResource(id = R.drawable.ic_show_less)
+            DeviceListViewModel.ActiveScannerExpandedState.EXPANDED -> painterResource(id = R.drawable.ic_show_more)
         }
         IconButton(onClick = { viewModel.activeScannerExpandedState = state.next() }) {
             Icon(
