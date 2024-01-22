@@ -42,6 +42,7 @@ class DeviceListViewModel(
 
     var currentBatchSortingStrategy by mutableStateOf(CurrentBatchSortingStrategy.GENERAL)
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
+    var activeScannerExpandedState by mutableStateOf(ActiveScannerExpandedState.COLLAPSED)
     var currentBatchViewState by mutableStateOf<List<DeviceData>?>(null)
     var appliedFilter: List<FilterHolder> by mutableStateOf(emptyList())
     var searchQuery: String? by mutableStateOf(null)
@@ -355,6 +356,18 @@ class DeviceListViewModel(
                 else -> GENERAL_COMPARATOR.compare(first, second)
             }
         }, R.string.sort_type_by_distance)
+    }
+
+    enum class ActiveScannerExpandedState {
+        EXPANDED, COLLAPSED;
+
+        fun next(): ActiveScannerExpandedState {
+            return entries.elementAt((ordinal + 1) % entries.size)
+        }
+
+        companion object {
+            val MAX_DEVICES_COUNT = 3
+        }
     }
 
     companion object {

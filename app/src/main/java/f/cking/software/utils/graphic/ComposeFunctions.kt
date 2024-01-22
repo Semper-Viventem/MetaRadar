@@ -239,6 +239,7 @@ fun ClickableField(
 fun DeviceListItem(
     device: DeviceData,
     showSignalData: Boolean = false,
+    showLastUpdate: Boolean = true,
     onTagSelected: (tag: String) -> Unit = {},
     onClick: () -> Unit,
 ) {
@@ -319,6 +320,19 @@ fun DeviceListItem(
                 fontWeight = FontWeight.Light,
             )
             Spacer(modifier = Modifier.height(4.dp))
+
+            val updateStr = if (showLastUpdate) {
+                stringResource(
+                    R.string.lifetime_data_last_update,
+                    device.firstDetectionPeriod(LocalContext.current),
+                    device.lastDetectionPeriod(LocalContext.current),
+                )
+            } else {
+                stringResource(
+                    R.string.lifetime_data,
+                    device.firstDetectionPeriod(LocalContext.current),
+                )
+            }
             Text(
                 text = stringResource(
                     R.string.lifetime_data,

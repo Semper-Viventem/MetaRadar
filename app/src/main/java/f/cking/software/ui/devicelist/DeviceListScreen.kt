@@ -44,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,7 +72,7 @@ import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -192,53 +193,83 @@ object DeviceListScreen {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(16.dp))
                 RadarIcon()
-
-                val sortByDialog = rememberMaterialDialogState()
-                ThemedDialog(sortByDialog) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(16.dp),
-                            text = stringResource(R.string.sort_by_title),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 20.sp
-                        )
-                        DeviceListViewModel.CurrentBatchSortingStrategy.entries.forEach { strategy ->
-                            fun selectStrategy() {
-                                viewModel.applyCurrentBatchSortingStrategy(strategy)
-                                sortByDialog.hide()
-                            }
-                            Box(modifier = Modifier.clickable { selectStrategy() }) {
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Checkbox(checked = viewModel.currentBatchSortingStrategy == strategy, onCheckedChange = { selectStrategy() })
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(text = stringResource(id = strategy.displayNameRes), color = MaterialTheme.colorScheme.onSurface)
-                                }
-                            }
-                        }
-                    }
-                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.current_batch_title),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                )
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { sortByDialog.show() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_sort),
-                        contentDescription = stringResource(R.string.sort_by_title),
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
+                if (!viewModel.currentBatchViewState.isNullOrEmpty()) {
+                    ExpandIcon(viewModel)
+                    SortByIcon(viewModel)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
             CurrentBatchList(viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    @Composable
+    private fun ExpandIcon(viewModel: DeviceListViewModel) {
+        val state = viewModel.activeScannerExpandedState
+        val icon = when (state) {
+            DeviceListViewModel.ActiveScannerExpandedState.COLLAPSED -> painterResource(id = R.drawable.ic_drop_up)
+            DeviceListViewModel.ActiveScannerExpandedState.EXPANDED -> painterResource(id = R.drawable.ic_drop_down)
+        }
+        IconButton(onClick = { viewModel.activeScannerExpandedState = state.next() }) {
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
+
+    @Composable
+    private fun SortByIcon(viewModel: DeviceListViewModel) {
+        val sortByDialog = rememberMaterialDialogState()
+        ThemedDialog(sortByDialog) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            ) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = stringResource(R.string.sort_by_title),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp
+                )
+                DeviceListViewModel.CurrentBatchSortingStrategy.entries.forEach { strategy ->
+                    fun selectStrategy() {
+                        viewModel.applyCurrentBatchSortingStrategy(strategy)
+                        sortByDialog.hide()
+                    }
+                    Box(modifier = Modifier.clickable { selectStrategy() }) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(checked = viewModel.currentBatchSortingStrategy == strategy, onCheckedChange = { selectStrategy() })
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = stringResource(id = strategy.displayNameRes), color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+                }
+            }
+        }
+
+
+        IconButton(onClick = { sortByDialog.show() }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_sort),
+                contentDescription = stringResource(R.string.sort_by_title),
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
 
@@ -253,15 +284,9 @@ object DeviceListScreen {
             painter = if (atEnd) painter else animatedPainter,
             contentDescription = null,
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(R.string.current_batch_title),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp,
-        )
-        Spacer(modifier = Modifier.width(16.dp))
+        val scope = rememberCoroutineScope()
         LaunchedEffect(key1 = radarIcon) {
-            while (isActive) {
+            scope.launch {
                 delay(1200)
                 atEnd = !atEnd
             }
@@ -271,24 +296,51 @@ object DeviceListScreen {
     @Composable
     private fun CurrentBatchList(viewModel: DeviceListViewModel) {
         val currentBatch = viewModel.currentBatchViewState!!
+        val mode = viewModel.activeScannerExpandedState
+        val visibleDevices = when (mode) {
+            DeviceListViewModel.ActiveScannerExpandedState.COLLAPSED -> currentBatch.take(DeviceListViewModel.ActiveScannerExpandedState.MAX_DEVICES_COUNT)
+            DeviceListViewModel.ActiveScannerExpandedState.EXPANDED -> currentBatch
+        }
         if (currentBatch.isNotEmpty()) {
-            currentBatch.forEachIndexed { index, deviceData ->
+            visibleDevices.forEachIndexed { index, deviceData ->
                 DeviceListItem(
                     device = deviceData,
                     showSignalData = true,
+                    showLastUpdate = false,
                     onClick = { viewModel.onDeviceClick(deviceData) },
                     onTagSelected = { viewModel.onTagSelected(it) },
                 )
-                if (index < currentBatch.lastIndex) {
+                if (index < visibleDevices.lastIndex) {
                     Divider()
+                }
+            }
+            if (mode == DeviceListViewModel.ActiveScannerExpandedState.COLLAPSED
+                && visibleDevices.size < currentBatch.size
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            viewModel.activeScannerExpandedState = DeviceListViewModel.ActiveScannerExpandedState.EXPANDED
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.active_mode_show_all, currentBatch.size.toString()),
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Icon(painter = painterResource(id = R.drawable.ic_more), contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                 }
             }
         } else {
             Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(16.dp),
                 text = stringResource(R.string.current_batch_empty),
                 fontWeight = FontWeight.Light,
                 fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }
