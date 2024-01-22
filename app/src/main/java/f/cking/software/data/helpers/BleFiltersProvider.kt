@@ -2,14 +2,20 @@ package f.cking.software.data.helpers
 
 import android.bluetooth.le.ScanFilter
 import android.os.ParcelUuid
-import f.cking.software.domain.interactor.GetKnownDevicesInteractor
+import f.cking.software.domain.interactor.GetAllDevicesInteractor
 import f.cking.software.domain.model.ManufacturerInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BleFiltersProvider(
-    private val getKnownDevicesInteractor: GetKnownDevicesInteractor,
+    private val getAllDevicesInteractor: GetAllDevicesInteractor,
 ) {
 
     val previouslyNoticedServicesUUIDs = mutableSetOf<String>()
+
+    suspend fun getBackgroundFilters(): List<ScanFilter> {
+        return getKnownDevicesFilters() + getPopularServiceUUIDS() + getManufacturerFilter()
+    }
 
     fun getPopularServiceUUIDS(): List<ScanFilter> {
         return (popularServicesUUID + previouslyNoticedServicesUUIDs).map { uuid ->
@@ -39,14 +45,28 @@ class BleFiltersProvider(
 
     }
 
-    suspend fun getBGFilters(): List<ScanFilter> {
-        return getKnownDevicesInteractor.execute()
-            .take(KNOWN_DEVICES_LIMIT) // Limit filters to fit into android scan registerer limitations
-            .map {
-                ScanFilter.Builder()
-                    .setDeviceAddress(it.address)
-                    .build()
-            }
+    suspend fun getKnownDevicesFilters(): List<ScanFilter> {
+        return withContext(Dispatchers.Default) {
+            val allKnownDevices = getAllDevicesInteractor.execute()
+
+            val lastSeenDevices = allKnownDevices
+                .sortedByDescending { it.lastDetectTimeMs }
+                .take(KNOWN_DEVICES_LIMIT) // Limit filters to fit into android scan registerer limitations
+                .map { it.address }
+                .toSet()
+
+            val shouldBeIncluded = allKnownDevices
+                .filter { it.tags.isNotEmpty() || it.favorite }
+                .map { it.address }
+                .toSet()
+
+            (lastSeenDevices + shouldBeIncluded)
+                .map {
+                    ScanFilter.Builder()
+                        .setDeviceAddress(it)
+                        .build()
+                }
+        }
     }
 
     private object NearByData {
