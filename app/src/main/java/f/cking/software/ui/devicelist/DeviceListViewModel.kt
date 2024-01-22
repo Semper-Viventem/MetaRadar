@@ -225,7 +225,13 @@ class DeviceListViewModel(
 
         withContext(Dispatchers.Default) {
             devicesViewState = devices
-                .filter { checkFilter(it, filter) && filterQuery(it, query) }
+                .let {
+                    if (filter != null || query != null) {
+                        it.filter { checkFilter(it, filter) && filterQuery(it, query) }
+                    } else {
+                        it
+                    }
+                }
                 .sortedWith(GENERAL_COMPARATOR)
                 .apply {
                     showEnjoyTheAppIfNeeded()
