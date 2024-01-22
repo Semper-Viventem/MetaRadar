@@ -334,11 +334,7 @@ fun DeviceListItem(
                 )
             }
             Text(
-                text = stringResource(
-                    R.string.lifetime_data,
-                    device.firstDetectionPeriod(LocalContext.current),
-                    device.lastDetectionPeriod(LocalContext.current)
-                ),
+                text = updateStr,
                 fontWeight = FontWeight.Light,
             )
         }
