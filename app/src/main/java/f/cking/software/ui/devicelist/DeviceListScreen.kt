@@ -44,7 +44,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +71,7 @@ import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -284,9 +283,8 @@ object DeviceListScreen {
             painter = if (atEnd) painter else animatedPainter,
             contentDescription = null,
         )
-        val scope = rememberCoroutineScope()
         LaunchedEffect(key1 = radarIcon) {
-            scope.launch {
+            while (isActive) {
                 delay(1200)
                 atEnd = !atEnd
             }
