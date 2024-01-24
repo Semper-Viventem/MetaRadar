@@ -16,6 +16,4 @@ This application does not share your personal data or geolocation, all work is o
 
 <br>
 
-<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_2.png' width='300'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_4.png' width='300'/>
-
-<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_5.png' width='300'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_7.png' width='300'/>
+<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_2.png' width='200'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_4.png' width='200'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_5.png' width='200'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_7.png' width='200'/>
