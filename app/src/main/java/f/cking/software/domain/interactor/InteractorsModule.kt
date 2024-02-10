@@ -26,7 +26,7 @@ object InteractorsModule {
         factory { RestoreDatabaseInteractor(get(), get(), get()) }
         factory { SaveRadarProfile(get(), get()) }
         factory { DeleteRadarProfile(get(), get()) }
-        single { CheckDeviceLocationHistoryInteractor(get()) }
+        factory { CheckDeviceLocationHistoryInteractor(get()) }
         factory { CheckUserLocationHistoryInteractor(get()) }
         factory { AddTagToDeviceInteractor(get(), get()) }
         factory { RemoveTagFromDeviceInteractor(get()) }
