@@ -97,20 +97,35 @@
     <!-- Select filter -->
     <string name="select_filter">Select filter</string>
     <string name="filter_by_name">By name</string>
+    <string name="filter_by_name_description">Triggers when the device name matches</string>
     <string name="filter_by_address">By address</string>
+    <string name="filter_by_address_description">Triggers when the device address matches</string>
     <string name="filter_by_first_detection_period">By first detection period</string>
+    <string name="filter_by_first_detection_period_description">Triggers if the found device was first time detected in the selected period</string>
     <string name="filter_by_last_detection_period">By last detection period</string>
+    <string name="filter_by_last_detection_period_description">Triggers if the found device was last time detected in the selected period</string>
     <string name="filter_by_is_favorite">By is favorite</string>
+    <string name="filter_by_is_favorite_description">Triggers if the device is marked as a favorite</string>
     <string name="filter_by_manufacturer">By manufacturer</string>
+    <string name="filter_by_manufacturer_description">Triggers when the device manufacturer matches</string>
     <string name="filter_by_min_lost_period">By min lost period</string>
+    <string name="filter_by_min_lost_period_description">Triggers if the device was lost for the selected period. Might be helpful to avoid constant profile detection if the matched device is online for a long time</string>
     <string name="filter_apple_airdrop_contact">Apple airdrop contact</string>
+    <string name="filter_apple_airdrop_contact_description">[DEPRECATED] Triggers when the device is an Apple device and the airdrop contact matches</string>
     <string name="filter_device_is_following_me">Device is following me</string>
+    <string name="filter_device_is_following_me_description">Triggers if the device is following you during your move for a selected period of time.</string>
     <string name="filter_any_of">Any of</string>
+    <string name="filter_any_of_description">Logical operator OR with group of filters inside</string>
     <string name="filter_all_of">All of</string>
+    <string name="filter_all_of_description">Logical operator AND with group of filters inside</string>
     <string name="filter_not">Not</string>
+    <string name="filter_not_description">Logical operator NOT</string>
     <string name="filter_device_location">By device location</string>
+    <string name="filter_device_location_description">Triggers when the device has been previously seen in the particular location in the selected time period</string>
     <string name="filter_user_location">By your location</string>
+    <string name="filter_user_location_description">Triggers if you are currently in a particular location. It might be helpful to avoid some filters triggering if you are at home or at the office</string>
     <string name="filter_by_tag">By tag</string>
+    <string name="filter_by_tag_description">Triggers if the device has a selected tag</string>
 
     <!-- Profiles list -->
     <string name="create_new">Create new</string>

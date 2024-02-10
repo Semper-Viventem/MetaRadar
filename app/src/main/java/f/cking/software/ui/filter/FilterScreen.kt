@@ -412,7 +412,7 @@ object FilterScreen {
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
                     filter.toDate = null
-                    filter.toDate = null
+                    filter.toTime = null
                 }
             }
         }

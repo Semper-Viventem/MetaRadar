@@ -81,6 +81,7 @@ import org.osmdroid.views.MapView
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.math.abs
+import kotlin.random.Random
 
 @Composable
 fun rememberDateDialog(
@@ -507,7 +508,7 @@ private val colorsDark = listOf(
 @Composable
 fun colorByHash(hash: Int): Color {
     val colors = if (isSystemInDarkTheme()) colorsDark else colorsLight
-    return colors[abs(hash % colors.size)]
+    return colors[abs(Random(hash).nextInt() % colors.size)]
 }
 
 @Composable

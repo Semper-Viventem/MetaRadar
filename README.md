@@ -3,7 +3,10 @@
 # Bluetooth Radar
 
 <a href='https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/dd3fc41a-9b51-4747-9a2c-57b37d4706aa' width='200'/></a>
+<a href='https://github.com/Semper-Viventem/MetaRadar/releases?q=Release+Build&expanded=true'><img alt='Get it on IzzyOnDroid' src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/b1cb44a9-3fd4-4f83-8700-485c10b090ba' width='200'/></a>
 <a href='https://f-droid.org/en/packages/f.cking.software/'><img alt='Get it on F-Droid' src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/c03a0cf2-b39a-4344-adb8-d4cde7ce4b61' width='200'/></a>
+<a href='https://android.izzysoft.de/repo/apk/f.cking.software'><img alt='Get it on IzzyOnDroid' src='https://github.com/Semper-Viventem/MetaRadar/assets/18288554/c0c85c9f-edc8-4fc7-97b1-bda925bf0833' width='200'/></a>
+
 
 This app is a tool for analyzing Bluetooth (BLE) environments. Scans the BLE ether in the background, notifying you if the device you are looking for is near you or if some unknown device has been following you for for a long time.
 
@@ -13,6 +16,4 @@ This application does not share your personal data or geolocation, all work is o
 
 <br>
 
-<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_2.png' width='300'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_4.png' width='300'/>
-
-<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_5.png' width='300'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_7.png' width='300'/>
+<img src='/metadata/en-US/images/phoneScreenshots/Screenshot_2.png' width='200'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_4.png' width='200'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_5.png' width='200'/> <img src='/metadata/en-US/images/phoneScreenshots/Screenshot_7.png' width='200'/>

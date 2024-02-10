@@ -17,7 +17,6 @@ abstract class FilterChecker<T : RadarProfile.Filter>(
         if (useCache() && cacheValue != null
             && System.currentTimeMillis() - cacheValue.time < powerModeHelper.powerMode(useCached = true).filterCacheExpirationTime
         ) {
-            // Timber.d("Cache hit for $key")
             return cacheValue.value
         }
         val result = checkInternal(deviceData, filter)
@@ -39,6 +38,6 @@ abstract class FilterChecker<T : RadarProfile.Filter>(
     )
 
     companion object {
-        private const val MAX_CACHE_SIZE = 5000
+        private const val MAX_CACHE_SIZE = 5_000
     }
 }
