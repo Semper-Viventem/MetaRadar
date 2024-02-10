@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class BgScanService : Service() {
@@ -43,7 +44,7 @@ class BgScanService : Service() {
     private val saveReportInteractor: SaveReportInteractor by inject()
 
     private val handler = Handler(Looper.getMainLooper())
-    private var failureScanCounter: Int = 0
+    private var failureScanCounter: AtomicInteger = AtomicInteger(0)
     private var locationDisabledWasReported: Boolean = false
     private var bluetoothDisabledWasReported: Boolean = false
     private val nextScanRunnable = Runnable {
@@ -68,12 +69,10 @@ class BgScanService : Service() {
     }
 
     private fun handleError(exception: Throwable) {
-        failureScanCounter++
-
         reportError(exception)
 
-        if (failureScanCounter >= MAX_FAILURE_SCANS_TO_CLOSE) {
-            reportError(RuntimeException("Ble Scan service was stopped after $MAX_FAILURE_SCANS_TO_CLOSE errors"))
+        if (failureScanCounter.incrementAndGet() >= MAX_FAILURE_SCANS_TO_CLOSE) {
+            reportError(RuntimeException("Ble Scan service has been stopped after $MAX_FAILURE_SCANS_TO_CLOSE errors"))
             stopSelf()
         } else {
             scheduleNextScan()
@@ -105,7 +104,7 @@ class BgScanService : Service() {
                     reportError(IllegalStateException("BLE Service is started but permissins are not granted"))
                     stopSelf()
                 },
-                onPermissionGranted =  {
+                onPermissionGranted = {
                     locationProvider.startLocationFetching()
                     scan()
                 }
@@ -133,7 +132,7 @@ class BgScanService : Service() {
     private fun scan() {
         scope.launch {
             try {
-                bleScannerHelper.scan(scanListener = bleListener,)
+                bleScannerHelper.scan(scanListener = bleListener)
             } catch (e: BleScannerHelper.BluetoothIsNotInitialized) {
                 handleBleIsTurnedOffError()
                 notificationsHelper.updateNotification(
@@ -150,45 +149,12 @@ class BgScanService : Service() {
 
     private fun handleScanResult(batch: List<BleScanDevice>) {
         scope.launch {
-
-            val notificationContent: NotificationsHelper.ServiceNotificationContent =
-                if (batch.isEmpty() && !locationProvider.isLocationAvailable() && !locationDisabledWasReported) {
-                    notificationsHelper.notifyLocationIsTurnedOff()
-                    reportError(IllegalStateException("The BLE scanner did not return anything. This may happen if geolocation is turned off at the system level. Location access is required to work with BLE on Android."))
-                    locationDisabledWasReported = true
-                    NotificationsHelper.ServiceNotificationContent.LocationIsTurnedOff
-                } else if (batch.isEmpty() && !bleScannerHelper.isBluetoothEnabled()) {
-                    handleBleIsTurnedOffError()
-                    NotificationsHelper.ServiceNotificationContent.BluetoothIsTurnedOff
-                } else if (batch.isNotEmpty()) {
-                    locationDisabledWasReported = false
-                    bluetoothDisabledWasReported = false
-
-
-                    try {
-                        val analyseResult = analyseScanBatchInteractor.execute(batch)
-                        withContext(Dispatchers.Default) {
-                            saveScanBatchInteractor.execute(batch)
-                        }
-
-                        withContext(Dispatchers.Main) {
-                            handleAnalysResult(analyseResult)
-                        }
-
-                        failureScanCounter = 0
-
-                        if (analyseResult.knownDevicesCount > 0) {
-                            NotificationsHelper.ServiceNotificationContent.KnownDevicesAround(analyseResult.knownDevicesCount)
-                        } else {
-                            NotificationsHelper.ServiceNotificationContent.TotalDevicesAround(batch.size)
-                        }
-                    } catch (exception: Throwable) {
-                        handleError(exception)
-                        NotificationsHelper.ServiceNotificationContent.NoDataYet
-                    }
-                } else {
-                    NotificationsHelper.ServiceNotificationContent.NoDataYet
-                }
+            val notificationContent: NotificationsHelper.ServiceNotificationContent = when {
+                batch.isEmpty() && !locationProvider.isLocationAvailable() && !locationDisabledWasReported -> handleLocationDisabled()
+                batch.isEmpty() && !bleScannerHelper.isBluetoothEnabled() -> handleBleIsTurnedOffError()
+                batch.isNotEmpty() -> handleNonEmptyBatch(batch)
+                else -> NotificationsHelper.ServiceNotificationContent.NoDataYet
+            }
 
             notificationsHelper.updateNotification(notificationContent, createCloseServiceIntent(this@BgScanService))
 
@@ -196,11 +162,46 @@ class BgScanService : Service() {
         }
     }
 
-    private fun handleBleIsTurnedOffError() {
+    private fun handleLocationDisabled(): NotificationsHelper.ServiceNotificationContent {
+        notificationsHelper.notifyLocationIsTurnedOff()
+        reportError(IllegalStateException("The BLE scanner did not return anything. This may happen if geolocation is turned off at the system level. Location access is required to work with BLE on Android."))
+        locationDisabledWasReported = true
+        return NotificationsHelper.ServiceNotificationContent.LocationIsTurnedOff
+    }
+
+    private fun handleBleIsTurnedOffError(): NotificationsHelper.ServiceNotificationContent {
         if (!bluetoothDisabledWasReported) {
             notificationsHelper.notifyBluetoothIsTurnedOff()
             reportError(BleScannerHelper.BluetoothIsNotInitialized())
             bluetoothDisabledWasReported = true
+        }
+        return NotificationsHelper.ServiceNotificationContent.BluetoothIsTurnedOff
+    }
+
+    private suspend fun handleNonEmptyBatch(batch: List<BleScanDevice>): NotificationsHelper.ServiceNotificationContent {
+        locationDisabledWasReported = false
+        bluetoothDisabledWasReported = false
+
+        return try {
+            val analyseResult = analyseScanBatchInteractor.execute(batch)
+            withContext(Dispatchers.Default) {
+                saveScanBatchInteractor.execute(batch)
+            }
+
+            withContext(Dispatchers.Main) {
+                handleAnalysResult(analyseResult)
+            }
+
+            failureScanCounter.set(0)
+
+            if (analyseResult.knownDevicesCount > 0) {
+                NotificationsHelper.ServiceNotificationContent.KnownDevicesAround(analyseResult.knownDevicesCount)
+            } else {
+                NotificationsHelper.ServiceNotificationContent.TotalDevicesAround(batch.size)
+            }
+        } catch (exception: Throwable) {
+            handleError(exception)
+            NotificationsHelper.ServiceNotificationContent.NoDataYet
         }
     }
 
