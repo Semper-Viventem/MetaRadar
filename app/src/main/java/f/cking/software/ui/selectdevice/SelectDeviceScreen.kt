@@ -1,5 +1,6 @@
 package f.cking.software.ui.selectdevice
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.utils.graphic.DeviceListItem
+import f.cking.software.utils.graphic.Divider
 import f.cking.software.utils.graphic.GlassSystemNavbar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -42,16 +43,20 @@ object SelectDeviceScreen {
         val viewModel: SelectDeviceViewModel = koinViewModel()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize(),
             topBar = { AppBar(viewModel, scrollBehavior) },
             content = { paddings ->
-                GlassSystemNavbar {
-                    Content(Modifier.padding(paddings), viewModel, onSelected)
+                GlassSystemNavbar(Modifier.fillMaxSize()) {
+                    Content(Modifier.padding(top = paddings.calculateTopPadding()), viewModel, onSelected)
                 }
             }
         )
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun Content(
         modifier: Modifier,
@@ -64,7 +69,7 @@ object SelectDeviceScreen {
                 .fillMaxSize()
         ) {
             if (viewModel.loading) {
-                item {
+                stickyHeader {
                     LinearProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -76,7 +81,6 @@ object SelectDeviceScreen {
 
             val list = viewModel.devices
             list.forEachIndexed { index, device ->
-
                 item {
                     DeviceListItem(device = device) {
                         onSelected.invoke(device)
@@ -87,8 +91,8 @@ object SelectDeviceScreen {
                 if (showDivider) {
                     item { Divider() }
                 }
-                item { SystemNavbarSpacer() }
             }
+            item { SystemNavbarSpacer() }
         }
     }
 
