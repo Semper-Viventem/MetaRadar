@@ -79,7 +79,7 @@
     <string name="project_github_title">%s — это проект с открытым исходным кодом. Вы можете найти исходники на Github, задать свой вопрос или оценить репозиторий!</string>
     <string name="open_github">Открыть GitHub</string>
     <string name="secret_cat">Секретный кот</string>
-    <string name="select_manufacturer">Выбор производителя</string>
+    <string name="select_manufacturer">Поиск производителя</string>
 
     <!-- Select location -->
     <string name="select_location">Выбор геолокации</string>
