@@ -51,6 +51,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -71,7 +72,6 @@ import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -276,18 +276,29 @@ object DeviceListScreen {
     @Composable
     private fun RadarIcon() {
         var atEnd by remember { mutableStateOf(false) }
-        val radarIcon = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
-        val painter = rememberAnimatedVectorPainter(radarIcon, atEnd)
-        val animatedPainter = rememberAnimatedVectorPainter(radarIcon, !atEnd)
-        Image(
-            painter = if (atEnd) painter else animatedPainter,
-            contentDescription = null,
-        )
-        LaunchedEffect(key1 = radarIcon) {
-            while (isActive) {
-                delay(1200)
+        val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
+        val animatedPainter = rememberAnimatedVectorPainterCompat(image, atEnd)
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(image.totalDuration.toLong())
                 atEnd = !atEnd
             }
+        }
+        Image(
+            painter = animatedPainter,
+            contentDescription = null,
+        )
+    }
+
+    @OptIn(ExperimentalAnimationGraphicsApi::class)
+    @Composable
+    fun rememberAnimatedVectorPainterCompat(image: AnimatedImageVector, atEnd: Boolean): Painter {
+        val animatedPainter = rememberAnimatedVectorPainter(image, atEnd)
+        val animatedPainter2 = rememberAnimatedVectorPainter(image, !atEnd)
+        return if (atEnd) {
+            animatedPainter
+        } else {
+            animatedPainter2
         }
     }
 

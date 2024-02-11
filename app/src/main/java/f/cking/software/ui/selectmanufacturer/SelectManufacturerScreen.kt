@@ -15,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -47,23 +48,31 @@ object SelectManufacturerScreen {
                 .fillMaxSize(),
             topBar = { AppBar(viewModel, scrollBehavior) },
             content = { paddings ->
-                GlassSystemNavbar {
-                    LazyColumn(modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(paddings)) {
-                        viewModel.manufacturers.forEach { type ->
-                            item {
-                                TypeItem(item = type) {
-                                    onSelected.invoke(type)
-                                    viewModel.back()
-                                }
-                            }
-                            item { SystemNavbarSpacer() }
-                        }
-                    }
+                GlassSystemNavbar(Modifier.fillMaxSize()) {
+                    Content(Modifier.padding(top = paddings.calculateTopPadding()), viewModel, onSelected)
                 }
             }
         )
+    }
+
+    @Composable
+    private fun Content(modifier: Modifier, viewModel: SelectManufacturerViewModel, onSelected: (type: ManufacturerInfo) -> Unit) {
+        LazyColumn(
+            modifier = modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
+        ) {
+            val list = viewModel.manufacturers
+            list.forEach { type ->
+                item {
+                    TypeItem(item = type) {
+                        onSelected.invoke(type)
+                        viewModel.back()
+                    }
+                }
+            }
+            item { SystemNavbarSpacer() }
+        }
     }
 
     @Composable
@@ -74,7 +83,12 @@ object SelectManufacturerScreen {
                 scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
             ),
             title = {
-                Text(text = stringResource(R.string.select_manufacturer))
+                TextField(
+                    maxLines = 1,
+                    value = viewModel.searchStr,
+                    onValueChange = { viewModel.searchRequest(it) },
+                    placeholder = { Text(text = stringResource(R.string.select_manufacturer)) }
+                )
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
@@ -93,8 +107,8 @@ object SelectManufacturerScreen {
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                text = item.name + " (0x${item.id.toHexString()})",
-                fontSize = 18.sp
+                text = "${item.name} (0x${item.id.toHexString()})",
+                fontSize = 18.sp,
             )
         }
     }
