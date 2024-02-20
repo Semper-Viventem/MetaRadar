@@ -69,27 +69,12 @@ object Shaders {
             return color;
         }
         
-        float4 distortion(float2 fragCoord) {
+        float4 colorDistortion(float2 fragCoord) {
             // uv (0 to 1)
             float2 uv = fragCoord.xy / iResolution.xy;
-            
-            // uv (-1 to 1, 0 - center)
-            uv.x = 2. * uv.x - 1.;
-            uv.y = 2. * uv.y - 1.;
-            
-            float barrel_power = 1.05; // increase for BIGGER EYE!
-            float theta = atan(uv.y, uv.x);
-	        float radius = length(uv);
-	        radius = pow(radius, barrel_power);
-	        uv.x = radius * cos(theta);
-	        uv.y = radius * sin(theta);
-            
-            // uv (0 to 1)
-            uv.x = 0.5 * (uv.x + 1.);
-            uv.y = 0.5 * (uv.y + 1.);
         
-            float chromo_x = 0.2;
-            float chromo_y = 0.2;
+            float chromo_x = 0.025;
+            float chromo_y = 0.025;
             
             return float4(content.eval(float2(uv.x - chromo_x * 0.016, uv.y - chromo_y * 0.009) * iResolution.xy).r, content.eval(float2(uv.x + chromo_x * 0.0125, uv.y - chromo_y * 0.004) * iResolution.xy).g, content.eval(float2(uv.x - chromo_x * 0.0045, uv.y + chromo_y * 0.0085) * iResolution.xy).b, 1.0);
         }
@@ -110,16 +95,14 @@ object Shaders {
             
             float sphereRadius = sqrt(u * u + v * v + z * z);
         
-            float uAlpha = (1.0 - (1.0 / tau)) * sin(u / sphereRadius);
-            float vAlpha = (1.0 - (1.0 / tau)) * sin(v / sphereRadius); // try cos
+            float uAlpha = (1.0 - (1.0 / tau)) * sin(u / sphereRadius / 2);
+            float vAlpha = (1.0 - (1.0 / tau)) * sin(v / sphereRadius);
             
-            u = 
-                l <= lensRadius ?
+            u = l <= lensRadius ?
                 u + uCenter - z * tan(uAlpha) :
                 u + uCenter;
                 
-            v = 
-                l <= lensRadius ?
+            v = l <= lensRadius ?
                 v + vCenter - z * tan(vAlpha) :
                 v + vCenter;
             
@@ -141,13 +124,13 @@ object Shaders {
                 uv.x,
                 uv.y,
                 (uv + (tile * amt) - offset).x,
-                0.90,
-                0.1,
+                1.0,
+                (blurredHeight / iResolution.y * 1.5),
                 1.5
             );
             
             float2 flutedGlassCoordinate = (uv + (tile * amt) - offset) * iResolution.xy;
-            float4 color = content.eval(flutedGlassCoordinate);
+            float4 color = colorDistortion(flutedGlassCoordinate);
             float4 white = float4(1.0, 1.0, 1.0, 1.0);
             float4 colorModificator = 0.04 * gradient((uv + (tile * amt) - offset) * iResolution.xy);
         	return min(color + colorModificator, white);

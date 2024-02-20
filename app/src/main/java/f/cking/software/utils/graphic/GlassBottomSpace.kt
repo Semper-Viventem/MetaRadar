@@ -36,7 +36,7 @@ fun GlassBottomNavBar(
     blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
     fallbackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
-    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.35f),
     content: @Composable () -> Unit,
 ) {
     GlassBottomSpace(
@@ -80,7 +80,7 @@ fun GlassBottomSpace(
     glassCurveSizeDp: Float = 3f,
     zIndex: Float = 1f,
     fallbackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
-    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.35f),
     bottomContent: @Composable () -> Unit,
     globalContent: @Composable () -> Unit,
 ) {
