@@ -68,8 +68,34 @@ object Shaders {
         
             return color;
         }
+        
+        float4 distortion(float2 fragCoord) {
+            // uv (0 to 1)
+            float2 uv = fragCoord.xy / iResolution.xy;
+            
+            // uv (-1 to 1, 0 - center)
+            uv.x = 2. * uv.x - 1.;
+            uv.y = 2. * uv.y - 1.;
+            
+            float barrel_power = 1.05; // increase for BIGGER EYE!
+            float theta = atan(uv.y, uv.x);
+	        float radius = length(uv);
+	        radius = pow(radius, barrel_power);
+	        uv.x = radius * cos(theta);
+	        uv.y = radius * sin(theta);
+            
+            // uv (0 to 1)
+            uv.x = 0.5 * (uv.x + 1.);
+            uv.y = 0.5 * (uv.y + 1.);
+        
+            float chromo_x = 0.2;
+            float chromo_y = 0.2;
+            
+            return float4(content.eval(float2(uv.x - chromo_x * 0.016, uv.y - chromo_y * 0.009) * iResolution.xy).r, content.eval(float2(uv.x + chromo_x * 0.0125, uv.y - chromo_y * 0.004) * iResolution.xy).g, content.eval(float2(uv.x - chromo_x * 0.0045, uv.y + chromo_y * 0.0085) * iResolution.xy).b, 1.0);
+        }
 
         float4 main(float2 fragCoord) {
+        
             float2 offset = float2(horizontalOffset, verticalOffset);
             float2 squares = float2(iResolution.x / horizontalSquareSize, verticalSquares);
         	float2 uv = fragCoord.xy / iResolution.xy;
@@ -79,7 +105,8 @@ object Shaders {
             
             float2 tile = fract(tc * squares);
             
-            float4 color = content.eval((uv + (tile * amt) - offset) * iResolution.xy);
+            float2 flutedGlassCoordinate = (uv + (tile * amt) - offset) * iResolution.xy;
+            float4 color = distortion(flutedGlassCoordinate);
             float4 white = float4(1.0, 1.0, 1.0, 1.0);
             float4 colorModificator = 0.04 * gradient((uv + (tile * amt) - offset) * iResolution.xy);
         	return min(color + colorModificator, white);
