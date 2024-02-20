@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import f.cking.software.dpToPx
+import kotlin.math.max
 
 @Composable
 fun GlassBottomNavBar(
@@ -35,7 +36,7 @@ fun GlassBottomNavBar(
     blur: Float = 3f,
     glassCurveSizeDp: Float = 3f,
     fallbackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
-    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.35f),
     content: @Composable () -> Unit,
 ) {
     GlassBottomSpace(
@@ -79,7 +80,7 @@ fun GlassBottomSpace(
     glassCurveSizeDp: Float = 3f,
     zIndex: Float = 1f,
     fallbackColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
-    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.3f),
+    overlayColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.35f),
     bottomContent: @Composable () -> Unit,
     globalContent: @Composable () -> Unit,
 ) {
@@ -144,7 +145,6 @@ fun Modifier.blurBottom(heightPx: Float, blur: Float, glassCurveSizeDp: Float): 
     contentShader.setFloatUniform("blurredHeight", heightPx)
     blurredShader.setFloatUniform("blurredHeight", heightPx)
     glassShader.setFloatUniform("blurredHeight", heightPx)
-    glassShader.setFloatUniform("horizontalSquareSize", context.dpToPx(glassCurveSizeDp).toFloat())
 
     this
         .onSizeChanged {
@@ -163,6 +163,10 @@ fun Modifier.blurBottom(heightPx: Float, blur: Float, glassCurveSizeDp: Float): 
                 it.width.toFloat(),
                 it.height.toFloat(),
             )
+
+            val minCurveSizePx: Float = it.width / 100f
+            val glassCurveSizePx = max(minCurveSizePx, context.dpToPx(glassCurveSizeDp).toFloat())
+            glassShader.setFloatUniform("horizontalSquareSize", glassCurveSizePx)
         }
         .then(
             graphicsLayer {

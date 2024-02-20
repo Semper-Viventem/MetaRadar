@@ -68,8 +68,49 @@ object Shaders {
         
             return color;
         }
+        
+        float4 colorDistortion(float2 fragCoord) {
+            // uv (0 to 1)
+            float2 uv = fragCoord.xy / iResolution.xy;
+        
+            float chromo_x = 0.025;
+            float chromo_y = 0.025;
+            
+            return float4(content.eval(float2(uv.x - chromo_x * 0.016, uv.y - chromo_y * 0.009) * iResolution.xy).r, content.eval(float2(uv.x + chromo_x * 0.0125, uv.y - chromo_y * 0.004) * iResolution.xy).g, content.eval(float2(uv.x - chromo_x * 0.0045, uv.y + chromo_y * 0.0085) * iResolution.xy).b, 1.0);
+        }
+        
+        float2 sphericalTransformation(
+            float u,
+            float v,
+            float uCenter,
+            float vCenter,
+            float lensRadius,
+            float tau
+        ) {
+            u -= uCenter;
+            v -= vCenter;
+            
+            float l = sqrt(u * u + v * v);
+            float z = sqrt(lensRadius * lensRadius - l * l);
+            
+            float sphereRadius = sqrt(u * u + v * v + z * z);
+        
+            float uAlpha = (1.0 - (1.0 / tau)) * sin(u / sphereRadius / 2);
+            float vAlpha = (1.0 - (1.0 / tau)) * sin(v / sphereRadius);
+            
+            u = l <= lensRadius ?
+                u + uCenter - z * tan(uAlpha) :
+                u + uCenter;
+                
+            v = l <= lensRadius ?
+                v + vCenter - z * tan(vAlpha) :
+                v + vCenter;
+            
+            return float2(u, v);
+        }
 
         float4 main(float2 fragCoord) {
+        
             float2 offset = float2(horizontalOffset, verticalOffset);
             float2 squares = float2(iResolution.x / horizontalSquareSize, verticalSquares);
         	float2 uv = fragCoord.xy / iResolution.xy;
@@ -78,8 +119,18 @@ object Shaders {
             tc.x *= iResolution.x / iResolution.y;
             
             float2 tile = fract(tc * squares);
+
+            uv = sphericalTransformation(
+                uv.x,
+                uv.y,
+                (uv + (tile * amt) - offset).x,
+                1.0,
+                (blurredHeight / iResolution.y * 1.5),
+                1.5
+            );
             
-            float4 color = content.eval((uv + (tile * amt) - offset) * iResolution.xy);
+            float2 flutedGlassCoordinate = (uv + (tile * amt) - offset) * iResolution.xy;
+            float4 color = colorDistortion(flutedGlassCoordinate);
             float4 white = float4(1.0, 1.0, 1.0, 1.0);
             float4 colorModificator = 0.04 * gradient((uv + (tile * amt) - offset) * iResolution.xy);
         	return min(color + colorModificator, white);
