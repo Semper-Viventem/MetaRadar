@@ -1,6 +1,7 @@
 package f.cking.software.data.repo
 
 import android.content.SharedPreferences
+import f.cking.software.BuildConfig
 import f.cking.software.TheAppConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,7 +74,7 @@ class SettingsRepository(
     }
 
     fun getSilentMode(): Boolean {
-        return sharedPreferences.getBoolean(KEY_SILENT_NETWORK_MODE, false)
+        return sharedPreferences.getBoolean(KEY_SILENT_NETWORK_MODE, BuildConfig.OFFLINE_MODE_DEFAULT_STATE)
     }
 
     fun observeSilentMode(): Flow<Boolean> {

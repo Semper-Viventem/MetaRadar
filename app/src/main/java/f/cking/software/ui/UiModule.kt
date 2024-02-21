@@ -28,6 +28,6 @@ object UiModule {
         viewModel { SelectDeviceViewModel(get(), get()) }
         viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { JournalViewModel(get(), get(), get(), get(), get()) }
-        viewModel { MapViewModel(get(), get()) }
+        viewModel { MapViewModel(get(), get(), get()) }
     }
 }

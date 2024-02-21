@@ -390,12 +390,12 @@ object DeviceDetailsScreen {
     @Composable
     private fun LocationHistory(modifier: Modifier = Modifier, deviceData: DeviceData, viewModel: DeviceDetailsViewModel) {
         RoundedBox(modifier = modifier, internalPaddings = 0.dp) {
+            val mapIsReady = remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                val mapIsReady = remember { mutableStateOf(false) }
                 Map(
                     Modifier.fillMaxSize(),
                     viewModel = viewModel,
@@ -408,7 +408,9 @@ object DeviceDetailsScreen {
                     MapOverlay(viewModel = viewModel)
                 }
             }
-            HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
+            if (mapIsReady.value) {
+                HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
+            }
         }
     }
 

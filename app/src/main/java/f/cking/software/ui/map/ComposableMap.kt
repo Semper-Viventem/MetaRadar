@@ -1,9 +1,10 @@
 package f.cking.software.ui.map
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -14,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,6 +27,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import f.cking.software.R
+import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.Switcher
 import org.koin.androidx.compose.koinViewModel
 import org.osmdroid.views.MapView
@@ -53,9 +57,15 @@ fun MapView(
 
 @Composable
 fun SilentModeDisclaimer(modifier: Modifier, viewModel: MapViewModel) {
-    Box(modifier.padding(16.dp), contentAlignment = Alignment.Center) {
-        Column {
-            Text(text = stringResource(id = R.string.silent_mode_is_enabled_disclaimer))
+    Box(modifier, contentAlignment = Alignment.Center) {
+        Image(
+            modifier = Modifier.fillMaxSize().alpha(0.5f),
+            painter = painterResource(id = R.drawable.map_placeholder),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+        )
+        RoundedBox(internalPaddings = 0.dp) {
+            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.silent_mode_is_enabled_disclaimer))
             Spacer(modifier = Modifier.height(8.dp))
             Switcher(
                 value = viewModel.silentModeEnabled,

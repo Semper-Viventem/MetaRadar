@@ -90,6 +90,7 @@
     <string name="silent_mode_subtitle">Turn off any network communications in the app. It might be helpful to save traffic.</string>
     <string name="database_block_title">Database actions</string>
     <string name="app_settings_title">App settings</string>
+    <string name="silent_mode_is_off_toast">Offline mode is turned off. You can change it in the settings.</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Search manufacturer</string>
