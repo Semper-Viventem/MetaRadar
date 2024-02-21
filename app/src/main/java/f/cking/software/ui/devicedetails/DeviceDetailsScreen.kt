@@ -34,6 +34,7 @@ import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -58,8 +59,8 @@ import f.cking.software.domain.model.LocationModel
 import f.cking.software.dpToPx
 import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
+import f.cking.software.ui.map.MapView
 import f.cking.software.ui.tagdialog.TagDialog
-import f.cking.software.utils.graphic.MapView
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.TagChip
@@ -389,17 +390,27 @@ object DeviceDetailsScreen {
     @Composable
     private fun LocationHistory(modifier: Modifier = Modifier, deviceData: DeviceData, viewModel: DeviceDetailsViewModel) {
         RoundedBox(modifier = modifier, internalPaddings = 0.dp) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)) {
+            val mapIsReady = remember { mutableStateOf(false) }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
                 Map(
                     Modifier.fillMaxSize(),
                     viewModel = viewModel,
-                    isLoading = { viewModel.markersInLoadingState = it }
+                    isLoading = { viewModel.markersInLoadingState = it },
+                    mapIsReadyToUse = {
+                        mapIsReady.value = true
+                    }
                 )
-                MapOverlay(viewModel = viewModel)
+                if (mapIsReady.value) {
+                    MapOverlay(viewModel = viewModel)
+                }
             }
-            HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
+            if (mapIsReady.value) {
+                HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
+            }
         }
     }
 
@@ -445,6 +456,7 @@ object DeviceDetailsScreen {
         modifier: Modifier,
         viewModel: DeviceDetailsViewModel,
         isLoading: (isLoading: Boolean) -> Unit,
+        mapIsReadyToUse: () -> Unit,
     ) {
 
         val scope = rememberCoroutineScope()
@@ -484,7 +496,10 @@ object DeviceDetailsScreen {
 
         MapView(
             modifier = modifier,
-            onLoad = { map -> initMapState(map) },
+            onLoad = { map ->
+                initMapState(map)
+                mapIsReadyToUse.invoke()
+            },
             onUpdate = { map -> refreshMap(map, viewModel, batchProcessor) }
         )
     }

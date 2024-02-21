@@ -1,11 +1,16 @@
 package f.cking.software.data.repo
 
 import android.content.SharedPreferences
+import f.cking.software.BuildConfig
 import f.cking.software.TheAppConfig
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class SettingsRepository(
     private val sharedPreferences: SharedPreferences,
 ) {
+
+    private val silentModeState = MutableStateFlow(getSilentMode())
 
     fun setGarbagingTime(time: Long) {
         sharedPreferences.edit().putLong(KEY_GARBAGING_TIME, time).apply()
@@ -63,6 +68,19 @@ class SettingsRepository(
         sharedPreferences.edit().putLong(KEY_ENJOY_THE_APP_STARTING_POINT, value).apply()
     }
 
+    fun setSilentMode(enabled: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_SILENT_NETWORK_MODE, enabled).apply()
+        silentModeState.tryEmit(getSilentMode())
+    }
+
+    fun getSilentMode(): Boolean {
+        return sharedPreferences.getBoolean(KEY_SILENT_NETWORK_MODE, BuildConfig.OFFLINE_MODE_DEFAULT_STATE)
+    }
+
+    fun observeSilentMode(): Flow<Boolean> {
+        return silentModeState
+    }
+
     companion object {
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"
         private const val KEY_USE_GPS_ONLY = "key_use_gps_location_only"
@@ -71,6 +89,7 @@ class SettingsRepository(
         private const val KEY_FIRST_APP_LAUNCH_TIME = "key_first_app_launch_time"
         private const val KEY_ENJOY_THE_APP_ANSWERED = "key_enjoy_the_app_answered_v1"
         private const val KEY_ENJOY_THE_APP_STARTING_POINT = "key_enjoy_the_app_starting_point"
+        private const val KEY_SILENT_NETWORK_MODE = "silent_network_mode"
 
         const val NO_APP_LAUNCH_TIME = -1L
         const val NO_ENJOY_THE_APP_STARTING_POINT = -1L

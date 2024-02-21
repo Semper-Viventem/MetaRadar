@@ -49,9 +49,11 @@ class SettingsViewModel(
     var useGpsLocationOnly: Boolean by mutableStateOf(settingsRepository.getUseGpsLocationOnly())
     var locationData: LocationProvider.LocationHandle? by mutableStateOf(null)
     var runOnStartup: Boolean by mutableStateOf(settingsRepository.getRunOnStartup())
+    var silentModeEnabled: Boolean by mutableStateOf(settingsRepository.getSilentMode())
 
     init {
         observeLocationData()
+        observeSilentMode()
     }
 
     fun onRemoveGarbageClick() {
@@ -132,6 +134,10 @@ class SettingsViewModel(
         runOnStartup = newValue
     }
 
+    fun changeSilentMode() {
+        settingsRepository.setSilentMode(!settingsRepository.getSilentMode())
+    }
+
     fun opReportIssueClick() {
         intentHelper.openUrl(BuildConfig.REPORT_ISSUE_URL)
     }
@@ -146,6 +152,13 @@ class SettingsViewModel(
                 .collect { locationHandle ->
                     locationData = locationHandle
                 }
+        }
+    }
+
+    private fun observeSilentMode() {
+        viewModelScope.launch {
+            settingsRepository.observeSilentMode()
+                .collect { silentModeEnabled = it }
         }
     }
 
