@@ -50,17 +50,11 @@ object SettingsScreen {
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            ProjectGithub(viewModel = viewModel)
+            ProjectInformationBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
-            ReportIssue(viewModel = viewModel)
+            AppSettings(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
-            SilentMode(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            ClearDatabaseBlock(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            BackupDatabaseBlock(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            RunOnStartup(viewModel = viewModel)
+            DatabaseBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             LocationBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
@@ -90,15 +84,6 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun ClearDatabaseBlock(viewModel: SettingsViewModel) {
-        RoundedBox {
-            ClearGarbageButton(viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            ClearLocationsButton(viewModel)
-        }
-    }
-
-    @Composable
     private fun LocationBlock(viewModel: SettingsViewModel) {
         RoundedBox(internalPaddings = 0.dp) {
             Box(modifier = Modifier.padding(16.dp)) {
@@ -109,11 +94,18 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun BackupDatabaseBlock(viewModel: SettingsViewModel) {
+    private fun DatabaseBlock(viewModel: SettingsViewModel) {
         RoundedBox {
+            Text(text = stringResource(id = R.string.database_block_title), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+
             BackupDB(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             RestoreDB(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ClearGarbageButton(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ClearLocationsButton(viewModel)
         }
     }
 
@@ -264,8 +256,16 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun RunOnStartup(viewModel: SettingsViewModel) {
+    private fun AppSettings(viewModel: SettingsViewModel) {
         RoundedBox(internalPaddings = 0.dp) {
+            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.app_settings_title), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Switcher(
+                value = viewModel.silentModeEnabled,
+                title = stringResource(R.string.silent_mode_title),
+                subtitle = stringResource(id = R.string.silent_mode_subtitle),
+                onClick = { viewModel.changeSilentMode() }
+            )
             Switcher(
                 value = viewModel.runOnStartup,
                 title = stringResource(R.string.launch_on_system_startup_title),
@@ -276,20 +276,14 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun SilentMode(viewModel: SettingsViewModel) {
-        RoundedBox(internalPaddings = 0.dp) {
-            Switcher(
-                value = viewModel.silentModeEnabled,
-                title = stringResource(R.string.silent_mode_title),
-                subtitle = stringResource(id = R.string.silent_mode_subtitle),
-                onClick = { viewModel.changeSilentMode() }
-            )
-        }
-    }
-
-    @Composable
-    private fun ReportIssue(viewModel: SettingsViewModel) {
+    private fun ProjectInformationBlock(viewModel: SettingsViewModel) {
         RoundedBox {
+            Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
+                Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
@@ -308,17 +302,6 @@ object SettingsScreen {
             Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release))
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION))
-        }
-    }
-
-    @Composable
-    private fun ProjectGithub(viewModel: SettingsViewModel) {
-        RoundedBox {
-            Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(4.dp))
-            Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
-                Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)
-            }
         }
     }
 }
