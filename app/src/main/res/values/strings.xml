@@ -86,7 +86,7 @@
     <string name="project_github_title">%s is an open-source project. You can find the source on GitHub. Feel free to ask your questions, contribute, and star the repository!</string>
     <string name="open_github">Go to GitHub</string>
     <string name="secret_cat">A secret cat photo</string>
-    <string name="silent_mode_title">Network silent mode</string>
+    <string name="silent_mode_title">Offline mode</string>
     <string name="silent_mode_subtitle">Turn off any network communications in the app. It might be helpful to save traffic.</string>
 
     <!-- Select manufacturer -->
@@ -218,7 +218,7 @@
     <string name="add_tag">Add tag</string>
     <string name="delete_tag_title">Delete tag \"%s\"?</string>
     <string name="osm_copyright">© OpenStreetMap</string>
-    <string name="silent_mode_is_enabled_disclaimer">Network silent mode is turned on. Map is disabled in purpose not to send any network packages. To see the map disable the silent mode first.</string>
+    <string name="silent_mode_is_enabled_disclaimer">The map is not available in the offline mode. To see the map disable the offline mode first.</string>
     <string name="rssi_value">%s dBm</string>
     <string name="distance_to_device">%s m</string>
     <string name="disclaimer">Disclaimer</string>
