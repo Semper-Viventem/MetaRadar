@@ -2,10 +2,8 @@ package f.cking.software.ui.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,6 +34,7 @@ import f.cking.software.dateTimeStringFormat
 import f.cking.software.utils.graphic.BottomNavigationSpacer
 import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.Switcher
 import f.cking.software.utils.graphic.ThemedDialog
 import org.koin.androidx.compose.koinViewModel
 
@@ -55,6 +53,8 @@ object SettingsScreen {
             ProjectGithub(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             ReportIssue(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            SilentMode(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             ClearDatabaseBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
@@ -276,6 +276,18 @@ object SettingsScreen {
     }
 
     @Composable
+    private fun SilentMode(viewModel: SettingsViewModel) {
+        RoundedBox(internalPaddings = 0.dp) {
+            Switcher(
+                value = viewModel.silentModeEnabled,
+                title = stringResource(R.string.silent_mode_title),
+                subtitle = stringResource(id = R.string.silent_mode_subtitle),
+                onClick = { viewModel.changeSilentMode() }
+            )
+        }
+    }
+
+    @Composable
     private fun ReportIssue(viewModel: SettingsViewModel) {
         RoundedBox {
             Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
@@ -306,41 +318,6 @@ object SettingsScreen {
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
                 Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)
-            }
-        }
-    }
-
-    @Composable
-    private fun Switcher(
-        value: Boolean,
-        title: String,
-        subtitle: String?,
-        onClick: () -> Unit,
-    ) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick.invoke() }
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(text = title)
-                    subtitle?.let {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp)
-                    }
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Switch(
-                    checked = value,
-                    onCheckedChange = { onClick.invoke() }
-                )
             }
         }
     }

@@ -43,7 +43,7 @@ import f.cking.software.TheAppConfig
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.ui.devicedetails.MapConfig
-import f.cking.software.utils.graphic.MapView
+import f.cking.software.ui.map.MapView
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import kotlinx.coroutines.flow.filterNotNull
@@ -121,33 +121,36 @@ object SelectLocationScreen {
                         initialLocationModel = initialLocationModel,
                         onMapReady = { map.value = it }
                     )
-                    Box(
-                        modifier = Modifier
-                            .size(width = 20.dp, height = 10.dp)
-                            .blur(2.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
+
+                    if (map.value != null) {
                         Box(
                             modifier = Modifier
-                                .size(width = 10.dp, height = 5.dp)
-                                .background(color = Color.DarkGray, shape = AbsoluteCutCornerShape(10.dp))
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .height(120.dp)
-                            .width(60.dp)
-                    ) {
-                        val painter = painterResource(R.drawable.ic_location)
-                        Image(
+                                .size(width = 20.dp, height = 10.dp)
+                                .blur(2.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(width = 10.dp, height = 5.dp)
+                                    .background(color = Color.DarkGray, shape = AbsoluteCutCornerShape(10.dp))
+                            )
+                        }
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(60.dp),
-                            contentScale = ContentScale.FillWidth,
-                            painter = painter,
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-                        )
+                                .height(120.dp)
+                                .width(60.dp)
+                        ) {
+                            val painter = painterResource(R.drawable.ic_location)
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp),
+                                contentScale = ContentScale.FillWidth,
+                                painter = painter,
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                            )
+                        }
                     }
                 }
             }

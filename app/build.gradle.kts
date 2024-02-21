@@ -32,6 +32,7 @@ android {
         buildConfigField("String", "REPORT_ISSUE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/issues\"")
         buildConfigField("String", "GITHUB_URL", "\"https://github.com/Semper-Viventem/MetaRadar\"")
         buildConfigField("String", "STORE_PAGE_URL", "\"Not specified\"")
+        buildConfigField("String", "MAP_LICENSE_URL", "\"https://www.openstreetmap.org/copyright\"")
 
         buildConfigField("String", "DISTRIBUTION", "\"Not specified\"")
     }
