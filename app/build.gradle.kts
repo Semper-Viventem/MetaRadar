@@ -24,14 +24,16 @@ android {
         minSdk = 29
         targetSdk = 34
 
-        versionCode = 1708449099
-        versionName = "0.22.9-beta"
+        versionCode = 1708536347
+        versionName = "0.23.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "REPORT_ISSUE_URL", "\"https://github.com/Semper-Viventem/MetaRadar/issues\"")
         buildConfigField("String", "GITHUB_URL", "\"https://github.com/Semper-Viventem/MetaRadar\"")
         buildConfigField("String", "STORE_PAGE_URL", "\"Not specified\"")
+        buildConfigField("String", "MAP_LICENSE_URL", "\"https://www.openstreetmap.org/copyright\"")
+        buildConfigField("Boolean", "OFFLINE_MODE_DEFAULT_STATE", "false")
 
         buildConfigField("String", "DISTRIBUTION", "\"Not specified\"")
     }
@@ -98,6 +100,7 @@ android {
             isDefault = false
             dimension = "distribution"
 
+            buildConfigField("Boolean", "OFFLINE_MODE_DEFAULT_STATE", "true")
             buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "false")
             buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
         }

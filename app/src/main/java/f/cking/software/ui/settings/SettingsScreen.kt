@@ -2,10 +2,8 @@ package f.cking.software.ui.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,6 +34,7 @@ import f.cking.software.dateTimeStringFormat
 import f.cking.software.utils.graphic.BottomNavigationSpacer
 import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.Switcher
 import f.cking.software.utils.graphic.ThemedDialog
 import org.koin.androidx.compose.koinViewModel
 
@@ -52,15 +50,11 @@ object SettingsScreen {
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            ProjectGithub(viewModel = viewModel)
+            ProjectInformationBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
-            ReportIssue(viewModel = viewModel)
+            AppSettings(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
-            ClearDatabaseBlock(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            BackupDatabaseBlock(viewModel = viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            RunOnStartup(viewModel = viewModel)
+            DatabaseBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             LocationBlock(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
@@ -90,15 +84,6 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun ClearDatabaseBlock(viewModel: SettingsViewModel) {
-        RoundedBox {
-            ClearGarbageButton(viewModel)
-            Spacer(modifier = Modifier.height(8.dp))
-            ClearLocationsButton(viewModel)
-        }
-    }
-
-    @Composable
     private fun LocationBlock(viewModel: SettingsViewModel) {
         RoundedBox(internalPaddings = 0.dp) {
             Box(modifier = Modifier.padding(16.dp)) {
@@ -109,11 +94,18 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun BackupDatabaseBlock(viewModel: SettingsViewModel) {
+    private fun DatabaseBlock(viewModel: SettingsViewModel) {
         RoundedBox {
+            Text(text = stringResource(id = R.string.database_block_title), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+
             BackupDB(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             RestoreDB(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ClearGarbageButton(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            ClearLocationsButton(viewModel)
         }
     }
 
@@ -264,8 +256,16 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun RunOnStartup(viewModel: SettingsViewModel) {
+    private fun AppSettings(viewModel: SettingsViewModel) {
         RoundedBox(internalPaddings = 0.dp) {
+            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.app_settings_title), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Switcher(
+                value = viewModel.silentModeEnabled,
+                title = stringResource(R.string.silent_mode_title),
+                subtitle = stringResource(id = R.string.silent_mode_subtitle),
+                onClick = { viewModel.changeSilentMode() }
+            )
             Switcher(
                 value = viewModel.runOnStartup,
                 title = stringResource(R.string.launch_on_system_startup_title),
@@ -276,8 +276,14 @@ object SettingsScreen {
     }
 
     @Composable
-    private fun ReportIssue(viewModel: SettingsViewModel) {
+    private fun ProjectInformationBlock(viewModel: SettingsViewModel) {
         RoundedBox {
+            Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
+                Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(R.string.report_issue_title), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.opReportIssueClick() }) {
@@ -296,52 +302,6 @@ object SettingsScreen {
             Text(text = stringResource(if (BuildConfig.DEBUG) R.string.app_info_build_type_debug else R.string.app_info_build_type_release))
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = stringResource(R.string.app_info_distribution, BuildConfig.DISTRIBUTION))
-        }
-    }
-
-    @Composable
-    private fun ProjectGithub(viewModel: SettingsViewModel) {
-        RoundedBox {
-            Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(4.dp))
-            Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
-                Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)
-            }
-        }
-    }
-
-    @Composable
-    private fun Switcher(
-        value: Boolean,
-        title: String,
-        subtitle: String?,
-        onClick: () -> Unit,
-    ) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick.invoke() }
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(text = title)
-                    subtitle?.let {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp)
-                    }
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Switch(
-                    checked = value,
-                    onCheckedChange = { onClick.invoke() }
-                )
-            }
         }
     }
 }

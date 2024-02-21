@@ -4,6 +4,7 @@ import f.cking.software.ui.devicedetails.DeviceDetailsViewModel
 import f.cking.software.ui.devicelist.DeviceListViewModel
 import f.cking.software.ui.journal.JournalViewModel
 import f.cking.software.ui.main.MainViewModel
+import f.cking.software.ui.map.MapViewModel
 import f.cking.software.ui.profiledetails.ProfileDetailsViewModel
 import f.cking.software.ui.profileslist.ProfilesListViewModel
 import f.cking.software.ui.selectdevice.SelectDeviceViewModel
@@ -27,5 +28,6 @@ object UiModule {
         viewModel { SelectDeviceViewModel(get(), get()) }
         viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { JournalViewModel(get(), get(), get(), get(), get()) }
+        viewModel { MapViewModel(get(), get(), get()) }
     }
 }

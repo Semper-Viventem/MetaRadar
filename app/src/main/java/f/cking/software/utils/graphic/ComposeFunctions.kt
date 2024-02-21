@@ -27,11 +27,11 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,7 +45,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -54,10 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.flowlayout.FlowRow
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogButtons
@@ -73,11 +69,9 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.dpToPx
-import f.cking.software.openUrl
 import f.cking.software.pxToDp
 import f.cking.software.toHexString
 import f.cking.software.ui.GlobalUiState
-import org.osmdroid.views.MapView
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.math.abs
@@ -343,74 +337,6 @@ fun DeviceListItem(
 }
 
 @Composable
-fun rememberMapViewWithLifecycle(): MapView {
-    val context = LocalContext.current
-    val mapView = remember {
-        MapView(context).apply {
-            id = R.id.layout_map
-            clipToOutline = true
-        }
-    }
-
-    // Makes MapView follow the lifecycle of this composable
-    val lifecycleObserver = rememberMapLifecycleObserver(mapView)
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
-        lifecycle.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycle.removeObserver(lifecycleObserver)
-        }
-    }
-
-    return mapView
-}
-
-@Composable
-fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
-    remember(mapView) {
-        LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                else -> {}
-            }
-        }
-    }
-
-/**
- * A composable Google Map.
- * @author Arnau Mora
- * @since 20211230
- * @param modifier Modifiers to apply to the map.
- * @param onLoad This will get called once the map has been loaded.
- */
-@Composable
-fun MapView(
-    modifier: Modifier = Modifier,
-    onLoad: ((map: MapView) -> Unit)? = null,
-    onUpdate: ((map: MapView) -> Unit)? = null,
-) {
-    val mapViewState = rememberMapViewWithLifecycle()
-    val context = LocalContext.current
-    Box(modifier = modifier) {
-        AndroidView(
-            { mapViewState.apply { onLoad?.invoke(this) } },
-        ) { mapView -> onUpdate?.invoke(mapView) }
-        Text(
-            text = stringResource(R.string.osm_copyright),
-            modifier = Modifier
-                .padding(start = 4.dp)
-                .align(Alignment.BottomStart)
-                .alpha(0.9f)
-                .clickable { context.openUrl("https://www.openstreetmap.org/copyright") },
-            color = Color.DarkGray,
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
-        )
-    }
-}
-
-@Composable
 fun Divider() {
     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
         Box(
@@ -566,4 +492,40 @@ fun SystemNavbarSpacer() {
 
 fun ColorScheme.surfaceEvaluated(evaluation: Dp = 3.dp): Color {
     return this.surfaceColorAtElevation(evaluation)
+}
+
+@Composable
+fun Switcher(
+    modifier: Modifier = Modifier,
+    value: Boolean,
+    title: String,
+    subtitle: String?,
+    onClick: () -> Unit,
+) {
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .clickable { onClick.invoke() }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = title)
+                subtitle?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = it, fontWeight = FontWeight.Light, fontSize = 12.sp)
+                }
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+            Switch(
+                checked = value,
+                onCheckedChange = { onClick.invoke() }
+            )
+        }
+    }
 }

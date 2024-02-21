@@ -90,7 +90,7 @@
     <string name="filter_user_location_if_no_location">Szűrő kihagyása, ha a hely nem érhető el (egyéb esetben az alapérték hamis)</string>
     <string name="from_date">Dátumból</string>
     <string name="from_time">Időből</string>
-    <string name="garbage_has_cleared">℅s szemét eszköz törölve</string>
+    <string name="garbage_has_cleared">%s szemét eszköz törölve</string>
     <string name="grant_permissions_manually">Add meg a szükséges engedélyeket manuálisan</string>
     <string name="ignore_case">Borítás figyelmen kívül hagyása</string>
     <string name="is_active">Aktív</string>
