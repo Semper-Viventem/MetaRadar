@@ -1,11 +1,13 @@
 package f.cking.software.ui.devicelist
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,10 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -69,9 +68,9 @@ import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
 import f.cking.software.utils.graphic.FABSpacer
+import f.cking.software.utils.graphic.RadarIcon
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.ThemedDialog
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -133,21 +132,30 @@ object DeviceListScreen {
             }
 
             if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
-                item(contentType = ListContentType.ENJOY_THE_APP) {
+                item(contentType = ListContentType.ENJOY_THE_APP, key = "enjoy_the_app") {
                     Spacer(modifier = Modifier.height(8.dp))
-                    EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
+                    EnjoyTheApp(Modifier.animateItemPlacement(), viewModel, viewModel.enjoyTheAppState)
                 }
             }
 
-            if (viewModel.currentBatchViewState != null) {
-                item(contentType = ListContentType.CURRENT_BATCH) {
-                    CurrentBatch(viewModel)
+            item(contentType = ListContentType.CURRENT_BATCH, key = "current_batch") {
+                AnimatedVisibility(
+                    modifier = Modifier
+                        .animateItemPlacement(),
+                    visible = viewModel.currentBatchViewState != null,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Column {
+                        CurrentBatch(viewModel)
+                    }
                 }
             }
 
             viewModel.devicesViewState.mapIndexed { index, deviceData ->
-                item(contentType = ListContentType.DEVICE) {
+                item(contentType = ListContentType.DEVICE, key = "device_${deviceData.address}") {
                     DeviceListItem(
+                        modifier = Modifier.animateItemPlacement(),
                         device = deviceData,
                         onClick = { viewModel.onDeviceClick(deviceData) },
                         onTagSelected = { viewModel.onTagSelected(it) },
@@ -156,7 +164,7 @@ object DeviceListScreen {
                 }
                 val showDivider = viewModel.devicesViewState.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                 if (showDivider) {
-                    item(contentType = ListContentType.DIVIDER) { Divider() }
+                    item(contentType = ListContentType.DIVIDER, key = "${deviceData.lastDetectTimeMs}") { Divider(Modifier.animateItemPlacement()) }
                 }
             }
 
@@ -205,7 +213,12 @@ object DeviceListScreen {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            CurrentBatchList(viewModel)
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()) {
+                CurrentBatchList(viewModel)
+            }
         }
     }
 
@@ -274,24 +287,6 @@ object DeviceListScreen {
 
     @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
-    private fun RadarIcon() {
-        var atEnd by remember { mutableStateOf(false) }
-        val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
-        val animatedPainter = rememberAnimatedVectorPainterCompat(image, atEnd)
-        LaunchedEffect(Unit) {
-            while (true) {
-                delay(image.totalDuration.toLong())
-                atEnd = !atEnd
-            }
-        }
-        Image(
-            painter = animatedPainter,
-            contentDescription = null,
-        )
-    }
-
-    @OptIn(ExperimentalAnimationGraphicsApi::class)
-    @Composable
     fun rememberAnimatedVectorPainterCompat(image: AnimatedImageVector, atEnd: Boolean): Painter {
         val animatedPainter = rememberAnimatedVectorPainter(image, atEnd)
         val animatedPainter2 = rememberAnimatedVectorPainter(image, !atEnd)
@@ -304,7 +299,7 @@ object DeviceListScreen {
 
     @Composable
     private fun CurrentBatchList(viewModel: DeviceListViewModel) {
-        val currentBatch = viewModel.currentBatchViewState!!
+        val currentBatch = viewModel.currentBatchViewState.orEmpty()
         val mode = viewModel.activeScannerExpandedState
         val visibleDevices = when (mode) {
             DeviceListViewModel.ActiveScannerExpandedState.COLLAPSED -> currentBatch.take(DeviceListViewModel.ActiveScannerExpandedState.MAX_DEVICES_COUNT)
@@ -355,8 +350,8 @@ object DeviceListScreen {
     }
 
     @Composable
-    private fun EnjoyTheApp(viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
-        RoundedBox {
+    private fun EnjoyTheApp(modifier: Modifier, viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
+        RoundedBox(modifier) {
             when (enjoyTheAppState) {
                 is DeviceListViewModel.EnjoyTheAppState.Question -> EnjoyTheAppQuestion(viewModel)
                 is DeviceListViewModel.EnjoyTheAppState.Like -> EnjoyTheAppLike(enjoyTheAppState, viewModel)

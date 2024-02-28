@@ -23,7 +23,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -65,7 +68,7 @@ class BgScanService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        isActive.tryEmit(true)
+        updateState(ScannerState.IDLING)
     }
 
     private fun handleError(exception: Throwable) {
@@ -118,7 +121,7 @@ class BgScanService : Service() {
         super.onDestroy()
         Timber.d("Background service destroyed")
         scope.cancel()
-        isActive.tryEmit(false)
+        updateState(ScannerState.DISABLED)
         bleScannerHelper.stopScanning()
         locationProvider.stopLocationListening()
         handler.removeCallbacks(nextScanRunnable)
@@ -132,6 +135,7 @@ class BgScanService : Service() {
     private fun scan() {
         scope.launch {
             try {
+                updateState(ScannerState.SCANNING)
                 bleScannerHelper.scan(scanListener = bleListener)
             } catch (e: BleScannerHelper.BluetoothIsNotInitialized) {
                 handleBleIsTurnedOffError()
@@ -183,6 +187,7 @@ class BgScanService : Service() {
         bluetoothDisabledWasReported = false
 
         return try {
+            updateState(ScannerState.ANALYZING)
             val analyseResult = analyseScanBatchInteractor.execute(batch)
             withContext(Dispatchers.Default) {
                 saveScanBatchInteractor.execute(batch)
@@ -217,6 +222,7 @@ class BgScanService : Service() {
     }
 
     private fun scheduleNextScan() {
+        updateState(ScannerState.IDLING)
         val interval = powerModeHelper.powerMode().scanInterval
         handler.postDelayed(nextScanRunnable, interval)
     }
@@ -232,13 +238,37 @@ class BgScanService : Service() {
         }
     }
 
+    enum class ScannerState {
+        DISABLED, SCANNING, ANALYZING, IDLING;
+
+        fun isActive(): Boolean {
+            return this != DISABLED
+        }
+
+        fun isProcessing(): Boolean {
+            return this == SCANNING || this == ANALYZING
+        }
+    }
+
     companion object {
         private const val MAX_FAILURE_SCANS_TO_CLOSE = 10
 
         private const val ACTION_STOP_SERVICE = "stop_ble_scan_service"
         private const val ACTION_SCAN_NOW = "ble_scan_now"
 
-        var isActive = MutableStateFlow(false)
+        var state = MutableStateFlow(ScannerState.DISABLED)
+            private set
+        val isActive: Boolean get() = state.value.isActive()
+
+        private fun updateState(newState: ScannerState) {
+            Timber.i("Scanner state: $newState")
+            state.tryEmit(newState)
+        }
+
+        fun observeIsActive(): Flow<Boolean> {
+            return state.map { it.isActive() }
+                .distinctUntilChanged()
+        }
 
         private fun createCloseServiceIntent(context: Context): Intent {
             return Intent(context, BgScanService::class.java).apply {
@@ -252,13 +282,13 @@ class BgScanService : Service() {
         }
 
         fun stop(context: Context) {
-            if (isActive.value) {
+            if (isActive) {
                 context.startService(createCloseServiceIntent(context))
             }
         }
 
         fun scan(context: Context) {
-            if (isActive.value) {
+            if (isActive) {
                 val intent = Intent(context, BgScanService::class.java).apply {
                     action = ACTION_SCAN_NOW
                 }
