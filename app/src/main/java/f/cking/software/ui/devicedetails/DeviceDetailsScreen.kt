@@ -111,6 +111,7 @@ object DeviceDetailsScreen {
                     Content(
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.surface)
+                            .fillMaxSize()
                             .padding(top = it.calculateTopPadding()),
                         viewModel = viewModel,
                     )

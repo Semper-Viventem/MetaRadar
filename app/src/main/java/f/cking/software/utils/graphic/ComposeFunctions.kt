@@ -241,6 +241,7 @@ fun ClickableField(
 
 @Composable
 fun DeviceListItem(
+    modifier: Modifier = Modifier,
     device: DeviceData,
     showSignalData: Boolean = false,
     showLastUpdate: Boolean = true,
@@ -248,7 +249,7 @@ fun DeviceListItem(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onClick.invoke() },
     ) {

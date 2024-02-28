@@ -1,5 +1,9 @@
 package f.cking.software.ui.devicelist
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
@@ -128,21 +132,30 @@ object DeviceListScreen {
             }
 
             if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
-                item(contentType = ListContentType.ENJOY_THE_APP) {
+                item(contentType = ListContentType.ENJOY_THE_APP, key = "enjoy_the_app") {
                     Spacer(modifier = Modifier.height(8.dp))
-                    EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
+                    EnjoyTheApp(Modifier.animateItemPlacement(), viewModel, viewModel.enjoyTheAppState)
                 }
             }
 
-            if (viewModel.currentBatchViewState != null) {
-                item(contentType = ListContentType.CURRENT_BATCH) {
-                    CurrentBatch(viewModel)
+            item(contentType = ListContentType.CURRENT_BATCH, key = "current_batch") {
+                AnimatedVisibility(
+                    modifier = Modifier
+                        .animateItemPlacement(),
+                    visible = viewModel.currentBatchViewState != null,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Column {
+                        CurrentBatch(viewModel)
+                    }
                 }
             }
 
             viewModel.devicesViewState.mapIndexed { index, deviceData ->
-                item(contentType = ListContentType.DEVICE) {
+                item(contentType = ListContentType.DEVICE, key = "device_${deviceData.address}") {
                     DeviceListItem(
+                        modifier = Modifier.animateItemPlacement(),
                         device = deviceData,
                         onClick = { viewModel.onDeviceClick(deviceData) },
                         onTagSelected = { viewModel.onTagSelected(it) },
@@ -200,7 +213,12 @@ object DeviceListScreen {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            CurrentBatchList(viewModel)
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()) {
+                CurrentBatchList(viewModel)
+            }
         }
     }
 
@@ -281,7 +299,7 @@ object DeviceListScreen {
 
     @Composable
     private fun CurrentBatchList(viewModel: DeviceListViewModel) {
-        val currentBatch = viewModel.currentBatchViewState!!
+        val currentBatch = viewModel.currentBatchViewState.orEmpty()
         val mode = viewModel.activeScannerExpandedState
         val visibleDevices = when (mode) {
             DeviceListViewModel.ActiveScannerExpandedState.COLLAPSED -> currentBatch.take(DeviceListViewModel.ActiveScannerExpandedState.MAX_DEVICES_COUNT)
@@ -332,8 +350,8 @@ object DeviceListScreen {
     }
 
     @Composable
-    private fun EnjoyTheApp(viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
-        RoundedBox {
+    private fun EnjoyTheApp(modifier: Modifier, viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
+        RoundedBox(modifier) {
             when (enjoyTheAppState) {
                 is DeviceListViewModel.EnjoyTheAppState.Question -> EnjoyTheAppQuestion(viewModel)
                 is DeviceListViewModel.EnjoyTheAppState.Like -> EnjoyTheAppLike(enjoyTheAppState, viewModel)
