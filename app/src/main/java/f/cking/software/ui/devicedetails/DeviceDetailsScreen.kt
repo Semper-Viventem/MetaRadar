@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -211,59 +212,60 @@ object DeviceDetailsScreen {
         modifier: Modifier = Modifier,
         deviceData: DeviceData,
     ) {
-
         RoundedBox(
             modifier = modifier
                 .fillMaxWidth(),
             internalPaddings = 0.dp,
         ) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = deviceData.buildDisplayName(),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
-                Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
-                Text(text = deviceData.address)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
-                Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row {
+            SelectionContainer {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(R.string.device_details_detect_count),
+                        text = deviceData.buildDisplayName(),
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
-                    Spacer(Modifier.width(4.dp))
-                    Text(text = deviceData.detectCount.toString())
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
+                    Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
+                    Text(text = deviceData.address)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
+                    Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row {
+                        Text(
+                            text = stringResource(R.string.device_details_detect_count),
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(text = deviceData.detectCount.toString())
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
-                Text(
-                    text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current))
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
-                Text(
-                    text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
-                )
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -357,7 +359,7 @@ object DeviceDetailsScreen {
             ) {
                 Text(stringResource(R.string.change_history_period_dialog), fontSize = 20.sp, fontWeight = FontWeight.Black)
                 Spacer(Modifier.height(8.dp))
-                DeviceDetailsViewModel.HistoryPeriod.values().forEach { period ->
+                DeviceDetailsViewModel.HistoryPeriod.entries.forEach { period ->
                     val isSelected = viewModel.historyPeriod == period
                     Button(
                         modifier = Modifier.fillMaxWidth(),
