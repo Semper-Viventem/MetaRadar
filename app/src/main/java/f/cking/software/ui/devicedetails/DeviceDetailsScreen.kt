@@ -557,23 +557,27 @@ object DeviceDetailsScreen {
 
         MapView(
             modifier = modifier.pointerInteropFilter { event ->
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        isMoving.value = true
-                        false
-                    }
+                if (mapView != null) {
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            isMoving.value = true
+                            false
+                        }
 
-                    MotionEvent.ACTION_UP -> {
-                        isMoving.value = false
-                        false
-                    }
+                        MotionEvent.ACTION_UP -> {
+                            isMoving.value = false
+                            false
+                        }
 
-                    MotionEvent.ACTION_OUTSIDE -> {
-                        isMoving.value = false
-                        false
-                    }
+                        MotionEvent.ACTION_OUTSIDE -> {
+                            isMoving.value = false
+                            false
+                        }
 
-                    else -> true
+                        else -> true
+                    }
+                } else {
+                    false
                 }
             },
             onLoad = { map ->
