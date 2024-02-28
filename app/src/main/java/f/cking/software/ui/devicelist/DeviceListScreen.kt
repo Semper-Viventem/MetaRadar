@@ -164,7 +164,7 @@ object DeviceListScreen {
                 }
                 val showDivider = viewModel.devicesViewState.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                 if (showDivider) {
-                    item(contentType = ListContentType.DIVIDER) { Divider() }
+                    item(contentType = ListContentType.DIVIDER, key = "${deviceData.lastDetectTimeMs}") { Divider(Modifier.animateItemPlacement()) }
                 }
             }
 

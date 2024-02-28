@@ -354,8 +354,8 @@ fun SignalData(rssi: Int?, distance: Float?) {
 }
 
 @Composable
-fun Divider() {
-    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+fun Divider(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.padding(horizontal = 16.dp)) {
         Box(
             modifier = Modifier
                 .height(1.dp)
