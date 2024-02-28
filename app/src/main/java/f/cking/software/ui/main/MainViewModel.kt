@@ -20,6 +20,8 @@ import f.cking.software.ui.devicelist.DeviceListScreen
 import f.cking.software.ui.journal.JournalScreen
 import f.cking.software.ui.profileslist.ProfilesListScreen
 import f.cking.software.ui.settings.SettingsScreen
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -31,8 +33,8 @@ class MainViewModel(
     private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
-    var scanStarted: Boolean by mutableStateOf(bluetoothHelper.inProgress.value)
-    var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive.value)
+    var scanStarted: Boolean by mutableStateOf(BgScanService.state.value.isProcessing())
+    var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive)
     var showLocationDisabledDialog: MaterialDialogState = MaterialDialogState()
     var showBluetoothDisabledDialog: MaterialDialogState = MaterialDialogState()
 
@@ -83,7 +85,7 @@ class MainViewModel(
 
     fun runBackgroundScanning() {
         checkPermissions {
-            if (BgScanService.isActive.value) {
+            if (BgScanService.isActive) {
                 BgScanService.stop(context)
             } else if (!locationProvider.isLocationAvailable()) {
                 showLocationDisabledDialog.show()
@@ -113,14 +115,16 @@ class MainViewModel(
 
     private fun observeScanInProgress() {
         viewModelScope.launch {
-            bluetoothHelper.inProgress
+            BgScanService.state
+                .map { it.isProcessing() }
+                .distinctUntilChanged()
                 .collect { scanStarted = it }
         }
     }
 
     private fun observeServiceIsLaunched() {
         viewModelScope.launch {
-            BgScanService.isActive
+            BgScanService.observeIsActive()
                 .collect { bgServiceIsActive = it }
         }
     }

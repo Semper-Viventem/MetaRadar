@@ -29,6 +29,10 @@ data class DeviceData(
         return (System.currentTimeMillis() - lastDetectTimeMs).getTimePeriodStr(context)
     }
 
+    fun hasBeenSeenTimeAgo(): Long {
+        return System.currentTimeMillis() - lastDetectTimeMs
+    }
+
     fun distance(): Float? {
         return if (rssi != null) {
             val txPower = -59 //hard coded power value. Usually ranges between -59 to -65

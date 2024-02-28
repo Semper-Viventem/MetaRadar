@@ -1,5 +1,6 @@
 package f.cking.software.ui.devicedetails
 
+import android.view.MotionEvent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -33,15 +35,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -61,13 +72,19 @@ import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
 import f.cking.software.ui.map.MapView
 import f.cking.software.ui.tagdialog.TagDialog
+import f.cking.software.utils.graphic.GlassSystemNavbar
+import f.cking.software.utils.graphic.RadarIcon
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.SignalData
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.TagChip
 import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -80,29 +97,34 @@ object DeviceDetailsScreen {
     @Composable
     fun Screen(address: String, key: String) {
         val viewModel: DeviceDetailsViewModel = koinViewModel(key = key) { parametersOf(address) }
-
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
             modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .background(MaterialTheme.colorScheme.surface)
                 .fillMaxSize(),
             topBar = {
-                AppBar(viewModel = viewModel)
+                AppBar(viewModel = viewModel, scrollBehavior)
             },
             content = {
-                Content(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(it),
-                    viewModel = viewModel,
-                )
+                GlassSystemNavbar(modifier = Modifier.fillMaxSize()) {
+                    Content(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .fillMaxSize()
+                            .padding(top = it.calculateTopPadding()),
+                        viewModel = viewModel,
+                    )
+                }
             }
         )
     }
 
     @Composable
-    private fun AppBar(viewModel: DeviceDetailsViewModel) {
+    private fun AppBar(viewModel: DeviceDetailsViewModel, scrollBehavior: TopAppBarScrollBehavior) {
         val deviceData = viewModel.deviceState
         TopAppBar(
+            scrollBehavior = scrollBehavior,
             title = {
                 Text(text = stringResource(R.string.device_details_title))
             },
@@ -161,24 +183,55 @@ object DeviceDetailsScreen {
         viewModel: DeviceDetailsViewModel,
         deviceData: DeviceData
     ) {
+        var scrollEnabled by remember { mutableStateOf(true) }
+        val isMoving = remember { mutableStateOf(false) }
+
+        LaunchedEffect(isMoving.value) {
+            scrollEnabled = !isMoving.value
+        }
+
         Column(
             modifier = modifier
                 .padding(horizontal = 16.dp)
-                .fillMaxSize()
+                .verticalScroll(rememberScrollState(), scrollEnabled)
+                .fillMaxSize(),
         ) {
             LocationHistory(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .height(400.dp),
                 deviceData = deviceData,
-                viewModel = viewModel
+                viewModel = viewModel,
+                isMoving = isMoving,
             )
+            OnlineStatus(viewModel = viewModel)
             Spacer(modifier = Modifier.height(16.dp))
             Tags(deviceData = deviceData, viewModel = viewModel)
             Spacer(modifier = Modifier.height(16.dp))
-            DeviceContent(modifier = Modifier.weight(1f), deviceData = deviceData)
+            DeviceContent(modifier = Modifier, deviceData = deviceData)
             Spacer(modifier = Modifier.height(16.dp))
             SystemNavbarSpacer()
+        }
+    }
+
+    @Composable
+    private fun OnlineStatus(
+        viewModel: DeviceDetailsViewModel,
+    ) {
+        viewModel.onlineStatusData?.let { onlineStatus ->
+            Spacer(modifier = Modifier.height(16.dp))
+            RoundedBox(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadarIcon()
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.device_is_online), fontWeight = FontWeight.SemiBold)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    SignalData(rssi = onlineStatus.signalStrength, distance = onlineStatus.distance)
+                }
+            }
         }
     }
 
@@ -187,59 +240,59 @@ object DeviceDetailsScreen {
         modifier: Modifier = Modifier,
         deviceData: DeviceData,
     ) {
-
         RoundedBox(
             modifier = modifier
                 .fillMaxWidth(),
             internalPaddings = 0.dp,
         ) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = deviceData.buildDisplayName(),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
-                Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
-                Text(text = deviceData.address)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
-                Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row {
+            SelectionContainer {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(R.string.device_details_detect_count),
+                        text = deviceData.buildDisplayName(),
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
-                    Spacer(Modifier.width(4.dp))
-                    Text(text = deviceData.detectCount.toString())
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_name), fontWeight = FontWeight.Bold)
+                    Text(text = deviceData.name ?: stringResource(R.string.not_applicable))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_address), fontWeight = FontWeight.Bold)
+                    Text(text = deviceData.address)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_manufacturer), fontWeight = FontWeight.Bold)
+                    Text(text = deviceData.manufacturerInfo?.name ?: stringResource(R.string.not_applicable))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row {
+                        Text(
+                            text = stringResource(R.string.device_details_detect_count),
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(text = deviceData.detectCount.toString())
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_first_detection), fontWeight = FontWeight.Bold)
-                Text(
-                    text = stringResource(R.string.time_ago, deviceData.firstDetectionPeriod(LocalContext.current))
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = stringResource(R.string.device_details_last_detection), fontWeight = FontWeight.Bold)
-                Text(
-                    text = stringResource(R.string.time_ago, deviceData.lastDetectionPeriod(LocalContext.current))
-                )
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -333,7 +386,7 @@ object DeviceDetailsScreen {
             ) {
                 Text(stringResource(R.string.change_history_period_dialog), fontSize = 20.sp, fontWeight = FontWeight.Black)
                 Spacer(Modifier.height(8.dp))
-                DeviceDetailsViewModel.HistoryPeriod.values().forEach { period ->
+                DeviceDetailsViewModel.HistoryPeriod.entries.forEach { period ->
                     val isSelected = viewModel.historyPeriod == period
                     Button(
                         modifier = Modifier.fillMaxWidth(),
@@ -388,9 +441,13 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun LocationHistory(modifier: Modifier = Modifier, deviceData: DeviceData, viewModel: DeviceDetailsViewModel) {
+    private fun LocationHistory(
+        modifier: Modifier = Modifier,
+        deviceData: DeviceData, viewModel: DeviceDetailsViewModel,
+        isMoving: MutableState<Boolean>,
+    ) {
         RoundedBox(modifier = modifier, internalPaddings = 0.dp) {
-            val mapIsReady = remember { mutableStateOf(false) }
+            var mapIsReady by remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -401,14 +458,15 @@ object DeviceDetailsScreen {
                     viewModel = viewModel,
                     isLoading = { viewModel.markersInLoadingState = it },
                     mapIsReadyToUse = {
-                        mapIsReady.value = true
-                    }
+                        mapIsReady = true
+                    },
+                    isMoving = isMoving,
                 )
-                if (mapIsReady.value) {
+                if (mapIsReady) {
                     MapOverlay(viewModel = viewModel)
                 }
             }
-            if (mapIsReady.value) {
+            if (mapIsReady) {
                 HistoryPeriod(deviceData = deviceData, viewModel = viewModel)
             }
         }
@@ -451,12 +509,14 @@ object DeviceDetailsScreen {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     private fun Map(
         modifier: Modifier,
         viewModel: DeviceDetailsViewModel,
         isLoading: (isLoading: Boolean) -> Unit,
         mapIsReadyToUse: () -> Unit,
+        isMoving: MutableState<Boolean>,
     ) {
 
         val scope = rememberCoroutineScope()
@@ -494,14 +554,57 @@ object DeviceDetailsScreen {
             )
         }
 
+        var mapView: MapView? by remember { mutableStateOf(null) }
+
         MapView(
-            modifier = modifier,
+            modifier = modifier.pointerInteropFilter { event ->
+                if (mapView != null) {
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            isMoving.value = true
+                            false
+                        }
+
+                        MotionEvent.ACTION_UP -> {
+                            isMoving.value = false
+                            false
+                        }
+
+                        MotionEvent.ACTION_OUTSIDE -> {
+                            isMoving.value = false
+                            false
+                        }
+
+                        else -> true
+                    }
+                } else {
+                    false
+                }
+            },
             onLoad = { map ->
                 initMapState(map)
                 mapIsReadyToUse.invoke()
+                map.addMapListener(object : MapListener {
+                    override fun onScroll(event: ScrollEvent?): Boolean {
+                        isMoving.value = false
+                        return true
+                    }
+
+                    override fun onZoom(event: ZoomEvent?): Boolean {
+                        // do nothing
+                        return true
+                    }
+                })
             },
-            onUpdate = { map -> refreshMap(map, viewModel, batchProcessor) }
+            onUpdate = { map -> mapView = map  }
         )
+
+        LaunchedEffect(mapView, viewModel.pointsState, viewModel.pointsState) {
+            if (mapView != null) {
+                val mapUpdate = MapUpdate(viewModel.pointsState, viewModel.cameraState, mapView!!)
+                refreshMap(mapUpdate, batchProcessor)
+            }
+        }
     }
 
     private fun initMapState(map: MapView) {
@@ -511,39 +614,43 @@ object DeviceDetailsScreen {
         map.controller.setZoom(MapConfig.MIN_MAP_ZOOM)
     }
 
+    private data class MapUpdate(
+        val points: List<LocationModel>,
+        val cameraState: DeviceDetailsViewModel.MapCameraState,
+        val map: MapView,
+    )
+
     private fun refreshMap(
-        map: MapView,
-        viewModel: DeviceDetailsViewModel,
+        mapUpdate: MapUpdate,
         batchProcessor: AsyncBatchProcessor<LocationModel, MapView>,
     ) {
 
-        val points = viewModel.pointsState
-        batchProcessor.process(points, map)
+        batchProcessor.process(mapUpdate.points, mapUpdate.map)
 
-        when (val cameraConfig = viewModel.cameraState) {
+        when (val cameraConfig = mapUpdate.cameraState) {
             is DeviceDetailsViewModel.MapCameraState.SinglePoint -> {
                 Timber.d(cameraConfig.toString())
                 val point = GeoPoint(cameraConfig.location.lat, cameraConfig.location.lng)
-                map.controller.animateTo(
+                mapUpdate.map.controller.animateTo(
                     point,
                     cameraConfig.zoom,
                     if (cameraConfig.withAnimation) MapConfig.MAP_ANIMATION else MapConfig.MAP_NO_ANIMATION
                 )
-                map.invalidate()
+                mapUpdate.map.invalidate()
             }
 
             is DeviceDetailsViewModel.MapCameraState.MultiplePoints -> {
                 Timber.d(cameraConfig.toString())
-                map.post {
-                    map.zoomToBoundingBox(
+                mapUpdate.map.post {
+                    mapUpdate.map.zoomToBoundingBox(
                         BoundingBox.fromGeoPoints(cameraConfig.points.map { GeoPoint(it.lat, it.lng) }),
                         cameraConfig.withAnimation,
-                        map.context.dpToPx(16f),
+                        mapUpdate.map.context.dpToPx(16f),
                         MapConfig.MAX_MAP_ZOOM,
                         MapConfig.MAP_ANIMATION,
                     )
                 }
-                map.invalidate()
+                mapUpdate.map.invalidate()
             }
         }
     }
