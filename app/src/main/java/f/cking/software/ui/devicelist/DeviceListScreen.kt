@@ -1,11 +1,9 @@
 package f.cking.software.ui.devicelist
 
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,10 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -69,9 +64,9 @@ import f.cking.software.utils.graphic.ContentPlaceholder
 import f.cking.software.utils.graphic.DeviceListItem
 import f.cking.software.utils.graphic.Divider
 import f.cking.software.utils.graphic.FABSpacer
+import f.cking.software.utils.graphic.RadarIcon
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.ThemedDialog
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -270,24 +265,6 @@ object DeviceListScreen {
                 tint = MaterialTheme.colorScheme.onSurface,
             )
         }
-    }
-
-    @OptIn(ExperimentalAnimationGraphicsApi::class)
-    @Composable
-    private fun RadarIcon() {
-        var atEnd by remember { mutableStateOf(false) }
-        val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
-        val animatedPainter = rememberAnimatedVectorPainterCompat(image, atEnd)
-        LaunchedEffect(Unit) {
-            while (true) {
-                delay(image.totalDuration.toLong())
-                atEnd = !atEnd
-            }
-        }
-        Image(
-            painter = animatedPainter,
-            contentDescription = null,
-        )
     }
 
     @OptIn(ExperimentalAnimationGraphicsApi::class)

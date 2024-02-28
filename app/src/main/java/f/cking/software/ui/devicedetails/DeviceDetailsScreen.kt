@@ -61,7 +61,9 @@ import f.cking.software.frameRate
 import f.cking.software.ui.AsyncBatchProcessor
 import f.cking.software.ui.map.MapView
 import f.cking.software.ui.tagdialog.TagDialog
+import f.cking.software.utils.graphic.RadarIcon
 import f.cking.software.utils.graphic.RoundedBox
+import f.cking.software.utils.graphic.SignalData
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.TagChip
 import f.cking.software.utils.graphic.ThemedDialog
@@ -173,12 +175,34 @@ object DeviceDetailsScreen {
                 deviceData = deviceData,
                 viewModel = viewModel
             )
+            OnlineStatus(viewModel = viewModel)
             Spacer(modifier = Modifier.height(16.dp))
             Tags(deviceData = deviceData, viewModel = viewModel)
             Spacer(modifier = Modifier.height(16.dp))
             DeviceContent(modifier = Modifier.weight(1f), deviceData = deviceData)
             Spacer(modifier = Modifier.height(16.dp))
             SystemNavbarSpacer()
+        }
+    }
+
+    @Composable
+    private fun OnlineStatus(
+        viewModel: DeviceDetailsViewModel,
+    ) {
+        viewModel.onlineStatusData?.let { onlineStatus ->
+            Spacer(modifier = Modifier.height(16.dp))
+            RoundedBox(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadarIcon()
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.device_is_online), fontWeight = FontWeight.SemiBold)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    SignalData(rssi = onlineStatus.signalStrength, distance = onlineStatus.distance)
+                }
+            }
         }
     }
 

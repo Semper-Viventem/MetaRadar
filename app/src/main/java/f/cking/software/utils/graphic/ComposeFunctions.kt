@@ -1,6 +1,10 @@
 package f.cking.software.utils.graphic
 
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -32,8 +36,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -72,6 +79,8 @@ import f.cking.software.dpToPx
 import f.cking.software.pxToDp
 import f.cking.software.toHexString
 import f.cking.software.ui.GlobalUiState
+import f.cking.software.ui.devicelist.DeviceListScreen
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.math.abs
@@ -262,32 +271,7 @@ fun DeviceListItem(
                 Spacer(modifier = Modifier.width(4.dp))
                 if (showSignalData) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Column(horizontalAlignment = Alignment.End) {
-                        device.distance()?.let { distance ->
-                            val distanceStr = if (distance < 2) "%.1f".format(distance) else distance.toInt().toString()
-                            val infoDialog = infoDialog(
-                                title = stringResource(id = R.string.disclaimer),
-                                content = stringResource(id = R.string.device_distance_disclaimer)
-                            )
-                            Row(modifier = Modifier.clickable { infoDialog.show() }, verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = stringResource(id = R.string.distance_to_device, distanceStr),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Spacer(modifier = Modifier.width(2.dp))
-                                Icon(
-                                    modifier = Modifier.size(16.dp).alpha(0.5f),
-                                    imageVector = Icons.Outlined.Info,
-                                    contentDescription = stringResource(R.string.is_favorite),
-                                    tint = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                        device.rssi?.let { rssi ->
-                            Text(text = stringResource(id = R.string.rssi_value, rssi), fontSize = 14.sp, fontWeight = FontWeight.Light)
-                        }
-                    }
+                    SignalData(rssi = device.rssi, distance = device.distance())
                 }
             }
             device.tags.takeIf { it.isNotEmpty() }?.let { tags ->
@@ -332,6 +316,38 @@ fun DeviceListItem(
                 text = updateStr,
                 fontWeight = FontWeight.Light,
             )
+        }
+    }
+}
+
+@Composable
+fun SignalData(rssi: Int?, distance: Float?) {
+    Column(horizontalAlignment = Alignment.End) {
+        distance?.let { distance ->
+            val distanceStr = if (distance < 2) "%.1f".format(distance) else distance.toInt().toString()
+            val infoDialog = infoDialog(
+                title = stringResource(id = R.string.disclaimer),
+                content = stringResource(id = R.string.device_distance_disclaimer)
+            )
+            Row(modifier = Modifier.clickable { infoDialog.show() }, verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(id = R.string.distance_to_device, distanceStr),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Icon(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .alpha(0.5f),
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = stringResource(R.string.is_favorite),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        rssi?.let { rssi ->
+            Text(text = stringResource(id = R.string.rssi_value, rssi), fontSize = 14.sp, fontWeight = FontWeight.Light)
         }
     }
 }
@@ -528,4 +544,22 @@ fun Switcher(
             )
         }
     }
+}
+
+@OptIn(ExperimentalAnimationGraphicsApi::class)
+@Composable
+fun RadarIcon() {
+    var atEnd by remember { mutableStateOf(false) }
+    val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.radar_animation)
+    val animatedPainter = DeviceListScreen.rememberAnimatedVectorPainterCompat(image, atEnd)
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(image.totalDuration.toLong())
+            atEnd = !atEnd
+        }
+    }
+    Image(
+        painter = animatedPainter,
+        contentDescription = null,
+    )
 }

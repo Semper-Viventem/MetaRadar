@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import f.cking.software.R
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.helpers.PermissionHelper
+import f.cking.software.data.helpers.PowerModeHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.LocationRepository
 import f.cking.software.domain.interactor.AddTagToDeviceInteractor
@@ -17,8 +18,13 @@ import f.cking.software.domain.interactor.RemoveTagFromDeviceInteractor
 import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.toDomain
+import f.cking.software.service.BgScanService
 import f.cking.software.utils.navigation.BackCommand
 import f.cking.software.utils.navigation.Router
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
@@ -39,6 +45,7 @@ class DeviceDetailsViewModel(
     var cameraState: MapCameraState by mutableStateOf(DEFAULT_MAP_CAMERA_STATE)
     var historyPeriod by mutableStateOf(DEFAULT_HISTORY_PERIOD)
     var markersInLoadingState by mutableStateOf(false)
+    var onlineStatusData: OnlineStatus? by mutableStateOf(null)
 
     private var currentLocation: LocationModel? = null
 
@@ -47,7 +54,35 @@ class DeviceDetailsViewModel(
         viewModelScope.launch {
             observeLocation()
             loadDevice(address)
+            observeOnlineStatus()
             refreshLocationHistory(address, autotunePeriod = true)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeOnlineStatus() {
+        viewModelScope.launch {
+            BgScanService.isActive
+                .flatMapLatest { isActive ->
+                    if (isActive) {
+                        devicesRepository.observeLastBatch()
+                    } else {
+                        flowOf(emptyList())
+                    }
+                }
+                .map { devices ->
+                    val currentDevice = devices.firstOrNull { it.address == address }
+                    val rssi = currentDevice?.rssi
+                    val distance = currentDevice?.distance()
+                    if (rssi != null && distance != null) {
+                        OnlineStatus(rssi, distance)
+                    } else {
+                        null
+                    }
+                }
+                .collect { onlineStatus ->
+                    onlineStatusData = onlineStatus
+                }
         }
     }
 
@@ -179,6 +214,11 @@ class DeviceDetailsViewModel(
         ) : MapCameraState
     }
 
+    data class OnlineStatus(
+        val signalStrength: Int,
+        val distance: Float,
+    )
+
     companion object {
         private const val HISTORY_PERIOD_DAY = 24 * 60 * 60 * 1000L // 24 hours
         private const val HISTORY_PERIOD_WEEK = 7 * 24 * 60 * 60 * 1000L // 1 week
@@ -186,6 +226,8 @@ class DeviceDetailsViewModel(
         private const val HISTORY_PERIOD_LONG = Long.MAX_VALUE
         private const val MAX_POINTS_FOR_AUTO_UPGRADE_PERIOD = 20_000
         private val DEFAULT_HISTORY_PERIOD = HistoryPeriod.DAY
+        private val ONLINE_THRESHOLD_MS =
+            PowerModeHelper.PowerMode.POWER_SAVING.scanDuration + PowerModeHelper.PowerMode.POWER_SAVING.scanDuration + 3000L
 
         private val DEFAULT_MAP_CAMERA_STATE = MapCameraState.SinglePoint(
             location = LocationModel(0.0, 0.0, 0),
