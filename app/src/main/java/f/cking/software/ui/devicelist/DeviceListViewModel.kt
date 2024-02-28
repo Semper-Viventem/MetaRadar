@@ -103,13 +103,13 @@ class DeviceListViewModel(
 
     private fun observeIsScannerEnabled() {
         viewModelScope.launch {
-            BgScanService.isActive
+            BgScanService.observeIsActive()
                 .collect { checkScreenMode(true) }
         }
     }
 
     private fun checkScreenMode(invalidateCurrentBatch: Boolean) {
-        val isScannerEnabled = BgScanService.isActive.value
+        val isScannerEnabled = BgScanService.isActive
         val anyFilterApplyed = isSearchMode || appliedFilter.isNotEmpty()
 
         scannerObservingJob?.cancel()

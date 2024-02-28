@@ -62,7 +62,7 @@ class DeviceDetailsViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeOnlineStatus() {
         viewModelScope.launch {
-            BgScanService.isActive
+            BgScanService.observeIsActive()
                 .flatMapLatest { isActive ->
                     if (isActive) {
                         devicesRepository.observeLastBatch()

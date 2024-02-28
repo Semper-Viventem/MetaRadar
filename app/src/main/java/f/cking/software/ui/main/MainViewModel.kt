@@ -32,7 +32,7 @@ class MainViewModel(
 ) : ViewModel() {
 
     var scanStarted: Boolean by mutableStateOf(bluetoothHelper.inProgress.value)
-    var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive.value)
+    var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive)
     var showLocationDisabledDialog: MaterialDialogState = MaterialDialogState()
     var showBluetoothDisabledDialog: MaterialDialogState = MaterialDialogState()
 
@@ -83,7 +83,7 @@ class MainViewModel(
 
     fun runBackgroundScanning() {
         checkPermissions {
-            if (BgScanService.isActive.value) {
+            if (BgScanService.isActive) {
                 BgScanService.stop(context)
             } else if (!locationProvider.isLocationAvailable()) {
                 showLocationDisabledDialog.show()
@@ -120,7 +120,7 @@ class MainViewModel(
 
     private fun observeServiceIsLaunched() {
         viewModelScope.launch {
-            BgScanService.isActive
+            BgScanService.observeIsActive()
                 .collect { bgServiceIsActive = it }
         }
     }
