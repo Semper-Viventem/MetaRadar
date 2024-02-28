@@ -238,6 +238,18 @@ class BgScanService : Service() {
         }
     }
 
+    enum class ScannerState {
+        DISABLED, SCANNING, ANALYZING, IDLING;
+
+        fun isActive(): Boolean {
+            return this != DISABLED
+        }
+
+        fun isProcessing(): Boolean {
+            return this == SCANNING || this == ANALYZING
+        }
+    }
+
     companion object {
         private const val MAX_FAILURE_SCANS_TO_CLOSE = 10
 
@@ -246,16 +258,17 @@ class BgScanService : Service() {
 
         var state = MutableStateFlow(ScannerState.DISABLED)
             private set
-        val isActive: Boolean get() = state.value != ScannerState.DISABLED
+        val isActive: Boolean get() = state.value.isActive()
 
         private fun updateState(newState: ScannerState) {
             Timber.i("Scanner state: $newState")
             state.tryEmit(newState)
         }
 
-        fun observeIsActive(): Flow<Boolean> = state.map { it != ScannerState.DISABLED }.distinctUntilChanged()
-
-        enum class ScannerState { DISABLED, SCANNING, ANALYZING, IDLING }
+        fun observeIsActive(): Flow<Boolean> {
+            return state.map { it.isActive() }
+                .distinctUntilChanged()
+        }
 
         private fun createCloseServiceIntent(context: Context): Intent {
             return Intent(context, BgScanService::class.java).apply {

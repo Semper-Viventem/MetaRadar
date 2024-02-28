@@ -75,6 +75,7 @@ class DeviceDetailsViewModel(
                     val rssi = currentDevice?.rssi
                     val distance = currentDevice?.distance()
                     if (rssi != null && distance != null) {
+                        deviceState = currentDevice
                         OnlineStatus(rssi, distance)
                     } else {
                         null
