@@ -3,7 +3,6 @@ package f.cking.software.ui.main
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
@@ -22,9 +21,12 @@ import f.cking.software.utils.graphic.Shaders
 import kotlin.math.min
 import kotlin.math.pow
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = composed {
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        return@composed this
+    }
 
     val shader = remember { RuntimeShader(Shaders.WATER_DROP) }
     val dropWave = remember { Animatable(0f) }
@@ -45,7 +47,7 @@ fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = compos
         shader.setFloatUniform("timeFactor", ((System.currentTimeMillis() - dropEvent.time) / 1000f))
     }
 
-    val factor =min((-4f * dropWave.value.pow(2f) + 4 * dropWave.value) * 1.2f, 1f)
+    val factor = min((-4f * dropWave.value.pow(2f) + 4 * dropWave.value) * 1.2f, 1f)
     shader.setFloatUniform("factor", factor)
 
     this
