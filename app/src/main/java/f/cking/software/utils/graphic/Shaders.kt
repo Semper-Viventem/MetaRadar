@@ -136,4 +136,53 @@ object Shaders {
         	return min(color + colorModificator, white);
         }
     """
+
+
+    @Language("AGSL")
+    val WATER_DROP = """
+        uniform shader content;
+        uniform float factor;
+        uniform float2 iResolution;
+        uniform float2 dropPosition;
+        uniform float timeFactor;
+        
+        const float PI = 3.14159265359;
+        
+        const float3 eps = float3(0.01, 0.0, 0.0);
+        
+        float genWave(float len)
+        {
+        	float wave = sin(8.0 * PI * len - (timeFactor * 5.0));
+        	wave = (wave + 1.0) * (0.5 * factor); // <0 ; 1>
+        	wave -= (0.3 * factor);
+        	wave *= wave * wave;
+        	return wave;
+        }
+        
+        float scene(float len)
+        {
+        	return genWave(len);
+        }
+        
+        float2 normal(float len) 
+        {
+        	float tg = (scene(len + eps.x) - scene(len)) / eps.x;
+        	return normalize(float2(-tg, 1.0));
+        }
+        
+        float4 main(float2 fragCoord)
+        {
+        	float2 uv = fragCoord.xy / iResolution.xy;
+        	float2 so = dropPosition.xy / iResolution.xy;
+        	float2 pos2 = float2(uv - so); 	  //wave origin
+        	float2 pos2n = normalize(pos2);
+        
+        	float len = length(pos2);
+        	float wave = scene(len); 
+        
+        	float2 uv2 = -pos2n * wave/(1.0 + 5.0 * len);
+        
+        	return content.eval((uv + uv2) * iResolution.xy);
+        }
+    """
 }

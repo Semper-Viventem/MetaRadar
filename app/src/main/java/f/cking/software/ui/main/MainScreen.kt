@@ -22,11 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,8 +52,11 @@ object MainScreen {
     @Composable
     fun Screen() {
         val viewModel: MainViewModel = koinViewModel()
+        val dropEffectState = rememberDropEffectState()
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .withDropEffect(dropEffectState),
             topBar = {
                 TopBar(viewModel)
             },
@@ -70,7 +75,7 @@ object MainScreen {
                 BottomNavigationBar(Modifier, viewModel)
             },
             floatingActionButton = {
-                ScanFab(viewModel)
+                ScanFab(viewModel, dropEffectState)
             },
         )
         LocationDisabledDialog(viewModel)
@@ -164,10 +169,11 @@ object MainScreen {
     }
 
     @Composable
-    private fun ScanFab(viewModel: MainViewModel) {
+    private fun ScanFab(viewModel: MainViewModel, dropEffectState: DropEffectState) {
         val text: String
         val icon: Int
 
+        val positionXY = remember { floatArrayOf(0f, 0f) }
         if (viewModel.bgServiceIsActive) {
             text = stringResource(R.string.stop)
             icon = R.drawable.ic_cancel
@@ -189,13 +195,18 @@ object MainScreen {
 
         ExtendedFloatingActionButton(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
+            modifier = Modifier.onGloballyPositioned {
+                GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat())
+                positionXY[0] = it.positionInParent().x + (it.size.width / 2)
+                positionXY[1] = it.positionInParent().y + (it.size.height / 2)
+            },
             text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer) },
             onClick = {
                 if (viewModel.needToShowPermissionsIntro()) {
                     permissionsIntro.show()
                 } else {
                     viewModel.runBackgroundScanning()
+                    dropEffectState.drop(positionXY[0], positionXY[1])
                 }
             },
             icon = {
