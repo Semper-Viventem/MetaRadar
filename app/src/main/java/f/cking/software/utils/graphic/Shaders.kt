@@ -172,6 +172,9 @@ object Shaders {
         
         float4 main(float2 fragCoord)
         {
+            if (factor == 0.0) {
+                return content.eval(fragCoord);
+            }
         	float2 uv = fragCoord.xy / iResolution.xy;
         	float2 so = dropPosition.xy / iResolution.xy;
         	float2 pos2 = float2(uv - so); 	  //wave origin
