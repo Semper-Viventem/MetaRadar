@@ -152,7 +152,7 @@ object Shaders {
         
         float genWave(float len)
         {
-        	float wave = sin(1.0 * PI * len - (timeFactor * 5.0));
+        	float wave = sin(1.0 * PI * len - (timeFactor * 5.0 + 2.0));
         	wave = (wave + 1.0) * (0.5 * factor); // <0 ; 1>
         	wave -= (0.3 * factor);
         	wave *= wave * wave;
@@ -180,10 +180,9 @@ object Shaders {
         	float len = length(pos2);
         	float wave = scene(len); 
         
-        	float2 uvR = -pos2n * wave/(1.0 + 5.0 * len + 0.5);
-        	float2 uvG = -pos2n * wave/(1.0 + 5.0 * len + 0.3);
+        	float2 uvR = -pos2n * wave/(1.0 + 5.0 * len + 0.2);
+        	float2 uvG = -pos2n * wave/(1.0 + 5.0 * len + 0.1);
         	float2 uvB = -pos2n * wave/(1.0 + 5.0 * len);
-            
             
         	return float4(content.eval((uv + uvR) * iResolution.xy).r, content.eval((uv + uvG) * iResolution.xy).g, content.eval((uv + uvB) * iResolution.xy).b, content.eval(fragCoord).a);
         }

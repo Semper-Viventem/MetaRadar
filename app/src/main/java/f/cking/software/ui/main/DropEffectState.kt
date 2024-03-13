@@ -5,6 +5,7 @@ import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import f.cking.software.utils.graphic.Shaders
+import kotlin.math.min
 import kotlin.math.pow
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -31,7 +33,7 @@ fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = compos
     if (dropEvent != null) {
         LaunchedEffect(dropEffectState.dropEvent) {
             dropWave.snapTo(0f)
-            dropWave.animateTo(1f, animationSpec = tween(durationMillis = 2000))
+            dropWave.animateTo(1f, animationSpec = tween(durationMillis = 2000, easing = CubicBezierEasing(0.6f, 0.7f, 0.9f, 1.0f)))
         }
 
         shader.setFloatUniform(
@@ -40,10 +42,10 @@ fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = compos
             dropEvent.y,
         )
 
-        shader.setFloatUniform("timeFactor", ((System.currentTimeMillis() - dropEvent.time) / 1000f + 2f))
+        shader.setFloatUniform("timeFactor", ((System.currentTimeMillis() - dropEvent.time) / 1000f))
     }
 
-    val factor = -4f * dropWave.value.pow(2f) + 4 * dropWave.value
+    val factor =min((-4f * dropWave.value.pow(2f) + 4 * dropWave.value) * 1.2f, 1f)
     shader.setFloatUniform("factor", factor)
 
     this
