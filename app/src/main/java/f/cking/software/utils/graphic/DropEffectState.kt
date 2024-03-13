@@ -1,4 +1,4 @@
-package f.cking.software.ui.main
+package f.cking.software.utils.graphic
 
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
@@ -17,7 +17,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
-import f.cking.software.utils.graphic.Shaders
 import kotlin.math.min
 import kotlin.math.pow
 

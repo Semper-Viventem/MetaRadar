@@ -42,9 +42,12 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.GlobalUiState
+import f.cking.software.utils.graphic.DropEffectState
 import f.cking.software.utils.graphic.GlassBottomNavBar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.ThemedDialog
+import f.cking.software.utils.graphic.rememberDropEffectState
+import f.cking.software.utils.graphic.withDropEffect
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
