@@ -217,28 +217,26 @@ object MainScreen {
                 .pointerInteropFilter { event ->
                     val touchX = geometry.left + event.x
                     val touchY = geometry.top + event.y
-                    when (event.action) {
-                        MotionEvent.ACTION_DOWN -> {
+                    when {
+                        event.action == MotionEvent.ACTION_DOWN -> {
                             dropEffectState.drop(type = DropEffectState.DropEvent.Type.TOUCH, touchX, touchY)
                             observeEvent = true
                             true
                         }
 
-                        MotionEvent.ACTION_UP -> {
-                            if (observeEvent) {
-                                if (viewModel.needToShowPermissionsIntro()) {
-                                    permissionsIntro.show()
-                                    dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
-                                } else {
-                                    viewModel.runBackgroundScanning()
-                                    dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_HARD, touchX, touchY)
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                }
+                        observeEvent && event.action == MotionEvent.ACTION_UP -> {
+                            if (viewModel.needToShowPermissionsIntro()) {
+                                permissionsIntro.show()
+                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
+                            } else {
+                                viewModel.runBackgroundScanning()
+                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_HARD, touchX, touchY)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                             true
                         }
 
-                        MotionEvent.ACTION_MOVE -> {
+                        observeEvent && event.action == MotionEvent.ACTION_MOVE -> {
                             if (geometry.contains(Offset(geometry.left + event.x, geometry.top + event.y))) {
                                 dropEffectState.move(touchX, touchY)
                                 true
