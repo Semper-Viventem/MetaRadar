@@ -1,6 +1,7 @@
 package f.cking.software.ui.main
 
 import android.annotation.SuppressLint
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,12 +23,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -38,9 +48,12 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import f.cking.software.R
 import f.cking.software.ui.GlobalUiState
+import f.cking.software.utils.graphic.DropEffectState
 import f.cking.software.utils.graphic.GlassBottomNavBar
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.ThemedDialog
+import f.cking.software.utils.graphic.rememberDropEffectState
+import f.cking.software.utils.graphic.withDropEffect
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,8 +63,11 @@ object MainScreen {
     @Composable
     fun Screen() {
         val viewModel: MainViewModel = koinViewModel()
+        val dropEffectState = rememberDropEffectState()
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .withDropEffect(dropEffectState),
             topBar = {
                 TopBar(viewModel)
             },
@@ -70,7 +86,7 @@ object MainScreen {
                 BottomNavigationBar(Modifier, viewModel)
             },
             floatingActionButton = {
-                ScanFab(viewModel)
+                ScanFab(viewModel, dropEffectState)
             },
         )
         LocationDisabledDialog(viewModel)
@@ -163,11 +179,13 @@ object MainScreen {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
-    private fun ScanFab(viewModel: MainViewModel) {
+    private fun ScanFab(viewModel: MainViewModel, dropEffectState: DropEffectState) {
         val text: String
         val icon: Int
 
+        var geometry = remember { Rect(0f, 0f, 0f, 0f) }
         if (viewModel.bgServiceIsActive) {
             text = stringResource(R.string.stop)
             icon = R.drawable.ic_cancel
@@ -186,17 +204,55 @@ object MainScreen {
                 Toast.makeText(context, "The scanner cannot work without these permissions", Toast.LENGTH_SHORT).show()
             }
         )
+        val haptic = LocalHapticFeedback.current
+        var observeEvent = remember { true }
 
         ExtendedFloatingActionButton(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.onGloballyPositioned { GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat()) },
+            modifier = Modifier
+                .onGloballyPositioned {
+                    GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat())
+                    geometry = Rect(Offset(it.positionInParent().x, it.positionInParent().y), Size(it.size.width.toFloat(), it.size.height.toFloat()))
+                }
+                .pointerInteropFilter { event ->
+                    val touchX = geometry.left + event.x
+                    val touchY = geometry.top + event.y
+                    when {
+                        event.action == MotionEvent.ACTION_DOWN -> {
+                            dropEffectState.drop(type = DropEffectState.DropEvent.Type.TOUCH, touchX, touchY)
+                            observeEvent = true
+                            true
+                        }
+
+                        observeEvent && event.action == MotionEvent.ACTION_UP -> {
+                            if (viewModel.needToShowPermissionsIntro()) {
+                                permissionsIntro.show()
+                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
+                            } else {
+                                viewModel.runBackgroundScanning()
+                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_HARD, touchX, touchY)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                            true
+                        }
+
+                        observeEvent && event.action == MotionEvent.ACTION_MOVE -> {
+                            if (geometry.contains(Offset(geometry.left + event.x, geometry.top + event.y))) {
+                                dropEffectState.move(touchX, touchY)
+                                true
+                            } else {
+                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
+                                observeEvent = false
+                                false
+                            }
+                        }
+
+                        else -> false
+                    }
+                },
             text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer) },
             onClick = {
-                if (viewModel.needToShowPermissionsIntro()) {
-                    permissionsIntro.show()
-                } else {
-                    viewModel.runBackgroundScanning()
-                }
+                // ignore
             },
             icon = {
                 Image(

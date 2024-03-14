@@ -136,4 +136,54 @@ object Shaders {
         	return min(color + colorModificator, white);
         }
     """
+
+
+    @Language("AGSL")
+    val WATER_DROP = """
+        uniform shader content;
+        uniform float factor;
+        uniform float2 iResolution;
+        uniform float2 dropPosition;
+        
+        const float PI = 3.14159265359;
+        
+        const float3 eps = float3(0.01, 0.0, 0.0);
+        
+        float genWave(float len)
+        {
+        	float wave = exp(-pow((len - factor + 0.35) * 8.0, 2.0))-(exp(-pow((len - factor + 0.5) * 16.0, 2.0) / 2.0)) - exp(-pow((len - factor - 3.2), 2.0));
+        	return wave;
+        }
+        
+        float scene(float len)
+        {
+        	return genWave(len);
+        }
+        
+        float2 normal(float len) 
+        {
+        	float tg = (scene(len + eps.x) - scene(len)) / eps.x;
+        	return normalize(float2(-tg, 1.0));
+        }
+        
+        float4 main(float2 fragCoord)
+        {
+            if (factor == 0.0) {
+                //return content.eval(fragCoord);
+            }
+        	float2 uv = fragCoord.xy / iResolution.xy;
+        	float2 so = dropPosition.xy / iResolution.xy;
+        	float2 pos2 = float2(uv - so); 	  //wave origin
+        	float2 pos2n = normalize(pos2);
+        
+        	float len = length(pos2);
+        	float wave = scene(len); 
+        
+        	float2 uvR = -pos2n * wave/(1.0 + 5.0 * len + 0.2);
+        	float2 uvG = -pos2n * wave/(1.0 + 5.0 * len + 0.1);
+        	float2 uvB = -pos2n * wave/(1.0 + 5.0 * len);
+            
+        	return float4(content.eval((uv + uvR) * iResolution.xy).r, content.eval((uv + uvG) * iResolution.xy).g, content.eval((uv + uvB) * iResolution.xy).b, content.eval(fragCoord).a);
+        }
+    """
 }
