@@ -27,6 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -182,7 +185,7 @@ object MainScreen {
         val text: String
         val icon: Int
 
-        val positionXY = remember { floatArrayOf(0f, 0f) }
+        var geometry = remember { Rect(0f, 0f, 0f, 0f) }
         if (viewModel.bgServiceIsActive) {
             text = stringResource(R.string.stop)
             icon = R.drawable.ic_cancel
@@ -202,36 +205,50 @@ object MainScreen {
             }
         )
         val haptic = LocalHapticFeedback.current
+        var observeEvent = remember { true }
 
         ExtendedFloatingActionButton(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             modifier = Modifier
                 .onGloballyPositioned {
                     GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat())
-                    positionXY[0] = it.positionInParent().x + (it.size.width / 2)
-                    positionXY[1] = it.positionInParent().y + (it.size.height / 2)
+                    geometry = Rect(Offset(it.positionInParent().x, it.positionInParent().y), Size(it.size.width.toFloat(), it.size.height.toFloat()))
                 }
                 .pointerInteropFilter { event ->
+                    val touchX = geometry.left + event.x
+                    val touchY = geometry.top + event.y
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
-                            dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.TOUCH)
+                            dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.TOUCH)
+                            observeEvent = true
                             true
                         }
-                        MotionEvent.ACTION_OUTSIDE -> {
-                            dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
-                            false
-                        }
+
                         MotionEvent.ACTION_UP -> {
-                            if (viewModel.needToShowPermissionsIntro()) {
-                                permissionsIntro.show()
-                                dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
-                            } else {
-                                //viewModel.runBackgroundScanning()
-                                dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.RELEASE_HARD)
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            if (observeEvent) {
+                                if (viewModel.needToShowPermissionsIntro()) {
+                                    permissionsIntro.show()
+                                    dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
+                                } else {
+                                    viewModel.runBackgroundScanning()
+                                    dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.RELEASE_HARD)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
                             }
                             true
                         }
+
+                        MotionEvent.ACTION_MOVE -> {
+                            if (geometry.contains(Offset(geometry.left + event.x, geometry.top + event.y))) {
+                                dropEffectState.move(touchX, touchY)
+                                true
+                            } else {
+                                dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
+                                observeEvent = false
+                                false
+                            }
+                        }
+
                         else -> true
                     }
                 },

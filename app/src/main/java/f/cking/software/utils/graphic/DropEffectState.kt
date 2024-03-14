@@ -19,7 +19,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
-import timber.log.Timber
 
 @Composable
 fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = composed {
@@ -29,30 +28,28 @@ fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = compos
     }
 
     val shader = remember { RuntimeShader(Shaders.WATER_DROP) }
-    val dropWave = remember { Animatable(0f) }
+    val factor = remember { Animatable(0f) }
 
     val dropEvent = dropEffectState.dropEvent
     if (dropEvent != null) {
         LaunchedEffect(dropEffectState.dropEvent) {
             dropEvent.type.animSpecs.forEach { animationSpec ->
-                dropWave.animateTo(
+                factor.animateTo(
                     targetValue = animationSpec.to,
                     animationSpec = tween(durationMillis = animationSpec.duration, easing = animationSpec.easing)
                 )
             }
-            dropEvent.type.postFactor?.let { dropWave.snapTo(it) }
+            dropEvent.type.postFactor?.let { factor.snapTo(it) }
         }
-
-        shader.setFloatUniform(
-            "dropPosition",
-            dropEvent.x,
-            dropEvent.y,
-        )
     }
 
-    shader.setFloatUniform("factor", dropWave.value)
+    shader.setFloatUniform(
+        "dropPosition",
+        dropEffectState.center[0],
+        dropEffectState.center[1],
+    )
 
-    Timber.d("DROP EFFECT: event: ${dropEvent?.type?.name}, factor: ${dropWave.value}")
+    shader.setFloatUniform("factor", factor.value)
 
     this
         .onSizeChanged {
@@ -81,15 +78,22 @@ class DropEffectState {
     var dropEvent: DropEvent? by mutableStateOf(null)
         private set
 
+    var center: FloatArray by mutableStateOf(floatArrayOf(0f, 0f))
+
     fun drop(centerX: Float, centerY: Float, type: DropEvent.Type) {
-        dropEvent = DropEvent(System.currentTimeMillis(), centerX, centerY, type)
+        move(centerX, centerY)
+        dropEvent = DropEvent(System.currentTimeMillis(), type)
     }
 
-    data class DropEvent(val time: Long, val x: Float, val y: Float, val type: Type) {
+    fun move(centerX: Float, centerY: Float) {
+        center = floatArrayOf(centerX, centerY)
+    }
+
+    data class DropEvent(val time: Long, val type: Type) {
         enum class Type(val animSpecs: List<AnimationSpec>, val postFactor: Float? = null) {
-            TOUCH(animSpecs = listOf(AnimationSpec(to = -1.5f, duration = 100))),
+            TOUCH(animSpecs = listOf(AnimationSpec(to = -1.5f, duration = 200))),
             RELEASE_SOFT(animSpecs = listOf(AnimationSpec(to = 0f, duration = 100))),
-            RELEASE_HARD(animSpecs = listOf(AnimationSpec(to = 2f, duration = 1000, easing = CubicBezierEasing(0f, 0.5f, 0.75f, 1f))), postFactor = 0f),
+            RELEASE_HARD(animSpecs = listOf(AnimationSpec(to = 0f, duration = 50), AnimationSpec(to = 2f, duration = 1000, easing = CubicBezierEasing(0f, 0.5f, 0.75f, 1f))), postFactor = 0f),
         }
 
         data class AnimationSpec(val to: Float, val duration: Int, val easing: Easing = LinearEasing)
