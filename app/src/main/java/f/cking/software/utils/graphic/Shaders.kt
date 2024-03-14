@@ -151,22 +151,13 @@ object Shaders {
         
         float genWave(float len)
         {
-        	float wave = sin(8.0 * PI * len - ((factor + 1.0) * 5.0));
-        	wave = (wave + 1.0) * (0.5 * factor); // <0 ; 1>
-        	wave -= (0.3 * factor);
-        	wave *= wave * wave;
-        	return wave;
-        }
-        
-        float genWave1(float len)
-        {
         	float wave = exp(-pow((len - factor + 0.35) * 8.0, 2.0))-(exp(-pow((len - factor + 0.5) * 16.0, 2.0) / 2.0)) - exp(-pow((len - factor - 3.2), 2.0));
         	return wave;
         }
         
         float scene(float len)
         {
-        	return genWave1(len);
+        	return genWave(len);
         }
         
         float2 normal(float len) 

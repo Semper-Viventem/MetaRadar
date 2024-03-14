@@ -219,7 +219,7 @@ object MainScreen {
                     val touchY = geometry.top + event.y
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
-                            dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.TOUCH)
+                            dropEffectState.drop(type = DropEffectState.DropEvent.Type.TOUCH, touchX, touchY)
                             observeEvent = true
                             true
                         }
@@ -228,10 +228,10 @@ object MainScreen {
                             if (observeEvent) {
                                 if (viewModel.needToShowPermissionsIntro()) {
                                     permissionsIntro.show()
-                                    dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
+                                    dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
                                 } else {
                                     viewModel.runBackgroundScanning()
-                                    dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.RELEASE_HARD)
+                                    dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_HARD, touchX, touchY)
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 }
                             }
@@ -243,18 +243,18 @@ object MainScreen {
                                 dropEffectState.move(touchX, touchY)
                                 true
                             } else {
-                                dropEffectState.drop(touchX, touchY, type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
+                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
                                 observeEvent = false
                                 false
                             }
                         }
 
-                        else -> true
+                        else -> false
                     }
                 },
             text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer) },
             onClick = {
-
+                // ignore
             },
             icon = {
                 Image(

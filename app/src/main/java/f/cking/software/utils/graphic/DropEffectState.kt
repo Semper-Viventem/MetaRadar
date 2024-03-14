@@ -80,8 +80,12 @@ class DropEffectState {
 
     var center: FloatArray by mutableStateOf(floatArrayOf(0f, 0f))
 
-    fun drop(centerX: Float, centerY: Float, type: DropEvent.Type) {
+    fun drop(type: DropEvent.Type, centerX: Float, centerY: Float) {
         move(centerX, centerY)
+        drop(type)
+    }
+
+    fun drop(type: DropEvent.Type) {
         dropEvent = DropEvent(System.currentTimeMillis(), type)
     }
 
