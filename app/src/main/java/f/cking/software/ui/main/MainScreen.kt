@@ -1,6 +1,7 @@
 package f.cking.software.ui.main
 
 import android.annotation.SuppressLint
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,10 +25,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
@@ -173,6 +176,7 @@ object MainScreen {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     private fun ScanFab(viewModel: MainViewModel, dropEffectState: DropEffectState) {
         val text: String
@@ -201,20 +205,39 @@ object MainScreen {
 
         ExtendedFloatingActionButton(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.onGloballyPositioned {
-                GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat())
-                positionXY[0] = it.positionInParent().x + (it.size.width / 2)
-                positionXY[1] = it.positionInParent().y + (it.size.height / 2)
-            },
+            modifier = Modifier
+                .onGloballyPositioned {
+                    GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat())
+                    positionXY[0] = it.positionInParent().x + (it.size.width / 2)
+                    positionXY[1] = it.positionInParent().y + (it.size.height / 2)
+                }
+                .pointerInteropFilter { event ->
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.TOUCH)
+                            true
+                        }
+                        MotionEvent.ACTION_OUTSIDE -> {
+                            dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
+                            false
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            if (viewModel.needToShowPermissionsIntro()) {
+                                permissionsIntro.show()
+                                dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.RELEASE_SOFT)
+                            } else {
+                                //viewModel.runBackgroundScanning()
+                                dropEffectState.drop(positionXY[0], positionXY[1], type = DropEffectState.DropEvent.Type.RELEASE_HARD)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                            true
+                        }
+                        else -> true
+                    }
+                },
             text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer) },
             onClick = {
-                if (viewModel.needToShowPermissionsIntro()) {
-                    permissionsIntro.show()
-                } else {
-                    viewModel.runBackgroundScanning()
-                    dropEffectState.drop(positionXY[0], positionXY[1])
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
+
             },
             icon = {
                 Image(

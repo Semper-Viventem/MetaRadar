@@ -144,7 +144,6 @@ object Shaders {
         uniform float factor;
         uniform float2 iResolution;
         uniform float2 dropPosition;
-        uniform float timeFactor;
         
         const float PI = 3.14159265359;
         
@@ -152,16 +151,22 @@ object Shaders {
         
         float genWave(float len)
         {
-        	float wave = sin(1.0 * PI * len - (timeFactor * 5.0 + 2.0));
+        	float wave = sin(8.0 * PI * len - ((factor + 1.0) * 5.0));
         	wave = (wave + 1.0) * (0.5 * factor); // <0 ; 1>
         	wave -= (0.3 * factor);
         	wave *= wave * wave;
         	return wave;
         }
         
+        float genWave1(float len)
+        {
+        	float wave = exp(-pow((len - factor + 0.35) * 8.0, 2.0))-(exp(-pow((len - factor + 0.5) * 16.0, 2.0) / 2.0)) - exp(-pow((len - factor - 3.2), 2.0));
+        	return wave;
+        }
+        
         float scene(float len)
         {
-        	return genWave(len);
+        	return genWave1(len);
         }
         
         float2 normal(float len) 
@@ -173,7 +178,7 @@ object Shaders {
         float4 main(float2 fragCoord)
         {
             if (factor == 0.0) {
-                return content.eval(fragCoord);
+                //return content.eval(fragCoord);
             }
         	float2 uv = fragCoord.xy / iResolution.xy;
         	float2 so = dropPosition.xy / iResolution.xy;

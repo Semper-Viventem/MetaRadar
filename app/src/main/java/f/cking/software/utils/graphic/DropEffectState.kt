@@ -5,6 +5,8 @@ import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,8 +19,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
-import kotlin.math.min
-import kotlin.math.pow
+import timber.log.Timber
 
 @Composable
 fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = composed {
@@ -33,8 +34,13 @@ fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = compos
     val dropEvent = dropEffectState.dropEvent
     if (dropEvent != null) {
         LaunchedEffect(dropEffectState.dropEvent) {
-            dropWave.snapTo(0f)
-            dropWave.animateTo(1f, animationSpec = tween(durationMillis = 2000, easing = CubicBezierEasing(0.6f, 0.7f, 0.9f, 1.0f)))
+            dropEvent.type.animSpecs.forEach { animationSpec ->
+                dropWave.animateTo(
+                    targetValue = animationSpec.to,
+                    animationSpec = tween(durationMillis = animationSpec.duration, easing = animationSpec.easing)
+                )
+            }
+            dropEvent.type.postFactor?.let { dropWave.snapTo(it) }
         }
 
         shader.setFloatUniform(
@@ -42,12 +48,11 @@ fun Modifier.withDropEffect(dropEffectState: DropEffectState): Modifier = compos
             dropEvent.x,
             dropEvent.y,
         )
-
-        shader.setFloatUniform("timeFactor", ((System.currentTimeMillis() - dropEvent.time) / 1000f))
     }
 
-    val factor = min((-4f * dropWave.value.pow(2f) + 4 * dropWave.value) * 1.2f, 1f)
-    shader.setFloatUniform("factor", factor)
+    shader.setFloatUniform("factor", dropWave.value)
+
+    Timber.d("DROP EFFECT: event: ${dropEvent?.type?.name}, factor: ${dropWave.value}")
 
     this
         .onSizeChanged {
@@ -76,12 +81,20 @@ class DropEffectState {
     var dropEvent: DropEvent? by mutableStateOf(null)
         private set
 
-    fun drop(centerX: Float, centerY: Float) {
-        dropEvent = DropEvent(System.currentTimeMillis(), centerX, centerY)
+    fun drop(centerX: Float, centerY: Float, type: DropEvent.Type) {
+        dropEvent = DropEvent(System.currentTimeMillis(), centerX, centerY, type)
+    }
+
+    data class DropEvent(val time: Long, val x: Float, val y: Float, val type: Type) {
+        enum class Type(val animSpecs: List<AnimationSpec>, val postFactor: Float? = null) {
+            TOUCH(animSpecs = listOf(AnimationSpec(to = -1.5f, duration = 100))),
+            RELEASE_SOFT(animSpecs = listOf(AnimationSpec(to = 0f, duration = 100))),
+            RELEASE_HARD(animSpecs = listOf(AnimationSpec(to = 2f, duration = 1000, easing = CubicBezierEasing(0f, 0.5f, 0.75f, 1f))), postFactor = 0f),
+        }
+
+        data class AnimationSpec(val to: Float, val duration: Int, val easing: Easing = LinearEasing)
     }
 }
-
-data class DropEvent(val time: Long, val x: Float, val y: Float)
 
 @Composable
 fun rememberDropEffectState(): DropEffectState {
