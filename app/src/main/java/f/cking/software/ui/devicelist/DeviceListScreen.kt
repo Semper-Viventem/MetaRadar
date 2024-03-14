@@ -131,10 +131,16 @@ object DeviceListScreen {
                 }
             }
 
-            if (viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None) {
-                item(contentType = ListContentType.ENJOY_THE_APP, key = "enjoy_the_app") {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    EnjoyTheApp(Modifier.animateItemPlacement(), viewModel, viewModel.enjoyTheAppState)
+            item(contentType = ListContentType.ENJOY_THE_APP, key = "enjoy_the_app") {
+                Spacer(modifier = Modifier.height(8.dp))
+                AnimatedVisibility(
+                    modifier = Modifier
+                        .animateItemPlacement(),
+                    visible = viewModel.enjoyTheAppState != DeviceListViewModel.EnjoyTheAppState.None,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    EnjoyTheApp(viewModel, viewModel.enjoyTheAppState)
                 }
             }
 
@@ -216,7 +222,8 @@ object DeviceListScreen {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .animateContentSize()) {
+                    .animateContentSize()
+            ) {
                 CurrentBatchList(viewModel)
             }
         }
@@ -350,8 +357,8 @@ object DeviceListScreen {
     }
 
     @Composable
-    private fun EnjoyTheApp(modifier: Modifier, viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
-        RoundedBox(modifier) {
+    private fun EnjoyTheApp(viewModel: DeviceListViewModel, enjoyTheAppState: DeviceListViewModel.EnjoyTheAppState) {
+        RoundedBox(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             when (enjoyTheAppState) {
                 is DeviceListViewModel.EnjoyTheAppState.Question -> EnjoyTheAppQuestion(viewModel)
                 is DeviceListViewModel.EnjoyTheAppState.Like -> EnjoyTheAppLike(enjoyTheAppState, viewModel)
