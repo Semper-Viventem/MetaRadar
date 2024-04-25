@@ -40,7 +40,7 @@ class DeviceListViewModel(
     private val intentHelper: IntentHelper,
 ) : ViewModel() {
 
-    var currentBatchSortingStrategy by mutableStateOf(CurrentBatchSortingStrategy.GENERAL)
+    var currentBatchSortingStrategy by mutableStateOf(getDefaultSortStrategy())
     var devicesViewState by mutableStateOf(emptyList<DeviceData>())
     var activeScannerExpandedState by mutableStateOf(ActiveScannerExpandedState.COLLAPSED)
     var currentBatchViewState by mutableStateOf<List<DeviceData>?>(null)
@@ -153,6 +153,7 @@ class DeviceListViewModel(
 
     fun applyCurrentBatchSortingStrategy(strategy: CurrentBatchSortingStrategy) {
         currentBatchSortingStrategy = strategy
+        settingsRepository.setCurrentBatchSortingStrategyId(strategy.ordinal)
         currentBatchViewState = currentBatchViewState?.sortedWith(strategy.comparator)
     }
 
@@ -302,6 +303,11 @@ class DeviceListViewModel(
         } else {
             true
         }
+    }
+
+    private fun getDefaultSortStrategy(): CurrentBatchSortingStrategy {
+        val id = settingsRepository.getCurrentBatchSortingStrategyId()
+        return CurrentBatchSortingStrategy.entries.getOrElse(id) { CurrentBatchSortingStrategy.GENERAL }
     }
 
     data class FilterHolder(

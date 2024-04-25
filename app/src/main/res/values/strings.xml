@@ -104,6 +104,7 @@
     <string name="filter_by_name">By name</string>
     <string name="filter_by_name_description">Triggers when the device name matches</string>
     <string name="filter_by_address">By address</string>
+    <string name="filter_by_address_disclaimer">The device address or a regex</string>
     <string name="filter_by_address_description">Triggers when the device address matches</string>
     <string name="filter_by_first_detection_period">By first detection period</string>
     <string name="filter_by_first_detection_period_description">Triggers if the found device was first time detected in the selected period</string>
