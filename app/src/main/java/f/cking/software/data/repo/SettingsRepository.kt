@@ -81,6 +81,14 @@ class SettingsRepository(
         return silentModeState
     }
 
+    fun getCurrentBatchSortingStrategyId(): Int {
+        return sharedPreferences.getInt(KEY_CURRENT_BATCH_SORTING_STRATEGY_ID, 0)
+    }
+
+    fun setCurrentBatchSortingStrategyId(value: Int) {
+        sharedPreferences.edit().putInt(KEY_CURRENT_BATCH_SORTING_STRATEGY_ID, value).apply()
+    }
+
     companion object {
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"
         private const val KEY_USE_GPS_ONLY = "key_use_gps_location_only"
@@ -90,6 +98,7 @@ class SettingsRepository(
         private const val KEY_ENJOY_THE_APP_ANSWERED = "key_enjoy_the_app_answered_v1"
         private const val KEY_ENJOY_THE_APP_STARTING_POINT = "key_enjoy_the_app_starting_point"
         private const val KEY_SILENT_NETWORK_MODE = "silent_network_mode"
+        private const val KEY_CURRENT_BATCH_SORTING_STRATEGY_ID = "key_current_batch_sorting_strategy_id"
 
         const val NO_APP_LAUNCH_TIME = -1L
         const val NO_ENJOY_THE_APP_STARTING_POINT = -1L

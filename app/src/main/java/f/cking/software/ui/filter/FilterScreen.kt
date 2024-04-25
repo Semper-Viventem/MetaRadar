@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -249,13 +251,19 @@ object FilterScreen {
             color = colorResource(R.color.filter_address),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
+            Spacer(modifier = Modifier.height(4.dp))
             Row {
                 TextField(
                     modifier = Modifier.weight(1f),
                     value = filter.address,
                     singleLine = true,
-                    onValueChange = { filter.address = it.uppercase() },
-                    placeholder = { Text(text = "00:00:00:00:00:00") }
+                    label = { Text(text = stringResource(R.string.filter_by_address_disclaimer)) },
+                    onValueChange = { filter.address = it },
+                    placeholder = { Text(text = "00:00:00:00:00:00") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        capitalization = KeyboardCapitalization.Characters,
+                        autoCorrect = false,
+                    ),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 IconButton(onClick = {
