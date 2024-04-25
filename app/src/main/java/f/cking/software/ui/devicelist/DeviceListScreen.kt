@@ -363,7 +363,9 @@ object DeviceListScreen {
                 is DeviceListViewModel.EnjoyTheAppState.Question -> EnjoyTheAppQuestion(viewModel)
                 is DeviceListViewModel.EnjoyTheAppState.Like -> EnjoyTheAppLike(enjoyTheAppState, viewModel)
                 is DeviceListViewModel.EnjoyTheAppState.Dislike -> EnjoyTheAppDislike(viewModel)
-                is DeviceListViewModel.EnjoyTheAppState.None -> throw IllegalStateException("EnjoyTheAppState.NONE is not supported here")
+                is DeviceListViewModel.EnjoyTheAppState.None -> {
+                    // nothing to draw
+                }
             }
         }
     }
