@@ -29,7 +29,7 @@ class FilterCheckerImpl(
         device.name != null && device.name.contains(filter.name, filter.ignoreCase)
     }
     private val address = filterChecker<RadarProfile.Filter.Address>(useCache = true) { device, filter ->
-        device.address == filter.address
+        device.address.contains(filter.address.toRegex())
     }
     private val manufacturer = filterChecker<RadarProfile.Filter.Manufacturer>(useCache = true) { device, filter ->
         device.manufacturerInfo?.id?.let { it == filter.manufacturerId } ?: false

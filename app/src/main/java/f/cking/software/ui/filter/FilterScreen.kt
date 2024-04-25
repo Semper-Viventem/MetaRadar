@@ -249,11 +249,13 @@ object FilterScreen {
             color = colorResource(R.color.filter_address),
             onDeleteButtonClick = { onDeleteClick.invoke(filter) }
         ) {
+            Spacer(modifier = Modifier.height(4.dp))
             Row {
                 TextField(
                     modifier = Modifier.weight(1f),
                     value = filter.address,
                     singleLine = true,
+                    label = { Text(text = stringResource(R.string.filter_by_address_disclaimer)) },
                     onValueChange = { filter.address = it.uppercase() },
                     placeholder = { Text(text = "00:00:00:00:00:00") }
                 )
