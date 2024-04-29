@@ -288,12 +288,14 @@ class DeviceListViewModel(
         intentHelper.openUrl(BuildConfig.REPORT_ISSUE_URL)
     }
 
-    fun filterQuery(device: DeviceData, query: String?): Boolean {
+    private fun filterQuery(device: DeviceData, query: String?): Boolean {
         return query?.takeIf { it.isNotBlank() }?.let { searchStr ->
             (device.name?.contains(searchStr, true) ?: false)
                     || (device.customName?.contains(searchStr, true) ?: false)
                     || (device.manufacturerInfo?.name?.contains(searchStr, true) ?: false)
                     || device.address.contains(searchStr, true)
+                    || device.address.contains(query.toRegex())
+                    || (device.name?.contains(query.toRegex()) ?: false)
         } ?: true
     }
 
