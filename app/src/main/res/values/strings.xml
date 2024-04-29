@@ -102,7 +102,7 @@
     <!-- Select filter -->
     <string name="select_filter">Select filter</string>
     <string name="filter_by_name">By name</string>
-    <string name="filter_by_name_description">Triggers when the device name matches</string>
+    <string name="filter_by_name_description">Triggers when the device name matches by subsrtring or regex</string>
     <string name="filter_by_address">By address</string>
     <string name="filter_by_address_disclaimer">The device address or a regex</string>
     <string name="filter_by_address_description">Triggers when the device address matches</string>
@@ -150,7 +150,7 @@
     <string name="min_interval_to_detect">Min interval to detect</string>
     <string name="time_placeholder">HH:MM</string>
     <string name="filter_unknown_title">Current filter is not supported by your app version</string>
-    <string name="placeholder_device_name">Device name</string>
+    <string name="placeholder_device_name">Device name (or regex)</string>
     <string name="ignore_case">Ignore case</string>
     <string name="placeholder_airdrope_contact">email/phone</string>
     <string name="airdrop_min_lost_period">Min lost period</string>
@@ -179,7 +179,7 @@
     <string name="custom_filter">Custom filter</string>
     <string name="create_filter">Create filter</string>
     <string name="filter_is_not_valid">Filter is not valid</string>
-    <string name="search_query">Search query</string>
+    <string name="search_query">Search query or regex</string>
     <string name="close_search">Close search</string>
     <string name="clear_search">Clear search</string>
     <string name="not_apple">Not apple</string>
