@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.BuildConfig
 import f.cking.software.R
+import f.cking.software.checkRegexSafe
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.SettingsRepository
@@ -294,8 +295,8 @@ class DeviceListViewModel(
                     || (device.customName?.contains(searchStr, true) ?: false)
                     || (device.manufacturerInfo?.name?.contains(searchStr, true) ?: false)
                     || device.address.contains(searchStr, true)
-                    || device.address.contains(query.toRegex())
-                    || (device.name?.contains(query.toRegex()) ?: false)
+                    || device.address.checkRegexSafe(query)
+                    || (device.name?.checkRegexSafe(query) ?: false)
         } ?: true
     }
 

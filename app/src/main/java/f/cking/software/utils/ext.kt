@@ -9,6 +9,7 @@ import android.view.Display
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import timber.log.Timber
 import java.security.MessageDigest
 import java.time.Instant
 import java.time.LocalDate
@@ -16,6 +17,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.regex.PatternSyntaxException
 
 
 fun Long.getTimePeriodStr(context: Context): String {
@@ -125,4 +127,15 @@ fun <T> List<T>.splitToBatches(batchSize: Int): List<List<T>> {
 fun Context.isDarkModeOn(): Boolean {
     val nightModeFlags = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
     return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+}
+
+fun String.checkRegexSafe(pattern: String): Boolean {
+    return try {
+        this.contains(pattern.toRegex())
+    } catch (e: PatternSyntaxException) {
+        false
+    } catch (e: Throwable) {
+         Timber.e("Unexpected regex failure", e)
+        false
+    }
 }

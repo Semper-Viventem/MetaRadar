@@ -1,5 +1,6 @@
 package f.cking.software.domain.interactor.filterchecker
 
+import f.cking.software.checkRegexSafe
 import f.cking.software.data.helpers.PowerModeHelper
 import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.domain.interactor.CheckDeviceIsFollowingInteractor
@@ -26,12 +27,12 @@ class FilterCheckerImpl(
         device.firstDetectTimeMs in filter.from..filter.to
     }
     private val name = filterChecker<RadarProfile.Filter.Name>(useCache = true) { device, filter ->
-        val regexMatch = device.name?.contains(filter.name.toRegex()) ?: false
+        val regexMatch = device.name?.checkRegexSafe(filter.name) ?: false
         val noCaseSubstringMatch = device.name?.contains(filter.name, filter.ignoreCase) ?: false
         regexMatch || noCaseSubstringMatch
     }
     private val address = filterChecker<RadarProfile.Filter.Address>(useCache = true) { device, filter ->
-        device.address.contains(filter.address.toRegex())
+        device.address.checkRegexSafe(filter.address)
     }
     private val manufacturer = filterChecker<RadarProfile.Filter.Manufacturer>(useCache = true) { device, filter ->
         device.manufacturerInfo?.id?.let { it == filter.manufacturerId } ?: false
