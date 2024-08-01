@@ -108,16 +108,16 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_22
+        targetCompatibility = JavaVersion.VERSION_22
     }
 
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(22)
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "22"
     }
 
     buildFeatures.apply {
