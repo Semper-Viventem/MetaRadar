@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("androidx.room")
+    alias(libs.plugins.compose.compiler)
 }
 
 room {
@@ -51,10 +52,10 @@ android {
             keyPassword = "metaradar-debug-keystore"
         }
         maybeCreate(RELEASE).apply {
-            storeFile = file(gradleLocalProperties(rootDir).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: "/"))
-            storePassword = gradleLocalProperties(rootDir).getProperty("releaseStorePassword", System.getenv("RELEASE_STORE_PASSWORD") ?: "")
-            keyAlias = gradleLocalProperties(rootDir).getProperty("releaseKeyAlias", System.getenv("RELEASE_STORE_KEY") ?: "")
-            keyPassword = gradleLocalProperties(rootDir).getProperty("releaseKeyPassword", System.getenv("RELEASE_STORE_KEY_PASSWORD") ?: "")
+            storeFile = file(gradleLocalProperties(rootDir, providers).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: "/"))
+            storePassword = gradleLocalProperties(rootDir, providers).getProperty("releaseStorePassword", System.getenv("RELEASE_STORE_PASSWORD") ?: "")
+            keyAlias = gradleLocalProperties(rootDir, providers).getProperty("releaseKeyAlias", System.getenv("RELEASE_STORE_KEY") ?: "")
+            keyPassword = gradleLocalProperties(rootDir, providers).getProperty("releaseKeyPassword", System.getenv("RELEASE_STORE_KEY_PASSWORD") ?: "")
         }
     }
 
@@ -71,7 +72,7 @@ android {
             isShrinkResources = true
             isDebuggable = false
 
-            val hasSignConfig = gradleLocalProperties(rootDir).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: NO_SIGNING_CONFIG) != NO_SIGNING_CONFIG
+            val hasSignConfig = gradleLocalProperties(rootDir, providers).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: NO_SIGNING_CONFIG) != NO_SIGNING_CONFIG
 
             signingConfig = if (hasSignConfig) signingConfigs[RELEASE] else null
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
