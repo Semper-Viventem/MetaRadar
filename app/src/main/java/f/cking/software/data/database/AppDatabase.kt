@@ -64,8 +64,10 @@ abstract class AppDatabase : RoomDatabase() {
                 throw IllegalStateException("The database file doesn't exist")
             }
             context.contentResolver.openOutputStream(toUri)?.use { outputStream ->
-                outputStream.write(dbFile.readBytes())
-            }
+                dbFile.inputStream().use { inputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            } ?: throw RuntimeException("Cannot create a backup file stream")
         }
     }
 
