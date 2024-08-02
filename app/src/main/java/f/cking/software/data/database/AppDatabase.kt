@@ -65,13 +65,9 @@ abstract class AppDatabase : RoomDatabase() {
             }
             context.contentResolver.openOutputStream(toUri)?.use { outputStream ->
                 dbFile.inputStream().use { inputStream ->
-                    val buffer = ByteArray(1024)
-                    var bytesRead: Int
-                    while ((inputStream.read(buffer).also { bytesRead = it }) != -1) {
-                        outputStream.write(buffer, 0, bytesRead)
-                    }
+                    inputStream.copyTo(outputStream)
                 }
-            }
+            } ?: throw RuntimeException("Cannot create a backup file stream")
         }
     }
 
