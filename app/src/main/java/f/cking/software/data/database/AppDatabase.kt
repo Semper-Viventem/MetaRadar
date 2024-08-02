@@ -64,7 +64,13 @@ abstract class AppDatabase : RoomDatabase() {
                 throw IllegalStateException("The database file doesn't exist")
             }
             context.contentResolver.openOutputStream(toUri)?.use { outputStream ->
-                outputStream.write(dbFile.readBytes())
+                dbFile.inputStream().use { inputStream ->
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+                    while ((inputStream.read(buffer).also { bytesRead = it }) != -1) {
+                        outputStream.write(buffer, 0, bytesRead)
+                    }
+                }
             }
         }
     }
