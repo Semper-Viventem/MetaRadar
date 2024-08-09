@@ -25,8 +25,8 @@ android {
         minSdk = 29
         targetSdk = 35
 
-        versionCode = 1708536357
-        versionName = "0.26.1-beta"
+        versionCode = 1708536358
+        versionName = "0.26.2-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -108,16 +108,16 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_22
-        targetCompatibility = JavaVersion.VERSION_22
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlin {
-        jvmToolchain(22)
+        jvmToolchain(21)
     }
 
     kotlinOptions {
-        jvmTarget = "22"
+        jvmTarget = "21"
     }
 
     buildFeatures.apply {

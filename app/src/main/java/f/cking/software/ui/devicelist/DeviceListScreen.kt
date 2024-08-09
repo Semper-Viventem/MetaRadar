@@ -158,8 +158,10 @@ object DeviceListScreen {
                 }
             }
 
-            viewModel.devicesViewState.mapIndexed { index, deviceData ->
-                item(contentType = ListContentType.DEVICE, key = "device_${deviceData.address}") {
+            val devices = viewModel.devicesViewState
+
+            items(devices.size, key = { "device_${devices[it]}" }, contentType = { ListContentType.DEVICE}) { index ->
+                val deviceData = devices[index]
                     DeviceListItem(
                         modifier = Modifier.animateItemPlacement(),
                         device = deviceData,
@@ -167,10 +169,9 @@ object DeviceListScreen {
                         onTagSelected = { viewModel.onTagSelected(it) },
                     )
 
-                }
                 val showDivider = viewModel.devicesViewState.getOrNull(index + 1)?.lastDetectTimeMs != deviceData.lastDetectTimeMs
                 if (showDivider) {
-                    item(contentType = ListContentType.DIVIDER, key = "${deviceData.lastDetectTimeMs}") { Divider(Modifier.animateItemPlacement()) }
+                    Divider(Modifier.animateItemPlacement())
                 }
             }
 
@@ -193,7 +194,7 @@ object DeviceListScreen {
     }
 
     enum class ListContentType {
-        ENJOY_THE_APP, CURRENT_BATCH, DEVICE, DIVIDER, PAGINATION_PROGRESS, BOTTOM_SPACER,
+        ENJOY_THE_APP, CURRENT_BATCH, DEVICE, PAGINATION_PROGRESS, BOTTOM_SPACER,
     }
 
     @Composable
