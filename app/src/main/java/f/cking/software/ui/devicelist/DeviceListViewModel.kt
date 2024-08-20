@@ -114,11 +114,14 @@ class DeviceListViewModel(
         val anyFilterApplyed = isSearchMode || appliedFilter.isNotEmpty()
 
         scannerObservingJob?.cancel()
-        if (isScannerEnabled || anyFilterApplyed) {
-            disablePagination()
-        } else {
-            enablePagination()
-        }
+        disablePagination()
+
+        // TODO fix realtime items observing before enabling pagination
+//        if (isScannerEnabled || anyFilterApplyed) {
+//            disablePagination()
+//        } else {
+//            enablePagination()
+//        }
 
         if (invalidateCurrentBatch) {
             lastBatchJob?.cancel()
