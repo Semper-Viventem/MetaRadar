@@ -19,6 +19,7 @@ apply {
 android {
     compileSdk = 35
     namespace = "f.cking.software"
+    val javaConfig: JavaConfig = JavaConfig.getByString(getEnvJavaConfigVersion())
 
     defaultConfig {
         applicationId = "f.cking.software"
@@ -108,16 +109,16 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = javaConfig.javaVersion
+        targetCompatibility = javaConfig.javaVersion
     }
 
     kotlin {
-        jvmToolchain(21)
+        jvmToolchain(javaConfig.jdkVersion)
     }
 
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = javaConfig.jvmTarget
     }
 
     buildFeatures.apply {
@@ -195,4 +196,30 @@ dependencies {
     // tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.ktx.testing)
+}
+
+private fun getEnvJavaConfigVersion(): String {
+    val version = gradleLocalProperties(rootDir, providers).getProperty("JAVA_CONFIG_VERSION", System.getenv("JAVA_CONFIG_VERSION") ?: "UNSPECIFIED")
+    println("Environment JDK version selected is ${version}. To override it define JAVA_CONFIG_VERSION environment variable or local properties.")
+    return version
+}
+
+enum class JavaConfig(val jvmTarget: String, val jdkVersion: Int, val javaVersion: JavaVersion) {
+    JAVA_21("21", 21, JavaVersion.VERSION_21),
+    JAVA_22("22", 22, JavaVersion.VERSION_22);
+
+    companion object {
+        fun getByString(versionStr: String?): JavaConfig {
+            return when (versionStr) {
+                "21" -> JAVA_21
+                "22" -> JAVA_22
+                else -> {
+                    println("Java version ${versionStr} is not recognized. The default one will be used instead for this project: ${DEFAULT.jvmTarget}")
+                    DEFAULT
+                }
+            }
+        }
+
+        private val DEFAULT = JAVA_22
+    }
 }
