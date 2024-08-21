@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: set up JDK 22
+    - name: set up JDK 21
       uses: actions/setup-java@v3
       with:
-        java-version: '22'
+        java-version: '21'
         distribution: 'oracle'
         cache: gradle
 
