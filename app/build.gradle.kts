@@ -26,8 +26,8 @@ android {
         minSdk = 29
         targetSdk = 35
 
-        versionCode = 1708536358
-        versionName = "0.26.2-beta"
+        versionCode = 1708536359
+        versionName = "0.26.3-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -220,6 +220,6 @@ enum class JavaConfig(val jvmTarget: String, val jdkVersion: Int, val javaVersio
             }
         }
 
-        private val DEFAULT = JAVA_22
+        private val DEFAULT = JAVA_21
     }
 }
