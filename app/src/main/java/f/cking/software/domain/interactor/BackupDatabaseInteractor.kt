@@ -8,7 +8,6 @@ class BackupDatabaseInteractor(
     private val appDatabase: AppDatabase,
     private val context: Context,
 ) {
-
     suspend fun execute(uri: Uri) {
         appDatabase.backupDatabase(uri, context)
     }

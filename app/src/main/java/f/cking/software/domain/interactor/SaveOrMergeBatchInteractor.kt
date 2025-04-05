@@ -21,33 +21,35 @@ class SaveOrMergeBatchInteractor(
     private val deviceServicesFetchingPlanner: DeviceServicesFetchingPlanner,
     private val settingsRepository: SettingsRepository,
 ) {
-
-    suspend fun execute(batch: List<BleScanDevice>): Result {
-        return withContext(Dispatchers.Default) {
+    suspend fun execute(batch: List<BleScanDevice>): Result =
+        withContext(Dispatchers.Default) {
             val discoveredDevices = batch.map { buildDeviceFromScanDataInteractor.execute(it) }
             val existingDevices = devicesRepository.getAllByAddresses(discoveredDevices.map { it.address }).associateBy { it.address }
             val airdropContactToPreviouslySeenAtTime = mutableMapOf<Int, Long>()
 
-            val mergedDevices = discoveredDevices.map { newDiscovered ->
-                val existing = existingDevices[newDiscovered.address]
-                val mergedDeviceData = existing?.mergeWithNewDetected(newDiscovered) ?: newDiscovered
-                val airdropMergeResult = mergeAirdropContactsWithExisting(mergedDeviceData.manufacturerInfo)
-                airdropContactToPreviouslySeenAtTime.putAll(airdropMergeResult.airdropContactToPreviouslySeenAtTime)
+            val mergedDevices =
+                discoveredDevices.map { newDiscovered ->
+                    val existing = existingDevices[newDiscovered.address]
+                    val mergedDeviceData = existing?.mergeWithNewDetected(newDiscovered) ?: newDiscovered
+                    val airdropMergeResult = mergeAirdropContactsWithExisting(mergedDeviceData.manufacturerInfo)
+                    airdropContactToPreviouslySeenAtTime.putAll(airdropMergeResult.airdropContactToPreviouslySeenAtTime)
 
-                mergedDeviceData.copy(manufacturerInfo = airdropMergeResult.updatedManufacturerInfo)
-            }
+                    mergedDeviceData.copy(manufacturerInfo = airdropMergeResult.updatedManufacturerInfo)
+                }
 
             devicesRepository.saveScanBatch(mergedDevices)
 
-            var savedBatch = mergedDevices.map { mergedDevice ->
-                SavedDeviceHandle(
-                    previouslySeenAtTime = existingDevices[mergedDevice.address]?.lastDetectTimeMs ?: mergedDevice.lastDetectTimeMs,
-                    device = mergedDevice,
-                    airdrop = airdropContactToPreviouslySeenAtTime
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { SavedDeviceHandle.AirdropHandle(it) }
-                )
-            }
+            var savedBatch =
+                mergedDevices.map { mergedDevice ->
+                    SavedDeviceHandle(
+                        previouslySeenAtTime = existingDevices[mergedDevice.address]?.lastDetectTimeMs ?: mergedDevice.lastDetectTimeMs,
+                        device = mergedDevice,
+                        airdrop =
+                            airdropContactToPreviouslySeenAtTime
+                                .takeIf { it.isNotEmpty() }
+                                ?.let { SavedDeviceHandle.AirdropHandle(it) },
+                    )
+                }
 
             if (settingsRepository.getEnableDeepAnalysis()) {
                 savedBatch = deviceServicesFetchingPlanner.scheduleFetchServiceInfo(savedBatch)
@@ -63,23 +65,23 @@ class SaveOrMergeBatchInteractor(
             val knownDevicesCount = mergedDevices.count(isKnownDeviceInteractor::execute)
             Result(
                 knownDevicesCount = knownDevicesCount,
-                savedBatch = savedBatch
+                savedBatch = savedBatch,
             )
         }
-    }
 
     private suspend fun mergeAirdropContactsWithExisting(found: ManufacturerInfo?): AirdropContactsMergeResult {
         val airdrop = found?.airdrop ?: return AirdropContactsMergeResult(found, emptyMap())
 
         val airdropContactToPreviouslySeenAtTime = mutableMapOf<Int, Long>()
         val existingContacts = devicesRepository.getAllBySHA(airdrop.contacts.map { it.sha256 }).associateBy { it.sha256 }
-        val mergedContacts = airdrop.contacts.map { contact ->
-            val existing = existingContacts[contact.sha256]
-            if (existing != null) {
-                airdropContactToPreviouslySeenAtTime[existing.sha256] = existing.lastDetectionTimeMs
+        val mergedContacts =
+            airdrop.contacts.map { contact ->
+                val existing = existingContacts[contact.sha256]
+                if (existing != null) {
+                    airdropContactToPreviouslySeenAtTime[existing.sha256] = existing.lastDetectionTimeMs
+                }
+                existing?.mergeWithNewContact(contact) ?: contact
             }
-            existing?.mergeWithNewContact(contact) ?: contact
-        }
         return AirdropContactsMergeResult(
             found.copy(airdrop = AppleAirDrop(mergedContacts)),
             airdropContactToPreviouslySeenAtTime,

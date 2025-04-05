@@ -8,7 +8,6 @@ import timber.log.Timber
 class CheckDeviceLocationHistoryInteractor(
     private val locationRepository: LocationRepository,
 ) {
-
     /**
      * @param targetLocation location to check
      * @param radius radius in meters
@@ -25,7 +24,6 @@ class CheckDeviceLocationHistoryInteractor(
         fromTime: Long,
         toTime: Long,
     ): Boolean {
-
         Timber.tag(TAG).d("Checking device location history for device: ${device.address}")
 
         if (toTime < device.firstDetectTimeMs || fromTime > device.lastDetectTimeMs) {
@@ -33,11 +31,12 @@ class CheckDeviceLocationHistoryInteractor(
             return false
         }
 
-        val locations = locationRepository.getAllLocationsByAddress(
-            deviceAddress = device.address,
-            fromTime = fromTime,
-            toTime = toTime
-        )
+        val locations =
+            locationRepository.getAllLocationsByAddress(
+                deviceAddress = device.address,
+                fromTime = fromTime,
+                toTime = toTime,
+            )
 
         Timber.tag(TAG).d("Locations count: ${locations.size}, device: ${device.address}")
 

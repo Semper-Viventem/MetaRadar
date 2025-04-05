@@ -19,7 +19,6 @@ import f.cking.software.domain.model.BleScanDevice
 import f.cking.software.domain.model.JournalEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -32,9 +31,7 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
 
-
 class BgScanService : Service() {
-
     private val permissionHelper: PermissionHelper by inject()
     private val bleScannerHelper: BleScannerHelper by inject()
     private val locationProvider: LocationProvider by inject()
@@ -50,19 +47,21 @@ class BgScanService : Service() {
     private var locationDisabledWasReported: Boolean = false
     private var bluetoothDisabledWasReported: Boolean = false
     private var backgroundLocationRestrictedWasReported: Boolean = false
-    private val nextScanRunnable = Runnable {
-        scan()
-    }
-
-    private val bleListener = object : BleScannerHelper.ScanListener {
-        override fun onFailure(exception: Exception) {
-            handleError(exception)
+    private val nextScanRunnable =
+        Runnable {
+            scan()
         }
 
-        override fun onSuccess(batch: List<BleScanDevice>) {
-            handleScanResult(batch)
+    private val bleListener =
+        object : BleScannerHelper.ScanListener {
+            override fun onFailure(exception: Exception) {
+                handleError(exception)
+            }
+
+            override fun onSuccess(batch: List<BleScanDevice>) {
+                handleScanResult(batch)
+            }
         }
-    }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main + Dispatchers.IO + Dispatchers.Default)
 
@@ -82,8 +81,11 @@ class BgScanService : Service() {
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         if (intent != null && intent.action == ACTION_STOP_SERVICE) {
             Timber.d("Background service close action handled")
             stopForeground(STOP_FOREGROUND_REMOVE)
@@ -97,7 +99,7 @@ class BgScanService : Service() {
                 NotificationsHelper.FOREGROUND_NOTIFICATION_ID,
                 notificationsHelper.buildForegroundNotification(
                     NotificationsHelper.ServiceNotificationContent.NoDataYet,
-                    createCloseServiceIntent(this)
+                    createCloseServiceIntent(this),
                 ),
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION,
             )
@@ -110,7 +112,7 @@ class BgScanService : Service() {
                 onPermissionGranted = {
                     locationProvider.startLocationFetching()
                     scan()
-                }
+                },
             )
         }
 
@@ -128,9 +130,7 @@ class BgScanService : Service() {
         notificationsHelper.cancel(NotificationsHelper.FOREGROUND_NOTIFICATION_ID)
     }
 
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(p0: Intent?): IBinder? = null
 
     private fun scan() {
         scope.launch {
@@ -141,7 +141,7 @@ class BgScanService : Service() {
                 handleBleIsTurnedOffError()
                 notificationsHelper.updateNotification(
                     NotificationsHelper.ServiceNotificationContent.BluetoothIsTurnedOff,
-                    createCloseServiceIntent(this@BgScanService)
+                    createCloseServiceIntent(this@BgScanService),
                 )
                 scheduleNextScan()
             } catch (e: Throwable) {
@@ -153,11 +153,12 @@ class BgScanService : Service() {
 
     private fun handleScanResult(batch: List<BleScanDevice>) {
         scope.launch {
-            val notificationContent: NotificationsHelper.ServiceNotificationContent = if (batch.isNotEmpty()){
-                handleNonEmptyBatch(batch)
-            } else {
-                handleEmptyBatch()
-            }
+            val notificationContent: NotificationsHelper.ServiceNotificationContent =
+                if (batch.isNotEmpty()) {
+                    handleNonEmptyBatch(batch)
+                } else {
+                    handleEmptyBatch()
+                }
 
             notificationsHelper.updateNotification(notificationContent, createCloseServiceIntent(this@BgScanService))
 
@@ -165,14 +166,13 @@ class BgScanService : Service() {
         }
     }
 
-    private fun handleEmptyBatch(): NotificationsHelper.ServiceNotificationContent {
-        return when {
+    private fun handleEmptyBatch(): NotificationsHelper.ServiceNotificationContent =
+        when {
             !locationProvider.isLocationAvailable() -> handleLocationDisabled()
             !bleScannerHelper.isBluetoothEnabled() -> handleBleIsTurnedOffError()
             !permissionHelper.backgroundLocationAllowed() -> handleBackgroundLocationRestricted()
             else -> NotificationsHelper.ServiceNotificationContent.NoDataYet
         }
-    }
 
     private fun handleBackgroundLocationRestricted(): NotificationsHelper.ServiceNotificationContent {
         if (!backgroundLocationRestrictedWasReported) {
@@ -186,7 +186,11 @@ class BgScanService : Service() {
     private fun handleLocationDisabled(): NotificationsHelper.ServiceNotificationContent {
         if (!locationDisabledWasReported) {
             notificationsHelper.notifyLocationIsTurnedOff()
-            reportError(IllegalStateException("The BLE scanner did not return anything. This may happen if geolocation is turned off at the system level. Location access is required to work with BLE on Android."))
+            reportError(
+                IllegalStateException(
+                    "The BLE scanner did not return anything. This may happen if geolocation is turned off at the system level. Location access is required to work with BLE on Android.",
+                ),
+            )
             locationDisabledWasReported = true
         }
         return NotificationsHelper.ServiceNotificationContent.LocationIsTurnedOff
@@ -207,13 +211,16 @@ class BgScanService : Service() {
 
         return try {
             updateState(ScannerState.ANALYZING)
-            val savingResult = withContext(Dispatchers.Default) {
-                saveOrMergeBatchInteractor.execute(batch)
-            }
+            val savingResult =
+                withContext(Dispatchers.Default) {
+                    saveOrMergeBatchInteractor.execute(batch)
+                }
 
             val matchedProfiles = checkBatchForRadarMatchesInteractor.execute(savingResult.savedBatch)
 
-            Timber.d("Background scan result: known_devices_count=${savingResult.knownDevicesCount}, matched_profiles=${matchedProfiles.count()}")
+            Timber.d(
+                "Background scan result: known_devices_count=${savingResult.knownDevicesCount}, matched_profiles=${matchedProfiles.count()}",
+            )
             withContext(Dispatchers.Main) {
                 handleProfileCheckingResult(matchedProfiles)
             }
@@ -246,24 +253,25 @@ class BgScanService : Service() {
     private fun reportError(error: Throwable) {
         Timber.e(error)
         scope.launch {
-            val report = JournalEntry.Report.Error(
-                title = "[BLE Service Error]: ${error.message ?: error::class.java}",
-                stackTrace = error.stackTraceToString(),
-            )
+            val report =
+                JournalEntry.Report.Error(
+                    title = "[BLE Service Error]: ${error.message ?: error::class.java}",
+                    stackTrace = error.stackTraceToString(),
+                )
             saveReportInteractor.execute(report)
         }
     }
 
     enum class ScannerState {
-        DISABLED, SCANNING, ANALYZING, IDLING;
+        DISABLED,
+        SCANNING,
+        ANALYZING,
+        IDLING,
+        ;
 
-        fun isActive(): Boolean {
-            return this != DISABLED
-        }
+        fun isActive(): Boolean = this != DISABLED
 
-        fun isProcessing(): Boolean {
-            return this == SCANNING || this == ANALYZING
-        }
+        fun isProcessing(): Boolean = this == SCANNING || this == ANALYZING
     }
 
     companion object {
@@ -281,16 +289,15 @@ class BgScanService : Service() {
             state.tryEmit(newState)
         }
 
-        fun observeIsActive(): Flow<Boolean> {
-            return state.map { it.isActive() }
+        fun observeIsActive(): Flow<Boolean> =
+            state
+                .map { it.isActive() }
                 .distinctUntilChanged()
-        }
 
-        private fun createCloseServiceIntent(context: Context): Intent {
-            return Intent(context, BgScanService::class.java).apply {
+        private fun createCloseServiceIntent(context: Context): Intent =
+            Intent(context, BgScanService::class.java).apply {
                 action = ACTION_STOP_SERVICE
             }
-        }
 
         fun start(context: Context) {
             val intent = Intent(context, BgScanService::class.java)
@@ -305,9 +312,10 @@ class BgScanService : Service() {
 
         fun scan(context: Context) {
             if (isActive) {
-                val intent = Intent(context, BgScanService::class.java).apply {
-                    action = ACTION_SCAN_NOW
-                }
+                val intent =
+                    Intent(context, BgScanService::class.java).apply {
+                        action = ACTION_SCAN_NOW
+                    }
                 context.startService(intent)
             } else {
                 start(context)

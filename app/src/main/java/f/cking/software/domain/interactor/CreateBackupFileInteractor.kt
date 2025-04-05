@@ -13,11 +13,10 @@ class CreateBackupFileInteractor(
     private val intentHelper: IntentHelper,
     private val context: Context,
 ) {
-
     fun execute(): Flow<Uri?> {
         val appName = context.getString(R.string.app_name)
         val time = System.currentTimeMillis().dateTimeStringFormat(TIME_FORMAT)
-        val name = "${appName}_${BACKUP_FILE_PREFIX}_(${time}).sqlite"
+        val name = "${appName}_${BACKUP_FILE_PREFIX}_($time).sqlite"
 
         return callbackFlow {
             intentHelper.createFile(name) { uri ->

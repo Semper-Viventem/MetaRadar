@@ -22,36 +22,45 @@ class CheckBatchForRadarMatchesInteractor(
     private val locationProvider: LocationProvider,
     private val locationRepository: LocationRepository,
 ) {
-
-    suspend fun execute(batch: List<SavedDeviceHandle>): List<ProfileResult> {
-        return withContext(Dispatchers.Default) {
+    suspend fun execute(batch: List<SavedDeviceHandle>): List<ProfileResult> =
+        withContext(Dispatchers.Default) {
             val checkStartTime = System.currentTimeMillis()
 
             // Use original previous detection time for device and it's airdrop info
             // This is needed to correctly process radar profiles that are based on last detection time
-            val adjustedDevices = batch.map { handle ->
-                handle.device.copy(
-                    lastDetectTimeMs = handle.previouslySeenAtTime,
-                    manufacturerInfo = handle.device.manufacturerInfo?.let { manufacturerInfo ->
-                        manufacturerInfo.copy(
-                            airdrop = manufacturerInfo.airdrop?.let { airdrop ->
-                                airdrop.copy(
-                                    contacts = airdrop.contacts.map { contact ->
-                                        val originalLastDetectionTime = handle.airdrop?.contactShaToPreviouslySeenAtTime[contact.sha256]
-                                        contact.copy(lastDetectionTimeMs = originalLastDetectionTime ?: handle.previouslySeenAtTime)
-                                    }
+            val adjustedDevices =
+                batch.map { handle ->
+                    handle.device.copy(
+                        lastDetectTimeMs = handle.previouslySeenAtTime,
+                        manufacturerInfo =
+                            handle.device.manufacturerInfo?.let { manufacturerInfo ->
+                                manufacturerInfo.copy(
+                                    airdrop =
+                                        manufacturerInfo.airdrop?.let { airdrop ->
+                                            airdrop.copy(
+                                                contacts =
+                                                    airdrop.contacts.map { contact ->
+                                                        val originalLastDetectionTime =
+                                                            handle.airdrop?.contactShaToPreviouslySeenAtTime[contact.sha256]
+                                                        contact.copy(
+                                                            lastDetectionTimeMs =
+                                                                originalLastDetectionTime ?: handle.previouslySeenAtTime,
+                                                        )
+                                                    },
+                                            )
+                                        },
                                 )
-                            }
-                        )
-                    }
-                )
-            }
+                            },
+                    )
+                }
 
             val allProfiles = radarProfilesRepository.getAllProfiles()
 
-            val result = allProfiles.mapParallel { profile ->
-                checkProfile(profile, adjustedDevices)
-            }.filterNotNull()
+            val result =
+                allProfiles
+                    .mapParallel { profile ->
+                        checkProfile(profile, adjustedDevices)
+                    }.filterNotNull()
 
             result.forEach { saveReport(it) }
 
@@ -59,18 +68,20 @@ class CheckBatchForRadarMatchesInteractor(
             Timber.tag(TAG).i("Radar detection check: ${result.size} profiles detected. Duration $totalDuration ms")
             result
         }
-    }
 
-    private suspend fun checkProfile(profile: RadarProfile, devices: List<DeviceData>): ProfileResult? {
-        return profile.takeIf { it.isActive && isCooledDown(it) }
+    private suspend fun checkProfile(
+        profile: RadarProfile,
+        devices: List<DeviceData>,
+    ): ProfileResult? =
+        profile
+            .takeIf { it.isActive && isCooledDown(it) }
             ?.let {
-                devices.mapParallel { device ->
-                    device.takeIf { profile.detectFilter?.let { filterChecker.check(device, it) } == true }
-                }.filterNotNull()
-            }
-            ?.takeIf { matched -> matched.isNotEmpty() }
+                devices
+                    .mapParallel { device ->
+                        device.takeIf { profile.detectFilter?.let { filterChecker.check(device, it) } == true }
+                    }.filterNotNull()
+            }?.takeIf { matched -> matched.isNotEmpty() }
             ?.let { matched -> ProfileResult(profile, matched) }
-    }
 
     private suspend fun isCooledDown(profile: RadarProfile): Boolean {
         val cooldown = profile.cooldownMs
@@ -90,30 +101,32 @@ class CheckBatchForRadarMatchesInteractor(
         val locationModel = locationProvider.getFreshLocation()
         val detectTime = System.currentTimeMillis()
 
-        val deviceDetects = result.matched.mapNotNull {
-            val profileId = result.profile.id
-            if (profileId != null) {
-                ProfileDetect(
-                    id = null,
-                    profileId = profileId,
-                    triggerTime = detectTime,
-                    deviceAddress = it.address,
-                )
-            } else {
-                null
+        val deviceDetects =
+            result.matched.mapNotNull {
+                val profileId = result.profile.id
+                if (profileId != null) {
+                    ProfileDetect(
+                        id = null,
+                        profileId = profileId,
+                        triggerTime = detectTime,
+                        deviceAddress = it.address,
+                    )
+                } else {
+                    null
+                }
             }
-        }
         radarProfilesRepository.saveProfileDetects(deviceDetects)
 
         if (locationModel != null) {
             locationRepository.saveLocation(locationModel.toDomain(detectTime))
         }
 
-        val journalReport = JournalEntry.Report.ProfileReport(
-            profileId = result.profile.id ?: return,
-            deviceAddresses = result.matched.map { it.address },
-            locationModel = locationModel?.toDomain(System.currentTimeMillis()),
-        )
+        val journalReport =
+            JournalEntry.Report.ProfileReport(
+                profileId = result.profile.id ?: return,
+                deviceAddresses = result.matched.map { it.address },
+                locationModel = locationModel?.toDomain(System.currentTimeMillis()),
+            )
         saveReportInteractor.execute(journalReport)
     }
 

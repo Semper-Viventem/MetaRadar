@@ -10,7 +10,6 @@ class RestoreDatabaseInteractor(
     private val appDatabase: AppDatabase,
     private val application: TheApp,
 ) {
-
     suspend fun execute(uri: Uri) {
         BgScanService.stop(application)
         appDatabase.restoreDatabase(uri, application)

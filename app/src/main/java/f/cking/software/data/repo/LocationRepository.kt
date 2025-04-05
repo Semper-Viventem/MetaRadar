@@ -13,18 +13,21 @@ import kotlinx.coroutines.withContext
 class LocationRepository(
     appDatabase: AppDatabase,
 ) {
-
     val locationDao = appDatabase.locationDao()
 
-    suspend fun saveLocation(location: LocationModel, detectedAddresses: List<String>) {
+    suspend fun saveLocation(
+        location: LocationModel,
+        detectedAddresses: List<String>,
+    ) {
         withContext(Dispatchers.IO) {
             locationDao.saveLocation(location.toData())
-            val addresses = detectedAddresses.map {
-                DeviceToLocationEntity(
-                    deviceAddress = it,
-                    locationTime = location.time
-                )
-            }
+            val addresses =
+                detectedAddresses.map {
+                    DeviceToLocationEntity(
+                        deviceAddress = it,
+                        locationTime = location.time,
+                    )
+                }
             locationDao.saveLocationToDevice(addresses)
         }
     }
@@ -39,12 +42,12 @@ class LocationRepository(
         deviceAddress: String,
         fromTime: Long = 0,
         toTime: Long = Long.MAX_VALUE,
-    ): List<LocationModel> {
-        return withContext(Dispatchers.IO) {
-            locationDao.getAllLocationsByDeviceAddress(deviceAddress, fromTime, toTime)
+    ): List<LocationModel> =
+        withContext(Dispatchers.IO) {
+            locationDao
+                .getAllLocationsByDeviceAddress(deviceAddress, fromTime, toTime)
                 .map { it.toDomain() }
         }
-    }
 
     suspend fun removeAllLocations() {
         withContext(Dispatchers.IO) {

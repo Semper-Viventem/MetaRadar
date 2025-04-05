@@ -8,10 +8,7 @@ data class ManufacturerInfo(
     val name: String,
     var airdrop: AppleAirDrop?,
 ) {
-
-    fun isApple(): Boolean {
-        return id == APPLE_ID
-    }
+    fun isApple(): Boolean = id == APPLE_ID
 
     companion object {
         const val APPLE_ID = 0x004C

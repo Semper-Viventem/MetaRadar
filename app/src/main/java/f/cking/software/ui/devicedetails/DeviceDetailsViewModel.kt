@@ -58,7 +58,6 @@ class DeviceDetailsViewModel(
     private val getBleRecordFramesFromRawInteractor: GetBleRecordFramesFromRawInteractor,
     private val fetchDeviceServiceInfo: FetchDeviceServiceInfo,
 ) : ViewModel() {
-
     var deviceState: DeviceData? by mutableStateOf(null)
     var pointsState: List<LocationModel> by mutableStateOf(emptyList())
     var cameraState: MapCameraState by mutableStateOf(DEFAULT_MAP_CAMERA_STATE)
@@ -72,10 +71,17 @@ class DeviceDetailsViewModel(
     private var connectionJob: Job? = null
     var matadataIsFetching by mutableStateOf(false)
 
-    sealed class ConnectionStatus(@StringRes val statusRes: Int) {
-        data class CONNECTED(val gatt: BluetoothGatt) : ConnectionStatus(R.string.device_details_status_connected)
+    sealed class ConnectionStatus(
+        @StringRes val statusRes: Int,
+    ) {
+        data class CONNECTED(
+            val gatt: BluetoothGatt,
+        ) : ConnectionStatus(R.string.device_details_status_connected)
+
         data object CONNECTING : ConnectionStatus(R.string.device_details_status_connecting)
+
         data object DISCONNECTED : ConnectionStatus(R.string.device_details_status_disconnected)
+
         data object DISCONNECTING : ConnectionStatus(R.string.device_details_status_disconnecting)
     }
 
@@ -112,17 +118,18 @@ class DeviceDetailsViewModel(
 
     fun establishConnection() {
         connectionJob?.cancel()
-        connectionJob = viewModelScope.launch {
-            bleScannerHelper.connectToDevice(address)
-                .onStart { connectionStatus = ConnectionStatus.CONNECTING }
-                .catch { e ->
-                    Timber.e(e)
-                    connectionStatus = ConnectionStatus.DISCONNECTED
-                }
-                .collect { result ->
-                    handleBleConnectResult(result)
-                }
-        }
+        connectionJob =
+            viewModelScope.launch {
+                bleScannerHelper
+                    .connectToDevice(address)
+                    .onStart { connectionStatus = ConnectionStatus.CONNECTING }
+                    .catch { e ->
+                        Timber.e(e)
+                        connectionStatus = ConnectionStatus.DISCONNECTED
+                    }.collect { result ->
+                        handleBleConnectResult(result)
+                    }
+            }
     }
 
     private fun handleBleConnectResult(result: BleScannerHelper.DeviceConnectResult) {
@@ -158,16 +165,18 @@ class DeviceDetailsViewModel(
             }
 
             is BleScannerHelper.DeviceConnectResult.CharacteristicRead -> {
-                val updatedServices = services.map { service ->
-                    val updatedCharacteristics = service.characteristics.map { characteristic ->
-                        if (characteristic.uuid == result.characteristic.uuid.toString()) {
-                            mapCharacteristic(result.characteristic, result.valueEncoded64.fromBase64())
-                        } else {
-                            characteristic
-                        }
+                val updatedServices =
+                    services.map { service ->
+                        val updatedCharacteristics =
+                            service.characteristics.map { characteristic ->
+                                if (characteristic.uuid == result.characteristic.uuid.toString()) {
+                                    mapCharacteristic(result.characteristic, result.valueEncoded64.fromBase64())
+                                } else {
+                                    characteristic
+                                }
+                            }
+                        service.copy(characteristics = updatedCharacteristics)
                     }
-                    service.copy(characteristics = updatedCharacteristics)
-                }
                 addServices(updatedServices.toSet())
             }
 
@@ -176,16 +185,22 @@ class DeviceDetailsViewModel(
             }
 
             is BleScannerHelper.DeviceConnectResult.DescriptorRead -> {
-                val updatedServices = services.map { service ->
-                    val updatedCharacteristics = service.characteristics.map { characteristic ->
-                        if (characteristic.gatt.descriptors.any { it.uuid == result.descriptor.uuid }) {
-                            mapCharacteristic(characteristic.gatt, characteristic.encodedValue?.fromBase64(), result.valueEncoded64.fromBase64())
-                        } else {
-                            characteristic
-                        }
+                val updatedServices =
+                    services.map { service ->
+                        val updatedCharacteristics =
+                            service.characteristics.map { characteristic ->
+                                if (characteristic.gatt.descriptors.any { it.uuid == result.descriptor.uuid }) {
+                                    mapCharacteristic(
+                                        characteristic.gatt,
+                                        characteristic.encodedValue?.fromBase64(),
+                                        result.valueEncoded64.fromBase64(),
+                                    )
+                                } else {
+                                    characteristic
+                                }
+                            }
+                        service.copy(characteristics = updatedCharacteristics)
                     }
-                    service.copy(characteristics = updatedCharacteristics)
-                }
                 addServices(updatedServices.toSet())
             }
         }
@@ -194,7 +209,7 @@ class DeviceDetailsViewModel(
     private fun mapCharacteristic(
         characteristic: BluetoothGattCharacteristic,
         value: ByteArray? = null,
-        description: ByteArray? = null
+        description: ByteArray? = null,
     ): CharacteristicData {
         val valueStr = value?.decodeToString()
         val valueHex = value?.toHexString()?.uppercase()?.let { "0x$it" }
@@ -204,26 +219,35 @@ class DeviceDetailsViewModel(
             value = valueStr,
             valueHex = valueHex,
             encodedValue = value?.toBase64(),
-            gatt = characteristic
+            gatt = characteristic,
         )
     }
 
-    private fun mapService(service: BluetoothGattService): ServiceData {
-        return ServiceData(getServiceNameIfKnown(service), service.uuid.toString(), service.characteristics.map { mapCharacteristic(it) })
-    }
+    private fun mapService(service: BluetoothGattService): ServiceData =
+        ServiceData(
+            getServiceNameIfKnown(service),
+            service.uuid.toString(),
+            service.characteristics.map {
+                mapCharacteristic(it)
+            },
+        )
 
-    private fun getServiceNameIfKnown(service: BluetoothGattService): String? {
-        return GetServiceNameFromBluetoothService.execute(service.uuid.toString())
-    }
+    private fun getServiceNameIfKnown(service: BluetoothGattService): String? =
+        GetServiceNameFromBluetoothService.execute(service.uuid.toString())
 
-    private fun getCharacteristicNameIfKnown(characteristic: BluetoothGattCharacteristic): String? {
-        return GetCharacteristicNameFromUUID.execute(characteristic.uuid.toString())
-    }
+    private fun getCharacteristicNameIfKnown(characteristic: BluetoothGattCharacteristic): String? =
+        GetCharacteristicNameFromUUID.execute(characteristic.uuid.toString())
 
     fun readDescription(characteristic: BluetoothGattCharacteristic) {
         viewModelScope.launch {
             val gat = (connectionStatus as? ConnectionStatus.CONNECTED)?.gatt
-            val descriptor = characteristic.descriptors.firstOrNull { it.uuid == UUID.fromString(DESCRIPTOR_CHARACTERISTIC_USER_DESCRIPTION) }
+            val descriptor =
+                characteristic.descriptors.firstOrNull {
+                    it.uuid ==
+                        UUID.fromString(
+                            DESCRIPTOR_CHARACTERISTIC_USER_DESCRIPTION,
+                        )
+                }
             if (gat != null && descriptor != null) {
                 try {
                     bleScannerHelper.readDescriptor(gat, characteristic, descriptor.uuid)
@@ -282,23 +306,24 @@ class DeviceDetailsViewModel(
 
     private fun loadRawData(raw: ByteArray) {
         val frames = getBleRecordFramesFromRawInteractor.execute(raw)
-        rawData = frames.map {
-            it.type.toHexString().uppercase() to it.data.toHexString().uppercase()
-        }
+        rawData =
+            frames.map {
+                it.type.toHexString().uppercase() to it.data.toHexString().uppercase()
+            }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeOnlineStatus() {
         viewModelScope.launch {
-            BgScanService.observeIsActive()
+            BgScanService
+                .observeIsActive()
                 .flatMapLatest { isActive ->
                     if (isActive) {
                         devicesRepository.observeLastBatch()
                     } else {
                         flowOf(emptyList())
                     }
-                }
-                .map { devices ->
+                }.map { devices ->
                     val currentDevice = devices.firstOrNull { it.address == address }
                     val rssi = currentDevice?.rssi
                     val distance = currentDevice?.distance()
@@ -310,8 +335,7 @@ class DeviceDetailsViewModel(
                     } else {
                         null
                     }
-                }
-                .collect { onlineStatus ->
+                }.collect { onlineStatus ->
                     onlineStatusData = onlineStatus
                 }
         }
@@ -336,7 +360,8 @@ class DeviceDetailsViewModel(
         permissionHelper.checkOrRequestPermission {
             viewModelScope.launch {
                 locationProvider.fetchOnce()
-                locationProvider.observeLocation()
+                locationProvider
+                    .observeLocation()
                     .take(2)
                     .collect { location ->
                         currentLocation = location?.location?.toDomain(System.currentTimeMillis())
@@ -346,7 +371,10 @@ class DeviceDetailsViewModel(
         }
     }
 
-    private suspend fun refreshLocationHistory(address: String, autotunePeriod: Boolean) {
+    private suspend fun refreshLocationHistory(
+        address: String,
+        autotunePeriod: Boolean,
+    ) {
         val fromTime = System.currentTimeMillis() - historyPeriod.periodMills
         val fetched = locationRepository.getAllLocationsByAddress(address, fromTime = fromTime)
         val nextStep = historyPeriod.next()
@@ -365,16 +393,20 @@ class DeviceDetailsViewModel(
         updateCameraPosition(pointsState, currentLocation)
     }
 
-    private fun updateCameraPosition(points: List<LocationModel>, currentLocation: LocationModel?) {
+    private fun updateCameraPosition(
+        points: List<LocationModel>,
+        currentLocation: LocationModel?,
+    ) {
         val previousState: MapCameraState = cameraState
         val withAnimation = previousState != DEFAULT_MAP_CAMERA_STATE
-        val newState = if (points.isNotEmpty()) {
-            MapCameraState.MultiplePoints(points, withAnimation = withAnimation)
-        } else if (currentLocation != null) {
-            MapCameraState.SinglePoint(location = currentLocation, zoom = MapConfig.DEFAULT_MAP_ZOOM, withAnimation = withAnimation)
-        } else {
-            DEFAULT_MAP_CAMERA_STATE.copy(withAnimation = withAnimation)
-        }
+        val newState =
+            if (points.isNotEmpty()) {
+                MapCameraState.MultiplePoints(points, withAnimation = withAnimation)
+            } else if (currentLocation != null) {
+                MapCameraState.SinglePoint(location = currentLocation, zoom = MapConfig.DEFAULT_MAP_ZOOM, withAnimation = withAnimation)
+            } else {
+                DEFAULT_MAP_CAMERA_STATE.copy(withAnimation = withAnimation)
+            }
         if (newState != previousState) {
             cameraState = newState
         }
@@ -383,7 +415,7 @@ class DeviceDetailsViewModel(
     fun selectHistoryPeriodSelected(
         newHistoryPeriod: HistoryPeriod,
         address: String,
-        autotunePeriod: Boolean
+        autotunePeriod: Boolean,
     ) {
         viewModelScope.launch {
             historyPeriod = newHistoryPeriod
@@ -398,14 +430,20 @@ class DeviceDetailsViewModel(
         }
     }
 
-    fun onNewTagSelected(device: DeviceData, tag: String) {
+    fun onNewTagSelected(
+        device: DeviceData,
+        tag: String,
+    ) {
         viewModelScope.launch {
             addTagToDeviceInteractor.execute(device, tag)
             loadDevice(deviceState!!.address)
         }
     }
 
-    fun onRemoveTagClick(device: DeviceData, tag: String) {
+    fun onRemoveTagClick(
+        device: DeviceData,
+        tag: String,
+    ) {
         viewModelScope.launch {
             removeTagFromDeviceInteractor.execute(device, tag)
             loadDevice(deviceState!!.address)
@@ -420,22 +458,20 @@ class DeviceDetailsViewModel(
         val periodMills: Long,
         @StringRes val displayNameRes: Int,
     ) {
-
         DAY(HISTORY_PERIOD_DAY, displayNameRes = R.string.device_details_day),
         WEEK(HISTORY_PERIOD_WEEK, displayNameRes = R.string.device_details_week),
         MONTH(HISTORY_PERIOD_MONTH, displayNameRes = R.string.device_details_month),
-        ALL(HISTORY_PERIOD_LONG, displayNameRes = R.string.device_details_all_time);
+        ALL(HISTORY_PERIOD_LONG, displayNameRes = R.string.device_details_all_time),
+        ;
 
-        fun next(): HistoryPeriod? {
-            return HistoryPeriod.values().getOrNull(ordinal + 1)
-        }
+        fun next(): HistoryPeriod? = HistoryPeriod.values().getOrNull(ordinal + 1)
 
-        fun previous(): HistoryPeriod? {
-            return HistoryPeriod.values().getOrNull(ordinal - 1)
-        }
+        fun previous(): HistoryPeriod? = HistoryPeriod.values().getOrNull(ordinal - 1)
     }
 
-    enum class PointsStyle(@StringRes val displayNameRes: Int) {
+    enum class PointsStyle(
+        @StringRes val displayNameRes: Int,
+    ) {
         MARKERS(R.string.device_history_pint_style_markers),
         PATH(R.string.device_history_pint_style_path),
     }
@@ -470,10 +506,11 @@ class DeviceDetailsViewModel(
             PowerModeHelper.PowerMode.POWER_SAVING.scanDuration + PowerModeHelper.PowerMode.POWER_SAVING.scanDuration + 3000L
         private val DEFAULT_POINTS_STYLE = PointsStyle.MARKERS
 
-        private val DEFAULT_MAP_CAMERA_STATE = MapCameraState.SinglePoint(
-            location = LocationModel(0.0, 0.0, 0),
-            zoom = MapConfig.MIN_MAP_ZOOM,
-            withAnimation = false
-        )
+        private val DEFAULT_MAP_CAMERA_STATE =
+            MapCameraState.SinglePoint(
+                location = LocationModel(0.0, 0.0, 0),
+                zoom = MapConfig.MIN_MAP_ZOOM,
+                withAnimation = false,
+            )
     }
 }

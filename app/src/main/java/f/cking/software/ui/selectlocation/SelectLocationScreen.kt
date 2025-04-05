@@ -56,7 +56,6 @@ import org.osmdroid.views.MapView
 
 @OptIn(ExperimentalMaterial3Api::class)
 object SelectLocationScreen {
-
     @Composable
     fun Screen(
         initialLocationModel: LocationModel?,
@@ -65,20 +64,22 @@ object SelectLocationScreen {
         onCloseClick: () -> Unit,
     ) {
         Scaffold(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
             topBar = { AppBar(onCloseClick) },
             content = { paddings ->
                 Content(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(top = paddings.calculateTopPadding()),
+                    modifier =
+                        Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(top = paddings.calculateTopPadding()),
                     onSelected = onSelected,
                     initialLocationModel = initialLocationModel,
-                    initialRadius = initialRadius
+                    initialRadius = initialRadius,
                 )
-            }
+            },
         )
     }
 
@@ -92,7 +93,7 @@ object SelectLocationScreen {
                 IconButton(onClick = onCloseClick) {
                     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
-            }
+            },
         )
     }
 
@@ -106,50 +107,56 @@ object SelectLocationScreen {
         val map = remember { mutableStateOf<MapView?>(null) }
 
         Column(
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxSize()
+            modifier =
+                modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxSize(),
         ) {
             RoundedBox(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                 internalPaddings = 0.dp,
             ) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Map(
                         modifier = Modifier.fillMaxSize(),
                         initialLocationModel = initialLocationModel,
-                        onMapReady = { map.value = it }
+                        onMapReady = { map.value = it },
                     )
 
                     if (map.value != null) {
                         Box(
-                            modifier = Modifier
-                                .size(width = 20.dp, height = 10.dp)
-                                .blur(2.dp),
+                            modifier =
+                                Modifier
+                                    .size(width = 20.dp, height = 10.dp)
+                                    .blur(2.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .size(width = 10.dp, height = 5.dp)
-                                    .background(color = Color.DarkGray, shape = AbsoluteCutCornerShape(10.dp))
+                                modifier =
+                                    Modifier
+                                        .size(width = 10.dp, height = 5.dp)
+                                        .background(color = Color.DarkGray, shape = AbsoluteCutCornerShape(10.dp)),
                             )
                         }
                         Column(
-                            modifier = Modifier
-                                .height(120.dp)
-                                .width(60.dp)
+                            modifier =
+                                Modifier
+                                    .height(120.dp)
+                                    .width(60.dp),
                         ) {
                             val painter = painterResource(R.drawable.ic_location)
                             Image(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp),
                                 contentScale = ContentScale.FillWidth,
                                 painter = painter,
                                 contentDescription = null,
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                             )
                         }
                     }
@@ -168,35 +175,38 @@ object SelectLocationScreen {
         val radiusMeters = remember { mutableStateOf(initialRadius ?: TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS) }
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(R.string.select_location_radius, radiusMeters.value),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+                fontSize = 16.sp,
             )
             Slider(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
                 value = radiusMeters.value,
                 onValueChange = { value -> radiusMeters.value = value },
                 valueRange = 5f..1000f,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
                 enabled = map != null,
                 onClick = {
                     val cameraCenter = map!!.mapCenter
                     onSelected.invoke(
                         LocationModel(cameraCenter.latitude, cameraCenter.longitude, System.currentTimeMillis()),
-                        radiusMeters.value
+                        radiusMeters.value,
                     )
-                }
+                },
             ) {
                 Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.onPrimary)
             }
@@ -209,7 +219,7 @@ object SelectLocationScreen {
     private fun Map(
         modifier: Modifier = Modifier,
         initialLocationModel: LocationModel?,
-        onMapReady: (mapView: MapView) -> Unit
+        onMapReady: (mapView: MapView) -> Unit,
     ) {
         val locationProvider = getKoin().get<LocationProvider>()
         val permissionHelper = getKoin().get<PermissionHelper>()
@@ -226,7 +236,8 @@ object SelectLocationScreen {
             } else {
                 scope.launch {
                     if (permissionHelper.locationAllowed()) {
-                        locationProvider.observeLocation()
+                        locationProvider
+                            .observeLocation()
                             .filterNotNull()
                             .take(1)
                             .collect { location ->

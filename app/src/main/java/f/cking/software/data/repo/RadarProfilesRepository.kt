@@ -14,30 +14,26 @@ import kotlinx.coroutines.withContext
 class RadarProfilesRepository(
     database: AppDatabase,
 ) {
-
     val dao = database.radarProfileDao()
     private val allProfiles = MutableStateFlow(emptyList<RadarProfile>())
 
-    suspend fun observeAllProfiles(): StateFlow<List<RadarProfile>> {
-        return withContext(Dispatchers.IO) {
+    suspend fun observeAllProfiles(): StateFlow<List<RadarProfile>> =
+        withContext(Dispatchers.IO) {
             if (allProfiles.value.isEmpty()) {
                 notifyListeners()
             }
             allProfiles
         }
-    }
 
-    suspend fun getAllProfiles(): List<RadarProfile> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getAllProfiles(): List<RadarProfile> =
+        withContext(Dispatchers.IO) {
             dao.getAll().map { it.toDomain() }
         }
-    }
 
-    suspend fun getById(id: Int): RadarProfile?{
-        return withContext(Dispatchers.IO) {
+    suspend fun getById(id: Int): RadarProfile? =
+        withContext(Dispatchers.IO) {
             dao.getById(id)?.toDomain()
         }
-    }
 
     suspend fun saveProfile(profile: RadarProfile) {
         withContext(Dispatchers.IO) {
@@ -59,17 +55,15 @@ class RadarProfilesRepository(
         }
     }
 
-    suspend fun getLatestProfileDetect(profileId: Int): ProfileDetect? {
-        return withContext(Dispatchers.IO) {
+    suspend fun getLatestProfileDetect(profileId: Int): ProfileDetect? =
+        withContext(Dispatchers.IO) {
             dao.getLastProfileDetect(profileId)?.toDomain()
         }
-    }
 
-    suspend fun getProfileDetectLocations(profileId: Int): List<LocationModel> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getProfileDetectLocations(profileId: Int): List<LocationModel> =
+        withContext(Dispatchers.IO) {
             dao.getProfileDetectLocations(profileId).map { it.toDomain() }
         }
-    }
 
     private suspend fun notifyListeners() {
         val data = getAllProfiles()

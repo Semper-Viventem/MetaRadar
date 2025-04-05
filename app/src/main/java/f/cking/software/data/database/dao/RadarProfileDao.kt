@@ -10,7 +10,6 @@ import f.cking.software.data.database.entity.RadarProfileEntity
 
 @Dao
 interface RadarProfileDao {
-
     @Query("SELECT * FROM radar_profile")
     fun getAll(): List<RadarProfileEntity>
 
@@ -29,19 +28,23 @@ interface RadarProfileDao {
     @Query("SELECT * FROM profile_detect WHERE profile_id = :profileId")
     fun getProfileDetects(profileId: Int): List<ProfileDetectEntity>
 
-    @Query("""
+    @Query(
+        """
         SELECT l.* 
         FROM location l
         INNER JOIN profile_detect pd ON l.time = pd.trigger_time
         WHERE pd.profile_id = :profileId
-    """)
+    """,
+    )
     fun getProfileDetectLocations(profileId: Int): List<LocationEntity>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM profile_detect 
         WHERE profile_id = :profileId 
         ORDER BY trigger_time DESC 
         LIMIT 1
-    """)
+    """,
+    )
     fun getLastProfileDetect(profileId: Int): ProfileDetectEntity?
 }

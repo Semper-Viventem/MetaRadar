@@ -10,7 +10,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 sealed class FilterUiState {
-
     abstract fun isCorrect(): Boolean
 
     abstract class Interval : FilterUiState() {
@@ -19,9 +18,7 @@ sealed class FilterUiState {
         var toDate: LocalDate? by mutableStateOf(null)
         var toTime: LocalTime? by mutableStateOf(null)
 
-        open override fun isCorrect(): Boolean {
-            return (fromDate != null && fromTime != null) || (toDate != null && toTime != null)
-        }
+        open override fun isCorrect(): Boolean = (fromDate != null && fromTime != null) || (toDate != null && toTime != null)
     }
 
     class LastDetectionInterval : Interval()
@@ -32,57 +29,43 @@ sealed class FilterUiState {
         var name: String by mutableStateOf("")
         var ignoreCase: Boolean by mutableStateOf(true)
 
-        override fun isCorrect(): Boolean {
-            return true
-        }
+        override fun isCorrect(): Boolean = true
     }
 
     class Address : FilterUiState() {
         var address: String by mutableStateOf("")
 
-        override fun isCorrect(): Boolean {
-            return address.isNotBlank()
-        }
+        override fun isCorrect(): Boolean = address.isNotBlank()
     }
 
     class Manufacturer : FilterUiState() {
         var manufacturer: ManufacturerInfo? by mutableStateOf(null)
 
-        override fun isCorrect(): Boolean {
-            return manufacturer != null
-        }
+        override fun isCorrect(): Boolean = manufacturer != null
     }
 
     class IsFavorite : FilterUiState() {
         var favorite: Boolean by mutableStateOf(true)
 
-        override fun isCorrect(): Boolean {
-            return true
-        }
+        override fun isCorrect(): Boolean = true
     }
 
     class IsPaired : FilterUiState() {
         var isPaired: Boolean by mutableStateOf(true)
 
-        override fun isCorrect(): Boolean {
-            return true
-        }
+        override fun isCorrect(): Boolean = true
     }
 
     class MinLostTime : FilterUiState() {
         var minLostTime: Long? by mutableStateOf(null)
 
-        override fun isCorrect(): Boolean {
-            return minLostTime != null
-        }
+        override fun isCorrect(): Boolean = minLostTime != null
     }
 
     class Tag : FilterUiState() {
         var tag: String? by mutableStateOf(null)
 
-        override fun isCorrect(): Boolean {
-            return !tag.isNullOrBlank()
-        }
+        override fun isCorrect(): Boolean = !tag.isNullOrBlank()
     }
 
     class Any : FilterUiState() {
@@ -92,9 +75,7 @@ sealed class FilterUiState {
             filters = filters.filter { it !== filter }
         }
 
-        override fun isCorrect(): Boolean {
-            return filters.isNotEmpty() && filters.all { it.isCorrect() }
-        }
+        override fun isCorrect(): Boolean = filters.isNotEmpty() && filters.all { it.isCorrect() }
     }
 
     class All : FilterUiState() {
@@ -104,9 +85,7 @@ sealed class FilterUiState {
             filters = filters.filter { it !== filter }
         }
 
-        override fun isCorrect(): Boolean {
-            return filters.isNotEmpty() && filters.all { it.isCorrect() }
-        }
+        override fun isCorrect(): Boolean = filters.isNotEmpty() && filters.all { it.isCorrect() }
     }
 
     class Not : FilterUiState() {
@@ -116,29 +95,24 @@ sealed class FilterUiState {
             this.filter = null
         }
 
-        override fun isCorrect(): Boolean {
-            return filter != null && filter!!.isCorrect()
-        }
+        override fun isCorrect(): Boolean = filter != null && filter!!.isCorrect()
     }
 
     class AppleAirdropContact : FilterUiState() {
         var contactString: String by mutableStateOf("")
         var minLostTime: Long? by mutableStateOf(null)
 
-        override fun isCorrect(): Boolean {
-            return contactString.isNotBlank()
-        }
+        override fun isCorrect(): Boolean = contactString.isNotBlank()
     }
 
     class DeviceLocation : Interval() {
         var targetLocation: LocationModel? by mutableStateOf(null)
         var radius: Float by mutableStateOf(TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS)
 
-        override fun isCorrect(): Boolean {
-            return targetLocation != null
-                    && ((fromDate != null && fromTime != null) || (fromDate == null && fromTime == null))
-                    && ((toDate != null && toTime != null) || (toDate == null && toTime == null))
-        }
+        override fun isCorrect(): Boolean =
+            targetLocation != null &&
+                ((fromDate != null && fromTime != null) || (fromDate == null && fromTime == null)) &&
+                ((toDate != null && toTime != null) || (toDate == null && toTime == null))
     }
 
     class UserLocation : FilterUiState() {
@@ -146,23 +120,17 @@ sealed class FilterUiState {
         var radius: Float by mutableStateOf(TheAppConfig.DEFAULT_LOCATION_FILTER_RADIUS)
         var defaultValueIfNoLocation: Boolean by mutableStateOf(false)
 
-        override fun isCorrect(): Boolean {
-            return targetLocation != null
-        }
+        override fun isCorrect(): Boolean = targetLocation != null
     }
 
-    class IsFollowing() : FilterUiState() {
+    class IsFollowing : FilterUiState() {
         var followingDurationMs: Long by mutableStateOf(TheAppConfig.MIN_FOLLOWING_DURATION_TIME_MS)
         var followingDetectionIntervalMs: Long by mutableStateOf(TheAppConfig.MIN_FOLLOWING_INTERVAL_TIME_MS)
 
-        override fun isCorrect(): Boolean {
-            return true
-        }
+        override fun isCorrect(): Boolean = true
     }
 
     class Unknown : FilterUiState() {
-        override fun isCorrect(): Boolean {
-            return false
-        }
+        override fun isCorrect(): Boolean = false
     }
 }

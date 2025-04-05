@@ -59,54 +59,61 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 object ProfileDetailsScreen {
-
     @Composable
-    fun Screen(profileId: Int?, template: FilterUiState?, key: String) {
+    fun Screen(
+        profileId: Int?,
+        template: FilterUiState?,
+        key: String,
+    ) {
         val viewModel: ProfileDetailsViewModel = koinViewModel(key = key) { parametersOf(profileId, template) }
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
         Scaffold(
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .fillMaxSize(),
             topBar = {
                 AppBar(viewModel, scrollBehavior)
             },
             content = {
                 GlassSystemNavbar(Modifier.padding(top = it.calculateTopPadding())) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .background(MaterialTheme.colorScheme.surface)
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .background(MaterialTheme.colorScheme.surface),
                     ) {
                         Content(viewModel)
                     }
                 }
-            }
+            },
         )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun AppBar(viewModel: ProfileDetailsViewModel, scrollBehavior: TopAppBarScrollBehavior) {
-
+    private fun AppBar(
+        viewModel: ProfileDetailsViewModel,
+        scrollBehavior: TopAppBarScrollBehavior,
+    ) {
         val discardChangesDialog = rememberMaterialDialogState()
         ThemedDialog(
             dialogState = discardChangesDialog,
             buttons = {
                 negativeButton(
                     stringResource(R.string.stay),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { discardChangesDialog.hide() }
                 positiveButton(
                     stringResource(R.string.discard_changes),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) {
                     discardChangesDialog.hide()
                     viewModel.back()
                 }
-            }
+            },
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(text = stringResource(R.string.discard_changes_dialog_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -117,23 +124,31 @@ object ProfileDetailsScreen {
         ThemedDialog(
             dialogState = deleteDialog,
             buttons = {
-                negativeButton(stringResource(R.string.cancel), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) { deleteDialog.hide() }
+                negativeButton(
+                    stringResource(R.string.cancel),
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                ) { deleteDialog.hide() }
                 positiveButton(stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
                     deleteDialog.hide()
                     viewModel.onRemoveClick()
                 }
-            }
+            },
         ) {
             Column(Modifier.padding(16.dp)) {
-                Text(text = stringResource(R.string.delete_profile_dialog_title, viewModel.name), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.delete_profile_dialog_title, viewModel.name),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
 
         TopAppBar(
             scrollBehavior = scrollBehavior,
-            colors = TopAppBarDefaults.topAppBarColors(
-                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                ),
             title = {
                 Text(text = stringResource(R.string.radar_profile_title))
             },
@@ -143,7 +158,7 @@ object ProfileDetailsScreen {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.delete),
-                            tint = MaterialTheme.colorScheme.onSurface
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
@@ -152,7 +167,7 @@ object ProfileDetailsScreen {
                     Icon(
                         imageVector = Icons.Filled.Done,
                         contentDescription = stringResource(R.string.save),
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             },
@@ -167,10 +182,10 @@ object ProfileDetailsScreen {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
-            }
+            },
         )
     }
 
@@ -195,32 +210,34 @@ object ProfileDetailsScreen {
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .padding(vertical = 8.dp),
         ) {
-
             TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
                 placeholder = { Text(text = stringResource(R.string.name)) },
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                 value = viewModel.description,
                 onValueChange = { viewModel.description = it },
-                placeholder = { Text(text = stringResource(R.string.description)) }
+                placeholder = { Text(text = stringResource(R.string.description)) },
             )
             Spacer(modifier = Modifier.height(8.dp))
             RoundedBox {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { viewModel.onIsActiveClick() },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { viewModel.onIsActiveClick() },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Spacer(modifier = Modifier.width(16.dp))
@@ -238,9 +255,10 @@ object ProfileDetailsScreen {
     @Composable
     private fun CooldownView(viewModel: ProfileDetailsViewModel) {
         val defaultTime = viewModel.cooldownMs ?: TimeUnit.MINUTES.toMillis(0)
-        val timeDialog = rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
-            viewModel.cooldownMs = time.toMilliseconds()
-        }
+        val timeDialog =
+            rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
+                viewModel.cooldownMs = time.toMilliseconds()
+            }
         val text = viewModel.cooldownMs?.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
 
         RoundedBox {
@@ -263,12 +281,12 @@ object ProfileDetailsScreen {
     @Composable
     private fun CreateFilter(viewModel: ProfileDetailsViewModel) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center,
         ) {
-
             val selectFilterDialog = rememberMaterialDialogState()
             SelectFilterTypeScreen.Dialog(selectFilterDialog) { filter ->
                 viewModel.filter = filter
@@ -280,7 +298,7 @@ object ProfileDetailsScreen {
                 },
                 content = {
                     Text(text = stringResource(R.string.add_filter), color = MaterialTheme.colorScheme.onPrimary)
-                }
+                },
             )
         }
     }

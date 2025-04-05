@@ -29,7 +29,6 @@ class JournalViewModel(
     private val router: Router,
     private val context: Application,
 ) : ViewModel() {
-
     var journal: List<JournalEntryUiModel> by mutableStateOf(emptyList())
     var loading by mutableStateOf(true)
 
@@ -51,7 +50,8 @@ class JournalViewModel(
 
     private fun observeJournal() {
         viewModelScope.launch {
-            journalRepository.observe()
+            journalRepository
+                .observe()
                 .onStart { loading = true }
                 .collect { update ->
                     loading = true
@@ -61,22 +61,22 @@ class JournalViewModel(
         }
     }
 
-    private suspend fun map(from: JournalEntry): JournalEntryUiModel {
-        return when (from.report) {
+    private suspend fun map(from: JournalEntry): JournalEntryUiModel =
+        when (from.report) {
             is JournalEntry.Report.Error -> mapReportError(from, from.report)
             is JournalEntry.Report.ProfileReport -> mapReportProfile(from, from.report)
         }
-    }
 
     private fun mapReportError(
         journalEntry: JournalEntry,
         report: JournalEntry.Report.Error,
     ): JournalEntryUiModel {
-        val title = if (report.title.length > MAX_ERROR_TITLE_LENGTH) {
-            report.title.substring(0 until MAX_ERROR_TITLE_LENGTH)
-        } else {
-            report.title
-        }
+        val title =
+            if (report.title.length > MAX_ERROR_TITLE_LENGTH) {
+                report.title.substring(0 until MAX_ERROR_TITLE_LENGTH)
+            } else {
+                report.title
+            }
         val description = report.stackTrace
         return JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
@@ -93,8 +93,8 @@ class JournalViewModel(
     private suspend fun mapReportProfile(
         journalEntry: JournalEntry,
         report: JournalEntry.Report.ProfileReport,
-    ): JournalEntryUiModel {
-        return JournalEntryUiModel(
+    ): JournalEntryUiModel =
+        JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
             color = { MaterialTheme.colorScheme.surface },
             colorForeground = { MaterialTheme.colorScheme.onSurface },
@@ -104,13 +104,11 @@ class JournalViewModel(
             journalEntry = journalEntry,
             items = mapListItems(report.deviceAddresses),
         )
-    }
 
     private fun Long.formattedDate() = dateTimeStringFormat("dd MMM yyyy, HH:mm")
 
-    private suspend fun getProfileName(id: Int): String {
-        return profileRepository.getById(id)?.name ?: context.getString(R.string.unknown_capital_case)
-    }
+    private suspend fun getProfileName(id: Int): String =
+        profileRepository.getById(id)?.name ?: context.getString(R.string.unknown_capital_case)
 
     private suspend fun mapListItems(addresses: List<String>): List<JournalEntryUiModel.ListItemUiModel> {
         val matchedDevices = devicesRepository.getAllByAddresses(addresses)

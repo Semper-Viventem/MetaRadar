@@ -38,14 +38,12 @@ import f.cking.software.utils.navigation.Router
 
 @OptIn(ExperimentalMaterial3Api::class)
 object SelectFilterScreen {
-
     @Composable
     fun Screen(
         initialFilterState: FilterUiState,
         router: Router,
-        onConfirm: (filterState: RadarProfile.Filter) -> Unit
+        onConfirm: (filterState: RadarProfile.Filter) -> Unit,
     ) {
-
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -57,20 +55,22 @@ object SelectFilterScreen {
                     modifier = Modifier.fillMaxSize(),
                     globalContent = { bottomPadding ->
                         Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .background(MaterialTheme.colorScheme.surface)
-                                .padding(top = paddings.calculateTopPadding())
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState())
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .padding(top = paddings.calculateTopPadding()),
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .padding(16.dp),
+                                modifier =
+                                    Modifier
+                                        .padding(16.dp),
                             ) {
                                 FilterScreen.Filter(
                                     filterState = initialFilterState,
                                     router = router,
-                                    onDeleteClick = { router.navigate(BackCommand) }
+                                    onDeleteClick = { router.navigate(BackCommand) },
                                 )
                             }
                             Spacer(modifier = Modifier.height(bottomPadding.calculateBottomPadding()))
@@ -80,13 +80,15 @@ object SelectFilterScreen {
                         val context = LocalContext.current
                         Column {
                             Button(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                                 onClick = {
-                                    val filter = initialFilterState
-                                        .takeIf { it.isCorrect() }
-                                        ?.let { FilterUiMapper.mapToDomain(it) }
+                                    val filter =
+                                        initialFilterState
+                                            .takeIf { it.isCorrect() }
+                                            ?.let { FilterUiMapper.mapToDomain(it) }
 
                                     if (filter != null) {
                                         router.navigate(BackCommand)
@@ -94,7 +96,7 @@ object SelectFilterScreen {
                                     } else {
                                         Toast.makeText(context, context.getString(R.string.filter_is_not_valid), Toast.LENGTH_SHORT).show()
                                     }
-                                }
+                                },
                             ) {
                                 Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.onPrimary)
                             }
@@ -102,18 +104,22 @@ object SelectFilterScreen {
                         }
                     },
                 )
-            }
+            },
         )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun AppBar(scrollBehavior: TopAppBarScrollBehavior, onBackClick: () -> Unit) {
+    private fun AppBar(
+        scrollBehavior: TopAppBarScrollBehavior,
+        onBackClick: () -> Unit,
+    ) {
         TopAppBar(
             scrollBehavior = scrollBehavior,
-            colors = TopAppBarDefaults.topAppBarColors(
-                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                ),
             title = {
                 Text(text = stringResource(R.string.create_filter))
             },
@@ -121,7 +127,7 @@ object SelectFilterScreen {
                 IconButton(onClick = onBackClick) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
-            }
+            },
         )
     }
 }

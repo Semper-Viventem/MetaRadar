@@ -7,7 +7,6 @@ import f.cking.software.toBase64
 class BuildDeviceFromScanDataInteractor(
     private val getManufacturerInfoFromRawBleInteractor: GetManufacturerInfoFromRawBleInteractor,
 ) {
-
     fun execute(scanData: BleScanDevice): DeviceData {
         val rawData = scanData.scanRecordRaw
 
@@ -19,9 +18,10 @@ class BuildDeviceFromScanDataInteractor(
             detectCount = 1,
             customName = null,
             favorite = false,
-            manufacturerInfo = rawData?.let {
-                getManufacturerInfoFromRawBleInteractor.execute(it, scanData.scanTimeMs)
-            },
+            manufacturerInfo =
+                rawData?.let {
+                    getManufacturerInfoFromRawBleInteractor.execute(it, scanData.scanTimeMs)
+                },
             lastFollowingDetectionTimeMs = null,
             tags = emptySet(),
             rssi = scanData.rssi,

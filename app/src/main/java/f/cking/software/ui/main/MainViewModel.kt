@@ -32,7 +32,6 @@ class MainViewModel(
     private val locationProvider: LocationProvider,
     private val intentHelper: IntentHelper,
 ) : ViewModel() {
-
     var scanStarted: Boolean by mutableStateOf(BgScanService.state.value.isProcessing())
     var bgServiceIsActive: Boolean by mutableStateOf(BgScanService.isActive)
     var showLocationDisabledDialog: MaterialDialogState = MaterialDialogState()
@@ -64,7 +63,7 @@ class MainViewModel(
                 text = context.getString(R.string.menu_settings),
                 selected = false,
             ) { SettingsScreen.Screen() },
-        )
+        ),
     )
 
     init {
@@ -105,9 +104,7 @@ class MainViewModel(
         intentHelper.openBluetoothSettings()
     }
 
-    fun needToShowPermissionsIntro(): Boolean {
-        return !settingsRepository.getPermissionsIntroWasShown()
-    }
+    fun needToShowPermissionsIntro(): Boolean = !settingsRepository.getPermissionsIntroWasShown()
 
     fun userHasPassedPermissionsIntro() {
         settingsRepository.setPermissionsIntroWasShown(true)
@@ -124,7 +121,8 @@ class MainViewModel(
 
     private fun observeServiceIsLaunched() {
         viewModelScope.launch {
-            BgScanService.observeIsActive()
+            BgScanService
+                .observeIsActive()
                 .collect { bgServiceIsActive = it }
         }
     }

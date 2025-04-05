@@ -8,14 +8,12 @@ import kotlinx.coroutines.withContext
 class TagsRepository(
     database: AppDatabase,
 ) {
-
     private val dao = database.tagDao()
 
-    suspend fun getAll(): List<String> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getAll(): List<String> =
+        withContext(Dispatchers.IO) {
             dao.getAll().map { it.name }
         }
-    }
 
     suspend fun addNewTag(tag: String) {
         withContext(Dispatchers.IO) {

@@ -94,15 +94,16 @@ import kotlin.random.Random
 @Composable
 fun rememberDateDialog(
     initialDate: LocalDate = LocalDate.now(),
-    datePickerColors: DatePickerColors = DatePickerDefaults.colors(
-        headerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
-        headerTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        calendarHeaderTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        dateActiveBackgroundColor = MaterialTheme.colorScheme.primary,
-        dateActiveTextColor = MaterialTheme.colorScheme.onPrimary,
-        dateInactiveBackgroundColor = Color.Transparent,
-        dateInactiveTextColor = MaterialTheme.colorScheme.onSurface,
-    ),
+    datePickerColors: DatePickerColors =
+        DatePickerDefaults.colors(
+            headerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            headerTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            calendarHeaderTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            dateActiveBackgroundColor = MaterialTheme.colorScheme.primary,
+            dateActiveTextColor = MaterialTheme.colorScheme.onPrimary,
+            dateInactiveBackgroundColor = Color.Transparent,
+            dateInactiveTextColor = MaterialTheme.colorScheme.onSurface,
+        ),
     dateResult: (date: LocalDate) -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
@@ -111,11 +112,11 @@ fun rememberDateDialog(
         buttons = {
             positiveButton(
                 stringResource(R.string.ok),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
             ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
             ) { dialogState.hide() }
         },
     ) {
@@ -129,17 +130,18 @@ fun rememberDateDialog(
 @Composable
 fun rememberTimeDialog(
     initialTime: LocalTime = LocalTime.now(),
-    timePickerColors: TimePickerColors = TimePickerDefaults.colors(
-        activeBackgroundColor = MaterialTheme.colorScheme.primary,
-        activeTextColor = MaterialTheme.colorScheme.onPrimary,
-        inactiveBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
-        inactiveTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        inactivePeriodBackground = Color.Transparent,
-        selectorColor = MaterialTheme.colorScheme.primary,
-        selectorTextColor = MaterialTheme.colorScheme.onPrimary,
-        headerTextColor = MaterialTheme.colorScheme.onSurface,
-        borderColor = Color.Transparent,
-    ),
+    timePickerColors: TimePickerColors =
+        TimePickerDefaults.colors(
+            activeBackgroundColor = MaterialTheme.colorScheme.primary,
+            activeTextColor = MaterialTheme.colorScheme.onPrimary,
+            inactiveBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            inactiveTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            inactivePeriodBackground = Color.Transparent,
+            selectorColor = MaterialTheme.colorScheme.primary,
+            selectorTextColor = MaterialTheme.colorScheme.onPrimary,
+            headerTextColor = MaterialTheme.colorScheme.onSurface,
+            borderColor = Color.Transparent,
+        ),
     dateResult: (date: LocalTime) -> Unit,
 ): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
@@ -148,11 +150,11 @@ fun rememberTimeDialog(
         buttons = {
             positiveButton(
                 stringResource(R.string.ok),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
             ) { dialogState.hide() }
             negativeButton(
                 stringResource(R.string.cancel),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
             ) { dialogState.hide() }
         },
     ) {
@@ -164,9 +166,7 @@ fun rememberTimeDialog(
 }
 
 @Composable
-fun rememberProgressDialog(
-    text: String,
-): MaterialDialogState {
+fun rememberProgressDialog(text: String): MaterialDialogState {
     val dialogState = rememberMaterialDialogState()
     ThemedDialog(
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -198,7 +198,7 @@ fun infoDialog(
         buttons = {
             positiveButton(
                 stringResource(R.string.ok),
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
             ) { dialogState.hide() }
         },
     ) {
@@ -224,7 +224,7 @@ fun ThemedDialog(
     autoDismiss: Boolean = true,
     onCloseRequest: (MaterialDialogState) -> Unit = { it.hide() },
     buttons: @Composable MaterialDialogButtons.() -> Unit = {},
-    content: @Composable MaterialDialogScope.() -> Unit
+    content: @Composable MaterialDialogScope.() -> Unit,
 ) {
     MaterialDialog(
         dialogState = dialogState,
@@ -236,7 +236,7 @@ fun ThemedDialog(
         autoDismiss = autoDismiss,
         onCloseRequest = onCloseRequest,
         buttons = buttons,
-        content = content
+        content = content,
     )
 }
 
@@ -255,13 +255,14 @@ fun ClickableField(
         unfocuse.value = false
     }
     TextField(
-        modifier = modifier
-            .onFocusChanged {
-                if (it.isFocused) {
-                    unfocuse.value = true
-                    onClick.invoke()
-                }
-            },
+        modifier =
+            modifier
+                .onFocusChanged {
+                    if (it.isFocused) {
+                        unfocuse.value = true
+                        onClick.invoke()
+                    }
+                },
         value = text ?: "",
         onValueChange = {},
         readOnly = true,
@@ -280,12 +281,16 @@ fun DeviceListItem(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick.invoke() },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick.invoke() },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             DeviceTypeIcon(
                 modifier = Modifier.size(64.dp),
@@ -300,7 +305,7 @@ fun DeviceListItem(
                         Icon(
                             imageVector = Icons.Filled.Star,
                             contentDescription = stringResource(R.string.is_favorite),
-                            tint = MaterialTheme.colorScheme.onSurface
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -312,7 +317,7 @@ fun DeviceListItem(
                         modifier = Modifier.weight(1f),
                         text = device.resolvedName ?: stringResource(R.string.not_applicable),
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     if (showSignalData) {
@@ -322,8 +327,9 @@ fun DeviceListItem(
                 }
                 device.tags.takeIf { it.isNotEmpty() }?.let { tags ->
                     FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth(),
                         mainAxisSpacing = 4.dp,
                     ) {
                         tags.forEachIndexed { index, tag ->
@@ -343,18 +349,19 @@ fun DeviceListItem(
                 ExtendedAddressView(device.extendedAddressInfo())
                 Spacer(modifier = Modifier.height(4.dp))
 
-                val updateStr = if (showLastUpdate) {
-                    stringResource(
-                        R.string.lifetime_data_last_update,
-                        device.firstDetectionPeriod(LocalContext.current),
-                        device.lastDetectionPeriod(LocalContext.current),
-                    )
-                } else {
-                    stringResource(
-                        R.string.lifetime_data,
-                        device.firstDetectionPeriod(LocalContext.current),
-                    )
-                }
+                val updateStr =
+                    if (showLastUpdate) {
+                        stringResource(
+                            R.string.lifetime_data_last_update,
+                            device.firstDetectionPeriod(LocalContext.current),
+                            device.lastDetectionPeriod(LocalContext.current),
+                        )
+                    } else {
+                        stringResource(
+                            R.string.lifetime_data,
+                            device.firstDetectionPeriod(LocalContext.current),
+                        )
+                    }
                 Text(
                     text = updateStr,
                     fontWeight = FontWeight.Light,
@@ -365,23 +372,29 @@ fun DeviceListItem(
 }
 
 @Composable
-fun DevicePairedIcon(isPaired: Boolean, extended: Boolean = false) {
+fun DevicePairedIcon(
+    isPaired: Boolean,
+    extended: Boolean = false,
+) {
     if (isPaired) {
         val color = colorResource(R.color.blue_600)
-        val infoDialog = infoDialog(
-            title = stringResource(id = R.string.bluetooth_status_paired_description),
-            content = null,
-        )
+        val infoDialog =
+            infoDialog(
+                title = stringResource(id = R.string.bluetooth_status_paired_description),
+                content = null,
+            )
         Row(
-            modifier = Modifier.background(color.copy(0.2f), RoundedCornerShape(20.dp))
-                .clickable { infoDialog.show() },
+            modifier =
+                Modifier
+                    .background(color.copy(0.2f), RoundedCornerShape(20.dp))
+                    .clickable { infoDialog.show() },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(Modifier.width(4.dp))
             Icon(
                 painter = painterResource(R.drawable.ic_ble_paired),
                 contentDescription = stringResource(R.string.bluetooth_status_paired),
-                tint = color
+                tint = color,
             )
             if (extended) {
                 Spacer(Modifier.width(4.dp))
@@ -401,24 +414,23 @@ fun DevicePairedIcon(isPaired: Boolean, extended: Boolean = false) {
 fun DeviceTypeIcon(
     modifier: Modifier = Modifier.size(64.dp),
     device: DeviceData,
-    paddingDp: Dp = 16.dp
+    paddingDp: Dp = 16.dp,
 ) {
     val icon = remember(device) { GetIconForDeviceClass.getIcon(device) }
     val color = colorByHash(device.address.hashCode())
     Icon(
-        modifier = modifier.background(color.copy(0.2f), CircleShape)
-            .padding(paddingDp),
+        modifier =
+            modifier
+                .background(color.copy(0.2f), CircleShape)
+                .padding(paddingDp),
         painter = painterResource(icon),
         contentDescription = stringResource(R.string.device_type),
-        tint = color
+        tint = color,
     )
 }
 
 @Composable
-fun ExtendedAddressView(
-    extendedAddressInfo: ExtendedAddressInfo,
-) {
-
+fun ExtendedAddressView(extendedAddressInfo: ExtendedAddressInfo) {
     Row {
         Text(
             text = extendedAddressInfo.address,
@@ -426,49 +438,50 @@ fun ExtendedAddressView(
         )
         val chip = extendedAddressInfo.type.toChip()
         if (chip != null) {
-
-            val dialog = infoDialog(
-                title = stringResource(id = chip.descriptionRes),
-                content = stringResource(id = R.string.address_private_disclamer)
-            )
+            val dialog =
+                infoDialog(
+                    title = stringResource(id = chip.descriptionRes),
+                    content = stringResource(id = R.string.address_private_disclamer),
+                )
 
             Spacer(modifier = Modifier.width(8.dp))
             val color = chip.color.invoke()
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(color.copy(alpha = 0.2f))
-                    .clickable { dialog.show() }
-                    .padding(horizontal = 4.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(color.copy(alpha = 0.2f))
+                        .clickable { dialog.show() }
+                        .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(id = chip.titleRes),
                     color = color,
                     fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Icon(
-                    modifier = Modifier
-                        .size(12.dp),
+                    modifier =
+                        Modifier
+                            .size(12.dp),
                     imageVector = Icons.Outlined.Info,
                     contentDescription = stringResource(R.string.app_info_title),
-                    tint = color
+                    tint = color,
                 )
             }
         }
     }
 }
 
-private fun ExtendedAddressInfo.BleAddressType.toChip(): ExtendedAddressInfoChip? {
-    return when (this) {
+private fun ExtendedAddressInfo.BleAddressType.toChip(): ExtendedAddressInfoChip? =
+    when (this) {
         ExtendedAddressInfo.BleAddressType.PUBLIC -> ExtendedAddressInfoChip.PUBLIC
         ExtendedAddressInfo.BleAddressType.STATIC_RANDOM -> ExtendedAddressInfoChip.RANDOM
         ExtendedAddressInfo.BleAddressType.NON_RESOLVABLE_PRIVATE -> ExtendedAddressInfoChip.NON_RESOLVABLE
         ExtendedAddressInfo.BleAddressType.RESOLVABLE_PRIVATE -> ExtendedAddressInfoChip.RESOLVABLE
         ExtendedAddressInfo.BleAddressType.INVALID -> null
     }
-}
 
 private enum class ExtendedAddressInfoChip(
     val titleRes: Int,
@@ -498,28 +511,33 @@ private enum class ExtendedAddressInfoChip(
 }
 
 @Composable
-fun SignalData(rssi: Int?, distance: Float?) {
+fun SignalData(
+    rssi: Int?,
+    distance: Float?,
+) {
     Column(horizontalAlignment = Alignment.End) {
         distance?.let { distance ->
             val distanceStr = if (distance < 2) "%.1f".format(distance) else distance.toInt().toString()
-            val infoDialog = infoDialog(
-                title = stringResource(id = R.string.disclaimer),
-                content = stringResource(id = R.string.device_distance_disclaimer)
-            )
+            val infoDialog =
+                infoDialog(
+                    title = stringResource(id = R.string.disclaimer),
+                    content = stringResource(id = R.string.device_distance_disclaimer),
+                )
             Row(modifier = Modifier.clickable { infoDialog.show() }, verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(id = R.string.distance_to_device, distanceStr),
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Icon(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .alpha(0.5f),
+                    modifier =
+                        Modifier
+                            .size(16.dp)
+                            .alpha(0.5f),
                     imageVector = Icons.Outlined.Info,
                     contentDescription = stringResource(R.string.is_favorite),
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
@@ -533,10 +551,11 @@ fun SignalData(rssi: Int?, distance: Float?) {
 fun Divider(modifier: Modifier = Modifier) {
     Box(modifier = modifier.padding(horizontal = 16.dp)) {
         Box(
-            modifier = Modifier
-                .height(1.dp)
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+            modifier =
+                Modifier
+                    .height(1.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)),
         )
     }
 }
@@ -549,14 +568,14 @@ fun ContentPlaceholder(
 ) {
     Box(
         modifier = modifier,
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 modifier = Modifier.size(100.dp),
                 painter = icon,
                 contentDescription = text,
-                tint = Color.Gray
+                tint = Color.Gray,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = text, color = Color.Gray, textAlign = TextAlign.Center)
@@ -566,11 +585,12 @@ fun ContentPlaceholder(
 
 @Composable
 fun RoundedBox(
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 8.dp),
+    modifier: Modifier =
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     internalPaddings: Dp = 16.dp,
-    boxContent: @Composable ColumnScope.() -> Unit
+    boxContent: @Composable ColumnScope.() -> Unit,
 ) {
     Box(modifier = modifier) {
         val shape = RoundedCornerShape(corner = CornerSize(8.dp))
@@ -579,50 +599,52 @@ fun RoundedBox(
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = shape)
                 .clip(shape = shape)
-                .padding(internalPaddings)
+                .padding(internalPaddings),
         ) { boxContent(this) }
     }
 }
 
-private val colorsLight = listOf(
-    Color(0xFFE57373),
-    Color(0xFFF06292),
-    Color(0xFFBA68C8),
-    Color(0xFF9575CD),
-    Color(0xFF7986CB),
-    Color(0xFF64B5F6),
-    Color(0xFF4FC3F7),
-    Color(0xFF4DD0E1),
-    Color(0xFF4DB6AC),
-    Color(0xFF81C784),
-    Color(0xFFAED581),
-    Color(0xFFFF8A65),
-    Color(0xFFD4E157),
-    Color(0xFFFFD54F),
-    Color(0xFFFFB74D),
-    Color(0xFFA1887F),
-    Color(0xFF90A4AE),
-)
+private val colorsLight =
+    listOf(
+        Color(0xFFE57373),
+        Color(0xFFF06292),
+        Color(0xFFBA68C8),
+        Color(0xFF9575CD),
+        Color(0xFF7986CB),
+        Color(0xFF64B5F6),
+        Color(0xFF4FC3F7),
+        Color(0xFF4DD0E1),
+        Color(0xFF4DB6AC),
+        Color(0xFF81C784),
+        Color(0xFFAED581),
+        Color(0xFFFF8A65),
+        Color(0xFFD4E157),
+        Color(0xFFFFD54F),
+        Color(0xFFFFB74D),
+        Color(0xFFA1887F),
+        Color(0xFF90A4AE),
+    )
 
-private val colorsDark = listOf(
-    Color(0xFF813535),
-    Color(0xFF742A43),
-    Color(0xFF5E2F66),
-    Color(0xFF443066),
-    Color(0xFF363E69),
-    Color(0xFF2F5574),
-    Color(0xFF275A70),
-    Color(0xFF2D6A72),
-    Color(0xFF235E58),
-    Color(0xFF457047),
-    Color(0xFF546D37),
-    Color(0xFF885241),
-    Color(0xFF6A7030),
-    Color(0xFF776426),
-    Color(0xFF7C643F),
-    Color(0xFF7A5446),
-    Color(0xFF3D545F),
-)
+private val colorsDark =
+    listOf(
+        Color(0xFF813535),
+        Color(0xFF742A43),
+        Color(0xFF5E2F66),
+        Color(0xFF443066),
+        Color(0xFF363E69),
+        Color(0xFF2F5574),
+        Color(0xFF275A70),
+        Color(0xFF2D6A72),
+        Color(0xFF235E58),
+        Color(0xFF457047),
+        Color(0xFF546D37),
+        Color(0xFF885241),
+        Color(0xFF6A7030),
+        Color(0xFF776426),
+        Color(0xFF7C643F),
+        Color(0xFF7A5446),
+        Color(0xFF3D545F),
+    )
 
 @Composable
 fun colorByHash(hash: Int): Color {
@@ -637,29 +659,26 @@ fun TagChip(
     onClick: () -> Unit = {},
 ) {
     AssistChip(
-        colors = AssistChipDefaults.assistChipColors(
-            containerColor = colorByHash(tagName.hashCode()),
-            labelColor = Color.Black,
-            leadingIconContentColor = Color.Black,
-        ),
+        colors =
+            AssistChipDefaults.assistChipColors(
+                containerColor = colorByHash(tagName.hashCode()),
+                labelColor = Color.Black,
+                leadingIconContentColor = Color.Black,
+            ),
         border = null,
         onClick = onClick,
         leadingIcon = { tagIcon?.let { Icon(imageVector = it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface) } },
         label = {
             Text(text = tagName, color = MaterialTheme.colorScheme.onSurface)
-        }
+        },
     )
 }
 
 @Composable
-fun dpToPx(dp: Float): Float {
-    return LocalContext.current.dpToPx(dp).toFloat()
-}
+fun dpToPx(dp: Float): Float = LocalContext.current.dpToPx(dp).toFloat()
 
 @Composable
-fun pxToDp(px: Float): Float {
-    return LocalContext.current.pxToDp(px)
-}
+fun pxToDp(px: Float): Float = LocalContext.current.pxToDp(px)
 
 @Composable
 fun BottomNavigationSpacer() {
@@ -683,9 +702,7 @@ fun SystemNavbarSpacer() {
     Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
 }
 
-fun ColorScheme.surfaceEvaluated(evaluation: Dp = 3.dp): Color {
-    return this.surfaceColorAtElevation(evaluation)
-}
+fun ColorScheme.surfaceEvaluated(evaluation: Dp = 3.dp): Color = this.surfaceColorAtElevation(evaluation)
 
 @Composable
 fun Switcher(
@@ -695,14 +712,17 @@ fun Switcher(
     subtitle: String?,
     onClick: () -> Unit,
 ) {
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .clickable { onClick.invoke() }
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick.invoke() },
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
@@ -717,7 +737,7 @@ fun Switcher(
             Spacer(modifier = Modifier.width(4.dp))
             Switch(
                 checked = value,
-                onCheckedChange = { onClick.invoke() }
+                onCheckedChange = { onClick.invoke() },
             )
         }
     }
@@ -742,12 +762,18 @@ fun RadarIcon() {
 }
 
 @Composable
-fun ListItem(icon: Painter, title: String, subtitle: String, onClick: () -> Unit) {
+fun ListItem(
+    icon: Painter,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(painter = icon, contentDescription = null)

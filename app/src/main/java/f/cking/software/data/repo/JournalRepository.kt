@@ -12,17 +12,15 @@ import kotlinx.coroutines.withContext
 class JournalRepository(
     private val database: AppDatabase,
 ) {
-
     val journalDao = database.journalDao()
     private val journal = MutableStateFlow(emptyList<JournalEntry>())
 
-    suspend fun observe(): Flow<List<JournalEntry>> {
-        return journal.apply {
+    suspend fun observe(): Flow<List<JournalEntry>> =
+        journal.apply {
             if (journal.value.isEmpty()) {
                 notifyListeners()
             }
         }
-    }
 
     suspend fun newEntry(journalEntry: JournalEntry) {
         withContext(Dispatchers.IO) {
@@ -31,17 +29,15 @@ class JournalRepository(
         }
     }
 
-    suspend fun getAllEntries(): List<JournalEntry> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getAllEntries(): List<JournalEntry> =
+        withContext(Dispatchers.IO) {
             journalDao.getAll().map { it.toDomain() }
         }
-    }
 
-    suspend fun getEntryById(id: Int): JournalEntry? {
-        return withContext(Dispatchers.IO) {
+    suspend fun getEntryById(id: Int): JournalEntry? =
+        withContext(Dispatchers.IO) {
             journalDao.getById(id)?.toDomain()
         }
-    }
 
     private suspend fun notifyListeners() {
         val data = getAllEntries()

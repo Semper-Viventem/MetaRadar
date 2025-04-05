@@ -35,46 +35,46 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 object SelectDeviceScreen {
-
     @Composable
-    fun Screen(
-        onSelected: (deviceData: DeviceData) -> Unit
-    ) {
+    fun Screen(onSelected: (deviceData: DeviceData) -> Unit) {
         val viewModel: SelectDeviceViewModel = koinViewModel()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
             topBar = { AppBar(viewModel, scrollBehavior) },
             content = { paddings ->
                 GlassSystemNavbar(Modifier.fillMaxSize()) {
                     Content(Modifier.padding(top = paddings.calculateTopPadding()), viewModel, onSelected)
                 }
-            }
+            },
         )
     }
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun Content(
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
         viewModel: SelectDeviceViewModel,
         onSelected: (deviceData: DeviceData) -> Unit,
     ) {
         LazyColumn(
-            modifier = modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize()
+            modifier =
+                modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
         ) {
             if (viewModel.loading) {
                 stickyHeader {
                     LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(2.dp),
-                        color = MaterialTheme.colorScheme.onSurface
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(2.dp),
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -97,25 +97,29 @@ object SelectDeviceScreen {
     }
 
     @Composable
-    private fun AppBar(viewModel: SelectDeviceViewModel, scrollBehavior: TopAppBarScrollBehavior) {
+    private fun AppBar(
+        viewModel: SelectDeviceViewModel,
+        scrollBehavior: TopAppBarScrollBehavior,
+    ) {
         TopAppBar(
             scrollBehavior = scrollBehavior,
-            colors = TopAppBarDefaults.topAppBarColors(
-                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                ),
             title = {
                 TextField(
                     value = viewModel.searchStr,
                     maxLines = 1,
                     onValueChange = { viewModel.searchRequest(it) },
-                    placeholder = { Text(text = stringResource(R.string.search)) }
+                    placeholder = { Text(text = stringResource(R.string.search)) },
                 )
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
-            }
+            },
         )
     }
 }

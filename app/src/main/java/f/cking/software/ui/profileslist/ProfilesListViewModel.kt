@@ -19,14 +19,13 @@ class ProfilesListViewModel(
     private val radarProfilesRepository: RadarProfilesRepository,
     private val router: Router,
 ) : ViewModel() {
-
     var profiles: List<RadarProfile> by mutableStateOf(emptyList())
     var defaultFiltersTemplate: List<FilterTemplate> by mutableStateOf(
         listOf(
             DEFAULT_FILTER_FOLLOWING,
             DEFAULT_FILTER_FAVORITE,
             DEFAULT_FILTER_BY_LOCATION,
-        )
+        ),
     )
 
     init {
@@ -35,7 +34,8 @@ class ProfilesListViewModel(
 
     private fun observeProfiles() {
         viewModelScope.launch {
-            radarProfilesRepository.observeAllProfiles()
+            radarProfilesRepository
+                .observeAllProfiles()
                 .collect { profiles = it }
         }
     }
@@ -58,33 +58,41 @@ class ProfilesListViewModel(
     )
 
     companion object {
-        private val DEFAULT_FILTER_FOLLOWING = FilterTemplate(
-            displayNameRes = R.string.filter_device_is_following_me,
-            filterUiState = FilterUiState.All().apply {
-                filters = listOf(FilterUiState.IsFollowing())
-            }
-        )
-        private val DEFAULT_FILTER_FAVORITE = FilterTemplate(
-            displayNameRes = R.string.is_favorite,
-            filterUiState = FilterUiState.All().apply {
-                filters = listOf(
-                    FilterUiState.IsFavorite(),
-                    FilterUiState.MinLostTime().apply {
-                        minLostTime = TimeUnit.HOURS.toMillis(2)
-                    }
-                )
-            }
-        )
-        private val DEFAULT_FILTER_BY_LOCATION = FilterTemplate(
-            displayNameRes = R.string.filter_device_location,
-            filterUiState = FilterUiState.All().apply {
-                filters = listOf(
-                    FilterUiState.MinLostTime().apply {
-                        minLostTime = TimeUnit.HOURS.toMillis(2)
+        private val DEFAULT_FILTER_FOLLOWING =
+            FilterTemplate(
+                displayNameRes = R.string.filter_device_is_following_me,
+                filterUiState =
+                    FilterUiState.All().apply {
+                        filters = listOf(FilterUiState.IsFollowing())
                     },
-                    FilterUiState.DeviceLocation(),
-                )
-            }
-        )
+            )
+        private val DEFAULT_FILTER_FAVORITE =
+            FilterTemplate(
+                displayNameRes = R.string.is_favorite,
+                filterUiState =
+                    FilterUiState.All().apply {
+                        filters =
+                            listOf(
+                                FilterUiState.IsFavorite(),
+                                FilterUiState.MinLostTime().apply {
+                                    minLostTime = TimeUnit.HOURS.toMillis(2)
+                                },
+                            )
+                    },
+            )
+        private val DEFAULT_FILTER_BY_LOCATION =
+            FilterTemplate(
+                displayNameRes = R.string.filter_device_location,
+                filterUiState =
+                    FilterUiState.All().apply {
+                        filters =
+                            listOf(
+                                FilterUiState.MinLostTime().apply {
+                                    minLostTime = TimeUnit.HOURS.toMillis(2)
+                                },
+                                FilterUiState.DeviceLocation(),
+                            )
+                    },
+            )
     }
 }

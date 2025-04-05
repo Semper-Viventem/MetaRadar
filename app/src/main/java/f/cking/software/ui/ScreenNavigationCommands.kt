@@ -18,35 +18,39 @@ import f.cking.software.utils.navigation.AddToStackCommand
 import f.cking.software.utils.navigation.BackCommand
 
 object ScreenNavigationCommands {
-
     object OpenMainScreen : AddToStackCommand(screenFunction = { key, _ -> MainScreen.Screen() })
 
-    class OpenProfileScreen(private val profileId: Int?, private val template: FilterUiState?) : AddToStackCommand(screenFunction = { key, _ ->
-        ProfileDetailsScreen.Screen(profileId = profileId, template, key)
-    })
+    class OpenProfileScreen(
+        private val profileId: Int?,
+        private val template: FilterUiState?,
+    ) : AddToStackCommand(screenFunction = { key, _ ->
+            ProfileDetailsScreen.Screen(profileId = profileId, template, key)
+        })
 
     class OpenCreateFilterScreen(
         initialFilterState: FilterUiState,
-        onConfirm: (filterState: RadarProfile.Filter) -> Unit
+        onConfirm: (filterState: RadarProfile.Filter) -> Unit,
     ) : AddToStackCommand(screenFunction = { key, router ->
-        SelectFilterScreen.Screen(initialFilterState, router, onConfirm)
-    })
+            SelectFilterScreen.Screen(initialFilterState, router, onConfirm)
+        })
 
     class OpenSelectManufacturerScreen(
-        onSelected: (manufacturerInfo: ManufacturerInfo) -> Unit
+        onSelected: (manufacturerInfo: ManufacturerInfo) -> Unit,
     ) : AddToStackCommand(screenFunction = { key, _ ->
-        SelectManufacturerScreen.Screen(onSelected = onSelected)
-    })
+            SelectManufacturerScreen.Screen(onSelected = onSelected)
+        })
 
     class OpenSelectDeviceScreen(
-        onSelected: (device: DeviceData) -> Unit
+        onSelected: (device: DeviceData) -> Unit,
     ) : AddToStackCommand(screenFunction = { key, _ ->
-        SelectDeviceScreen.Screen(onSelected = onSelected)
-    })
+            SelectDeviceScreen.Screen(onSelected = onSelected)
+        })
 
-    class OpenDeviceDetailsScreen(val address: String) : AddToStackCommand(screenFunction = { key, _ ->
-        DeviceDetailsScreen.Screen(address = address)
-    })
+    class OpenDeviceDetailsScreen(
+        val address: String,
+    ) : AddToStackCommand(screenFunction = { key, _ ->
+            DeviceDetailsScreen.Screen(address = address)
+        })
 
     object OpenShaderTestScreen : AddToStackCommand(screenFunction = { key, router ->
         ShaderTestScreen.Screen(router)
@@ -59,18 +63,18 @@ object ScreenNavigationCommands {
     class OpenSelectLocationScreen(
         initialLocationModel: LocationModel?,
         initialRadius: Float?,
-        onSelected: (location: LocationModel, radiusMeters: Float) -> Unit
+        onSelected: (location: LocationModel, radiusMeters: Float) -> Unit,
     ) : AddToStackCommand(screenFunction = { key, router ->
-        SelectLocationScreen.Screen(
-            onSelected = { location, radius ->
-                onSelected.invoke(location, radius)
-                router.navigate(BackCommand)
-            },
-            onCloseClick = {
-                router.navigate(BackCommand)
-            },
-            initialLocationModel = initialLocationModel,
-            initialRadius = initialRadius,
-        )
-    })
+            SelectLocationScreen.Screen(
+                onSelected = { location, radius ->
+                    onSelected.invoke(location, radius)
+                    router.navigate(BackCommand)
+                },
+                onCloseClick = {
+                    router.navigate(BackCommand)
+                },
+                initialLocationModel = initialLocationModel,
+                initialRadius = initialRadius,
+            )
+        })
 }

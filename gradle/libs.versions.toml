@@ -1,78 +1,78 @@
 [versions]
 # You also need to bump the version of ksp, anvil, compose
-kotlin-general = "2.0.0"
-kotlinx = "1.7.3"
-ksp = "2.0.0-1.0.24"
+kotlin-general = "2.1.20"
+kotlinx = "1.10.1"
+ksp = "2.1.20-1.0.32"
 anvil = "2.4.2"
-android-gradle = "8.5.2"
-protobuf = "3.21.7"
+android-gradle = "8.9.1"
+protobuf = "4.26.1"
 protobuf-gradle = "0.9.1"
 # Protobuf JVM library https://github.com/flipperdevices/flipperzero-protobuf-jvm
 protobuf-jvm = "0.12.0-0.3.0"
-compose = "1.7.6"
-compose-wear = "1.4.0"
+compose = "1.7.8"
+compose-wear = "1.4.1"
 compose-compiler = "1.5.6"
-compose-accompanist = "0.28.0"
-compose-constraint = "1.1.0"
-compose-navigation = "2.8.5"
+compose-accompanist = "0.36.0"
+compose-constraint = "1.1.1"
+compose-navigation = "2.8.9"
 compose-material3 = "1.3.1"
 horologist = "0.1.13"
-serialization-json = "1.6.3"
-wear = "1.2.0"
-wear-gms = "18.0.0"
-wear-interaction-phone = "1.1.0-alpha03"
-wear-interaction-remote = "1.0.0"
+serialization-json = "1.8.1"
+wear = "1.3.0"
+wear-gms = "19.0.0"
+wear-interaction-phone = "1.1.0"
+wear-interaction-remote = "1.1.0"
 room = "2.6.1"
-dagger = "2.44"
+dagger = "2.56.1"
 timber = "5.0.1"
 timber-treessence = "1.0.5"
-sentry-runtime = "6.5.0"
-sentry-gradle = "3.2.0"
+sentry-runtime = "8.5.0"
+sentry-gradle = "5.3.0"
 zip4j = "2.11.2"
 seismic = "1.0.3"
 cicerone = "7.1"
 ktx = "1.15.0"
-ktx-fragment = "1.6.2"
-ktx-activity = "1.9.1"
-ktx-testing = "1.1.5"
+ktx-fragment = "1.8.6"
+ktx-activity = "1.10.1"
+ktx-testing = "1.6.1"
 lifecycle = "2.8.7"
 # https://github.com/vigna/fastutil/issues/136
-fastutil = "7.2.1"
+fastutil = "8.4.0"
 ble = "2.5.1"
 ble-scan = "1.6.0"
-lottie = "5.2.0"
+lottie = "6.1.0"
 material = "1.12.0"
 annotations = "1.9.1"
 appcompat = "1.7.0"
-datastore = "1.1.2"
+datastore = "1.1.4"
 # https://github.com/vsch/flexmark-java/issues/442
-flexmark = "0.42.14"
+flexmark = "0.50.44"
 markdown = "0.1.5"
-ktor = "2.1.2"
-apache-compress = "1.21"
-apache-codec = "1.15"
-countly = "22.06.0"
+ktor = "3.1.2"
+apache-compress = "1.27.1"
+apache-codec = "1.17.1"
+countly = "25.1.1"
 # https://github.com/JLLeitschuh/ktlint-gradle/issues/589
 ktlint-runtime = "0.45.2"
-ktlint-gradle = "10.2.0"
-detekt-gradle = "1.21.0"
+ktlint-gradle = "12.2.0"
+detekt-gradle = "1.23.8"
 grgit-gradle = "8d818b74b9"
 tangle = "0.15.1"
-work = "2.7.1"
+work = "2.10.0"
 concurrent = "1.2.0"
-koin = "3.5.6"
-koin-android = "3.5.6"
-koin-android-compose = "3.5.6"
+koin = "4.0.4"
+koin-android = "4.0.4"
+koin-android-compose = "4.0.4"
 compose-dialogs = "0.9.0"
 process-phoenix = "2.1.2"
 
 # Testing
 junit = "4.13.2"
-mockito = "4.0.0"
-roboelectric = "4.9"
-mockk = "1.13.2"
+mockito = "5.4.0"
+roboelectric = "4.14.1"
+mockk = "1.13.17"
 
-map = "6.1.14"
+map = "6.1.20"
 
 [libraries]
 # Gradle - Core
@@ -109,9 +109,9 @@ compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "co
 compose-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-compose-dialogs = { module = "io.github.vanpra.compose-material-dialogs:core", version.ref = "compose-dialogs"}
-compose-dialogs-datetime = { module = "io.github.vanpra.compose-material-dialogs:datetime", version.ref = "compose-dialogs"}
-compose-flow-row = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "compose-accompanist"}
+compose-dialogs = { module = "io.github.vanpra.compose-material-dialogs:core", version.ref = "compose-dialogs" }
+compose-dialogs-datetime = { module = "io.github.vanpra.compose-material-dialogs:datetime", version.ref = "compose-dialogs" }
+compose-flow-row = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "compose-accompanist" }
 compose-animation = { module = "androidx.compose.animation:animation-graphics", version.ref = "compose" }
 
 # UI - Wear
@@ -174,7 +174,7 @@ countly = { module = "ly.count.android:sdk", version.ref = "countly" }
 ktx = { module = "androidx.core:core-ktx", version.ref = "ktx" }
 ktx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "ktx-fragment" }
 ktx-activity = { module = "androidx.activity:activity-ktx", version.ref = "ktx-activity" }
-ktx-testing = { module = "androidx.test.ext:junit", version.ref = "ktx-testing" }
+ktx-testing = { module = "androidx.test.ext:junit", version = "1.2.1" }
 ktx-testing-core = { module = "androidx.test:core", version.ref = "ktx-testing" }
 
 # Lifecycle
@@ -232,12 +232,12 @@ work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrent" }
 concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrent" }
 
-koin = { module = "io.insert-koin:koin-core", version.ref = "koin"}
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-android"}
-koin-android-compat = { module = "io.insert-koin:koin-android-compat", version.ref = "koin-android"}
-koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-android-compose"}
+koin = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-android" }
+koin-android-compat = { module = "io.insert-koin:koin-android-compat", version.ref = "koin-android" }
+koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-android-compose" }
 
-process-phoenix = { module = "com.jakewharton:process-phoenix", version.ref = "process-phoenix"}
+process-phoenix = { module = "com.jakewharton:process-phoenix", version.ref = "process-phoenix" }
 
 map = { module = "org.osmdroid:osmdroid-android", version.ref = "map" }
 

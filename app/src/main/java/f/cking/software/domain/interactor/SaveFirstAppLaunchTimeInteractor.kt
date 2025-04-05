@@ -3,9 +3,8 @@ package f.cking.software.domain.interactor
 import f.cking.software.data.repo.SettingsRepository
 
 class SaveFirstAppLaunchTimeInteractor(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
 ) {
-
     fun execute() {
         val time = System.currentTimeMillis()
 

@@ -27,7 +27,6 @@ class ProfileDetailsViewModel(
     private val deleteRadarProfile: DeleteRadarProfile,
     private val context: Application,
 ) : ViewModel() {
-
     var originalProfile: RadarProfile? = null
     var name: String by mutableStateOf("")
     var description: String by mutableStateOf("")
@@ -47,10 +46,9 @@ class ProfileDetailsViewModel(
         isActive = !isActive
     }
 
-    fun checkUnsavedChanges(): Boolean {
-        return (originalProfile != null && originalProfile != buildProfile())
-                || (originalProfile == null && buildProfile() != EMPTY_PROFILE)
-    }
+    fun checkUnsavedChanges(): Boolean =
+        (originalProfile != null && originalProfile != buildProfile()) ||
+            (originalProfile == null && buildProfile() != EMPTY_PROFILE)
 
     fun back() {
         router.navigate(BackCommand)
@@ -91,7 +89,10 @@ class ProfileDetailsViewModel(
         }
     }
 
-    private fun handleProfile(profile: RadarProfile, template: FilterUiState?) {
+    private fun handleProfile(
+        profile: RadarProfile,
+        template: FilterUiState?,
+    ) {
         name = profile.name
         description = profile.description.orEmpty()
         isActive = profile.isActive
@@ -99,8 +100,8 @@ class ProfileDetailsViewModel(
         cooldownMs = profile.cooldownMs
     }
 
-    private fun buildProfile(): RadarProfile? {
-        return try {
+    private fun buildProfile(): RadarProfile? =
+        try {
             RadarProfile(
                 id = profileId,
                 name = name,
@@ -112,16 +113,16 @@ class ProfileDetailsViewModel(
         } catch (e: Throwable) {
             null
         }
-    }
 
     companion object {
-        private val EMPTY_PROFILE = RadarProfile(
-            id = null,
-            name = "",
-            description = "",
-            isActive = true,
-            detectFilter = null,
-            cooldownMs = null,
-        )
+        private val EMPTY_PROFILE =
+            RadarProfile(
+                id = null,
+                name = "",
+                description = "",
+                isActive = true,
+                detectFilter = null,
+                cooldownMs = null,
+            )
     }
 }

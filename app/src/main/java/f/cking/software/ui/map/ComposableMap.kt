@@ -32,7 +32,6 @@ import f.cking.software.utils.graphic.Switcher
 import org.koin.androidx.compose.koinViewModel
 import org.osmdroid.views.MapView
 
-
 /**
  * A composable Google Map.
  * @author Arnau Mora
@@ -56,10 +55,16 @@ fun MapView(
 }
 
 @Composable
-fun SilentModeDisclaimer(modifier: Modifier, viewModel: MapViewModel) {
+fun SilentModeDisclaimer(
+    modifier: Modifier = Modifier,
+    viewModel: MapViewModel,
+) {
     Box(modifier, contentAlignment = Alignment.Center) {
         Image(
-            modifier = Modifier.fillMaxSize().alpha(0.5f),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .alpha(0.5f),
             painter = painterResource(id = R.drawable.map_placeholder),
             contentDescription = null,
             contentScale = ContentScale.Crop,
@@ -73,7 +78,7 @@ fun SilentModeDisclaimer(modifier: Modifier, viewModel: MapViewModel) {
                 subtitle = stringResource(id = R.string.silent_mode_subtitle),
                 onClick = {
                     viewModel.changeSilentModeState()
-                }
+                },
             )
         }
     }
@@ -94,11 +99,12 @@ fun OSMMap(
         )
         Text(
             text = stringResource(R.string.osm_copyright),
-            modifier = Modifier
-                .padding(start = 4.dp)
-                .align(Alignment.BottomStart)
-                .alpha(0.9f)
-                .clickable { viewModel.openOSMLicense() },
+            modifier =
+                Modifier
+                    .padding(start = 4.dp)
+                    .align(Alignment.BottomStart)
+                    .alpha(0.9f)
+                    .clickable { viewModel.openOSMLicense() },
             color = Color.DarkGray,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
@@ -109,12 +115,13 @@ fun OSMMap(
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
     val context = LocalContext.current
-    val mapView = remember {
-        MapView(context).apply {
-            id = R.id.layout_map
-            clipToOutline = true
+    val mapView =
+        remember {
+            MapView(context).apply {
+                id = R.id.layout_map
+                clipToOutline = true
+            }
         }
-    }
 
     // Makes MapView follow the lifecycle of this composable
     val lifecycleObserver = rememberMapLifecycleObserver(mapView)
@@ -130,8 +137,8 @@ fun rememberMapViewWithLifecycle(): MapView {
 }
 
 @Composable
-fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver {
-    return remember(mapView) {
+fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
+    remember(mapView) {
         LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> mapView.onResume()
@@ -140,5 +147,3 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver {
             }
         }
     }
-}
-

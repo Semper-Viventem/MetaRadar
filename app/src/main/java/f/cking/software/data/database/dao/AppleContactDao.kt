@@ -8,7 +8,6 @@ import f.cking.software.data.database.entity.AppleContactEntity
 
 @Dao
 interface AppleContactDao {
-
     @Query("SELECT * FROM apple_contacts")
     fun getAll(): List<AppleContactEntity>
 

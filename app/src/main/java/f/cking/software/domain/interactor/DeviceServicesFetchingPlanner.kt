@@ -27,82 +27,87 @@ class DeviceServicesFetchingPlanner(
     private val bleScannerHelper: BleScannerHelper,
     private val saveReportInteractor: SaveReportInteractor,
 ) {
-
     private var parallelProcessingBatches = PARALLEL_BATCH_COUNT
     private var cooldownStartedAt: Long? = null
     private var lastJournalReportTime: Long = 0
 
-    suspend fun scheduleFetchServiceInfo(devices: List<SavedDeviceHandle>): List<SavedDeviceHandle> = coroutineScope {
-
-        val cooldown = this@DeviceServicesFetchingPlanner.cooldownStartedAt
-        if (cooldown != null && System.currentTimeMillis() - cooldown < MIN_COOLDOWN_DURATION_MINS.minutes.inWholeMilliseconds) {
-            Timber.tag(TAG).i("Device services fetching is on cooldown due to a high errors rate, current batch will be skipped")
-            return@coroutineScope devices
-        }
-
-        val result = devices
-            .map { it }
-            .associateBy { it.device.address }
-            .toMutableMap()
-
-        var updatedCount = 0
-        var errors = 0
-        var timeouts = 0
-
-        withContext(Dispatchers.IO) {
-            val metadataNeeded = devices
-                .filter { checkIfMetadataUpdateNeeded(it) }
-                .map { it.device }
-                .sortedBy { it.rssi }
-                .reversed()
-
-            Timber.tag(TAG).i("Scheduling fetch service info for ${metadataNeeded.size} devices, out of ${devices.size} total")
-            val updated = fetchAllDevices(metadataNeeded)
-            updated.forEach { fetchFeedback ->
-                when (fetchFeedback.feedback) {
-                    FetchFeedback.SUCCESS -> {
-                        fetchFeedback.device?.let { device ->
-                            result[device.address]?.let { previousHandle ->
-                                result[device.address] = previousHandle.copy(device = device)
-                            }
-                            updatedCount++
-                        }
-                    }
-                    FetchFeedback.TIMEOUT -> {
-                        timeouts++
-                    }
-                    FetchFeedback.ERROR -> {
-                        errors++
-                    }
-                }
+    suspend fun scheduleFetchServiceInfo(devices: List<SavedDeviceHandle>): List<SavedDeviceHandle> =
+        coroutineScope {
+            val cooldown = this@DeviceServicesFetchingPlanner.cooldownStartedAt
+            if (cooldown != null && System.currentTimeMillis() - cooldown < MIN_COOLDOWN_DURATION_MINS.minutes.inWholeMilliseconds) {
+                Timber.tag(TAG).i("Device services fetching is on cooldown due to a high errors rate, current batch will be skipped")
+                return@coroutineScope devices
             }
 
-            analyzeFeedback(metadataNeeded.size, updatedCount, timeouts, errors, devices.size)
-            result.values.toList()
-        }
-    }
+            val result =
+                devices
+                    .map { it }
+                    .associateBy { it.device.address }
+                    .toMutableMap()
 
-    private suspend fun fetchAllDevices(metadataNeeded: List<DeviceData>): List<DeviceFetchFeedback> = coroutineScope {
-        val result = mutableListOf<DeviceFetchFeedback>()
+            var updatedCount = 0
+            var errors = 0
+            var timeouts = 0
 
-        softTimeout(TOTAL_FETCH_TIMEOUT_SEC.seconds, onTimeout = {
-            Timber.tag(TAG).e("Timeout fetching total devices")
-        }) {
-            metadataNeeded.splitToBatchesEqual(parallelProcessingBatches)
-                .filter { it.isNotEmpty() }
-                .mapParallel { batch ->
-                    Timber.tag(TAG).i("Processing batch of ${batch.size} devices ($parallelProcessingBatches parallel)")
-                    batch.map { device ->
-                        result += fetchDevice(device)
+            withContext(Dispatchers.IO) {
+                val metadataNeeded =
+                    devices
+                        .filter { checkIfMetadataUpdateNeeded(it) }
+                        .map { it.device }
+                        .sortedBy { it.rssi }
+                        .reversed()
+
+                Timber.tag(TAG).i("Scheduling fetch service info for ${metadataNeeded.size} devices, out of ${devices.size} total")
+                val updated = fetchAllDevices(metadataNeeded)
+                updated.forEach { fetchFeedback ->
+                    when (fetchFeedback.feedback) {
+                        FetchFeedback.SUCCESS -> {
+                            fetchFeedback.device?.let { device ->
+                                result[device.address]?.let { previousHandle ->
+                                    result[device.address] = previousHandle.copy(device = device)
+                                }
+                                updatedCount++
+                            }
+                        }
+
+                        FetchFeedback.TIMEOUT -> {
+                            timeouts++
+                        }
+
+                        FetchFeedback.ERROR -> {
+                            errors++
+                        }
                     }
                 }
+
+                analyzeFeedback(metadataNeeded.size, updatedCount, timeouts, errors, devices.size)
+                result.values.toList()
+            }
         }
 
-        result
-    }
+    private suspend fun fetchAllDevices(metadataNeeded: List<DeviceData>): List<DeviceFetchFeedback> =
+        coroutineScope {
+            val result = mutableListOf<DeviceFetchFeedback>()
 
-    private suspend fun fetchDevice(device: DeviceData): DeviceFetchFeedback {
-        return softTimeout(DEVICE_FETCH_TIMEOUT_SEC.seconds, onTimeout = {
+            softTimeout(TOTAL_FETCH_TIMEOUT_SEC.seconds, onTimeout = {
+                Timber.tag(TAG).e("Timeout fetching total devices")
+            }) {
+                metadataNeeded
+                    .splitToBatchesEqual(parallelProcessingBatches)
+                    .filter { it.isNotEmpty() }
+                    .mapParallel { batch ->
+                        Timber.tag(TAG).i("Processing batch of ${batch.size} devices ($parallelProcessingBatches parallel)")
+                        batch.map { device ->
+                            result += fetchDevice(device)
+                        }
+                    }
+            }
+
+            result
+        }
+
+    private suspend fun fetchDevice(device: DeviceData): DeviceFetchFeedback =
+        softTimeout(DEVICE_FETCH_TIMEOUT_SEC.seconds, onTimeout = {
             Timber.tag(TAG).e("Timeout fetching device info for ${device.address}")
             DeviceFetchFeedback(null, FetchFeedback.TIMEOUT)
         }) {
@@ -116,7 +121,6 @@ class DeviceServicesFetchingPlanner(
                 DeviceFetchFeedback(null, FetchFeedback.ERROR)
             }
         }
-    }
 
     private data class DeviceFetchFeedback(
         val device: DeviceData?,
@@ -136,7 +140,11 @@ class DeviceServicesFetchingPlanner(
         errors: Int,
         total: Int,
     ) {
-        Timber.tag(TAG).i("Deep analysis finished. Candidates: $updateNeeded (updated: $updated, timeouts: $timeouts, errors: $errors), total $total devices")
+        Timber
+            .tag(TAG)
+            .i(
+                "Deep analysis finished. Candidates: $updateNeeded (updated: $updated, timeouts: $timeouts, errors: $errors), total $total devices",
+            )
         val errorsRate: Float = errors / (errors + timeouts + updated).toFloat()
         if (updateNeeded > 5 && errorsRate > 0.75f) {
             Timber.tag(TAG).e("Too many errors during deep analysis. Will try to reset ble stack and remove all connections")
@@ -156,30 +164,38 @@ class DeviceServicesFetchingPlanner(
         if (System.currentTimeMillis() - lastJournalReportTime < JOURNAL_REPORT_COOLDOWN_MIN.minutes.inWholeMilliseconds) {
             return
         }
-        val report = JournalEntry.Report.Error(
-            title = "Too many errors during deep analysis. Restart bluetooth or disable deep analysis in settings",
-            stackTrace = "Errors: $errors, timeouts: $timeouts, updated: $updated, in total: $updateNeeded"
-        )
+        val report =
+            JournalEntry.Report.Error(
+                title = "Too many errors during deep analysis. Restart bluetooth or disable deep analysis in settings",
+                stackTrace = "Errors: $errors, timeouts: $timeouts, updated: $updated, in total: $updateNeeded",
+            )
         saveReportInteractor.execute(report)
         lastJournalReportTime = System.currentTimeMillis()
     }
 
-    private suspend fun <T> softTimeout(timeout: Duration, onTimeout: suspend () -> T, block: suspend () -> T): T = coroutineScope {
-        channelFlow<T> {
-            var timeoutJob: Job? = null
-            val primaryJob = async {
-                val result = block.invoke()
-                timeoutJob?.cancel()
-                send(result)
-            }
+    private suspend fun <T> softTimeout(
+        timeout: Duration,
+        onTimeout: suspend () -> T,
+        block: suspend () -> T,
+    ): T =
+        coroutineScope {
+            channelFlow<T> {
+                var timeoutJob: Job? = null
+                val primaryJob =
+                    async {
+                        val result = block.invoke()
+                        timeoutJob?.cancel()
+                        send(result)
+                    }
 
-            timeoutJob = async {
-                delay(timeout)
-                primaryJob.cancel()
-                send(onTimeout.invoke())
-            }
-        }.first()
-    }
+                timeoutJob =
+                    async {
+                        delay(timeout)
+                        primaryJob.cancel()
+                        send(onTimeout.invoke())
+                    }
+            }.first()
+        }
 
     private fun checkIfMetadataUpdateNeeded(device: SavedDeviceHandle): Boolean {
         if (!device.device.isConnectable) {
@@ -191,9 +207,9 @@ class DeviceServicesFetchingPlanner(
 
         val isNewDevice = device.device.detectCount == 1
 
-        return isNewDevice
-                || device.device.metadata.isNullOrEmpty()
-                || !recentlyChecked
+        return isNewDevice ||
+            device.device.metadata.isNullOrEmpty() ||
+            !recentlyChecked
     }
 
     private fun decreaseMaxConnections() {

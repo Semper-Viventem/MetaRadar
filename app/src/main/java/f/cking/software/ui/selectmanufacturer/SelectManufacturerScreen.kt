@@ -34,33 +34,36 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 object SelectManufacturerScreen {
-
     @Composable
-    fun Screen(
-        onSelected: (type: ManufacturerInfo) -> Unit
-    ) {
+    fun Screen(onSelected: (type: ManufacturerInfo) -> Unit) {
         val viewModel: SelectManufacturerViewModel = koinViewModel()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
             topBar = { AppBar(viewModel, scrollBehavior) },
             content = { paddings ->
                 GlassSystemNavbar(Modifier.fillMaxSize()) {
                     Content(Modifier.padding(top = paddings.calculateTopPadding()), viewModel, onSelected)
                 }
-            }
+            },
         )
     }
 
     @Composable
-    private fun Content(modifier: Modifier, viewModel: SelectManufacturerViewModel, onSelected: (type: ManufacturerInfo) -> Unit) {
+    private fun Content(
+        modifier: Modifier = Modifier,
+        viewModel: SelectManufacturerViewModel,
+        onSelected: (type: ManufacturerInfo) -> Unit,
+    ) {
         LazyColumn(
-            modifier = modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize()
+            modifier =
+                modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
         ) {
             val list = viewModel.manufacturers
             list.forEach { type ->
@@ -76,34 +79,42 @@ object SelectManufacturerScreen {
     }
 
     @Composable
-    private fun AppBar(viewModel: SelectManufacturerViewModel, scrollBehavior: TopAppBarScrollBehavior) {
+    private fun AppBar(
+        viewModel: SelectManufacturerViewModel,
+        scrollBehavior: TopAppBarScrollBehavior,
+    ) {
         TopAppBar(
             scrollBehavior = scrollBehavior,
-            colors = TopAppBarDefaults.topAppBarColors(
-                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                ),
             title = {
                 TextField(
                     maxLines = 1,
                     value = viewModel.searchStr,
                     onValueChange = { viewModel.searchRequest(it) },
-                    placeholder = { Text(text = stringResource(R.string.select_manufacturer)) }
+                    placeholder = { Text(text = stringResource(R.string.select_manufacturer)) },
                 )
             },
             navigationIcon = {
                 IconButton(onClick = { viewModel.back() }) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
-            }
+            },
         )
     }
 
     @Composable
-    private fun TypeItem(item: ManufacturerInfo, onClickListener: () -> Unit) {
+    private fun TypeItem(
+        item: ManufacturerInfo,
+        onClickListener: () -> Unit,
+    ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClickListener.invoke() }
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { onClickListener.invoke() },
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

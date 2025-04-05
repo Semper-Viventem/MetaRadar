@@ -6,8 +6,5 @@ import f.cking.software.domain.model.DeviceData
 class GetAllDevicesInteractor(
     private val devicesRepository: DevicesRepository,
 ) {
-
-    suspend fun execute(): List<DeviceData> {
-        return devicesRepository.getDevices()
-    }
+    suspend fun execute(): List<DeviceData> = devicesRepository.getDevices()
 }

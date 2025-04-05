@@ -61,7 +61,6 @@ import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 object FilterScreen {
-
     @Composable
     fun Filter(
         filterState: FilterUiState,
@@ -97,15 +96,17 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_device_is_following_me),
             color = colorResource(R.color.filter_is_following),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
-            val followingDuration = rememberTimeDialog(filter.followingDurationMs.toLocalTime(ZoneId.of("GMT"))) { time ->
-                filter.followingDurationMs = time.toMilliseconds()
-            }
+            val followingDuration =
+                rememberTimeDialog(filter.followingDurationMs.toLocalTime(ZoneId.of("GMT"))) { time ->
+                    filter.followingDurationMs = time.toMilliseconds()
+                }
 
-            val followingInterval = rememberTimeDialog(filter.followingDetectionIntervalMs.toLocalTime(ZoneId.of("GMT"))) { time ->
-                filter.followingDetectionIntervalMs = time.toMilliseconds()
-            }
+            val followingInterval =
+                rememberTimeDialog(filter.followingDetectionIntervalMs.toLocalTime(ZoneId.of("GMT"))) { time ->
+                    filter.followingDetectionIntervalMs = time.toMilliseconds()
+                }
 
             val followingDurationText = filter.followingDurationMs.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
             val followingIntervalText = filter.followingDetectionIntervalMs.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
@@ -131,11 +132,14 @@ object FilterScreen {
     }
 
     @Composable
-    private fun FilterUnknown(filter: FilterUiState, onDeleteClick: (child: FilterUiState) -> Unit) {
+    private fun FilterUnknown(
+        filter: FilterUiState,
+        onDeleteClick: (child: FilterUiState) -> Unit,
+    ) {
         FilterBase(
             title = stringResource(R.string.filter_unknown),
             color = colorResource(R.color.filter_unknown),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Text(text = stringResource(R.string.filter_unknown_title))
         }
@@ -149,14 +153,14 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_name),
             color = colorResource(R.color.filter_name),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Column {
                 TextField(
                     value = filter.name,
                     singleLine = true,
                     onValueChange = { filter.name = it },
-                    placeholder = { Text(text = stringResource(R.string.placeholder_device_name)) }
+                    placeholder = { Text(text = stringResource(R.string.placeholder_device_name)) },
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -177,12 +181,12 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_tag),
             color = colorResource(R.color.filter_tag),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
-
-            val addTagDialog = TagDialog.rememberDialog {
-                filter.tag = it
-            }
+            val addTagDialog =
+                TagDialog.rememberDialog {
+                    filter.tag = it
+                }
             val tag = filter.tag
 
             if (tag == null) {
@@ -191,7 +195,7 @@ object FilterScreen {
                     icon = {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
                     },
-                    label = { Text(text = stringResource(R.string.select_tag)) }
+                    label = { Text(text = stringResource(R.string.select_tag)) },
                 )
             } else {
                 TagChip(tagName = tag, tagIcon = Icons.Filled.Delete) { filter.tag = null }
@@ -207,7 +211,7 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_apple_airdrop_contact),
             color = colorResource(R.color.filter_airdrop_contact),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Column {
                 TextField(value = filter.contactString, singleLine = true, onValueChange = {
@@ -216,16 +220,17 @@ object FilterScreen {
 
                 val text = filter.minLostTime?.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
                 val defaultTime: Long = filter.minLostTime ?: TimeUnit.HOURS.toMillis(1)
-                val timeDialog = rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
-                    filter.minLostTime = time.toMilliseconds()
-                }
+                val timeDialog =
+                    rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
+                        filter.minLostTime = time.toMilliseconds()
+                    }
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Row {
                     ClickableField(
                         text = text,
                         label = stringResource(R.string.airdrop_min_lost_period),
-                        placeholder = stringResource(R.string.time_placeholder)
+                        placeholder = stringResource(R.string.time_placeholder),
                     ) {
                         timeDialog.show()
                     }
@@ -250,7 +255,7 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_address),
             color = colorResource(R.color.filter_address),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Spacer(modifier = Modifier.height(4.dp))
             Row {
@@ -261,16 +266,19 @@ object FilterScreen {
                     label = { Text(text = stringResource(R.string.filter_by_address_disclaimer)) },
                     onValueChange = { filter.address = it },
                     placeholder = { Text(text = "00:00:00:00:00:00") },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        capitalization = KeyboardCapitalization.Characters,
-                        autoCorrectEnabled = false,
-                    ),
+                    keyboardOptions =
+                        KeyboardOptions.Default.copy(
+                            capitalization = KeyboardCapitalization.Characters,
+                            autoCorrectEnabled = false,
+                        ),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 IconButton(onClick = {
-                    router.navigate(ScreenNavigationCommands.OpenSelectDeviceScreen { device ->
-                        filter.address = device.address
-                    })
+                    router.navigate(
+                        ScreenNavigationCommands.OpenSelectDeviceScreen { device ->
+                            filter.address = device.address
+                        },
+                    )
                 }) {
                     Icon(imageVector = Icons.Filled.List, contentDescription = stringResource(R.string.select_device), tint = Color.Black)
                 }
@@ -287,7 +295,8 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_manufacturer),
             color = colorResource(R.color.filter_manufacturer),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }) {
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
+        ) {
             val name: String? = filter.manufacturer?.name
             val label = if (name == null) stringResource(R.string.tap_to_select) else null
 
@@ -296,9 +305,11 @@ object FilterScreen {
                 placeholder = stringResource(R.string.select),
                 label = label,
             ) {
-                router.navigate(ScreenNavigationCommands.OpenSelectManufacturerScreen { manufacturer ->
-                    filter.manufacturer = manufacturer
-                })
+                router.navigate(
+                    ScreenNavigationCommands.OpenSelectManufacturerScreen { manufacturer ->
+                        filter.manufacturer = manufacturer
+                    },
+                )
             }
         }
     }
@@ -311,12 +322,13 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_min_lost_period),
             color = colorResource(R.color.filter_lost_time),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             val defaultTime = filter.minLostTime ?: TimeUnit.HOURS.toMillis(1)
-            val timeDialog = rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
-                filter.minLostTime = time.toMilliseconds()
-            }
+            val timeDialog =
+                rememberTimeDialog(defaultTime.toLocalTime(ZoneId.of("GMT"))) { time ->
+                    filter.minLostTime = time.toMilliseconds()
+                }
 
             val text = filter.minLostTime?.dateTimeStringFormat("HH:mm", ZoneId.of("GMT"))
 
@@ -334,7 +346,7 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_first_detection_period),
             color = colorResource(R.color.filter_first_seen),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             TimeInterval(filter)
         }
@@ -348,7 +360,7 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_last_detection_period),
             color = colorResource(R.color.filter_last_seen),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             TimeInterval(filter)
         }
@@ -356,7 +368,6 @@ object FilterScreen {
 
     @Composable
     private fun TimeInterval(filter: FilterUiState.Interval) {
-
         val dateFormat = "dd MMM yyyy"
         val timeFormat = "HH:mm"
 
@@ -365,18 +376,22 @@ object FilterScreen {
         val toDateStr: String? = filter.toDate?.dateTimeFormat(dateFormat)
         val toTimeStr: String? = filter.toTime?.dateTimeFormat(timeFormat)
 
-        val fromDateDialog = rememberDateDialog(filter.fromDate ?: LocalDate.now()) { date ->
-            filter.fromDate = date
-        }
-        val fromTimeDialog = rememberTimeDialog(filter.fromTime ?: LocalTime.now()) { date ->
-            filter.fromTime = date
-        }
-        val toDateDialog = rememberDateDialog(filter.toDate ?: LocalDate.now()) { date ->
-            filter.toDate = date
-        }
-        val toTimeDialog = rememberTimeDialog(filter.toTime ?: LocalTime.now()) { date ->
-            filter.toTime = date
-        }
+        val fromDateDialog =
+            rememberDateDialog(filter.fromDate ?: LocalDate.now()) { date ->
+                filter.fromDate = date
+            }
+        val fromTimeDialog =
+            rememberTimeDialog(filter.fromTime ?: LocalTime.now()) { date ->
+                filter.fromTime = date
+            }
+        val toDateDialog =
+            rememberDateDialog(filter.toDate ?: LocalDate.now()) { date ->
+                filter.toDate = date
+            }
+        val toTimeDialog =
+            rememberTimeDialog(filter.toTime ?: LocalTime.now()) { date ->
+                filter.toTime = date
+            }
 
         Column {
             Row {
@@ -386,14 +401,14 @@ object FilterScreen {
                     modifier = Modifier.weight(1f),
                     text = fromDateStr,
                     placeholder = fromDatePlaceholder,
-                    label = if (fromDateStr != null) fromDatePlaceholder else null
+                    label = if (fromDateStr != null) fromDatePlaceholder else null,
                 ) { fromDateDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClickableField(
                     modifier = Modifier.weight(1f),
                     text = fromTimeStr,
                     placeholder = fromTimePlaceholder,
-                    label = if (fromTimeStr != null) fromTimePlaceholder else null
+                    label = if (fromTimeStr != null) fromTimePlaceholder else null,
                 ) { fromTimeDialog.show() }
                 Spacer(modifier = Modifier.width(2.dp))
                 ClearIcon {
@@ -428,7 +443,10 @@ object FilterScreen {
     }
 
     @Composable
-    private fun ClearIcon(modifier: Modifier = Modifier, action: () -> Unit) {
+    private fun ClearIcon(
+        modifier: Modifier = Modifier,
+        action: () -> Unit,
+    ) {
         IconButton(modifier = modifier, onClick = action) {
             Icon(imageVector = Icons.Filled.Clear, contentDescription = stringResource(R.string.clear))
         }
@@ -442,7 +460,7 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_is_favorite),
             color = colorResource(R.color.filter_is_favorite),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(R.string.is_favorite))
@@ -461,7 +479,7 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_by_is_paired),
             color = colorResource(R.color.filter_lost_time),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(R.string.is_paired))
@@ -488,7 +506,7 @@ object FilterScreen {
             color = colorResource(R.color.filter_all),
             addText = stringResource(R.string.add_filter),
             addClick = { selectFilterDialog.show() },
-            onDeleteClick = { onDeleteClick.invoke(filter) }
+            onDeleteClick = { onDeleteClick.invoke(filter) },
         ) {
             filter.filters.forEach {
                 Filter(filterState = it, router = router, onDeleteClick = filter::delete)
@@ -506,33 +524,38 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_device_location),
             color = colorResource(R.color.filter_device_location),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Column {
                 RoundedBox(modifier = Modifier.fillMaxWidth(), internalPaddings = 0.dp) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                router.navigate(ScreenNavigationCommands.OpenSelectLocationScreen(
-                                    initialLocationModel = filter.targetLocation,
-                                    initialRadius = filter.radius,
-                                ) { location, radiusMeters ->
-                                    filter.targetLocation = location
-                                    filter.radius = radiusMeters
-                                })
-                            }
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    router.navigate(
+                                        ScreenNavigationCommands.OpenSelectLocationScreen(
+                                            initialLocationModel = filter.targetLocation,
+                                            initialRadius = filter.radius,
+                                        ) { location, radiusMeters ->
+                                            filter.targetLocation = location
+                                            filter.radius = radiusMeters
+                                        },
+                                    )
+                                },
                     ) {
-                        val locationText = if (filter.targetLocation != null) {
-                            stringResource(R.string.filter_location_has_data, filter.radius)
-                        } else {
-                            stringResource(R.string.filter_location_no_data)
-                        }
+                        val locationText =
+                            if (filter.targetLocation != null) {
+                                stringResource(R.string.filter_location_has_data, filter.radius)
+                            } else {
+                                stringResource(R.string.filter_location_no_data)
+                            }
 
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 16.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 16.dp),
                         ) {
                             Text(modifier = Modifier.weight(1f), text = locationText)
                             Spacer(modifier = Modifier.width(4.dp))
@@ -558,33 +581,38 @@ object FilterScreen {
         FilterBase(
             title = stringResource(R.string.filter_user_location),
             color = colorResource(R.color.filter_user_location),
-            onDeleteButtonClick = { onDeleteClick.invoke(filter) }
+            onDeleteButtonClick = { onDeleteClick.invoke(filter) },
         ) {
             Column {
                 RoundedBox(modifier = Modifier.fillMaxWidth(), internalPaddings = 0.dp) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                router.navigate(ScreenNavigationCommands.OpenSelectLocationScreen(
-                                    initialLocationModel = filter.targetLocation,
-                                    initialRadius = filter.radius,
-                                ) { location, radiusMeters ->
-                                    filter.targetLocation = location
-                                    filter.radius = radiusMeters
-                                })
-                            }
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    router.navigate(
+                                        ScreenNavigationCommands.OpenSelectLocationScreen(
+                                            initialLocationModel = filter.targetLocation,
+                                            initialRadius = filter.radius,
+                                        ) { location, radiusMeters ->
+                                            filter.targetLocation = location
+                                            filter.radius = radiusMeters
+                                        },
+                                    )
+                                },
                     ) {
-                        val locationText = if (filter.targetLocation != null) {
-                            stringResource(R.string.filter_location_has_data, filter.radius)
-                        } else {
-                            stringResource(R.string.filter_location_no_data)
-                        }
+                        val locationText =
+                            if (filter.targetLocation != null) {
+                                stringResource(R.string.filter_location_has_data, filter.radius)
+                            } else {
+                                stringResource(R.string.filter_location_no_data)
+                            }
 
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 16.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 16.dp),
                         ) {
                             Text(modifier = Modifier.weight(1f), text = locationText)
                             Spacer(modifier = Modifier.width(4.dp))
@@ -597,10 +625,11 @@ object FilterScreen {
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { filter.defaultValueIfNoLocation = !filter.defaultValueIfNoLocation },
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { filter.defaultValueIfNoLocation = !filter.defaultValueIfNoLocation },
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(modifier = Modifier.weight(1f), text = stringResource(R.string.filter_user_location_if_no_location))
@@ -609,7 +638,8 @@ object FilterScreen {
                         checked = filter.defaultValueIfNoLocation,
                         onCheckedChange = {
                             filter.defaultValueIfNoLocation = it
-                        })
+                        },
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
                 }
             }
@@ -632,7 +662,7 @@ object FilterScreen {
             color = colorResource(R.color.filter_any),
             addText = stringResource(R.string.add_filter),
             addClick = { selectFilterDialog.show() },
-            onDeleteClick = { onDeleteClick.invoke(filter) }
+            onDeleteClick = { onDeleteClick.invoke(filter) },
         ) {
             filter.filters.forEach {
                 Filter(filterState = it, router = router, onDeleteClick = filter::delete)
@@ -684,7 +714,7 @@ object FilterScreen {
             Modifier
                 .background(color, shape = backgroundShape)
                 .border(width = 1.dp, color = Color.Black, backgroundShape)
-                .clip(backgroundShape)
+                .clip(backgroundShape),
         ) {
             Box(Modifier.clickable { minimize.value = !minimize.value }) {
                 Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -709,10 +739,11 @@ object FilterScreen {
             }
             if (!minimize.value) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(8.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(8.dp),
                 ) {
                     content.invoke()
                 }
@@ -727,7 +758,7 @@ object FilterScreen {
         addText: String,
         addClick: () -> Unit,
         onDeleteClick: () -> Unit,
-        content: @Composable () -> Unit
+        content: @Composable () -> Unit,
     ) {
         FilterBase(title = title, color = color, onDeleteClick) {
             Column {

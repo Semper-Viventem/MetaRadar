@@ -43,7 +43,6 @@ class SettingsViewModel(
     private val permissionHelper: PermissionHelper,
     private val router: Router,
 ) : ViewModel() {
-
     var garbageRemovingInProgress: Boolean by mutableStateOf(false)
     var locationRemovingInProgress: Boolean by mutableStateOf(false)
     var backupDbInProgress: Boolean by mutableStateOf(false)
@@ -104,12 +103,12 @@ class SettingsViewModel(
 
     fun onBackupDBClick() {
         viewModelScope.launch {
-            createBackupFileInteractor.execute()
+            createBackupFileInteractor
+                .execute()
                 .catch {
                     toast(context.getString(R.string.backup_has_failed))
                     reportError(it)
-                }
-                .collect { uri ->
+                }.collect { uri ->
                     if (uri != null) {
                         backupFileTo(uri)
                     } else {
@@ -121,12 +120,12 @@ class SettingsViewModel(
 
     fun onRestoreDBClick() {
         viewModelScope.launch {
-            selectBackupFileInteractor.execute()
+            selectBackupFileInteractor
+                .execute()
                 .catch {
                     toast(context.getString(R.string.cannot_restore_database))
                     reportError(it)
-                }
-                .collect { uri ->
+                }.collect { uri ->
                     if (uri != null) {
                         restoreFrom(uri)
                     } else {
@@ -160,7 +159,8 @@ class SettingsViewModel(
 
     private fun observeLocationData() {
         viewModelScope.launch {
-            locationProvider.observeLocation()
+            locationProvider
+                .observeLocation()
                 .collect { locationHandle ->
                     locationData = locationHandle
                 }
@@ -169,7 +169,8 @@ class SettingsViewModel(
 
     private fun observeSilentMode() {
         viewModelScope.launch {
-            settingsRepository.observeSilentMode()
+            settingsRepository
+                .observeSilentMode()
                 .collect { silentModeEnabled = it }
         }
     }
@@ -209,10 +210,11 @@ class SettingsViewModel(
     private fun reportError(error: Throwable) {
         Timber.e(error)
         viewModelScope.launch {
-            val report = JournalEntry.Report.Error(
-                title = "[Settings]: ${error.message ?: error::class.java}",
-                stackTrace = error.stackTraceToString(),
-            )
+            val report =
+                JournalEntry.Report.Error(
+                    title = "[Settings]: ${error.message ?: error::class.java}",
+                    stackTrace = error.stackTraceToString(),
+                )
             saveReportInteractor.execute(report)
         }
     }

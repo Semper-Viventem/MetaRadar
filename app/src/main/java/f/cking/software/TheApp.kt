@@ -14,7 +14,6 @@ import org.koin.dsl.module
 import timber.log.Timber
 
 class TheApp : Application() {
-
     override fun onCreate() {
         super.onCreate()
         applyDynamicColors()
@@ -43,7 +42,7 @@ class TheApp : Application() {
                 DataModule(SHARED_PREF_NAME, DATABASE_NAME).module,
                 InteractorsModule.module,
                 UiModule.module,
-                module { single { this@TheApp } }
+                module { single { this@TheApp } },
             )
         }
     }

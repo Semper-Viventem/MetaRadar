@@ -8,14 +8,14 @@ import kotlinx.coroutines.withContext
 class SaveReportInteractor(
     private val journalRepository: JournalRepository,
 ) {
-
     suspend fun execute(report: JournalEntry.Report) {
         withContext(Dispatchers.Default) {
-            val journalEntry = JournalEntry(
-                id = null,
-                timestamp = System.currentTimeMillis(),
-                report = report,
-            )
+            val journalEntry =
+                JournalEntry(
+                    id = null,
+                    timestamp = System.currentTimeMillis(),
+                    report = report,
+                )
 
             journalRepository.newEntry(journalEntry)
         }

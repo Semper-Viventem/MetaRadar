@@ -6,17 +6,17 @@ import android.os.PowerManager
 class PowerModeHelper(
     private val context: Context,
 ) {
-
     private val powerManager by lazy { context.getSystemService(PowerManager::class.java) }
     private var cachedPowerMode: PowerMode = PowerMode.DEFAULT
 
     fun powerMode(useCached: Boolean = false): PowerMode {
         if (!useCached) {
-            cachedPowerMode = when {
-                powerManager.isPowerSaveMode -> PowerMode.POWER_SAVING
-                !powerManager.isInteractive -> PowerMode.DEFAULT_RESTRICTED
-                else -> PowerMode.DEFAULT
-            }
+            cachedPowerMode =
+                when {
+                    powerManager.isPowerSaveMode -> PowerMode.POWER_SAVING
+                    !powerManager.isInteractive -> PowerMode.DEFAULT_RESTRICTED
+                    else -> PowerMode.DEFAULT
+                }
         }
 
         return cachedPowerMode

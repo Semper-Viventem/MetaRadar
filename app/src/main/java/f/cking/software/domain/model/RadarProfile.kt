@@ -13,47 +13,68 @@ data class RadarProfile(
     val detectFilter: Filter?,
     val cooldownMs: Long?,
 ) {
-
     @Serializable
-    sealed class Filter(@Transient protected val checkDifficulty: Int = 0) {
-
+    sealed class Filter(
+        @Transient protected val checkDifficulty: Int = 0,
+    ) {
         open fun getDifficulty(): Int = checkDifficulty
 
         @Serializable
         @SerialName("last_detection_interval")
-        data class LastDetectionInterval(val from: Long, val to: Long) : Filter()
+        data class LastDetectionInterval(
+            val from: Long,
+            val to: Long,
+        ) : Filter()
 
         @Serializable
         @SerialName("first_detection_interval")
-        data class FirstDetectionInterval(val from: Long, val to: Long) : Filter()
+        data class FirstDetectionInterval(
+            val from: Long,
+            val to: Long,
+        ) : Filter()
 
         @Serializable
         @SerialName("name")
-        data class Name(val name: String, val ignoreCase: Boolean) : Filter()
+        data class Name(
+            val name: String,
+            val ignoreCase: Boolean,
+        ) : Filter()
 
         @Serializable
         @SerialName("address")
-        data class Address(val address: String) : Filter()
+        data class Address(
+            val address: String,
+        ) : Filter()
 
         @Serializable
         @SerialName("manufacturer")
-        data class Manufacturer(val manufacturerId: Int) : Filter()
+        data class Manufacturer(
+            val manufacturerId: Int,
+        ) : Filter()
 
         @Serializable
         @SerialName("is_favorite")
-        data class IsFavorite(val favorite: Boolean) : Filter()
+        data class IsFavorite(
+            val favorite: Boolean,
+        ) : Filter()
 
         @Serializable
         @SerialName("is_paired")
-        data class IsPaired(val isPaired: Boolean, ) : Filter()
+        data class IsPaired(
+            val isPaired: Boolean,
+        ) : Filter()
 
         @Serializable
         @SerialName("min_lost_time")
-        data class MinLostTime(val minLostTime: Long) : Filter()
+        data class MinLostTime(
+            val minLostTime: Long,
+        ) : Filter()
 
         @Serializable
         @SerialName("tag")
-        data class ByTag(val tag: String) : Filter()
+        data class ByTag(
+            val tag: String,
+        ) : Filter()
 
         @Serializable
         @SerialName("airdrop_contact")
@@ -72,26 +93,26 @@ data class RadarProfile(
 
         @Serializable
         @SerialName("any")
-        data class Any(val filters: List<Filter>) : Filter(checkDifficulty = 1) {
-            override fun getDifficulty(): Int {
-                return filters.sumOf { it.getDifficulty() } + checkDifficulty
-            }
+        data class Any(
+            val filters: List<Filter>,
+        ) : Filter(checkDifficulty = 1) {
+            override fun getDifficulty(): Int = filters.sumOf { it.getDifficulty() } + checkDifficulty
         }
 
         @Serializable
         @SerialName("all")
-        data class All(val filters: List<Filter>) : Filter(checkDifficulty = 1) {
-            override fun getDifficulty(): Int {
-                return filters.sumOf { it.getDifficulty() } + checkDifficulty
-            }
+        data class All(
+            val filters: List<Filter>,
+        ) : Filter(checkDifficulty = 1) {
+            override fun getDifficulty(): Int = filters.sumOf { it.getDifficulty() } + checkDifficulty
         }
 
         @Serializable
         @SerialName("not")
-        data class Not(val filter: Filter) : Filter(checkDifficulty = 1) {
-            override fun getDifficulty(): Int {
-                return filter.getDifficulty() + checkDifficulty
-            }
+        data class Not(
+            val filter: Filter,
+        ) : Filter(checkDifficulty = 1) {
+            override fun getDifficulty(): Int = filter.getDifficulty() + checkDifficulty
         }
 
         @Serializable

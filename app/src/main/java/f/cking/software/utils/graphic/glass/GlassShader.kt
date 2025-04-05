@@ -5,7 +5,6 @@ import org.intellij.lang.annotations.Language
 import kotlin.reflect.KClass
 
 object GlassShader {
-
     const val ARG_CONTENT = "content"
     const val ARG_ELEVATION = "elevation"
     const val ARG_REFRACTION_INDEX = "refractionIndex"
@@ -21,13 +20,20 @@ object GlassShader {
     const val ARG_TILT = "tilt"
     const val ARG_BLUR = "blurRadius"
 
-
     sealed interface CurveType {
         val A: Float
         val k: Float
 
-        data class Sin(override val A: Float = 0.2f, override val k: Float = 0.3f) : CurveType
-        data class Mod(override val A: Float = 0.2f, override val k: Float = 0.25f) : CurveType
+        data class Sin(
+            override val A: Float = 0.2f,
+            override val k: Float = 0.3f,
+        ) : CurveType
+
+        data class Mod(
+            override val A: Float = 0.2f,
+            override val k: Float = 0.25f,
+        ) : CurveType
+
         object Flat : CurveType {
             override val k: Float = 0.0f
             override val A: Float = 0.0f
@@ -37,14 +43,13 @@ object GlassShader {
             val Sin = Sin()
             val Mod = Mod()
 
-            fun KClass<out CurveType>.getType(): Int {
-                return when {
+            fun KClass<out CurveType>.getType(): Int =
+                when {
                     this == Sin::class -> 0
                     this == Mod::class -> 1
                     this == Flat::class -> 2
                     else -> throw IllegalStateException("Type matcher is not implemented for CurveType: $this")
                 }
-            }
         }
     }
 

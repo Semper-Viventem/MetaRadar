@@ -3,7 +3,6 @@ package f.cking.software.domain.interactor
 import f.cking.software.domain.model.BleRecordFrame
 
 class GetBleRecordFramesFromRawInteractor {
-
     fun execute(raw: ByteArray): List<BleRecordFrame> {
         val frames = mutableListOf<BleRecordFrame>()
 
@@ -27,9 +26,11 @@ class GetBleRecordFramesFromRawInteractor {
                     frameSize = byte
                     currentFrameByteNumber = 0
                 }
+
                 isTypeByte -> {
                     currentFrameType = byte
                 }
+
                 isDataByte -> {
                     currentFrameDataBuffer.add(byte)
                 }

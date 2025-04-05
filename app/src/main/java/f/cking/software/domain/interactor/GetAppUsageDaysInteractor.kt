@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit
 class GetAppUsageDaysInteractor(
     private val settingsRepository: SettingsRepository,
 ) {
-
     fun execute(): Long {
         val firstLaunchTime = settingsRepository.getFirstAppLaunchTime()
 

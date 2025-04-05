@@ -7,7 +7,6 @@ import f.cking.software.domain.model.LocationModel
 class CheckDeviceIsFollowingInteractor(
     private val locationRepository: LocationRepository,
 ) {
-
     suspend fun execute(
         deviceData: DeviceData,
         minFollowingDuration: Long,
@@ -16,23 +15,25 @@ class CheckDeviceIsFollowingInteractor(
         val currentTime = System.currentTimeMillis()
 
         val lifeTimeIsShort = currentTime - deviceData.firstDetectTimeMs < minFollowingDuration
-        val wasDetectedRecently = deviceData.lastFollowingDetectionTimeMs != null
-                && currentTime - deviceData.lastFollowingDetectionTimeMs < followingDetectionInterval
+        val wasDetectedRecently =
+            deviceData.lastFollowingDetectionTimeMs != null &&
+                currentTime - deviceData.lastFollowingDetectionTimeMs < followingDetectionInterval
 
         if (lifeTimeIsShort || wasDetectedRecently) return false
 
-        val lastLocations = locationRepository.getAllLocationsByAddress(
-            deviceAddress = deviceData.address,
-            fromTime = currentTime - minFollowingDuration
-        )
+        val lastLocations =
+            locationRepository.getAllLocationsByAddress(
+                deviceAddress = deviceData.address,
+                fromTime = currentTime - minFollowingDuration,
+            )
 
         if (lastLocations.isEmpty()) return false
 
         val distanceByAllSegments = distanceByAllSegments(lastLocations)
         val distanceBetweenFirstAndLast = lastLocations.first().distanceTo(lastLocations.last())
 
-        return distanceByAllSegments >= MIN_DISTANCE_BY_ALL_SEGMENTS_M
-                && distanceBetweenFirstAndLast >= MIN_DISTANCE_BETWEEN_FIRST_AND_LAST
+        return distanceByAllSegments >= MIN_DISTANCE_BY_ALL_SEGMENTS_M &&
+            distanceBetweenFirstAndLast >= MIN_DISTANCE_BETWEEN_FIRST_AND_LAST
     }
 
     private fun distanceByAllSegments(points: List<LocationModel>): Float {

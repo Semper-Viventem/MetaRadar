@@ -5,7 +5,6 @@ import f.cking.software.domain.model.DeviceClass
 import f.cking.software.domain.model.DeviceData
 
 object GetIconForDeviceClass {
-
     /**
      * @return icon resource based on [DeviceClass]
      */

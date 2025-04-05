@@ -8,8 +8,10 @@ class AddTagToDeviceInteractor(
     private val devicesRepository: DevicesRepository,
     private val tagsRepository: TagsRepository,
 ) {
-
-    suspend fun execute(device: DeviceData, tag: String) {
+    suspend fun execute(
+        device: DeviceData,
+        tag: String,
+    ) {
         val deviceWithTags = device.copy(tags = device.tags + tag)
         devicesRepository.saveDevice(deviceWithTags)
         tagsRepository.addNewTag(tag)

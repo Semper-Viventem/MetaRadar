@@ -15,21 +15,21 @@ class SelectDeviceViewModel(
     private val router: Router,
     private val devicesRepository: DevicesRepository,
 ) : ViewModel() {
-
     var devices: List<DeviceData> by mutableStateOf(emptyList())
     var loading by mutableStateOf(false)
     var searchStr: String by mutableStateOf("")
 
-    private val generalComparator = Comparator<DeviceData> { second, first ->
-        when {
-            first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
-            first.resolvedName != second.resolvedName -> first.resolvedName?.compareTo(second.resolvedName ?: return@Comparator 1) ?: -1
-            first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
-                first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
+    private val generalComparator =
+        Comparator<DeviceData> { second, first ->
+            when {
+                first.lastDetectTimeMs != second.lastDetectTimeMs -> first.lastDetectTimeMs.compareTo(second.lastDetectTimeMs)
+                first.resolvedName != second.resolvedName -> first.resolvedName?.compareTo(second.resolvedName ?: return@Comparator 1) ?: -1
+                first.manufacturerInfo?.name != second.manufacturerInfo?.name ->
+                    first.manufacturerInfo?.name?.compareTo(second.manufacturerInfo?.name ?: return@Comparator 1) ?: -1
 
-            else -> first.address.compareTo(second.address)
+                else -> first.address.compareTo(second.address)
+            }
         }
-    }
 
     init {
         refreshDevices()
@@ -38,17 +38,19 @@ class SelectDeviceViewModel(
     private fun refreshDevices() {
         viewModelScope.launch {
             loading = true
-            devices = devicesRepository.getDevices().asSequence()
-                .filter { device ->
-                    searchStr.takeIf { it.isNotBlank() }?.let { searchStr ->
-                        (device.resolvedName?.contains(searchStr, true) ?: false)
-                                || (device.customName?.contains(searchStr, true) ?: false)
-                                || (device.manufacturerInfo?.name?.contains(searchStr, true) ?: false)
-                                || device.address.contains(searchStr, true)
-                    } ?: true
-                }
-                .sortedWith(generalComparator)
-                .toList()
+            devices =
+                devicesRepository
+                    .getDevices()
+                    .asSequence()
+                    .filter { device ->
+                        searchStr.takeIf { it.isNotBlank() }?.let { searchStr ->
+                            (device.resolvedName?.contains(searchStr, true) ?: false) ||
+                                (device.customName?.contains(searchStr, true) ?: false) ||
+                                (device.manufacturerInfo?.name?.contains(searchStr, true) ?: false) ||
+                                device.address.contains(searchStr, true)
+                        } ?: true
+                    }.sortedWith(generalComparator)
+                    .toList()
             loading = false
         }
     }

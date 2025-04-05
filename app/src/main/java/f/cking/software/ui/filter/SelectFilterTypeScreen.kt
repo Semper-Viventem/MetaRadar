@@ -22,7 +22,6 @@ import f.cking.software.R
 import f.cking.software.utils.graphic.ThemedDialog
 
 object SelectFilterTypeScreen {
-
     @Composable
     fun Dialog(
         dialogState: MaterialDialogState,
@@ -33,9 +32,9 @@ object SelectFilterTypeScreen {
             buttons = {
                 negativeButton(
                     stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { dialogState.hide() }
-            }
+            },
         ) {
             LazyColumn {
                 FilterType.entries.forEach { type ->
@@ -51,20 +50,25 @@ object SelectFilterTypeScreen {
     }
 
     @Composable
-    private fun TypeItem(item: FilterType, onClickListener: () -> Unit) {
+    private fun TypeItem(
+        item: FilterType,
+        onClickListener: () -> Unit,
+    ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClickListener.invoke() }
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { onClickListener.invoke() },
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 Text(
                     text = stringResource(item.displayNameRes),
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
@@ -76,8 +80,8 @@ object SelectFilterTypeScreen {
         }
     }
 
-    private fun getFilterByType(type: FilterType): FilterUiState {
-        return when (type) {
+    private fun getFilterByType(type: FilterType): FilterUiState =
+        when (type) {
             FilterType.NAME -> FilterUiState.Name()
             FilterType.ADDRESS -> FilterUiState.Address()
             FilterType.BY_LAST_DETECTION -> FilterUiState.LastDetectionInterval()
@@ -95,5 +99,4 @@ object SelectFilterTypeScreen {
             FilterType.BY_USER_LOCATION -> FilterUiState.UserLocation()
             FilterType.BY_TAG -> FilterUiState.Tag()
         }
-    }
 }

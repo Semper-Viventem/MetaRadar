@@ -18,12 +18,12 @@ class MapViewModel(
     private val intentHelper: IntentHelper,
     private val activityProvider: ActivityProvider,
 ) : ViewModel() {
-
     var silentModeEnabled by mutableStateOf(settingsRepository.getSilentMode())
 
     init {
         viewModelScope.launch {
-            settingsRepository.observeSilentMode()
+            settingsRepository
+                .observeSilentMode()
                 .collect { silentModeEnabled = it }
         }
     }

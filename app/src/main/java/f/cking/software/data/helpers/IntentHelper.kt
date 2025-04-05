@@ -6,10 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import f.cking.software.data.helpers.IntentHelper.ScreenNavigation.BACKGROUND_LOCATION_DESCRIPTION
 import f.cking.software.data.helpers.IntentHelper.ScreenNavigation.Companion.toNavigationCommand
-import f.cking.software.data.helpers.IntentHelper.ScreenNavigation.MAIN
-import f.cking.software.data.helpers.IntentHelper.ScreenNavigation.entries
 import f.cking.software.openUrl
 import f.cking.software.ui.MainActivity
 import f.cking.software.ui.ScreenNavigationCommands
@@ -20,7 +17,6 @@ class IntentHelper(
     private val activityProvider: ActivityProvider,
     private val router: Router,
 ) {
-
     /**
      * TODO: this code us unsafe
      */
@@ -33,20 +29,25 @@ class IntentHelper(
     }
 
     fun selectFile(onResult: (filePath: Uri?) -> Unit) {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "*/*"
-        }
+        val intent =
+            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+            }
         activityProvider.requireActivity().startActivityForResult(intent, ACTIVITY_RESULT_SELECT_FILE)
         pendingConsumers[ACTIVITY_RESULT_SELECT_FILE] = onResult
     }
 
-    fun createFile(fileName: String, onResult: (directoryPath: Uri?) -> Unit) {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            putExtra(Intent.EXTRA_TITLE, fileName)
-            type = "application/sqlite"
-        }
+    fun createFile(
+        fileName: String,
+        onResult: (directoryPath: Uri?) -> Unit,
+    ) {
+        val intent =
+            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, fileName)
+                type = "application/sqlite"
+            }
         activityProvider.requireActivity().startActivityForResult(intent, ACTIVITY_RESULT_CREATE_FILE)
         pendingConsumers[ACTIVITY_RESULT_CREATE_FILE] = onResult
     }
@@ -90,31 +91,32 @@ class IntentHelper(
         return false
     }
 
-    private fun Intent.isScreenNavigation(): Boolean {
-        return action == ACTION_OPEN_SCREEN
-    }
+    private fun Intent.isScreenNavigation(): Boolean = action == ACTION_OPEN_SCREEN
 
     enum class ScreenNavigation {
         MAIN,
-        BACKGROUND_LOCATION_DESCRIPTION;
+        BACKGROUND_LOCATION_DESCRIPTION,
+        ;
 
         companion object {
-
             fun fromIntent(intent: Intent): ScreenNavigation? {
                 val name = intent.getStringExtra(SCREEN_NAME) ?: return null
                 return entries.firstOrNull { it.name == name }
             }
 
-            fun ScreenNavigation.toNavigationCommand(): NavigationCommand {
-                return when (this) {
+            fun ScreenNavigation.toNavigationCommand(): NavigationCommand =
+                when (this) {
                     MAIN -> ScreenNavigationCommands.OpenMainScreen
                     BACKGROUND_LOCATION_DESCRIPTION -> ScreenNavigationCommands.OpenBackgroundLocationScreen
                 }
-            }
         }
     }
 
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+    ) {
         val consumer = pendingConsumers[requestCode]
         if (resultCode == Activity.RESULT_OK) {
             consumer?.invoke(data?.data)

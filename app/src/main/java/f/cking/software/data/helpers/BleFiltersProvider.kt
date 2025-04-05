@@ -10,73 +10,72 @@ import kotlinx.coroutines.withContext
 class BleFiltersProvider(
     private val getAllDevicesInteractor: GetAllDevicesInteractor,
 ) {
-
     val previouslyNoticedServicesUUIDs = mutableSetOf<String>()
 
-    suspend fun getBackgroundFilters(): List<ScanFilter> {
-        return getKnownDevicesFilters() + getPopularServiceUUIDS() + getManufacturerFilter()
-    }
+    suspend fun getBackgroundFilters(): List<ScanFilter> = getKnownDevicesFilters() + getPopularServiceUUIDS() + getManufacturerFilter()
 
-    fun getPopularServiceUUIDS(): List<ScanFilter> {
-        return (popularServicesUUID + previouslyNoticedServicesUUIDs).map { uuid ->
-            ScanFilter.Builder()
+    fun getPopularServiceUUIDS(): List<ScanFilter> =
+        (popularServicesUUID + previouslyNoticedServicesUUIDs).map { uuid ->
+            ScanFilter
+                .Builder()
                 .setServiceUuid(ParcelUuid.fromString(uuid))
                 .build()
         }
-    }
 
-    fun getManufacturerFilter(): List<ScanFilter> {
-        return listOf(
-            ScanFilter.Builder()
+    fun getManufacturerFilter(): List<ScanFilter> =
+        listOf(
+            ScanFilter
+                .Builder()
                 .setManufacturerData(
                     ManufacturerInfo.APPLE_ID,
                     NearByData.bytes,
                     NearByData.bytesMask,
-                )
-                .build(),
-            ScanFilter.Builder()
+                ).build(),
+            ScanFilter
+                .Builder()
                 .setManufacturerData(
                     ManufacturerInfo.APPLE_ID,
                     AirdropData.bytes,
                     AirdropData.bytesMask,
-                )
-                .build(),
+                ).build(),
         )
 
-    }
-
-    suspend fun getKnownDevicesFilters(): List<ScanFilter> {
-        return withContext(Dispatchers.Default) {
+    suspend fun getKnownDevicesFilters(): List<ScanFilter> =
+        withContext(Dispatchers.Default) {
             val allKnownDevices = getAllDevicesInteractor.execute()
 
-            val lastSeenDevices = allKnownDevices
-                .sortedByDescending { it.lastDetectTimeMs }
-                .take(KNOWN_DEVICES_LIMIT) // Limit filters to fit into android scan registerer limitations
-                .map { it.address }
-                .toSet()
+            val lastSeenDevices =
+                allKnownDevices
+                    .sortedByDescending { it.lastDetectTimeMs }
+                    .take(KNOWN_DEVICES_LIMIT) // Limit filters to fit into android scan registerer limitations
+                    .map { it.address }
+                    .toSet()
 
-            val shouldBeIncluded = allKnownDevices
-                .filter { it.tags.isNotEmpty() || it.favorite }
-                .map { it.address }
-                .toSet()
+            val shouldBeIncluded =
+                allKnownDevices
+                    .filter { it.tags.isNotEmpty() || it.favorite }
+                    .map { it.address }
+                    .toSet()
 
             (lastSeenDevices + shouldBeIncluded)
                 .map {
-                    ScanFilter.Builder()
+                    ScanFilter
+                        .Builder()
                         .setDeviceAddress(it)
                         .build()
                 }
         }
-    }
 
     private object NearByData {
-        val bytes: ByteArray = listOf(0x10, 0x07, 0x38, 0x1F, 0x0E, 0x67, 0x06, 0x71, 0x18)
-            .map { it.toUByte().toByte() }
-            .toByteArray()
+        val bytes: ByteArray =
+            listOf(0x10, 0x07, 0x38, 0x1F, 0x0E, 0x67, 0x06, 0x71, 0x18)
+                .map { it.toUByte().toByte() }
+                .toByteArray()
 
-        val bytesMask: ByteArray = listOf(0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
-            .map { it.toUByte().toByte() }
-            .toByteArray()
+        val bytesMask: ByteArray =
+            listOf(0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+                .map { it.toUByte().toByte() }
+                .toByteArray()
     }
 
     private object AirdropData {
@@ -92,11 +91,12 @@ class BleFiltersProvider(
 
     companion object {
         private const val KNOWN_DEVICES_LIMIT = 3000
-        private val popularServicesUUID = setOf(
-            "0000fe8f-0000-1000-8000-00805f9b34fb",
-            "0000fe9f-0000-1000-8000-00805f9b34fb",
-            "0000feb8-0000-1000-8000-00805f9b34fb",
-            "0000fd5a-0000-1000-8000-00805f9b34fb",
-        )
+        private val popularServicesUUID =
+            setOf(
+                "0000fe8f-0000-1000-8000-00805f9b34fb",
+                "0000fe9f-0000-1000-8000-00805f9b34fb",
+                "0000feb8-0000-1000-8000-00805f9b34fb",
+                "0000fd5a-0000-1000-8000-00805f9b34fb",
+            )
     }
 }

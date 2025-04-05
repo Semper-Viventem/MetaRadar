@@ -19,26 +19,26 @@ import kotlinx.coroutines.withContext
 class DevicesRepository(
     appDatabase: AppDatabase,
 ) {
-
     private val deviceDao: DeviceDao = appDatabase.deviceDao()
     private val appleContactsDao = appDatabase.appleContactDao()
     private val lastBatch = MutableStateFlow(emptyList<DeviceData>())
     private val allDevices = MutableStateFlow(emptyList<DeviceData>())
 
-    suspend fun getDevices(): List<DeviceData> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getDevices(): List<DeviceData> =
+        withContext(Dispatchers.IO) {
             deviceDao.getAll().toDomainWithAirDrop()
         }
-    }
 
-    suspend fun getPaginated(offset: Int, limit: Int): List<DeviceData> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getPaginated(
+        offset: Int,
+        limit: Int,
+    ): List<DeviceData> =
+        withContext(Dispatchers.IO) {
             deviceDao.getPaginated(offset, limit).toDomainWithAirDrop()
         }
-    }
 
-    suspend fun getLastBatch(): List<DeviceData> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getLastBatch(): List<DeviceData> =
+        withContext(Dispatchers.IO) {
             val lastDevice = deviceDao.getPaginated(0, 1).firstOrNull()
 
             if (lastDevice == null) {
@@ -48,27 +48,24 @@ class DevicesRepository(
                 deviceDao.getByLastDetectTime(scanTime).toDomainWithAirDrop()
             }
         }
-    }
 
     fun clearLastBatch() {
         lastBatch.value = emptyList()
     }
 
-    suspend fun observeAllDevices(): StateFlow<List<DeviceData>> {
-        return allDevices.apply {
+    suspend fun observeAllDevices(): StateFlow<List<DeviceData>> =
+        allDevices.apply {
             if (allDevices.value.isEmpty()) {
                 notifyListeners()
             }
         }
-    }
 
-    suspend fun observeLastBatch(): StateFlow<List<DeviceData>> {
-        return lastBatch.apply {
+    suspend fun observeLastBatch(): StateFlow<List<DeviceData>> =
+        lastBatch.apply {
             if (lastBatch.value.isEmpty()) {
                 notifyListeners()
             }
         }
-    }
 
     suspend fun saveScanBatch(devices: List<DeviceData>) {
         withContext(Dispatchers.IO) {
@@ -85,7 +82,10 @@ class DevicesRepository(
         }
     }
 
-    suspend fun saveFollowingDetection(device: DeviceData, detectionTime: Long) {
+    suspend fun saveFollowingDetection(
+        device: DeviceData,
+        detectionTime: Long,
+    ) {
         withContext(Dispatchers.IO) {
             val new = device.copy(lastFollowingDetectionTimeMs = detectionTime)
             deviceDao.insert(new.toData())
@@ -102,34 +102,31 @@ class DevicesRepository(
         }
     }
 
-    suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getAllByAddresses(addresses: List<String>): List<DeviceData> =
+        withContext(Dispatchers.IO) {
             addresses.splitToBatches(DatabaseUtils.getMaxSQLVariablesNumber()).flatMap {
                 deviceDao.findAllByAddresses(addresses).toDomainWithAirDrop()
             }
         }
-    }
 
-    suspend fun getDeviceByAddress(address: String): DeviceData? {
-        return withContext(Dispatchers.IO) {
+    suspend fun getDeviceByAddress(address: String): DeviceData? =
+        withContext(Dispatchers.IO) {
             deviceDao.findByAddress(address)?.toDomainWithAirDrop()
         }
-    }
 
-    suspend fun getAirdropByKnownAddress(address: String): AppleAirDrop? {
-        return withContext(Dispatchers.IO) {
-            appleContactsDao.getByAddress(address)
+    suspend fun getAirdropByKnownAddress(address: String): AppleAirDrop? =
+        withContext(Dispatchers.IO) {
+            appleContactsDao
+                .getByAddress(address)
                 .map { it.toDomain() }
                 .takeIf { it.isNotEmpty() }
                 ?.let { AppleAirDrop(it) }
         }
-    }
 
-    suspend fun getAllBySHA(sha: List<Int>): List<AppleAirDrop.AppleContact> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getAllBySHA(sha: List<Int>): List<AppleAirDrop.AppleContact> =
+        withContext(Dispatchers.IO) {
             appleContactsDao.getBySHA(sha).map { it.toDomain() }
         }
-    }
 
     private suspend fun saveDevices(devices: List<DeviceData>) {
         withContext(Dispatchers.IO) {
@@ -139,9 +136,13 @@ class DevicesRepository(
 
     private suspend fun saveContacts(devices: List<DeviceData>) {
         withContext(Dispatchers.IO) {
-            val contacts = devices.flatMap { device ->
-                device.manufacturerInfo?.airdrop?.contacts?.map { it.toData(device.address) } ?: emptyList()
-            }
+            val contacts =
+                devices.flatMap { device ->
+                    device.manufacturerInfo
+                        ?.airdrop
+                        ?.contacts
+                        ?.map { it.toData(device.address) } ?: emptyList()
+                }
 
             appleContactsDao.insertAll(contacts)
         }
@@ -160,31 +161,30 @@ class DevicesRepository(
         }
     }
 
-    private suspend fun DeviceEntity.toDomainWithAirDrop(): DeviceData {
-        return withContext(Dispatchers.IO) {
+    private suspend fun DeviceEntity.toDomainWithAirDrop(): DeviceData =
+        withContext(Dispatchers.IO) {
             val contacts = appleContactsDao.getByAddress(address)
             toDomain(AppleAirDrop(contacts.map { it.toDomain() }))
         }
-    }
 
-    private suspend fun List<DeviceEntity>.toDomainWithAirDrop(): List<DeviceData> {
-        return withContext(Dispatchers.IO) {
-
+    private suspend fun List<DeviceEntity>.toDomainWithAirDrop(): List<DeviceData> =
+        withContext(Dispatchers.IO) {
             val allRelatedContacts =
                 splitToBatches(DatabaseUtils.getMaxSQLVariablesNumber()).flatMap { batch ->
                     appleContactsDao.getByAddresses(batch.map { it.address })
                 }
 
             map { device ->
-                val airdrop = allRelatedContacts.asSequence()
-                    .filter { it.associatedAddress == device.address }
-                    .map { it.toDomain() }
-                    .toList()
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { AppleAirDrop(it) }
+                val airdrop =
+                    allRelatedContacts
+                        .asSequence()
+                        .filter { it.associatedAddress == device.address }
+                        .map { it.toDomain() }
+                        .toList()
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { AppleAirDrop(it) }
 
                 device.toDomain(airdrop)
             }
         }
-    }
 }

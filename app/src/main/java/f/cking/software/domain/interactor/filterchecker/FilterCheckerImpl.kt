@@ -17,78 +17,101 @@ class FilterCheckerImpl(
     private val checkDeviceLocationHistoryInteractor: CheckDeviceLocationHistoryInteractor,
     private val checkUserLocationHistoryInteractor: CheckUserLocationHistoryInteractor,
 ) : FilterChecker<RadarProfile.Filter>(powerModeHelper) {
-
-    data class StatData(val name: String, val total: Long, val count: Int, val avg: Long)
+    data class StatData(
+        val name: String,
+        val total: Long,
+        val count: Int,
+        val avg: Long,
+    )
 
     private val internalFilters: MutableList<FilterChecker<*>> = mutableListOf()
 
-    private val lastDetectionInterval = filterChecker<RadarProfile.Filter.LastDetectionInterval> { device, filter ->
-        device.lastDetectTimeMs in filter.from..filter.to
-    }
-    private val firstDetectionInterval = filterChecker<RadarProfile.Filter.FirstDetectionInterval>(useCache = true) { device, filter ->
-        device.firstDetectTimeMs in filter.from..filter.to
-    }
-    private val name = filterChecker<RadarProfile.Filter.Name>(useCache = true) { device, filter ->
-        val regexMatch = device.resolvedName?.checkRegexSafe(filter.name) ?: false
-        val noCaseSubstringMatch = device.resolvedName?.contains(filter.name, filter.ignoreCase) ?: false
-        regexMatch || noCaseSubstringMatch
-    }
-    private val address = filterChecker<RadarProfile.Filter.Address>(useCache = true) { device, filter ->
-        device.address.checkRegexSafe(filter.address)
-    }
-    private val manufacturer = filterChecker<RadarProfile.Filter.Manufacturer>(useCache = true) { device, filter ->
-        device.manufacturerInfo?.id?.let { it == filter.manufacturerId } ?: false
-    }
-    private val isFavorite = filterChecker<RadarProfile.Filter.IsFavorite> { device, filter ->
-        device.favorite == filter.favorite
-    }
-    private val isPaired = filterChecker<RadarProfile.Filter.IsPaired> { device, filter ->
-        device.isPaired == filter.isPaired
-    }
-    private val minLostTime = filterChecker<RadarProfile.Filter.MinLostTime> { device, filter ->
-        System.currentTimeMillis() - device.lastDetectTimeMs >= filter.minLostTime
-    }
-    private val airdrop = filterChecker<RadarProfile.Filter.AppleAirdropContact> { device, filter ->
-        fun checkMinLostTime(contact: AppleAirDrop.AppleContact): Boolean {
-            val currentTime = System.currentTimeMillis()
-            return filter.minLostTime == null
-                    || (contact.firstDetectionTimeMs == contact.lastDetectionTimeMs)
-                    || (currentTime - contact.lastDetectionTimeMs >= filter.minLostTime)
+    private val lastDetectionInterval =
+        filterChecker<RadarProfile.Filter.LastDetectionInterval> { device, filter ->
+            device.lastDetectTimeMs in filter.from..filter.to
         }
-        device.manufacturerInfo?.airdrop?.contacts?.any { contact ->
-            contact.sha256 == filter.airdropShaFormat && checkMinLostTime(contact)
-        } == true
-    }
-    private val any = filterChecker<RadarProfile.Filter.Any> { device, filter ->
-        filter.filters
-            .any { check(device, it) }
-    }
-    private val all = filterChecker<RadarProfile.Filter.All> { device, filter ->
-        filter.filters
-            .all { check(device, it) }
-    }
-    private val not = filterChecker<RadarProfile.Filter.Not> { device, filter ->
-        !check(device, filter.filter)
-    }
-    private val isFollowing = filterChecker<RadarProfile.Filter.IsFollowing> { deviceData, filter ->
-        val detected = checkDeviceIsFollowing.execute(deviceData, filter.followingDurationMs, filter.followingDetectionIntervalMs)
-        if (detected) {
-            devicesRepository.saveFollowingDetection(deviceData, System.currentTimeMillis())
+    private val firstDetectionInterval =
+        filterChecker<RadarProfile.Filter.FirstDetectionInterval>(useCache = true) { device, filter ->
+            device.firstDetectTimeMs in filter.from..filter.to
         }
-        detected
-    }
-    private val deviceLocation = filterChecker<RadarProfile.Filter.DeviceLocation>(useCache = true) { device, filter ->
-        checkDeviceLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, device, filter.fromTimeMs, filter.toTimeMs)
-    }
-    private val userLocation = filterChecker<RadarProfile.Filter.UserLocation> { device, filter ->
-        checkUserLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, filter.noLocationDefaultValue)
-    }
-    private val tag = filterChecker<RadarProfile.Filter.ByTag> { device, filter ->
-        device.tags.contains(filter.tag)
-    }
+    private val name =
+        filterChecker<RadarProfile.Filter.Name>(useCache = true) { device, filter ->
+            val regexMatch = device.resolvedName?.checkRegexSafe(filter.name) ?: false
+            val noCaseSubstringMatch = device.resolvedName?.contains(filter.name, filter.ignoreCase) ?: false
+            regexMatch || noCaseSubstringMatch
+        }
+    private val address =
+        filterChecker<RadarProfile.Filter.Address>(useCache = true) { device, filter ->
+            device.address.checkRegexSafe(filter.address)
+        }
+    private val manufacturer =
+        filterChecker<RadarProfile.Filter.Manufacturer>(useCache = true) { device, filter ->
+            device.manufacturerInfo?.id?.let { it == filter.manufacturerId } ?: false
+        }
+    private val isFavorite =
+        filterChecker<RadarProfile.Filter.IsFavorite> { device, filter ->
+            device.favorite == filter.favorite
+        }
+    private val isPaired =
+        filterChecker<RadarProfile.Filter.IsPaired> { device, filter ->
+            device.isPaired == filter.isPaired
+        }
+    private val minLostTime =
+        filterChecker<RadarProfile.Filter.MinLostTime> { device, filter ->
+            System.currentTimeMillis() - device.lastDetectTimeMs >= filter.minLostTime
+        }
+    private val airdrop =
+        filterChecker<RadarProfile.Filter.AppleAirdropContact> { device, filter ->
+            fun checkMinLostTime(contact: AppleAirDrop.AppleContact): Boolean {
+                val currentTime = System.currentTimeMillis()
+                return filter.minLostTime == null ||
+                    (contact.firstDetectionTimeMs == contact.lastDetectionTimeMs) ||
+                    (currentTime - contact.lastDetectionTimeMs >= filter.minLostTime)
+            }
+            device.manufacturerInfo?.airdrop?.contacts?.any { contact ->
+                contact.sha256 == filter.airdropShaFormat && checkMinLostTime(contact)
+            } == true
+        }
+    private val any =
+        filterChecker<RadarProfile.Filter.Any> { device, filter ->
+            filter.filters
+                .any { check(device, it) }
+        }
+    private val all =
+        filterChecker<RadarProfile.Filter.All> { device, filter ->
+            filter.filters
+                .all { check(device, it) }
+        }
+    private val not =
+        filterChecker<RadarProfile.Filter.Not> { device, filter ->
+            !check(device, filter.filter)
+        }
+    private val isFollowing =
+        filterChecker<RadarProfile.Filter.IsFollowing> { deviceData, filter ->
+            val detected = checkDeviceIsFollowing.execute(deviceData, filter.followingDurationMs, filter.followingDetectionIntervalMs)
+            if (detected) {
+                devicesRepository.saveFollowingDetection(deviceData, System.currentTimeMillis())
+            }
+            detected
+        }
+    private val deviceLocation =
+        filterChecker<RadarProfile.Filter.DeviceLocation>(useCache = true) { device, filter ->
+            checkDeviceLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, device, filter.fromTimeMs, filter.toTimeMs)
+        }
+    private val userLocation =
+        filterChecker<RadarProfile.Filter.UserLocation> { device, filter ->
+            checkUserLocationHistoryInteractor.execute(filter.location, filter.radiusMeters, filter.noLocationDefaultValue)
+        }
+    private val tag =
+        filterChecker<RadarProfile.Filter.ByTag> { device, filter ->
+            device.tags.contains(filter.tag)
+        }
 
-    override suspend fun checkInternal(deviceData: DeviceData, filter: RadarProfile.Filter): Boolean {
-        return when (filter) {
+    override suspend fun checkInternal(
+        deviceData: DeviceData,
+        filter: RadarProfile.Filter,
+    ): Boolean =
+        when (filter) {
             is RadarProfile.Filter.LastDetectionInterval -> lastDetectionInterval.check(deviceData, filter)
             is RadarProfile.Filter.FirstDetectionInterval -> firstDetectionInterval.check(deviceData, filter)
             is RadarProfile.Filter.Name -> name.check(deviceData, filter)
@@ -106,30 +129,26 @@ class FilterCheckerImpl(
             is RadarProfile.Filter.UserLocation -> userLocation.check(deviceData, filter)
             is RadarProfile.Filter.ByTag -> tag.check(deviceData, filter)
         }
-    }
 
     override fun clearCache() {
         internalFilters.forEach { it.clearCache() }
     }
 
-    override fun useCache(): Boolean {
-        return false
-    }
+    override fun useCache(): Boolean = false
 
     private fun <T : RadarProfile.Filter> filterChecker(
         useCache: Boolean = false,
         check: suspend (deviceData: DeviceData, filter: T) -> Boolean,
     ): FilterChecker<T> {
+        val filter =
+            object : FilterChecker<T>(powerModeHelper) {
+                override suspend fun checkInternal(
+                    deviceData: DeviceData,
+                    filter: T,
+                ): Boolean = check.invoke(deviceData, filter)
 
-        val filter = object : FilterChecker<T>(powerModeHelper) {
-            override suspend fun checkInternal(deviceData: DeviceData, filter: T): Boolean {
-                return check.invoke(deviceData, filter)
+                override fun useCache(): Boolean = useCache
             }
-
-            override fun useCache(): Boolean {
-                return useCache
-            }
-        }
 
         internalFilters.add(filter)
 

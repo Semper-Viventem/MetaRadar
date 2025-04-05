@@ -59,7 +59,7 @@ fun GlassBottomNavBar(
         blur = blur,
         fallbackColor = fallbackColor,
         overlayColor = overlayColor,
-        bottomContent = { BottomNavigationSpacer() }
+        bottomContent = { BottomNavigationSpacer() },
     ) { padding ->
         content(padding)
     }
@@ -78,7 +78,7 @@ fun GlassSystemNavbar(
         blur = blur,
         fallbackColor = fallbackColor,
         overlayColor = overlayColor,
-        bottomContent = { SystemNavbarSpacer() }
+        bottomContent = { SystemNavbarSpacer() },
     ) { padding ->
         content(padding)
     }
@@ -101,35 +101,35 @@ fun GlassBottomSpace(
         var navbarHeightPx by remember { mutableStateOf(height?.value?.let(context::dpToPx)?.toFloat()) }
         val isRenderEffectSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .letIf(isRenderEffectSupported && navbarHeightPx != null) {
-                    it.glassBottom(heightPx = navbarHeightPx!!, blurRadius = blur)
-                }
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .letIf(isRenderEffectSupported && navbarHeightPx != null) {
+                        it.glassBottom(heightPx = navbarHeightPx!!, blurRadius = blur)
+                    },
         ) {
             globalContent(PaddingValues(bottom = navbarHeightPx?.dp ?: 0.dp))
         }
         Box(
-            modifier = Modifier
-                .zIndex(zIndex)
-                .fillMaxWidth()
-                .let {
-                    if (height == null) {
-                        it.onGloballyPositioned {
-                            navbarHeightPx = it.size.height.toFloat()
+            modifier =
+                Modifier
+                    .zIndex(zIndex)
+                    .fillMaxWidth()
+                    .let {
+                        if (height == null) {
+                            it.onGloballyPositioned {
+                                navbarHeightPx = it.size.height.toFloat()
+                            }
+                        } else {
+                            it.height(height)
                         }
-                    } else {
-                        it.height(height)
-                    }
-                }
-                .let {
-                    if (!isRenderEffectSupported) {
-                        it.background(fallbackColor)
-                    } else {
-                        it.background(overlayColor)
-                    }
-                }
-                .align(Alignment.BottomCenter)
+                    }.let {
+                        if (!isRenderEffectSupported) {
+                            it.background(fallbackColor)
+                        } else {
+                            it.background(overlayColor)
+                        }
+                    }.align(Alignment.BottomCenter),
         ) {
             Column {
                 bottomContent()
@@ -140,7 +140,9 @@ fun GlassBottomSpace(
                     .fillMaxWidth()
                     .height(2.dp)
                     .align(Alignment.TopCenter)
-                    .background(Brush.horizontalGradient(listOf(Color.White.copy(alpha = 0.1f), Color.White.copy(alpha = 0.2f), Color.Transparent)))
+                    .background(
+                        Brush.horizontalGradient(listOf(Color.White.copy(alpha = 0.1f), Color.White.copy(alpha = 0.2f), Color.Transparent)),
+                    ),
             )
         }
     }
@@ -153,79 +155,83 @@ fun Modifier.glassBottom(
     curveType: GlassShader.CurveType = GlassShader.CurveType.Mod,
     elevationPx: Float = LocalContext.current.dpToPx(8f).toFloat(),
     blurRadius: Float = GlassBottomSpaceDefaults.BLUR,
-): Modifier = composed {
+): Modifier =
+    composed {
+        val contentSize = remember { mutableStateOf(Size(0.0f, 0.0f)) }
 
-    val contentSize = remember { mutableStateOf(Size(0.0f, 0.0f)) }
-
-    this
-        .onSizeChanged {
-            contentSize.value = Size(it.width.toFloat(), it.height.toFloat())
-        }
-        .then(
-            glassPanel(
-                rect = Rect(
-                    0,
-                    (contentSize.value.height - heightPx).toInt(),
-                    contentSize.value.width.toInt(),
-                    contentSize.value.height.toInt(),
+        this
+            .onSizeChanged {
+                contentSize.value = Size(it.width.toFloat(), it.height.toFloat())
+            }.then(
+                glassPanel(
+                    rect =
+                        Rect(
+                            0,
+                            (contentSize.value.height - heightPx).toInt(),
+                            contentSize.value.width.toInt(),
+                            contentSize.value.height.toInt(),
+                        ),
+                    curveType = curveType,
+                    elevationPx = elevationPx,
+                    material = RefractionMaterial.GLASS,
+                    blurRadius = blurRadius,
+                    tilt = Tilt.Motion(0.04f, 0.015f),
                 ),
-                curveType = curveType,
-                elevationPx = elevationPx,
-                material = RefractionMaterial.GLASS,
-                blurRadius = blurRadius,
-                tilt = Tilt.Motion(0.04f, 0.015f),
             )
-        )
-}
+    }
 
 @Deprecated("Use glassBottom instead, I want to keep this code here for historical reasons", ReplaceWith("glassBottom()"))
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun Modifier.blurBottom(heightPx: Float, blur: Float, glassCurveSizeDp: Float): Modifier = composed {
-    val context = LocalContext.current
+fun Modifier.blurBottom(
+    heightPx: Float,
+    blur: Float,
+    glassCurveSizeDp: Float,
+): Modifier =
+    composed {
+        val context = LocalContext.current
 
-    val contentShader = remember { RuntimeShader(Shaders.SHADER_CONTENT) }
-    val effectAreaShader = remember { RuntimeShader(Shaders.SHADER_EFFECT_AREA) }
-    val glassShader = remember { RuntimeShader(Shaders.GLASS_SHADER) }
+        val contentShader = remember { RuntimeShader(Shaders.SHADER_CONTENT) }
+        val effectAreaShader = remember { RuntimeShader(Shaders.SHADER_EFFECT_AREA) }
+        val glassShader = remember { RuntimeShader(Shaders.GLASS_SHADER) }
 
-    contentShader.setFloatUniform("blurredHeight", heightPx)
-    effectAreaShader.setFloatUniform("blurredHeight", heightPx)
-    glassShader.setFloatUniform("blurredHeight", heightPx)
+        contentShader.setFloatUniform("blurredHeight", heightPx)
+        effectAreaShader.setFloatUniform("blurredHeight", heightPx)
+        glassShader.setFloatUniform("blurredHeight", heightPx)
 
-    this
-        .onSizeChanged {
-            contentShader.setFloatUniform(
-                "iResolution",
-                it.width.toFloat(),
-                it.height.toFloat(),
-            )
-            effectAreaShader.setFloatUniform(
-                "iResolution",
-                it.width.toFloat(),
-                it.height.toFloat(),
-            )
-            glassShader.setFloatUniform(
-                "iResolution",
-                it.width.toFloat(),
-                it.height.toFloat(),
-            )
-
-            val minCurveSizePx: Float = it.width / 100f
-            val glassCurveSizePx = max(minCurveSizePx, context.dpToPx(glassCurveSizeDp).toFloat())
-            glassShader.setFloatUniform("horizontalSquareSize", glassCurveSizePx)
-        }
-        .graphicsLayer {
-            renderEffect = RenderEffect
-                .createBlendModeEffect(
-                    RenderEffect.createRuntimeShaderEffect(contentShader, Shaders.ARG_CONTENT),
-                    RenderEffect.createChainEffect(
-                        RenderEffect.createRuntimeShaderEffect(effectAreaShader, Shaders.ARG_CONTENT),
-                        RenderEffect.createChainEffect(
-                            RenderEffect.createRuntimeShaderEffect(glassShader, Shaders.ARG_CONTENT),
-                            RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.MIRROR),
-                        )
-                    ),
-                    BlendMode.SRC_OVER,
+        this
+            .onSizeChanged {
+                contentShader.setFloatUniform(
+                    "iResolution",
+                    it.width.toFloat(),
+                    it.height.toFloat(),
                 )
-                .asComposeRenderEffect()
-        }
-}
+                effectAreaShader.setFloatUniform(
+                    "iResolution",
+                    it.width.toFloat(),
+                    it.height.toFloat(),
+                )
+                glassShader.setFloatUniform(
+                    "iResolution",
+                    it.width.toFloat(),
+                    it.height.toFloat(),
+                )
+
+                val minCurveSizePx: Float = it.width / 100f
+                val glassCurveSizePx = max(minCurveSizePx, context.dpToPx(glassCurveSizeDp).toFloat())
+                glassShader.setFloatUniform("horizontalSquareSize", glassCurveSizePx)
+            }.graphicsLayer {
+                renderEffect =
+                    RenderEffect
+                        .createBlendModeEffect(
+                            RenderEffect.createRuntimeShaderEffect(contentShader, Shaders.ARG_CONTENT),
+                            RenderEffect.createChainEffect(
+                                RenderEffect.createRuntimeShaderEffect(effectAreaShader, Shaders.ARG_CONTENT),
+                                RenderEffect.createChainEffect(
+                                    RenderEffect.createRuntimeShaderEffect(glassShader, Shaders.ARG_CONTENT),
+                                    RenderEffect.createBlurEffect(blur, blur, Shader.TileMode.MIRROR),
+                                ),
+                            ),
+                            BlendMode.SRC_OVER,
+                        ).asComposeRenderEffect()
+            }
+    }

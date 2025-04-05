@@ -9,7 +9,6 @@ data class LocationModel(
     val lng: Double,
     val time: Long,
 ) : Serializable {
-
     fun distanceTo(other: LocationModel): Float {
         val result = FloatArray(1)
         Location.distanceBetween(lat, lng, other.lat, other.lng, result)

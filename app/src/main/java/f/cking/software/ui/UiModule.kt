@@ -17,19 +17,35 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 object UiModule {
-    val module = module {
-        single { RouterImpl() }
-        single<Router> { get<RouterImpl>() }
-        viewModel { MainViewModel(get(), get(), get(), get(), get(), get()) }
-        viewModel { DeviceListViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { ProfilesListViewModel(get(), get()) }
-        viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get(), get(), get()) }
-        viewModel { SelectManufacturerViewModel(get()) }
-        viewModel { SelectDeviceViewModel(get(), get()) }
-        viewModel { DeviceDetailsViewModel(address = it[0], get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { JournalViewModel(get(), get(), get(), get(), get()) }
-        viewModel { MapViewModel(get(), get(), get()) }
-        viewModel { BackgroundLocationRequestViewModel(get(), get()) }
-    }
+    val module =
+        module {
+            single { RouterImpl() }
+            single<Router> { get<RouterImpl>() }
+            viewModel { MainViewModel(get(), get(), get(), get(), get(), get()) }
+            viewModel { DeviceListViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+            viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+            viewModel { ProfilesListViewModel(get(), get()) }
+            viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get(), get(), get()) }
+            viewModel { SelectManufacturerViewModel(get()) }
+            viewModel { SelectDeviceViewModel(get(), get()) }
+            viewModel {
+                DeviceDetailsViewModel(
+                    address = it[0],
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                )
+            }
+            viewModel { JournalViewModel(get(), get(), get(), get(), get()) }
+            viewModel { MapViewModel(get(), get(), get()) }
+            viewModel { BackgroundLocationRequestViewModel(get(), get()) }
+        }
 }

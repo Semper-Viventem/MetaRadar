@@ -27,7 +27,6 @@ data class DeviceData(
     val metadata: DeviceMetadata?,
     val isConnectable: Boolean,
 ) {
-
     val resolvedDeviceClass: DeviceClass by lazy {
         BuildDeviceClassFromSystemInfo.execute(this)
     }
@@ -40,58 +39,49 @@ data class DeviceData(
         metadata?.manufacturerName?.takeIf { it.isNotBlank() } ?: manufacturerInfo?.name
     }
 
-    fun knownLifetime(): Long {
-        return lastDetectTimeMs - firstDetectTimeMs
-    }
+    fun knownLifetime(): Long = lastDetectTimeMs - firstDetectTimeMs
 
-    fun buildDisplayName(): String {
-        return customName?.takeIf { it.isNotBlank() }
+    fun buildDisplayName(): String =
+        customName?.takeIf { it.isNotBlank() }
             ?: name
             ?: metadata?.buildDisplayName()?.takeIf { it.isNotBlank() }
             ?: address
-    }
 
-    fun firstDetectionPeriod(context: Context): String {
-        return (System.currentTimeMillis() - firstDetectTimeMs).getTimePeriodStr(context)
-    }
+    fun firstDetectionPeriod(context: Context): String = (System.currentTimeMillis() - firstDetectTimeMs).getTimePeriodStr(context)
 
-    fun firstDetectionExactTime(context: Context, formatStyle: FormatStyle = FormatStyle.SHORT): String {
-        return firstDetectTimeMs.dateTimeStringFormatLocalized(formatStyle)
-    }
+    fun firstDetectionExactTime(
+        context: Context,
+        formatStyle: FormatStyle = FormatStyle.SHORT,
+    ): String = firstDetectTimeMs.dateTimeStringFormatLocalized(formatStyle)
 
-    fun lastDetectionPeriod(context: Context): String {
-        return (System.currentTimeMillis() - lastDetectTimeMs).getTimePeriodStr(context)
-    }
+    fun lastDetectionPeriod(context: Context): String = (System.currentTimeMillis() - lastDetectTimeMs).getTimePeriodStr(context)
 
-    fun lastDetectionExactTime(context: Context, formatStyle: FormatStyle = FormatStyle.SHORT): String {
-        return lastDetectTimeMs.dateTimeStringFormatLocalized(formatStyle)
-    }
+    fun lastDetectionExactTime(
+        context: Context,
+        formatStyle: FormatStyle = FormatStyle.SHORT,
+    ): String = lastDetectTimeMs.dateTimeStringFormatLocalized(formatStyle)
 
-    fun hasBeenSeenTimeAgo(): Long {
-        return System.currentTimeMillis() - lastDetectTimeMs
-    }
+    fun hasBeenSeenTimeAgo(): Long = System.currentTimeMillis() - lastDetectTimeMs
 
-    fun extendedAddressInfo(): ExtendedAddressInfo {
-        return BuildExtendedAddressInfoInteractor.execute(this)
-    }
+    fun extendedAddressInfo(): ExtendedAddressInfo = BuildExtendedAddressInfoInteractor.execute(this)
 
-    fun distance(): Float? {
-        return if (rssi != null) {
-            val txPower = -59 //hard coded power value. Usually ranges between -59 to -65
+    fun distance(): Float? =
+        if (rssi != null) {
+            val txPower = -59 // hard coded power value. Usually ranges between -59 to -65
             val ratio = rssi * 1.0 / txPower
-            val distance = if (ratio < 1.0) {
-                Math.pow(ratio, 10.0)
-            } else {
-                (0.89976) * Math.pow(ratio, 7.7095) + 0.111
-            }
+            val distance =
+                if (ratio < 1.0) {
+                    Math.pow(ratio, 10.0)
+                } else {
+                    (0.89976) * Math.pow(ratio, 7.7095) + 0.111
+                }
             distance.toFloat()
         } else {
             null
         }
-    }
 
-    fun mergeWithNewDetected(new: DeviceData): DeviceData {
-        return this.copy(
+    fun mergeWithNewDetected(new: DeviceData): DeviceData =
+        this.copy(
             detectCount = detectCount + 1,
             lastDetectTimeMs = new.lastDetectTimeMs,
             name = new.name,
@@ -104,5 +94,4 @@ data class DeviceData(
             rowDataEncoded = new.rowDataEncoded,
             isConnectable = new.isConnectable,
         )
-    }
 }

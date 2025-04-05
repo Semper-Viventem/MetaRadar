@@ -28,14 +28,11 @@ import f.cking.software.data.repo.TagsRepository
 import f.cking.software.utils.graphic.TagChip
 import f.cking.software.utils.graphic.ThemedDialog
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getKoin
+import org.koin.compose.getKoin
 
 object TagDialog {
-
     @Composable
-    fun rememberDialog(
-        onSelected: (String) -> Unit,
-    ): MaterialDialogState {
+    fun rememberDialog(onSelected: (String) -> Unit): MaterialDialogState {
         val dialog = rememberMaterialDialogState()
         val inputState = remember { mutableStateOf("") }
         ThemedDialog(
@@ -45,14 +42,17 @@ object TagDialog {
             },
             onCloseRequest = { dialog.hide() },
         ) {
-            Column(modifier = Modifier
-                .padding(8.dp)
-                .height(300.dp)) {
+            Column(
+                modifier =
+                    Modifier
+                        .padding(8.dp)
+                        .height(300.dp),
+            ) {
                 TextField(
                     value = inputState.value,
                     onValueChange = { inputState.value = it },
                     placeholder = { Text(text = stringResource(R.string.tag_name)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 TagsList(prefix = inputState.value, onTagSelected = {
@@ -82,16 +82,22 @@ object TagDialog {
         Column(modifier = Modifier.fillMaxWidth()) {
             Button(
                 onClick = { onTagSelected.invoke(prefix.trim()) },
-                enabled = prefix.isNotBlank() && tags.value.none { it == prefix.trim() }
+                enabled = prefix.isNotBlank() && tags.value.none { it == prefix.trim() },
             ) {
                 Text(text = stringResource(id = R.string.create_new_tag))
             }
-            LazyColumn(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
+            LazyColumn(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+            ) {
                 item {
                     FlowRow(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
+                        modifier =
+                            Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
                         mainAxisSpacing = 8.dp,
                     ) {
                         tags.value.forEach { name ->

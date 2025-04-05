@@ -8,7 +8,6 @@ import f.cking.software.data.database.entity.JournalEntryEntity
 
 @Dao
 interface JournalDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(journalEntryEntity: JournalEntryEntity)
 

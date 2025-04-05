@@ -34,19 +34,19 @@ import f.cking.software.utils.graphic.FABSpacer
 import org.koin.androidx.compose.koinViewModel
 
 object JournalScreen {
-
     @Composable
     fun Screen() {
         val viewModel: JournalViewModel = koinViewModel()
         val journal = viewModel.journal
-        val modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxSize()
+        val modifier =
+            Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
         Box(modifier = modifier) {
             if (journal.isEmpty()) {
                 ContentPlaceholder(
                     modifier = Modifier.fillMaxSize(),
-                    text = stringResource(R.string.journal_placeholder)
+                    text = stringResource(R.string.journal_placeholder),
                 )
             } else {
                 LazyColumn(
@@ -61,27 +61,33 @@ object JournalScreen {
             }
             if (viewModel.loading) {
                 LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp),
-                    color = MaterialTheme.colorScheme.onSurface
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(4.dp),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
     }
 
     @Composable
-    fun JournalEntry(uiModel: JournalViewModel.JournalEntryUiModel, viewModel: JournalViewModel) {
+    fun JournalEntry(
+        uiModel: JournalViewModel.JournalEntryUiModel,
+        viewModel: JournalViewModel,
+    ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(uiModel.color())
-                .clickable { viewModel.onEntryClick(uiModel.journalEntry) }
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(uiModel.color())
+                    .clickable { viewModel.onEntryClick(uiModel.journalEntry) },
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Row(Modifier.fillMaxWidth()) {
                     Text(
@@ -90,7 +96,7 @@ object JournalScreen {
                         fontWeight = FontWeight.Bold,
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis,
-                        color = uiModel.colorForeground()
+                        color = uiModel.colorForeground(),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = uiModel.dateTime, fontWeight = FontWeight.Thin, color = uiModel.colorForeground())
@@ -100,14 +106,15 @@ object JournalScreen {
 
                 uiModel.subtitle?.let { subtitle ->
                     Text(
-                        modifier = Modifier.clickable {
-                            isExpanded = !isExpanded
-                        },
+                        modifier =
+                            Modifier.clickable {
+                                isExpanded = !isExpanded
+                            },
                         text = if (isExpanded) uiModel.subtitle else uiModel.subtitleCollapsed.orEmpty(),
                         fontWeight = FontWeight.Normal,
                         maxLines = if (isExpanded) Int.MAX_VALUE else 5,
                         overflow = TextOverflow.Ellipsis,
-                        color = uiModel.colorForeground()
+                        color = uiModel.colorForeground(),
                     )
                 }
 
@@ -118,7 +125,7 @@ object JournalScreen {
                         items.forEach { item ->
                             SuggestionChip(
                                 onClick = { viewModel.onJournalListItemClick(item.payload) },
-                                label = { Text(text = item.displayName) }
+                                label = { Text(text = item.displayName) },
                             )
                         }
                     }

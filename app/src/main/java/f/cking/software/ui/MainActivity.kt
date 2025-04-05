@@ -44,7 +44,6 @@ import org.koin.compose.KoinContext
 import org.osmdroid.config.Configuration
 
 class MainActivity : AppCompatActivity() {
-
     private val TAG = "Main Activity"
 
     private val permissionHelper: PermissionHelper by inject()
@@ -59,11 +58,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val navigationBarStyle = if (isDarkModeOn()) {
-            SystemBarStyle.dark(Color.TRANSPARENT)
-        } else {
-            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-        }
+        val navigationBarStyle =
+            if (isDarkModeOn()) {
+                SystemBarStyle.dark(Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            }
         enableEdgeToEdge(navigationBarStyle = navigationBarStyle)
 
         Configuration.getInstance().load(this, sharedPreferences)
@@ -76,15 +76,15 @@ class MainActivity : AppCompatActivity() {
             val focusManager = LocalFocusManager.current
             val colors = themeColorScheme()
 
-
             KoinContext {
                 MaterialTheme(
                     colorScheme = colors,
-                    typography = Typography(
-                        bodyMedium = MaterialTheme.typography.bodyMedium.copy(color = colors.onSurface),
-                        bodyLarge = MaterialTheme.typography.bodyLarge.copy(color = colors.onSurface),
-                        bodySmall = MaterialTheme.typography.bodySmall.copy(color = colors.onSurface),
-                    )
+                    typography =
+                        Typography(
+                            bodyMedium = MaterialTheme.typography.bodyMedium.copy(color = colors.onSurface),
+                            bodyLarge = MaterialTheme.typography.bodyLarge.copy(color = colors.onSurface),
+                            bodySmall = MaterialTheme.typography.bodySmall.copy(color = colors.onSurface),
+                        ),
                 ) {
                     val stack = viewModel.navigator.stack
                     if (stack.isEmpty()) {
@@ -110,18 +110,29 @@ class MainActivity : AppCompatActivity() {
         intentHelper.tryHandleIntent(intent)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permissionHelper.onPermissionResult(requestCode, permissions, grantResults)
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+    ) {
         super.onActivityResult(requestCode, resultCode, data)
         intentHelper.handleActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+    override fun onNewIntent(
+        intent: Intent,
+        caller: ComponentCaller,
+    ) {
         super.onNewIntent(intent, caller)
         intentHelper.tryHandleIntent(intent)
     }
@@ -146,79 +157,84 @@ class MainActivity : AppCompatActivity() {
     private fun themeColorScheme(): ColorScheme {
         val dynamicColorsAreSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         val darkMode = isSystemInDarkTheme()
-        val colors = when {
-            dynamicColorsAreSupported && darkMode -> dynamicDarkColorScheme(this)
-            dynamicColorsAreSupported && !darkMode -> dynamicLightColorScheme(this)
-            darkMode -> darkColorScheme(
-                primary = colorResource(id = R.color.md_theme_dark_primary),
-                onPrimary = colorResource(id = R.color.md_theme_dark_onPrimary),
-                primaryContainer = colorResource(id = R.color.md_theme_dark_primaryContainer),
-                onPrimaryContainer = colorResource(id = R.color.md_theme_dark_onPrimaryContainer),
-                secondary = colorResource(id = R.color.md_theme_dark_secondary),
-                onSecondary = colorResource(id = R.color.md_theme_dark_onSecondary),
-                secondaryContainer = colorResource(id = R.color.md_theme_dark_secondaryContainer),
-                onSecondaryContainer = colorResource(id = R.color.md_theme_dark_onSecondaryContainer),
-                tertiary = colorResource(id = R.color.md_theme_dark_tertiary),
-                onTertiary = colorResource(id = R.color.md_theme_dark_onTertiary),
-                tertiaryContainer = colorResource(id = R.color.md_theme_dark_tertiaryContainer),
-                onTertiaryContainer = colorResource(id = R.color.md_theme_dark_onTertiaryContainer),
-                error = colorResource(id = R.color.md_theme_dark_error),
-                errorContainer = colorResource(id = R.color.md_theme_dark_errorContainer),
-                onError = colorResource(id = R.color.md_theme_dark_onError),
-                onErrorContainer = colorResource(id = R.color.md_theme_dark_onErrorContainer),
-                background = colorResource(id = R.color.md_theme_dark_background),
-                onBackground = colorResource(id = R.color.md_theme_dark_onBackground),
-                surface = colorResource(id = R.color.md_theme_dark_surface),
-                surfaceContainer = colorResource(id = R.color.md_theme_dark_surfaceContainer),
-                surfaceContainerHigh = colorResource(id = R.color.md_theme_dark_surfaceContainerHigh),
-                surfaceContainerHighest = colorResource(id = R.color.md_theme_dark_surfaceContainerHighest),
-                onSurface = colorResource(id = R.color.md_theme_dark_onSurface),
-                surfaceVariant = colorResource(id = R.color.md_theme_dark_surfaceVariant),
-                onSurfaceVariant = colorResource(id = R.color.md_theme_dark_onSurfaceVariant),
-                outline = colorResource(id = R.color.md_theme_dark_outline),
-                inverseOnSurface = colorResource(id = R.color.md_theme_dark_inverseOnSurface),
-                inverseSurface = colorResource(id = R.color.md_theme_dark_inverseSurface),
-                inversePrimary = colorResource(id = R.color.md_theme_dark_inversePrimary),
-                surfaceTint = colorResource(id = R.color.md_theme_dark_surfaceTint),
-                outlineVariant = colorResource(id = R.color.md_theme_dark_outlineVariant),
-                scrim = colorResource(id = R.color.md_theme_dark_scrim),
-            )
-            !darkMode -> lightColorScheme(
-                primary = colorResource(id = R.color.md_theme_light_primary),
-                onPrimary = colorResource(id = R.color.md_theme_light_onPrimary),
-                primaryContainer = colorResource(id = R.color.md_theme_light_primaryContainer),
-                onPrimaryContainer = colorResource(id = R.color.md_theme_light_onPrimaryContainer),
-                secondary = colorResource(id = R.color.md_theme_light_secondary),
-                onSecondary = colorResource(id = R.color.md_theme_light_onSecondary),
-                secondaryContainer = colorResource(id = R.color.md_theme_light_secondaryContainer),
-                onSecondaryContainer = colorResource(id = R.color.md_theme_light_onSecondaryContainer),
-                tertiary = colorResource(id = R.color.md_theme_light_tertiary),
-                onTertiary = colorResource(id = R.color.md_theme_light_onTertiary),
-                tertiaryContainer = colorResource(id = R.color.md_theme_light_tertiaryContainer),
-                onTertiaryContainer = colorResource(id = R.color.md_theme_light_onTertiaryContainer),
-                error = colorResource(id = R.color.md_theme_light_error),
-                errorContainer = colorResource(id = R.color.md_theme_light_errorContainer),
-                onError = colorResource(id = R.color.md_theme_light_onError),
-                onErrorContainer = colorResource(id = R.color.md_theme_light_onErrorContainer),
-                background = colorResource(id = R.color.md_theme_light_background),
-                onBackground = colorResource(id = R.color.md_theme_light_onBackground),
-                surface = colorResource(id = R.color.md_theme_light_surface),
-                surfaceContainer = colorResource(id = R.color.md_theme_light_surfaceContainer),
-                surfaceContainerHigh = colorResource(id = R.color.md_theme_light_surfaceContainerHigh),
-                surfaceContainerHighest = colorResource(id = R.color.md_theme_light_surfaceContainerHighest),
-                onSurface = colorResource(id = R.color.md_theme_light_onSurface),
-                surfaceVariant = colorResource(id = R.color.md_theme_light_surfaceVariant),
-                onSurfaceVariant = colorResource(id = R.color.md_theme_light_onSurfaceVariant),
-                outline = colorResource(id = R.color.md_theme_light_outline),
-                inverseOnSurface = colorResource(id = R.color.md_theme_light_inverseOnSurface),
-                inverseSurface = colorResource(id = R.color.md_theme_light_inverseSurface),
-                inversePrimary = colorResource(id = R.color.md_theme_light_inversePrimary),
-                surfaceTint = colorResource(id = R.color.md_theme_light_surfaceTint),
-                outlineVariant = colorResource(id = R.color.md_theme_light_outlineVariant),
-                scrim = colorResource(id = R.color.md_theme_light_scrim),
-            )
-            else -> throw IllegalStateException("This state is unreachable")
-        }
+        val colors =
+            when {
+                dynamicColorsAreSupported && darkMode -> dynamicDarkColorScheme(this)
+                dynamicColorsAreSupported && !darkMode -> dynamicLightColorScheme(this)
+                darkMode ->
+                    darkColorScheme(
+                        primary = colorResource(id = R.color.md_theme_dark_primary),
+                        onPrimary = colorResource(id = R.color.md_theme_dark_onPrimary),
+                        primaryContainer = colorResource(id = R.color.md_theme_dark_primaryContainer),
+                        onPrimaryContainer = colorResource(id = R.color.md_theme_dark_onPrimaryContainer),
+                        secondary = colorResource(id = R.color.md_theme_dark_secondary),
+                        onSecondary = colorResource(id = R.color.md_theme_dark_onSecondary),
+                        secondaryContainer = colorResource(id = R.color.md_theme_dark_secondaryContainer),
+                        onSecondaryContainer = colorResource(id = R.color.md_theme_dark_onSecondaryContainer),
+                        tertiary = colorResource(id = R.color.md_theme_dark_tertiary),
+                        onTertiary = colorResource(id = R.color.md_theme_dark_onTertiary),
+                        tertiaryContainer = colorResource(id = R.color.md_theme_dark_tertiaryContainer),
+                        onTertiaryContainer = colorResource(id = R.color.md_theme_dark_onTertiaryContainer),
+                        error = colorResource(id = R.color.md_theme_dark_error),
+                        errorContainer = colorResource(id = R.color.md_theme_dark_errorContainer),
+                        onError = colorResource(id = R.color.md_theme_dark_onError),
+                        onErrorContainer = colorResource(id = R.color.md_theme_dark_onErrorContainer),
+                        background = colorResource(id = R.color.md_theme_dark_background),
+                        onBackground = colorResource(id = R.color.md_theme_dark_onBackground),
+                        surface = colorResource(id = R.color.md_theme_dark_surface),
+                        surfaceContainer = colorResource(id = R.color.md_theme_dark_surfaceContainer),
+                        surfaceContainerHigh = colorResource(id = R.color.md_theme_dark_surfaceContainerHigh),
+                        surfaceContainerHighest = colorResource(id = R.color.md_theme_dark_surfaceContainerHighest),
+                        onSurface = colorResource(id = R.color.md_theme_dark_onSurface),
+                        surfaceVariant = colorResource(id = R.color.md_theme_dark_surfaceVariant),
+                        onSurfaceVariant = colorResource(id = R.color.md_theme_dark_onSurfaceVariant),
+                        outline = colorResource(id = R.color.md_theme_dark_outline),
+                        inverseOnSurface = colorResource(id = R.color.md_theme_dark_inverseOnSurface),
+                        inverseSurface = colorResource(id = R.color.md_theme_dark_inverseSurface),
+                        inversePrimary = colorResource(id = R.color.md_theme_dark_inversePrimary),
+                        surfaceTint = colorResource(id = R.color.md_theme_dark_surfaceTint),
+                        outlineVariant = colorResource(id = R.color.md_theme_dark_outlineVariant),
+                        scrim = colorResource(id = R.color.md_theme_dark_scrim),
+                    )
+
+                !darkMode ->
+                    lightColorScheme(
+                        primary = colorResource(id = R.color.md_theme_light_primary),
+                        onPrimary = colorResource(id = R.color.md_theme_light_onPrimary),
+                        primaryContainer = colorResource(id = R.color.md_theme_light_primaryContainer),
+                        onPrimaryContainer = colorResource(id = R.color.md_theme_light_onPrimaryContainer),
+                        secondary = colorResource(id = R.color.md_theme_light_secondary),
+                        onSecondary = colorResource(id = R.color.md_theme_light_onSecondary),
+                        secondaryContainer = colorResource(id = R.color.md_theme_light_secondaryContainer),
+                        onSecondaryContainer = colorResource(id = R.color.md_theme_light_onSecondaryContainer),
+                        tertiary = colorResource(id = R.color.md_theme_light_tertiary),
+                        onTertiary = colorResource(id = R.color.md_theme_light_onTertiary),
+                        tertiaryContainer = colorResource(id = R.color.md_theme_light_tertiaryContainer),
+                        onTertiaryContainer = colorResource(id = R.color.md_theme_light_onTertiaryContainer),
+                        error = colorResource(id = R.color.md_theme_light_error),
+                        errorContainer = colorResource(id = R.color.md_theme_light_errorContainer),
+                        onError = colorResource(id = R.color.md_theme_light_onError),
+                        onErrorContainer = colorResource(id = R.color.md_theme_light_onErrorContainer),
+                        background = colorResource(id = R.color.md_theme_light_background),
+                        onBackground = colorResource(id = R.color.md_theme_light_onBackground),
+                        surface = colorResource(id = R.color.md_theme_light_surface),
+                        surfaceContainer = colorResource(id = R.color.md_theme_light_surfaceContainer),
+                        surfaceContainerHigh = colorResource(id = R.color.md_theme_light_surfaceContainerHigh),
+                        surfaceContainerHighest = colorResource(id = R.color.md_theme_light_surfaceContainerHighest),
+                        onSurface = colorResource(id = R.color.md_theme_light_onSurface),
+                        surfaceVariant = colorResource(id = R.color.md_theme_light_surfaceVariant),
+                        onSurfaceVariant = colorResource(id = R.color.md_theme_light_onSurfaceVariant),
+                        outline = colorResource(id = R.color.md_theme_light_outline),
+                        inverseOnSurface = colorResource(id = R.color.md_theme_light_inverseOnSurface),
+                        inverseSurface = colorResource(id = R.color.md_theme_light_inverseSurface),
+                        inversePrimary = colorResource(id = R.color.md_theme_light_inversePrimary),
+                        surfaceTint = colorResource(id = R.color.md_theme_light_surfaceTint),
+                        outlineVariant = colorResource(id = R.color.md_theme_light_outlineVariant),
+                        scrim = colorResource(id = R.color.md_theme_light_scrim),
+                    )
+
+                else -> throw IllegalStateException("This state is unreachable")
+            }
         return colors
     }
 }

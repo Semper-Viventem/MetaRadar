@@ -36,7 +36,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-
 fun Long.getTimePeriodStr(context: Context): String {
     val sec = this / (1000)
     val min = this / (1000 * 60)
@@ -58,38 +57,53 @@ fun Context.frameRate(): Float {
 
 @ExperimentalUnsignedTypes // just to make it clear that the experimental unsigned types are used
 fun ByteArray.toHexUByteString() = asUByteArray().joinToString("") { it.toString(16).padStart(2, '0') }
+
 fun ByteArray.toHexString() = joinToString("") { it.toHexString() }
+
 fun Byte.toHexString() = "%02x".format(this)
+
 fun Int.toHexString() = "%04x".format(this)
 
 fun Long.toLocalDate(timeZone: ZoneId = ZoneId.systemDefault()) = Instant.ofEpochMilli(this).atZone(timeZone).toLocalDate()
+
 fun Long.toLocalTime(timeZone: ZoneId = ZoneId.systemDefault()) = Instant.ofEpochMilli(this).atZone(timeZone).toLocalTime()
-fun timeFromDateTime(date: LocalDate, time: LocalTime): Long =
-    LocalDateTime.of(date, time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-fun Long.dateTimeStringFormat(format: String, timeZone: ZoneId = ZoneId.systemDefault()): String {
-    return LocalDateTime.of(toLocalDate(timeZone), toLocalTime(timeZone))
+fun timeFromDateTime(
+    date: LocalDate,
+    time: LocalTime,
+): Long =
+    LocalDateTime
+        .of(date, time)
+        .atZone(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli()
+
+fun Long.dateTimeStringFormat(
+    format: String,
+    timeZone: ZoneId = ZoneId.systemDefault(),
+): String =
+    LocalDateTime
+        .of(toLocalDate(timeZone), toLocalTime(timeZone))
         .format(DateTimeFormatter.ofPattern(format))
-}
 
-fun Long.dateTimeStringFormatLocalized(formatStyle: FormatStyle = FormatStyle.SHORT, timeZone: ZoneId = ZoneId.systemDefault()): String {
-    return LocalDateTime.of(toLocalDate(timeZone), toLocalTime(timeZone))
+fun Long.dateTimeStringFormatLocalized(
+    formatStyle: FormatStyle = FormatStyle.SHORT,
+    timeZone: ZoneId = ZoneId.systemDefault(),
+): String =
+    LocalDateTime
+        .of(toLocalDate(timeZone), toLocalTime(timeZone))
         .format(DateTimeFormatter.ofLocalizedDateTime(formatStyle))
-}
 
-fun LocalTime.dateTimeFormat(format: String): String {
-    return format(DateTimeFormatter.ofPattern(format))
-}
+fun LocalTime.dateTimeFormat(format: String): String = format(DateTimeFormatter.ofPattern(format))
 
-fun LocalDate.dateTimeFormat(format: String): String {
-    return format(DateTimeFormatter.ofPattern(format))
-}
+fun LocalDate.dateTimeFormat(format: String): String = format(DateTimeFormatter.ofPattern(format))
 
 fun LocalTime.toMilliseconds() = (hour * 60L * 60L * 1000L) + (minute * 60L * 1000L)
 
-fun concatTwoBytes(firstByte: Byte, secondByte: Byte): Int {
-    return (firstByte.toUByte().toInt() shl 8) or secondByte.toUByte().toInt()
-}
+fun concatTwoBytes(
+    firstByte: Byte,
+    secondByte: Byte,
+): Int = (firstByte.toUByte().toInt() shl 8) or secondByte.toUByte().toInt()
 
 val String.sha256: ByteArray
     get() {
@@ -110,9 +124,7 @@ object SHA256 {
         }
     }
 
-    fun fromStringAirdrop(string: String): Int {
-        return fromString(string).let { concatTwoBytes(it[0], it[1]) }
-    }
+    fun fromStringAirdrop(string: String): Int = fromString(string).let { concatTwoBytes(it[0], it[1]) }
 }
 
 fun Context.openUrl(url: String) {
@@ -125,13 +137,10 @@ fun Context.openUrl(url: String) {
     }
 }
 
-fun Context.dpToPx(value: Float): Int =
-    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
+fun Context.dpToPx(value: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
 
 @Composable
-fun Float.toPx(): Int {
-    return LocalContext.current.dpToPx(this)
-}
+fun Float.toPx(): Int = LocalContext.current.dpToPx(this)
 
 fun Context.pxToDp(value: Float): Float = value / resources.displayMetrics.density
 
@@ -167,19 +176,21 @@ fun Context.isDarkModeOn(): Boolean {
     return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
 }
 
-fun String.checkRegexSafe(pattern: String): Boolean {
-    return try {
+fun String.checkRegexSafe(pattern: String): Boolean =
+    try {
         this.contains(pattern.toRegex())
     } catch (e: PatternSyntaxException) {
         false
     } catch (e: Throwable) {
-         Timber.e(e, "Unexpected regex failure")
+        Timber.e(e, "Unexpected regex failure")
         false
     }
-}
 
 @OptIn(ExperimentalContracts::class)
-inline fun <T> T.letIf(condition: () -> Boolean, block: (T) -> T): T {
+inline fun <T> T.letIf(
+    condition: () -> Boolean,
+    block: (T) -> T,
+): T {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -187,14 +198,20 @@ inline fun <T> T.letIf(condition: () -> Boolean, block: (T) -> T): T {
 }
 
 @OptIn(ExperimentalContracts::class)
-inline fun <T> T.letIf(condition: Boolean, block: (T) -> T): T {
+inline fun <T> T.letIf(
+    condition: Boolean,
+    block: (T) -> T,
+): T {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return if (condition) block(this) else this
 }
 
-fun <T> Flow<T>.collectAsState(scope: CoroutineScope, initialValue: T): State<T> {
+fun <T> Flow<T>.collectAsState(
+    scope: CoroutineScope,
+    initialValue: T,
+): State<T> {
     val state = mutableStateOf(initialValue)
 
     onEach { state.value = it }
@@ -203,19 +220,14 @@ fun <T> Flow<T>.collectAsState(scope: CoroutineScope, initialValue: T): State<T>
     return state
 }
 
-fun ByteArray.toBase64(): String {
-    return Base64.encodeToString(this, Base64.NO_WRAP)
-}
+fun ByteArray.toBase64(): String = Base64.encodeToString(this, Base64.NO_WRAP)
 
-fun String.fromBase64(): ByteArray {
-    return Base64.decode(this, Base64.NO_WRAP)
-}
+fun String.fromBase64(): ByteArray = Base64.decode(this, Base64.NO_WRAP)
 
-suspend fun <T, R> List<T>.mapParallel(transform: suspend (T) -> R): List<R> {
-    return coroutineScope {
+suspend fun <T, R> List<T>.mapParallel(transform: suspend (T) -> R): List<R> =
+    coroutineScope {
         map { async { transform(it) } }.awaitAll()
     }
-}
 
 fun extract16BitUuid(fullUuid: String): String? {
     val regex = Regex("^0000([0-9a-fA-F]{4})-0000-1000-8000-00805f9b34fb$")

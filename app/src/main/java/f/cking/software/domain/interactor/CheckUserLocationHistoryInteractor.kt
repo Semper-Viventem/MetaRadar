@@ -7,7 +7,6 @@ import f.cking.software.domain.toDomain
 class CheckUserLocationHistoryInteractor(
     private val locationProvider: LocationProvider,
 ) {
-
     /**
      * @param targetLocation location to check
      * @param radius radius in meters
@@ -20,7 +19,6 @@ class CheckUserLocationHistoryInteractor(
         radius: Float,
         ifNoLocationDefaultValue: Boolean,
     ): Boolean {
-
         val location = locationProvider.getFreshLocation()?.toDomain(System.currentTimeMillis()) ?: return ifNoLocationDefaultValue
 
         return targetLocation.distanceTo(location) <= radius

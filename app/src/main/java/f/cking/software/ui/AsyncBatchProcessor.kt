@@ -3,7 +3,6 @@ package f.cking.software.ui
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import java.util.*
 
 /**
  * The helper class splits large rendering operations into small subtasks to don't stuck the main thread for a long time.
@@ -24,13 +23,15 @@ class AsyncBatchProcessor<Item, Payload>(
     private val onComplete: (payload: Payload) -> Unit = {},
     private val onCancelled: (payload: Payload?) -> Unit = {},
 ) {
-
-    private val batchTimeOut =  (1000 / frameRate * renderLoad).toLong()
+    private val batchTimeOut = (1000 / frameRate * renderLoad).toLong()
     private var payload: Payload? = null
     private val handler = Handler(Looper.getMainLooper())
     private var isActive: Boolean = false
 
-    fun process(iterable: Iterable<Item>, payload: Payload) {
+    fun process(
+        iterable: Iterable<Item>,
+        payload: Payload,
+    ) {
         cancel()
         isActive = true
         this.payload = payload
@@ -50,7 +51,6 @@ class AsyncBatchProcessor<Item, Payload>(
         payload: Payload,
         batchId: Int,
     ) {
-
         val drawStartTime = SystemClock.elapsedRealtime()
 
         var shouldWaitNextFrame = false
@@ -68,13 +68,9 @@ class AsyncBatchProcessor<Item, Payload>(
         }
     }
 
-    private fun checkTaskIsActive(): Boolean {
-        return !provideIsCancelled.invoke() && isActive
-    }
+    private fun checkTaskIsActive(): Boolean = !provideIsCancelled.invoke() && isActive
 
-    private fun shouldWaitForNextFrame(drawStartTime: Long): Boolean {
-        return SystemClock.elapsedRealtime() - drawStartTime > batchTimeOut
-    }
+    private fun shouldWaitForNextFrame(drawStartTime: Long): Boolean = SystemClock.elapsedRealtime() - drawStartTime > batchTimeOut
 
     companion object {
         private const val DEFAULT_RENDER_LOAD = 0.5f

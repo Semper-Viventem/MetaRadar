@@ -13,8 +13,8 @@ class BackgroundLocationRequestViewModel(
     private val permissionHelper: PermissionHelper,
     private val router: Router,
 ) : ViewModel() {
-
-    val grantButtonEnabled by permissionHelper.observeBackgroundLocationPermission()
+    val grantButtonEnabled by permissionHelper
+        .observeBackgroundLocationPermission()
         .map { !it }
         .collectAsState(viewModelScope, true)
 

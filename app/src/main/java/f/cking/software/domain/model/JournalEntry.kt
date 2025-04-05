@@ -8,10 +8,8 @@ data class JournalEntry(
     val timestamp: Long,
     val report: Report,
 ) : java.io.Serializable {
-
     @Serializable
     sealed class Report : java.io.Serializable {
-
         @Serializable
         @SerialName("profile_report")
         data class ProfileReport(

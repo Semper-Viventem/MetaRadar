@@ -29,39 +29,51 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 object BackgroundLocationRequestScreen {
-
     @Composable
     fun Screen(viewModel: BackgroundLocationRequestViewModel = koinViewModel()) {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = { AppBar(scrollBehavior) { viewModel.onBack() } },
             content = { paddings ->
                 GlassBottomSpace(
                     modifier = Modifier.fillMaxSize(),
                     globalContent = { bottomPadding ->
-                        Content(Modifier.padding(top = paddings.calculateTopPadding(), bottom = bottomPadding.calculateBottomPadding()), viewModel)
+                        Content(
+                            Modifier.padding(top = paddings.calculateTopPadding(), bottom = bottomPadding.calculateBottomPadding()),
+                            viewModel,
+                        )
                     },
                     bottomContent = {
                         Button(
                             enabled = viewModel.grantButtonEnabled,
-                            modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                            modifier =
+                                Modifier
+                                    .padding(8.dp)
+                                    .fillMaxWidth(),
                             onClick = { viewModel.grantPermission() },
                             content = {
-                                Text(stringResource(R.string.background_location_request_button), color = MaterialTheme.colorScheme.onPrimary)
-                            }
+                                Text(
+                                    stringResource(R.string.background_location_request_button),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            },
                         )
                         SystemNavbarSpacer()
-                    }
+                    },
                 )
-            }
+            },
         )
     }
 
     @Composable
-    private fun Content(modifier: Modifier, viewModel: BackgroundLocationRequestViewModel) {
+    private fun Content(
+        modifier: Modifier = Modifier,
+        viewModel: BackgroundLocationRequestViewModel,
+    ) {
         Column(modifier.fillMaxSize()) {
             RoundedBox {
                 Text(stringResource(R.string.background_location_request_content))
@@ -70,18 +82,22 @@ object BackgroundLocationRequestScreen {
     }
 
     @Composable
-    private fun AppBar(scrollState: TopAppBarScrollBehavior, onBackClick: () -> Unit) {
+    private fun AppBar(
+        scrollState: TopAppBarScrollBehavior,
+        onBackClick: () -> Unit,
+    ) {
         TopAppBar(
             scrollBehavior = scrollState,
-            colors = TopAppBarDefaults.topAppBarColors(
-                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                ),
             title = { Text(text = stringResource(R.string.background_location_request_title)) },
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
-            }
+            },
         )
     }
 }

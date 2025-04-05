@@ -9,7 +9,6 @@ import f.cking.software.data.database.entity.TagEntity
 
 @Dao
 interface TagDao {
-
     @Query("SELECT * FROM tag")
     fun getAll(): List<TagEntity>
 

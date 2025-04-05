@@ -1,7 +1,6 @@
 package f.cking.software.utils.navigation
 
 class RouterImpl : Router {
-
     private var navigator: Navigator? = null
 
     fun attachNavigator(navigator: Navigator) {

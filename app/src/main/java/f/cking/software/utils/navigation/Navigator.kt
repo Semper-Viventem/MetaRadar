@@ -6,11 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 class Navigator(
-    root: AddToStackCommand?
+    root: AddToStackCommand?,
 ) : Router {
-
     var stack: List<@Composable () -> Unit> by mutableStateOf(emptyList())
-
 
     init {
         root?.let { handle(it) }
@@ -23,7 +21,7 @@ class Navigator(
     fun handle(command: NavigationCommand) {
         when (command) {
             is BackCommand -> handleBack()
-            is AddToStackCommand -> handleAddToStackCommand { command.screenFunction(command.key, this)}
+            is AddToStackCommand -> handleAddToStackCommand { command.screenFunction(command.key, this) }
         }
     }
 

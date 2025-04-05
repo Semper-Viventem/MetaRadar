@@ -6,7 +6,17 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -58,16 +68,16 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 object MainScreen {
-
     @SuppressLint("NewApi")
     @Composable
     fun Screen() {
         val viewModel: MainViewModel = koinViewModel()
         val dropEffectState = rememberDropEffectState()
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .withDropEffect(dropEffectState),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .withDropEffect(dropEffectState),
             topBar = {
                 TopBar(viewModel)
             },
@@ -76,7 +86,10 @@ object MainScreen {
                     modifier = Modifier.fillMaxSize(),
                     content = {
                         Box(Modifier.padding(top = innerPaddings.calculateTopPadding())) {
-                            viewModel.tabs.firstOrNull { it.selected }?.screen?.invoke()
+                            viewModel.tabs
+                                .firstOrNull { it.selected }
+                                ?.screen
+                                ?.invoke()
                         }
                     },
                 )
@@ -132,19 +145,24 @@ object MainScreen {
     }
 
     @Composable
-    private fun BottomNavigationBar(modifier: Modifier, viewModel: MainViewModel) {
+    private fun BottomNavigationBar(
+        modifier: Modifier = Modifier,
+        viewModel: MainViewModel,
+    ) {
         Column(
-            modifier = modifier
-                .onGloballyPositioned { GlobalUiState.setBottomOffset(navbarOffset = it.size.height.toFloat()) }
-                .fillMaxWidth(),
+            modifier =
+                modifier
+                    .onGloballyPositioned { GlobalUiState.setBottomOffset(navbarOffset = it.size.height.toFloat()) }
+                    .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
             ) {
                 viewModel.tabs.forEach { tab ->
                     TabButton(viewModel = viewModel, targetTab = tab, modifier = Modifier.weight(1f))
@@ -162,8 +180,9 @@ object MainScreen {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .clickable { viewModel.onTabClick(targetTab) }
+            modifier =
+                modifier
+                    .clickable { viewModel.onTabClick(targetTab) },
         ) {
             val icon = if (targetTab.selected) targetTab.selectedIconRes else targetTab.iconRes
             val font = if (targetTab.selected) FontWeight.Bold else FontWeight.SemiBold
@@ -181,7 +200,10 @@ object MainScreen {
 
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
-    private fun ScanFab(viewModel: MainViewModel, dropEffectState: DropEffectState) {
+    private fun ScanFab(
+        viewModel: MainViewModel,
+        dropEffectState: DropEffectState,
+    ) {
         val text: String
         val icon: Int
 
@@ -195,61 +217,66 @@ object MainScreen {
         }
 
         val context = LocalContext.current
-        val permissionsIntro = permissionsIntroDialog(
-            onPassed = {
-                viewModel.userHasPassedPermissionsIntro()
-                viewModel.runBackgroundScanning()
-            },
-            onDeclined = {
-                Toast.makeText(context, "The scanner cannot work without these permissions", Toast.LENGTH_SHORT).show()
-            }
-        )
+        val permissionsIntro =
+            permissionsIntroDialog(
+                onPassed = {
+                    viewModel.userHasPassedPermissionsIntro()
+                    viewModel.runBackgroundScanning()
+                },
+                onDeclined = {
+                    Toast.makeText(context, "The scanner cannot work without these permissions", Toast.LENGTH_SHORT).show()
+                },
+            )
         val haptic = LocalHapticFeedback.current
         var observeEvent = remember { true }
 
         ExtendedFloatingActionButton(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier
-                .onGloballyPositioned {
-                    GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat())
-                    geometry = Rect(Offset(it.positionInParent().x, it.positionInParent().y), Size(it.size.width.toFloat(), it.size.height.toFloat()))
-                }
-                .pointerInteropFilter { event ->
-                    val touchX = geometry.left + event.x
-                    val touchY = geometry.top + event.y
-                    when {
-                        event.action == MotionEvent.ACTION_DOWN -> {
-                            dropEffectState.drop(type = DropEffectState.DropEvent.Type.TOUCH, touchX, touchY)
-                            observeEvent = true
-                            true
-                        }
-
-                        observeEvent && event.action == MotionEvent.ACTION_UP -> {
-                            if (viewModel.needToShowPermissionsIntro()) {
-                                permissionsIntro.show()
-                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
-                            } else {
-                                viewModel.runBackgroundScanning()
-                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_HARD, touchX, touchY)
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            }
-                            true
-                        }
-
-                        observeEvent && event.action == MotionEvent.ACTION_MOVE -> {
-                            if (geometry.contains(Offset(geometry.left + event.x, geometry.top + event.y))) {
-                                dropEffectState.move(touchX, touchY)
+            modifier =
+                Modifier
+                    .onGloballyPositioned {
+                        GlobalUiState.setBottomOffset(fabOffset = it.size.height.toFloat())
+                        geometry =
+                            Rect(
+                                Offset(it.positionInParent().x, it.positionInParent().y),
+                                Size(it.size.width.toFloat(), it.size.height.toFloat()),
+                            )
+                    }.pointerInteropFilter { event ->
+                        val touchX = geometry.left + event.x
+                        val touchY = geometry.top + event.y
+                        when {
+                            event.action == MotionEvent.ACTION_DOWN -> {
+                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.TOUCH, touchX, touchY)
+                                observeEvent = true
                                 true
-                            } else {
-                                dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
-                                observeEvent = false
-                                false
                             }
-                        }
 
-                        else -> false
-                    }
-                },
+                            observeEvent && event.action == MotionEvent.ACTION_UP -> {
+                                if (viewModel.needToShowPermissionsIntro()) {
+                                    permissionsIntro.show()
+                                    dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
+                                } else {
+                                    viewModel.runBackgroundScanning()
+                                    dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_HARD, touchX, touchY)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
+                                true
+                            }
+
+                            observeEvent && event.action == MotionEvent.ACTION_MOVE -> {
+                                if (geometry.contains(Offset(geometry.left + event.x, geometry.top + event.y))) {
+                                    dropEffectState.move(touchX, touchY)
+                                    true
+                                } else {
+                                    dropEffectState.drop(type = DropEffectState.DropEvent.Type.RELEASE_SOFT, touchX, touchY)
+                                    observeEvent = false
+                                    false
+                                }
+                            }
+
+                            else -> false
+                        }
+                    },
             text = { Text(text = text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer) },
             onClick = {
                 // ignore
@@ -258,9 +285,9 @@ object MainScreen {
                 Image(
                     painter = painterResource(id = icon),
                     contentDescription = text,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer)
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
                 )
-            }
+            },
         )
     }
 
@@ -281,7 +308,7 @@ object MainScreen {
                     state.hide()
                     onDeclined.invoke()
                 }
-            }
+            },
         ) {
             PermissionDisclaimerContent()
         }
@@ -333,12 +360,13 @@ object MainScreen {
         icon: Painter,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(8.dp))
-                .padding(8.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(8.dp))
+                    .padding(8.dp),
         ) {
-            Column() {
+            Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = icon,
@@ -363,23 +391,24 @@ object MainScreen {
                 if (viewModel.scanStarted && viewModel.bgServiceIsActive) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .size(24.dp)
+                        modifier =
+                            Modifier
+                                .size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-
                 } else if (viewModel.bgServiceIsActive) {
                     IconButton(onClick = { viewModel.onScanButtonClick() }) {
                         Image(
-                            modifier = Modifier
-                                .size(24.dp),
+                            modifier =
+                                Modifier
+                                    .size(24.dp),
                             imageVector = Icons.Filled.Refresh,
                             contentDescription = stringResource(R.string.refresh),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                         )
                     }
                 }
-            }
+            },
         )
     }
 }

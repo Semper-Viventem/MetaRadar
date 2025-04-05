@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 class SelectManufacturerViewModel(
     private val router: Router,
 ) : ViewModel() {
-
     var manufacturers by mutableStateOf(MANUFACTURERS)
 
     var searchStr by mutableStateOf("")
@@ -34,12 +33,13 @@ class SelectManufacturerViewModel(
 
     private fun loadManufacturers() {
         viewModelScope.launch {
-            manufacturers = MANUFACTURERS
-                .filter { manufacturer ->
-                    searchStr.takeIf { it.isNotBlank() }?.let { searchRequest ->
-                        manufacturer.name.contains(searchRequest, ignoreCase = true)
-                    } ?: true
-                }
+            manufacturers =
+                MANUFACTURERS
+                    .filter { manufacturer ->
+                        searchStr.takeIf { it.isNotBlank() }?.let { searchRequest ->
+                            manufacturer.name.contains(searchRequest, ignoreCase = true)
+                        } ?: true
+                    }
         }
     }
 

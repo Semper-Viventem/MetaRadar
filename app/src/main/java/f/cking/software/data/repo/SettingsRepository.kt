@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class SettingsRepository(
     private val sharedPreferences: SharedPreferences,
 ) {
-
     private val silentModeState = MutableStateFlow(getSilentMode())
     private val hideBackgroundLocationWarning = MutableStateFlow(getHideBackgroundLocationWarning())
 
@@ -18,45 +17,33 @@ class SettingsRepository(
         sharedPreferences.edit().putLong(KEY_GARBAGING_TIME, time).apply()
     }
 
-    fun getGarbagingTime(): Long {
-        return sharedPreferences.getLong(KEY_GARBAGING_TIME, TheAppConfig.DEVICE_GARBAGING_TIME)
-    }
+    fun getGarbagingTime(): Long = sharedPreferences.getLong(KEY_GARBAGING_TIME, TheAppConfig.DEVICE_GARBAGING_TIME)
 
     fun setUseGpsLocationOnly(value: Boolean) {
         sharedPreferences.edit().putBoolean(KEY_USE_GPS_ONLY, value).apply()
     }
 
-    fun getUseGpsLocationOnly(): Boolean {
-        return sharedPreferences.getBoolean(KEY_USE_GPS_ONLY, TheAppConfig.USE_GPS_LOCATION_ONLY)
-    }
+    fun getUseGpsLocationOnly(): Boolean = sharedPreferences.getBoolean(KEY_USE_GPS_ONLY, TheAppConfig.USE_GPS_LOCATION_ONLY)
 
-    fun getPermissionsIntroWasShown(): Boolean {
-        return sharedPreferences.getBoolean(KEY_PERMISSIONS_INTRO_WAS_SHOWN, false)
-    }
+    fun getPermissionsIntroWasShown(): Boolean = sharedPreferences.getBoolean(KEY_PERMISSIONS_INTRO_WAS_SHOWN, false)
 
     fun setPermissionsIntroWasShown(value: Boolean) {
         sharedPreferences.edit().putBoolean(KEY_PERMISSIONS_INTRO_WAS_SHOWN, value).apply()
     }
 
-    fun getRunOnStartup(): Boolean {
-        return sharedPreferences.getBoolean(KEY_RUN_ON_STARTUP, false)
-    }
+    fun getRunOnStartup(): Boolean = sharedPreferences.getBoolean(KEY_RUN_ON_STARTUP, false)
 
     fun setRunOnStartup(value: Boolean) {
         sharedPreferences.edit().putBoolean(KEY_RUN_ON_STARTUP, value).apply()
     }
 
-    fun getFirstAppLaunchTime(): Long {
-        return sharedPreferences.getLong(KEY_FIRST_APP_LAUNCH_TIME, NO_APP_LAUNCH_TIME)
-    }
+    fun getFirstAppLaunchTime(): Long = sharedPreferences.getLong(KEY_FIRST_APP_LAUNCH_TIME, NO_APP_LAUNCH_TIME)
 
     fun setFirstAppLaunchTime(value: Long) {
         sharedPreferences.edit().putLong(KEY_FIRST_APP_LAUNCH_TIME, value).apply()
     }
 
-    fun getEnjoyTheAppAnswered(): Boolean {
-        return sharedPreferences.getBoolean(KEY_ENJOY_THE_APP_ANSWERED, false)
-    }
+    fun getEnjoyTheAppAnswered(): Boolean = sharedPreferences.getBoolean(KEY_ENJOY_THE_APP_ANSWERED, false)
 
     fun setEnjoyTheAppAnswered(value: Boolean) {
         sharedPreferences.edit().putBoolean(KEY_ENJOY_THE_APP_ANSWERED, value).apply()
@@ -67,17 +54,11 @@ class SettingsRepository(
         hideBackgroundLocationWarning.tryEmit(value)
     }
 
-    fun getHideBackgroundLocationWarning(): Long {
-        return sharedPreferences.getLong(KEY_HIDE_BACKGROUND_LOCATION_WARNING, 0L)
-    }
+    fun getHideBackgroundLocationWarning(): Long = sharedPreferences.getLong(KEY_HIDE_BACKGROUND_LOCATION_WARNING, 0L)
 
-    fun observeHideBackgroundLocationWarning(): Flow<Long> {
-        return hideBackgroundLocationWarning
-    }
+    fun observeHideBackgroundLocationWarning(): Flow<Long> = hideBackgroundLocationWarning
 
-    fun getEnjoyTheAppStartingPoint(): Long {
-        return sharedPreferences.getLong(KEY_ENJOY_THE_APP_STARTING_POINT, NO_ENJOY_THE_APP_STARTING_POINT)
-    }
+    fun getEnjoyTheAppStartingPoint(): Long = sharedPreferences.getLong(KEY_ENJOY_THE_APP_STARTING_POINT, NO_ENJOY_THE_APP_STARTING_POINT)
 
     fun setEnjoyTheAppStartingPoint(value: Long) {
         sharedPreferences.edit { putLong(KEY_ENJOY_THE_APP_STARTING_POINT, value) }
@@ -88,17 +69,11 @@ class SettingsRepository(
         silentModeState.tryEmit(getSilentMode())
     }
 
-    fun getSilentMode(): Boolean {
-        return sharedPreferences.getBoolean(KEY_SILENT_NETWORK_MODE, BuildConfig.OFFLINE_MODE_DEFAULT_STATE)
-    }
+    fun getSilentMode(): Boolean = sharedPreferences.getBoolean(KEY_SILENT_NETWORK_MODE, BuildConfig.OFFLINE_MODE_DEFAULT_STATE)
 
-    fun observeSilentMode(): Flow<Boolean> {
-        return silentModeState
-    }
+    fun observeSilentMode(): Flow<Boolean> = silentModeState
 
-    fun getCurrentBatchSortingStrategyId(): Int {
-        return sharedPreferences.getInt(KEY_CURRENT_BATCH_SORTING_STRATEGY_ID, 0)
-    }
+    fun getCurrentBatchSortingStrategyId(): Int = sharedPreferences.getInt(KEY_CURRENT_BATCH_SORTING_STRATEGY_ID, 0)
 
     fun setCurrentBatchSortingStrategyId(value: Int) {
         sharedPreferences.edit { putInt(KEY_CURRENT_BATCH_SORTING_STRATEGY_ID, value) }
@@ -108,9 +83,7 @@ class SettingsRepository(
         sharedPreferences.edit { putBoolean(KEY_ENABLE_DEEP_ANALYSIS, value) }
     }
 
-    fun getEnableDeepAnalysis(): Boolean {
-        return sharedPreferences.getBoolean(KEY_ENABLE_DEEP_ANALYSIS, false)
-    }
+    fun getEnableDeepAnalysis(): Boolean = sharedPreferences.getBoolean(KEY_ENABLE_DEEP_ANALYSIS, false)
 
     companion object {
         private const val KEY_GARBAGING_TIME = "key_garbaging_time"

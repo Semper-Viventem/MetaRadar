@@ -11,14 +11,11 @@ class SelectBackupFileInteractor(
     private val intentHelper: IntentHelper,
     private val context: Context,
 ) {
-
-    fun execute(): Flow<Uri?> {
-
-        return callbackFlow {
+    fun execute(): Flow<Uri?> =
+        callbackFlow {
             intentHelper.selectFile { uri ->
                 trySend(uri)
             }
             awaitClose()
         }
-    }
 }

@@ -15,13 +15,15 @@ import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 
 class BootBroadcastReceiver : BroadcastReceiver() {
-
     private val permissionHelper: PermissionHelper by inject(PermissionHelper::class.java)
     private val settingsRepository: SettingsRepository by inject(SettingsRepository::class.java)
     private val saveReportInteractor: SaveReportInteractor by inject(SaveReportInteractor::class.java)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
             tryToRunService(context)
         }
@@ -34,18 +36,19 @@ class BootBroadcastReceiver : BroadcastReceiver() {
                     BgScanService.start(context)
                 } catch (error: Exception) {
                     Timber.e(error, "Failed to start service from the boot receiver")
-                    val report = JournalEntry.Report.Error(
-                        title = "[Launch on system startup error]: ${error.message ?: error::class.java}",
-                        stackTrace = error.stackTraceToString(),
-                    )
+                    val report =
+                        JournalEntry.Report.Error(
+                            title = "[Launch on system startup error]: ${error.message ?: error::class.java}",
+                            stackTrace = error.stackTraceToString(),
+                        )
                     report(report)
                 }
             } else {
                 report(
                     JournalEntry.Report.Error(
                         title = "[Launch on system startup error]: Not all permissions granted",
-                        stackTrace = IllegalStateException("Not all permissions granted").stackTraceToString()
-                    )
+                        stackTrace = IllegalStateException("Not all permissions granted").stackTraceToString(),
+                    ),
                 )
             }
         }

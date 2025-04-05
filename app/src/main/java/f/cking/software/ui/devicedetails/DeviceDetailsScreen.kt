@@ -111,38 +111,41 @@ import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 object DeviceDetailsScreen {
-
     @Composable
     fun Screen(
         address: String,
-        viewModel: DeviceDetailsViewModel = koinViewModel(key = address) { parametersOf(address) }
+        viewModel: DeviceDetailsViewModel = koinViewModel(key = address) { parametersOf(address) },
     ) {
-
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
             topBar = {
                 AppBar(viewModel = viewModel, scrollBehavior)
             },
             content = { padding ->
                 GlassSystemNavbar(modifier = Modifier.fillMaxSize()) {
                     Content(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface)
-                            .fillMaxSize()
-                            .padding(top = padding.calculateTopPadding()),
+                        modifier =
+                            Modifier
+                                .background(MaterialTheme.colorScheme.surface)
+                                .fillMaxSize()
+                                .padding(top = padding.calculateTopPadding()),
                         viewModel = viewModel,
                     )
                 }
-            }
+            },
         )
     }
 
     @Composable
-    private fun AppBar(viewModel: DeviceDetailsViewModel, scrollBehavior: TopAppBarScrollBehavior) {
+    private fun AppBar(
+        viewModel: DeviceDetailsViewModel,
+        scrollBehavior: TopAppBarScrollBehavior,
+    ) {
         val deviceData = viewModel.deviceState
         TopAppBar(
             scrollBehavior = scrollBehavior,
@@ -154,7 +157,14 @@ object DeviceDetailsScreen {
                     IconButton(onClick = { viewModel.onFavoriteClick(deviceData) }) {
                         val iconId =
                             if (deviceData.favorite) R.drawable.ic_star else R.drawable.ic_star_outline
-                        val text = if (deviceData.favorite) stringResource(R.string.is_favorite) else stringResource(R.string.is_not_favorite)
+                        val text =
+                            if (deviceData.favorite) {
+                                stringResource(
+                                    R.string.is_favorite,
+                                )
+                            } else {
+                                stringResource(R.string.is_not_favorite)
+                            }
                         Icon(
                             imageVector = ImageVector.vectorResource(id = iconId),
                             contentDescription = text,
@@ -168,16 +178,16 @@ object DeviceDetailsScreen {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
-            }
+            },
         )
     }
 
     @Composable
     private fun Content(
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
         viewModel: DeviceDetailsViewModel,
     ) {
         val deviceData = viewModel.deviceState
@@ -200,9 +210,9 @@ object DeviceDetailsScreen {
 
     @Composable
     private fun DeviceDetails(
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
         viewModel: DeviceDetailsViewModel,
-        deviceData: DeviceData
+        deviceData: DeviceData,
     ) {
         var scrollEnabled by remember { mutableStateOf(true) }
         val isMoving = remember { mutableStateOf(false) }
@@ -212,15 +222,17 @@ object DeviceDetailsScreen {
         }
 
         Column(
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState(), scrollEnabled)
-                .fillMaxSize(),
+            modifier =
+                modifier
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState(), scrollEnabled)
+                    .fillMaxSize(),
         ) {
             LocationHistory(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(400.dp),
                 deviceData = deviceData,
                 viewModel = viewModel,
                 isMoving = isMoving,
@@ -259,13 +271,19 @@ object DeviceDetailsScreen {
                         when (val status = viewModel.connectionStatus) {
                             is DeviceDetailsViewModel.ConnectionStatus.DISCONNECTED -> {
                                 Button(onClick = { viewModel.establishConnection() }) {
-                                    Text(text = stringResource(R.string.device_details_connect), color = MaterialTheme.colorScheme.onPrimary)
+                                    Text(
+                                        text = stringResource(R.string.device_details_connect),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                    )
                                 }
                             }
 
                             is DeviceDetailsViewModel.ConnectionStatus.CONNECTED -> {
                                 Button(onClick = { viewModel.disconnect(status.gatt) }) {
-                                    Text(text = stringResource(R.string.device_details_disconnect), color = MaterialTheme.colorScheme.onPrimary)
+                                    Text(
+                                        text = stringResource(R.string.device_details_disconnect),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                    )
                                 }
                             }
 
@@ -288,15 +306,16 @@ object DeviceDetailsScreen {
         viewModel: DeviceDetailsViewModel,
     ) {
         RoundedBox(
-            modifier = modifier
-                .fillMaxWidth(),
+            modifier =
+                modifier
+                    .fillMaxWidth(),
             internalPaddings = 0.dp,
         ) {
             SelectionContainer {
                 Column(
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp),
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -356,7 +375,10 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun DeviceMetadataView(device: DeviceData, viewModel: DeviceDetailsViewModel) {
+    private fun DeviceMetadataView(
+        device: DeviceData,
+        viewModel: DeviceDetailsViewModel,
+    ) {
         val metadata = device.metadata
         ExpandableLine(
             title = {
@@ -382,12 +404,15 @@ object DeviceDetailsScreen {
                     metadata?.serialNumber?.let { Text(text = it) }
                     metadata?.batteryLevel?.let { Text(text = "$it %") }
                 }
-            }
+            },
         )
     }
 
     @Composable
-    private fun Services(servicesUuids: Set<DeviceDetailsViewModel.ServiceData>, viewModel: DeviceDetailsViewModel) {
+    private fun Services(
+        servicesUuids: Set<DeviceDetailsViewModel.ServiceData>,
+        viewModel: DeviceDetailsViewModel,
+    ) {
         ExpandableLine(pluralStringResource(R.plurals.services_discovered, servicesUuids.size, servicesUuids.size)) {
             servicesUuids.forEach { service ->
                 ServiceDetails(service, viewModel)
@@ -396,7 +421,10 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun ServiceDetails(service: DeviceDetailsViewModel.ServiceData, viewModel: DeviceDetailsViewModel) {
+    private fun ServiceDetails(
+        service: DeviceDetailsViewModel.ServiceData,
+        viewModel: DeviceDetailsViewModel,
+    ) {
         val serviceUuid = service.uuid
         val name = service.name
         ExpandableLine(
@@ -414,12 +442,12 @@ object DeviceDetailsScreen {
                     }
                 }
             },
-            isExpandable = service.characteristics.isNotEmpty()
+            isExpandable = service.characteristics.isNotEmpty(),
         ) {
             Column(
                 Modifier
                     .border(width = 1.dp, color = MaterialTheme.colorScheme.onSurface, shape = RoundedCornerShape(8.dp))
-                    .padding(8.dp)
+                    .padding(8.dp),
             ) {
                 service.characteristics.forEach { characteristic ->
                     CharacteristicDetails(characteristic, viewModel)
@@ -429,7 +457,10 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun CharacteristicDetails(characteristic: DeviceDetailsViewModel.CharacteristicData, viewModel: DeviceDetailsViewModel) {
+    private fun CharacteristicDetails(
+        characteristic: DeviceDetailsViewModel.CharacteristicData,
+        viewModel: DeviceDetailsViewModel,
+    ) {
         val characteristicUuid = characteristic.uuid
         val isExpandable = characteristic.gatt.properties and BluetoothGattCharacteristic.PROPERTY_READ != 0
         val name = characteristic.name
@@ -449,7 +480,7 @@ object DeviceDetailsScreen {
                     }
                 }
             },
-            isExpandable = isExpandable
+            isExpandable = isExpandable,
         ) {
             val value = characteristic.value
             val valueHex = characteristic.valueHex
@@ -476,7 +507,11 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun ExpandableLine(title: String, isExpandable: Boolean = true, content: @Composable () -> Unit) {
+    private fun ExpandableLine(
+        title: String,
+        isExpandable: Boolean = true,
+        content: @Composable () -> Unit,
+    ) {
         ExpandableLine(
             title = {
                 Text(
@@ -485,26 +520,30 @@ object DeviceDetailsScreen {
                 )
             },
             isExpandable = isExpandable,
-            content = content
+            content = content,
         )
     }
 
     @Composable
-    private fun ExpandableLine(title: @Composable () -> Unit, isExpandable: Boolean = true, content: @Composable () -> Unit) {
+    private fun ExpandableLine(
+        title: @Composable () -> Unit,
+        isExpandable: Boolean = true,
+        content: @Composable () -> Unit,
+    ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             var expanded by remember { mutableStateOf(false) }
             val rotation by animateFloatAsState(180f * if (expanded) 1 else 0)
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        if (isExpandable) {
-                            expanded = !expanded
-                        }
-                    }
-                    .padding(vertical = 8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            if (isExpandable) {
+                                expanded = !expanded
+                            }
+                        }.padding(vertical = 8.dp),
             ) {
                 title.invoke()
                 if (isExpandable) {
@@ -532,12 +571,13 @@ object DeviceDetailsScreen {
     ) {
         RoundedBox(
             modifier = Modifier.fillMaxWidth(),
-            internalPaddings = 0.dp
+            internalPaddings = 0.dp,
         ) {
             FlowRow(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
             ) {
                 AddTag(viewModel = viewModel, deviceData = deviceData)
                 deviceData.tags.forEach { tag ->
@@ -560,9 +600,12 @@ object DeviceDetailsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                positiveButton(
+                    text = stringResource(R.string.confirm),
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                ) {
                     dialogState.hide()
                     viewModel.onRemoveTagClick(deviceData, name)
                 }
@@ -582,34 +625,33 @@ object DeviceDetailsScreen {
         deviceData: DeviceData,
         viewModel: DeviceDetailsViewModel,
     ) {
-        val addTagDialog = TagDialog.rememberDialog {
-            viewModel.onNewTagSelected(deviceData, it)
-        }
+        val addTagDialog =
+            TagDialog.rememberDialog {
+                viewModel.onNewTagSelected(deviceData, it)
+            }
         SuggestionChip(
             onClick = { addTagDialog.show() },
             icon = {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
             },
-            label = { Text(text = stringResource(R.string.add_tag)) }
+            label = { Text(text = stringResource(R.string.add_tag)) },
         )
     }
 
     @Composable
-    private fun PointsStyle(
-        viewModel: DeviceDetailsViewModel,
-    ) {
+    private fun PointsStyle(viewModel: DeviceDetailsViewModel) {
         val dialog = rememberMaterialDialogState()
         ThemedDialog(
             dialogState = dialog,
             buttons = {
                 negativeButton(
                     stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { dialog.hide() }
             },
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) {
                 Text(stringResource(R.string.device_history_pint_style), fontSize = 20.sp, fontWeight = FontWeight.Black)
                 Spacer(Modifier.height(8.dp))
@@ -621,9 +663,10 @@ object DeviceDetailsScreen {
                         dialog.hide()
                     }
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = onClick),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onClick),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = isSelected, onClick = onClick)
@@ -637,7 +680,7 @@ object DeviceDetailsScreen {
             icon = painterResource(R.drawable.ic_style),
             title = stringResource(R.string.device_history_pint_style),
             subtitle = stringResource(viewModel.pointsStyle.displayNameRes),
-            onClick = { dialog.show() }
+            onClick = { dialog.show() },
         )
     }
 
@@ -652,12 +695,12 @@ object DeviceDetailsScreen {
             buttons = {
                 negativeButton(
                     stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { dialog.hide() }
             },
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) {
                 Text(stringResource(R.string.change_history_period_dialog), fontSize = 20.sp, fontWeight = FontWeight.Black)
                 Spacer(Modifier.height(8.dp))
@@ -669,9 +712,10 @@ object DeviceDetailsScreen {
                         dialog.hide()
                     }
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = onClick),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onClick),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = isSelected, onClick = onClick)
@@ -685,22 +729,24 @@ object DeviceDetailsScreen {
             icon = painterResource(R.drawable.ic_time),
             title = stringResource(R.string.device_details_history_period, stringResource(viewModel.historyPeriod.displayNameRes)),
             subtitle = stringResource(R.string.device_details_history_period_subtitle),
-            onClick = { dialog.show() }
+            onClick = { dialog.show() },
         )
     }
 
     @Composable
     private fun LocationHistory(
         modifier: Modifier = Modifier,
-        deviceData: DeviceData, viewModel: DeviceDetailsViewModel,
+        deviceData: DeviceData,
+        viewModel: DeviceDetailsViewModel,
         isMoving: MutableState<Boolean>,
     ) {
         RoundedBox(modifier = modifier, internalPaddings = 0.dp) {
             var mapIsReady by remember { mutableStateOf(false) }
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
             ) {
                 Map(
                     Modifier.fillMaxSize(),
@@ -723,19 +769,19 @@ object DeviceDetailsScreen {
     }
 
     @Composable
-    private fun MapOverlay(
-        viewModel: DeviceDetailsViewModel
-    ) {
+    private fun MapOverlay(viewModel: DeviceDetailsViewModel) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
         ) {
             if (viewModel.pointsState.isEmpty()) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
                     contentAlignment = Alignment.Center,
                 ) {
                     Box(modifier = Modifier.background(color = colorResource(id = R.color.black_30), shape = RoundedCornerShape(8.dp))) {
@@ -750,10 +796,11 @@ object DeviceDetailsScreen {
 
             if (viewModel.markersInLoadingState) {
                 LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(5.dp),
-                    color = MaterialTheme.colorScheme.onSurface
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(5.dp),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
@@ -762,92 +809,96 @@ object DeviceDetailsScreen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     private fun Map(
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
         viewModel: DeviceDetailsViewModel,
         isLoading: (isLoading: Boolean) -> Unit,
         mapIsReadyToUse: () -> Unit,
         isMoving: MutableState<Boolean>,
     ) {
-
         val scope = rememberCoroutineScope()
         val frameRate = LocalContext.current.frameRate()
 
-        val batchProcessor = remember {
-            AsyncBatchProcessor<LocationModel, MapView>(
-                frameRate = frameRate,
-                provideIsCancelled = { !scope.isActive },
-                onBatchCompleted = { batchId, map ->
-                    if (batchId % 10 == 0) {
+        val batchProcessor =
+            remember {
+                AsyncBatchProcessor<LocationModel, MapView>(
+                    frameRate = frameRate,
+                    provideIsCancelled = { !scope.isActive },
+                    onBatchCompleted = { batchId, map ->
+                        if (batchId % 10 == 0) {
+                            map.invalidate()
+                        }
+                    },
+                    processItem = { location, map ->
+                        val marker =
+                            Marker(map).apply {
+                                position = GeoPoint(location.lat, location.lng)
+                                title = location.time.dateTimeStringFormat("dd.MM.yy HH:mm")
+                            }
+                        map.overlays.add(marker)
+                    },
+                    onStart = { map ->
+                        isLoading.invoke(true)
+                        map.overlays.clear()
                         map.invalidate()
-                    }
-                },
-                processItem = { location, map ->
-                    val marker = Marker(map).apply {
-                        position = GeoPoint(location.lat, location.lng)
-                        title = location.time.dateTimeStringFormat("dd.MM.yy HH:mm")
-                    }
-                    map.overlays.add(marker)
-                },
-                onStart = { map ->
-                    isLoading.invoke(true)
-                    map.overlays.clear()
-                    map.invalidate()
-                },
-                onComplete = { map ->
-                    isLoading.invoke(false)
-                    map.invalidate()
-                },
-                onCancelled = { map ->
-                    isLoading.invoke(false)
-                    map?.invalidate()
-                }
-            )
-        }
+                    },
+                    onComplete = { map ->
+                        isLoading.invoke(false)
+                        map.invalidate()
+                    },
+                    onCancelled = { map ->
+                        isLoading.invoke(false)
+                        map?.invalidate()
+                    },
+                )
+            }
 
         var mapView: MapView? by remember { mutableStateOf(null) }
         val colorScheme = MaterialTheme.colorScheme
 
         MapView(
-            modifier = modifier.pointerInteropFilter { event ->
-                if (mapView != null) {
-                    when (event.action) {
-                        MotionEvent.ACTION_DOWN -> {
-                            isMoving.value = true
-                            false
-                        }
+            modifier =
+                modifier.pointerInteropFilter { event ->
+                    if (mapView != null) {
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                isMoving.value = true
+                                false
+                            }
 
-                        MotionEvent.ACTION_UP -> {
-                            isMoving.value = false
-                            false
-                        }
+                            MotionEvent.ACTION_UP -> {
+                                isMoving.value = false
+                                false
+                            }
 
-                        MotionEvent.ACTION_OUTSIDE -> {
-                            isMoving.value = false
-                            false
-                        }
+                            MotionEvent.ACTION_OUTSIDE -> {
+                                isMoving.value = false
+                                false
+                            }
 
-                        else -> true
+                            else -> true
+                        }
+                    } else {
+                        false
                     }
-                } else {
-                    false
-                }
-            },
+                },
             onLoad = { map ->
                 initMapState(map, colorScheme)
                 mapIsReadyToUse.invoke()
-                map.addMapListener(object : MapListener {
-                    override fun onScroll(event: ScrollEvent?): Boolean {
-                        isMoving.value = false
-                        return true
-                    }
+                map.addMapListener(
+                    object : MapListener {
+                        override fun onScroll(event: ScrollEvent?): Boolean {
+                            isMoving.value = false
+                            return true
+                        }
 
-                    override fun onZoom(event: ZoomEvent?): Boolean {
-                        // do nothing
-                        return true
-                    }
-                })
+                        override fun onZoom(event: ZoomEvent?): Boolean {
+                            // do nothing
+                            return true
+                        }
+                    },
+                )
             },
-            onUpdate = { map -> mapView = map }
+            onUpdate = { map -> mapView = map },
         )
         val mapColorScheme = remember { MapColorScheme(colorScheme.scrim.copy(alpha = 0.6f), Color.Red) }
 
@@ -859,7 +910,10 @@ object DeviceDetailsScreen {
         }
     }
 
-    private fun initMapState(map: MapView, colorScheme: ColorScheme) {
+    private fun initMapState(
+        map: MapView,
+        colorScheme: ColorScheme,
+    ) {
         map.setMultiTouchControls(true)
         map.setBackgroundColor(colorScheme.surface.toArgb())
         map.minZoomLevel = MapConfig.MIN_MAP_ZOOM
@@ -884,7 +938,6 @@ object DeviceDetailsScreen {
         mapColorScheme: MapColorScheme,
         pointsStyle: DeviceDetailsViewModel.PointsStyle,
     ) {
-
         when (pointsStyle) {
             DeviceDetailsViewModel.PointsStyle.MARKERS -> {
                 batchProcessor.process(mapUpdate.points, mapUpdate.map)
@@ -894,33 +947,36 @@ object DeviceDetailsScreen {
                 batchProcessor.cancel()
                 mapUpdate.map.overlays.clear()
                 val points = mapUpdate.points.map { GeoPoint(it.lat, it.lng) }
-                val polyline = Polyline(mapUpdate.map).apply {
-                    this.setPoints(points)
-                    this.outlinePaint.apply {
-                        color = mapColorScheme.lineColor.toArgb()
+                val polyline =
+                    Polyline(mapUpdate.map).apply {
+                        this.setPoints(points)
+                        this.outlinePaint.apply {
+                            color = mapColorScheme.lineColor.toArgb()
+                        }
                     }
-                }
 
                 mapUpdate.map.overlays.add(polyline)
 
                 val pt = SimplePointTheme(points)
 
-                val paint = Paint().apply {
-                    style = Paint.Style.FILL
-                    setColor(mapColorScheme.pointColor.toArgb())
-                }
+                val paint =
+                    Paint().apply {
+                        style = Paint.Style.FILL
+                        setColor(mapColorScheme.pointColor.toArgb())
+                    }
 
-                val fastPointOverlayOptions = SimpleFastPointOverlayOptions.getDefaultStyle()
-                    .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
-                    .setPointStyle(paint)
-                    .setRadius(5f)
+                val fastPointOverlayOptions =
+                    SimpleFastPointOverlayOptions
+                        .getDefaultStyle()
+                        .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
+                        .setPointStyle(paint)
+                        .setRadius(5f)
 
                 val fastPointOverlay = SimpleFastPointOverlay(pt, fastPointOverlayOptions)
                 mapUpdate.map.overlays.add(fastPointOverlay)
                 mapUpdate.map.invalidate()
             }
         }
-
 
         when (val cameraConfig = mapUpdate.cameraState) {
             is DeviceDetailsViewModel.MapCameraState.SinglePoint -> {
@@ -929,7 +985,7 @@ object DeviceDetailsScreen {
                 mapUpdate.map.controller.animateTo(
                     point,
                     cameraConfig.zoom,
-                    if (cameraConfig.withAnimation) MapConfig.MAP_ANIMATION else MapConfig.MAP_NO_ANIMATION
+                    if (cameraConfig.withAnimation) MapConfig.MAP_ANIMATION else MapConfig.MAP_NO_ANIMATION,
                 )
                 mapUpdate.map.invalidate()
             }

@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 
 class ActivityProvider {
-
     private var activity: AppCompatActivity? = null
 
     fun setActivity(activity: AppCompatActivity?) {

@@ -9,5 +9,5 @@ object BackCommand : NavigationCommand
 
 abstract class AddToStackCommand(
     val screenFunction: @Composable (key: String, router: Router) -> Unit,
-    val key: String = UUID.randomUUID().toString()
+    val key: String = UUID.randomUUID().toString(),
 ) : NavigationCommand

@@ -3,7 +3,10 @@ package f.cking.software.ui.filter
 import androidx.annotation.StringRes
 import f.cking.software.R
 
-enum class FilterType(@StringRes val displayNameRes: Int, @StringRes val displayDescription: Int) {
+enum class FilterType(
+    @StringRes val displayNameRes: Int,
+    @StringRes val displayDescription: Int,
+) {
     BY_LOGIC_ANY(R.string.filter_any_of, R.string.filter_any_of_description),
     BY_LOGIC_ALL(R.string.filter_all_of, R.string.filter_all_of_description),
     BY_LOGIC_NOT(R.string.filter_not, R.string.filter_not_description),

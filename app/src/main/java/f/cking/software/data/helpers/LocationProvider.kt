@@ -13,12 +13,15 @@ import androidx.core.location.LocationListenerCompat
 import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.SaveReportInteractor
 import f.cking.software.domain.model.JournalEntry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.Runnable
 import java.util.function.Consumer
 
 class LocationProvider(
@@ -27,82 +30,79 @@ class LocationProvider(
     private val saveReportInteractor: SaveReportInteractor,
     private val powerModeHelper: PowerModeHelper,
 ) {
-
     private val locationState = MutableStateFlow<LocationHandle?>(null)
 
     private val locationManager: LocationManager? = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
 
-    private val consumer = Consumer<Location?> { newLocation ->
+    private val consumer =
+        Consumer<Location?> { newLocation ->
 
-        if (isActive) {
-            scheduleNextRequest()
+            if (isActive) {
+                scheduleNextRequest()
+            }
+
+            val provider = provider()
+
+            if (newLocation == null) {
+                Timber.d("Empty location emitted  (provider: $provider)")
+                return@Consumer
+            }
+
+            if (!newLocation.isRelevant(locationState.value?.location)) {
+                Timber.d("Irrelevant location has emitted (provider: $provider)")
+                return@Consumer
+            }
+
+            if (!powerModeHelper.powerMode().useLocation) {
+                Timber.d("Location is turned of for such power mode (${powerModeHelper.powerMode().name})")
+                return@Consumer
+            }
+
+            Timber.d("New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
+
+            locationState.tryEmit(LocationHandle(newLocation, System.currentTimeMillis()))
         }
-
-        val provider = provider()
-
-        if (newLocation == null) {
-            Timber.d("Empty location emitted  (provider: $provider)")
-            return@Consumer
-        }
-
-        if (!newLocation.isRelevant(locationState.value?.location)) {
-            Timber.d("Irrelevant location has emitted (provider: $provider)")
-            return@Consumer
-        }
-
-        if (!powerModeHelper.powerMode().useLocation) {
-            Timber.d("Location is turned of for such power mode (${powerModeHelper.powerMode().name})")
-            return@Consumer
-        }
-
-        Timber.d("New location: lat=${newLocation.latitude}, lng=${newLocation.longitude} (provider: $provider)")
-
-        locationState.tryEmit(LocationHandle(newLocation, System.currentTimeMillis()))
-    }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private val locationListener = LocationListenerCompat {
-        consumer.accept(it)
-    }
+    private val locationListener =
+        LocationListenerCompat {
+            consumer.accept(it)
+        }
 
     private var isActive: Boolean = false
     private var cancellationSignal: CancellationSignal = CancellationSignal()
 
     private val handler = Handler(Looper.getMainLooper())
-    private val nextLocationRequest = Runnable {
-        try {
-            fetchLocation(withRestartSchedule = true)
-        } catch (error: Throwable) {
-            reportError(error)
-            scheduleNextRequest()
+    private val nextLocationRequest =
+        Runnable {
+            try {
+                fetchLocation(withRestartSchedule = true)
+            } catch (error: Throwable) {
+                reportError(error)
+                scheduleNextRequest()
+            }
         }
-    }
 
-    private val restartServiceRunnable = Runnable {
-        stopLocationListening()
-        startLocationFetching()
-    }
+    private val restartServiceRunnable =
+        Runnable {
+            stopLocationListening()
+            startLocationFetching()
+        }
 
-    fun isLocationAvailable(): Boolean {
-        return (locationManager?.isProviderEnabled(provider()) == true)
-                && locationManager.isLocationEnabled
-    }
+    fun isLocationAvailable(): Boolean =
+        (locationManager?.isProviderEnabled(provider()) == true) &&
+            locationManager.isLocationEnabled
 
-    fun isActive(): Boolean {
-        return isActive
-    }
+    fun isActive(): Boolean = isActive
 
-    fun observeLocation(): Flow<LocationHandle?> {
-        return locationState
-    }
+    fun observeLocation(): Flow<LocationHandle?> = locationState
 
-    suspend fun getFreshLocation(): Location? {
-        return observeLocation()
+    suspend fun getFreshLocation(): Location? =
+        observeLocation()
             .firstOrNull()
             ?.takeIf { it.isFresh() }
             ?.location
-    }
 
     @SuppressLint("MissingPermission")
     fun startLocationFetching() {
@@ -141,21 +141,22 @@ class LocationProvider(
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             locationManager?.getCurrentLocation(
                 provider(),
-                LocationRequest.Builder(powerModeHelper.powerMode().locationUpdateInterval)
+                LocationRequest
+                    .Builder(powerModeHelper.powerMode().locationUpdateInterval)
                     .setDurationMillis(LOCATION_REQUEST_MAX_DURATION_MILLS)
                     .setMaxUpdateDelayMillis(LOCATION_REQUEST_MAX_DURATION_MILLS)
                     .setQuality(LocationRequest.QUALITY_HIGH_ACCURACY)
                     .build(),
                 cancellationSignal,
                 context.mainExecutor,
-                consumer
+                consumer,
             )
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             locationManager?.getCurrentLocation(
                 provider(),
                 cancellationSignal,
                 context.mainExecutor,
-                consumer
+                consumer,
             )
         } else {
             locationManager?.requestSingleUpdate(
@@ -170,13 +171,12 @@ class LocationProvider(
         }
     }
 
-    private fun provider(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !settingsRepository.getUseGpsLocationOnly()) {
+    private fun provider(): String =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !settingsRepository.getUseGpsLocationOnly()) {
             LocationManager.FUSED_PROVIDER
         } else {
             LocationManager.GPS_PROVIDER
         }
-    }
 
     private fun scheduleNextRequest() {
         handler.postDelayed(nextLocationRequest, powerModeHelper.powerMode().locationUpdateInterval)
@@ -195,24 +195,27 @@ class LocationProvider(
     private fun reportError(error: Throwable) {
         Timber.e(error)
         scope.launch {
-            val report = JournalEntry.Report.Error(
-                error.message ?: error::class.java.name,
-                error.stackTraceToString()
-            )
+            val report =
+                JournalEntry.Report.Error(
+                    error.message ?: error::class.java.name,
+                    error.stackTraceToString(),
+                )
             saveReportInteractor.execute(report)
         }
     }
 
-    private fun LocationHandle.isFresh(): Boolean {
-        return System.currentTimeMillis() - this.emitTime < ALLOWED_LOCATION_LIVETIME_MS
-    }
+    private fun LocationHandle.isFresh(): Boolean = System.currentTimeMillis() - this.emitTime < ALLOWED_LOCATION_LIVETIME_MS
 
-    private fun Location.isRelevant(oldLocation: Location?): Boolean {
-        return oldLocation == null
-                || ((latitude != oldLocation.longitude || longitude != oldLocation.longitude)
-                && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && elapsedRealtimeAgeMillis <= ALLOWED_LOCATION_LIVETIME_MS)
-                && accuracy <= MAX_ALLOWED_ACCURACY_METERS)
-    }
+    private fun Location.isRelevant(oldLocation: Location?): Boolean =
+        oldLocation == null ||
+            (
+                (latitude != oldLocation.longitude || longitude != oldLocation.longitude) &&
+                    (
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            elapsedRealtimeAgeMillis <= ALLOWED_LOCATION_LIVETIME_MS
+                    ) &&
+                    accuracy <= MAX_ALLOWED_ACCURACY_METERS
+            )
 
     data class LocationHandle(
         val location: Location,

@@ -1,7 +1,7 @@
 package f.cking.software.domain.model
 
 data class AppleAirDrop(
-    val contacts: List<AppleContact>
+    val contacts: List<AppleContact>,
 ) {
     /**
      * We cannot specify the contact type (phone/email) because apple shuffles it in airdrop packages
@@ -11,8 +11,6 @@ data class AppleAirDrop(
         val lastDetectionTimeMs: Long,
         val firstDetectionTimeMs: Long,
     ) {
-        fun mergeWithNewContact(new: AppleContact): AppleContact {
-            return new.copy(firstDetectionTimeMs = firstDetectionTimeMs)
-        }
+        fun mergeWithNewContact(new: AppleContact): AppleContact = new.copy(firstDetectionTimeMs = firstDetectionTimeMs)
     }
 }

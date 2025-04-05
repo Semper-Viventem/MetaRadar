@@ -40,22 +40,22 @@ import f.cking.software.utils.graphic.FABSpacer
 import org.koin.androidx.compose.koinViewModel
 
 object ProfilesListScreen {
-
     @Composable
     fun Screen() {
         val viewModel: ProfilesListViewModel = koinViewModel()
         Column(
             Modifier
                 .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             Header(viewModel = viewModel)
             val profiles = viewModel.profiles
             if (profiles.isNotEmpty()) {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
                 ) {
                     profiles.map { item { ListItem(profile = it, viewModel = viewModel) } }
                     item {
@@ -71,29 +71,32 @@ object ProfilesListScreen {
     @Composable
     private fun Header(viewModel: ProfilesListViewModel) {
         Surface(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
             shadowElevation = 4.dp,
         ) {
             LazyRow(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                    .padding(vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                        .padding(vertical = 8.dp),
             ) {
                 item { Spacer(modifier = Modifier.width(16.dp)) }
                 item {
                     SuggestionChip(
                         onClick = { viewModel.createNewClick() },
-                        colors = SuggestionChipDefaults.suggestionChipColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            iconContentColor = MaterialTheme.colorScheme.onPrimary,
-                            labelColor = MaterialTheme.colorScheme.onPrimary,
-                        ),
+                        colors =
+                            SuggestionChipDefaults.suggestionChipColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                iconContentColor = MaterialTheme.colorScheme.onPrimary,
+                                labelColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
                         border = null,
                         icon = {
                             Icon(imageVector = Icons.Default.Add, contentDescription = null)
                         },
-                        label = { Text(text = stringResource(R.string.create_new)) }
+                        label = { Text(text = stringResource(R.string.create_new)) },
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
@@ -110,35 +113,49 @@ object ProfilesListScreen {
     }
 
     @Composable
-    private fun DefaultFilterChip(filter: ProfilesListViewModel.FilterTemplate, viewModel: ProfilesListViewModel) {
+    private fun DefaultFilterChip(
+        filter: ProfilesListViewModel.FilterTemplate,
+        viewModel: ProfilesListViewModel,
+    ) {
         SuggestionChip(onClick = { viewModel.selectFilterTemplate(filter) }, label = {
             Text(text = stringResource(filter.displayNameRes))
         })
     }
 
     @Composable
-    private fun ListItem(profile: RadarProfile, viewModel: ProfilesListViewModel) {
+    private fun ListItem(
+        profile: RadarProfile,
+        viewModel: ProfilesListViewModel,
+    ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { viewModel.onProfileClick(profile) }
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { viewModel.onProfileClick(profile) },
         ) {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 Text(text = profile.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(4.dp))
-                val activeText = if (profile.isActive) stringResource(R.string.profile_is_active) else stringResource(R.string.profile_is_not_active)
+                val activeText =
+                    if (profile.isActive) {
+                        stringResource(
+                            R.string.profile_is_active,
+                        )
+                    } else {
+                        stringResource(R.string.profile_is_not_active)
+                    }
                 val color = if (profile.isActive) colorResource(id = R.color.green_600) else MaterialTheme.colorScheme.onBackground
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(12.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_circle),
                         tint = color,
-                        contentDescription = activeText
+                        contentDescription = activeText,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = activeText, fontWeight = FontWeight.Bold, color = color)

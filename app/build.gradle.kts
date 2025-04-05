@@ -17,14 +17,14 @@ apply {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
     namespace = "f.cking.software"
     val javaConfig: JavaConfig = JavaConfig.getByString(getEnvJavaConfigVersion())
 
     defaultConfig {
         applicationId = "f.cking.software"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
 
         versionCode = 1708536373
         versionName = "0.29.3-beta"
@@ -53,10 +53,16 @@ android {
             keyPassword = "metaradar-debug-keystore"
         }
         maybeCreate(RELEASE).apply {
-            storeFile = file(gradleLocalProperties(rootDir, providers).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: "/"))
-            storePassword = gradleLocalProperties(rootDir, providers).getProperty("releaseStorePassword", System.getenv("RELEASE_STORE_PASSWORD") ?: "")
+            storeFile =
+                file(gradleLocalProperties(rootDir, providers).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: "/"))
+            storePassword =
+                gradleLocalProperties(rootDir, providers).getProperty("releaseStorePassword", System.getenv("RELEASE_STORE_PASSWORD") ?: "")
             keyAlias = gradleLocalProperties(rootDir, providers).getProperty("releaseKeyAlias", System.getenv("RELEASE_STORE_KEY") ?: "")
-            keyPassword = gradleLocalProperties(rootDir, providers).getProperty("releaseKeyPassword", System.getenv("RELEASE_STORE_KEY_PASSWORD") ?: "")
+            keyPassword =
+                gradleLocalProperties(rootDir, providers).getProperty(
+                    "releaseKeyPassword",
+                    System.getenv("RELEASE_STORE_KEY_PASSWORD") ?: "",
+                )
         }
     }
 
@@ -73,7 +79,11 @@ android {
             isShrinkResources = true
             isDebuggable = false
 
-            val hasSignConfig = gradleLocalProperties(rootDir, providers).getProperty("releaseStoreFile", System.getenv("RELEASE_STORE_PATH") ?: NO_SIGNING_CONFIG) != NO_SIGNING_CONFIG
+            val hasSignConfig =
+                gradleLocalProperties(rootDir, providers).getProperty(
+                    "releaseStoreFile",
+                    System.getenv("RELEASE_STORE_PATH") ?: NO_SIGNING_CONFIG,
+                ) != NO_SIGNING_CONFIG
 
             signingConfig = if (hasSignConfig) signingConfigs[RELEASE] else null
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -96,7 +106,11 @@ android {
 
             buildConfigField("String", "DISTRIBUTION", "\"Google play\"")
             buildConfigField("Boolean", "STORE_RATING_IS_APPLICABLE", "true")
-            buildConfigField("String", "STORE_PAGE_URL", "\"https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=web_share\"")
+            buildConfigField(
+                "String",
+                "STORE_PAGE_URL",
+                "\"https://play.google.com/store/apps/details?id=f.cking.software&pcampaignid=web_share\"",
+            )
         }
         create("fdroid") {
             isDefault = false
@@ -127,7 +141,9 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+        kotlinCompilerExtensionVersion =
+            libs.versions.compose.compiler
+                .get()
     }
 }
 
@@ -202,26 +218,38 @@ dependencies {
 }
 
 private fun getEnvJavaConfigVersion(): String {
-    val version = gradleLocalProperties(rootDir, providers).getProperty("JAVA_CONFIG_VERSION", System.getenv("JAVA_CONFIG_VERSION") ?: "UNSPECIFIED")
-    println("Environment JDK version selected is ${version}. To override it define JAVA_CONFIG_VERSION environment variable or local properties.")
+    val version =
+        gradleLocalProperties(rootDir, providers).getProperty(
+            "JAVA_CONFIG_VERSION",
+            System.getenv("JAVA_CONFIG_VERSION") ?: "UNSPECIFIED",
+        )
+    println(
+        "Environment JDK version selected is $version. To override it define JAVA_CONFIG_VERSION environment variable or local properties.",
+    )
     return version
 }
 
-enum class JavaConfig(val jvmTarget: String, val jdkVersion: Int, val javaVersion: JavaVersion) {
+enum class JavaConfig(
+    val jvmTarget: String,
+    val jdkVersion: Int,
+    val javaVersion: JavaVersion,
+) {
     JAVA_21("21", 21, JavaVersion.VERSION_21),
-    JAVA_22("22", 22, JavaVersion.VERSION_22);
+    JAVA_22("22", 22, JavaVersion.VERSION_22),
+    ;
 
     companion object {
-        fun getByString(versionStr: String?): JavaConfig {
-            return when (versionStr) {
+        fun getByString(versionStr: String?): JavaConfig =
+            when (versionStr) {
                 "21" -> JAVA_21
                 "22" -> JAVA_22
                 else -> {
-                    println("Java version ${versionStr} is not recognized. The default one will be used instead for this project: ${DEFAULT.jvmTarget}")
+                    println(
+                        "Java version $versionStr is not recognized. The default one will be used instead for this project: ${DEFAULT.jvmTarget}",
+                    )
                     DEFAULT
                 }
             }
-        }
 
         private val DEFAULT = JAVA_21
     }

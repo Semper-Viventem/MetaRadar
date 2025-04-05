@@ -64,11 +64,8 @@ import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)
 object ShaderTestScreen {
-
     @Composable
-    fun Screen(
-        router: Router,
-    ) {
+    fun Screen(router: Router) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             Text("This screen requires Android 13+")
             return
@@ -81,9 +78,10 @@ object ShaderTestScreen {
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = { AppBar(scrollBehavior) { router.navigate(BackCommand) } },
             content = { paddings ->
                 GlassSystemNavbar(
@@ -92,16 +90,13 @@ object ShaderTestScreen {
                         Content(Modifier.padding(top = paddings.calculateTopPadding()))
                     },
                 )
-            }
+            },
         )
     }
 
     @SuppressLint("NewApi")
     @Composable
-    private fun Content(
-        parentModifier: Modifier = Modifier,
-    ) {
-
+    private fun Content(parentModifier: Modifier = Modifier) {
         val scrollState = rememberScrollState()
         var screenSize by remember { mutableStateOf(Size(0.0f, 0.0f)) }
         var settingsBlockSize by remember { mutableStateOf(Size(0.0f, 0.0f)) }
@@ -112,12 +107,13 @@ object ShaderTestScreen {
         val sliderBlurRadiusState = remember { SliderState(value = 3f, valueRange = 0f..8f) }
         val sliderAmplitudeState = remember { SliderState(value = 0.3f) }
         val sliderLengthState = remember { SliderState(value = 0.2f) }
-        val sliderRefractionIndexState = remember {
-            SliderState(
-                value = RefractionMaterial.GLASS.refractionIndex,
-                valueRange = RefractionMaterial.VACUUM.refractionIndex..RefractionMaterial.DIAMOND.refractionIndex
-            )
-        }
+        val sliderRefractionIndexState =
+            remember {
+                SliderState(
+                    value = RefractionMaterial.GLASS.refractionIndex,
+                    valueRange = RefractionMaterial.VACUUM.refractionIndex..RefractionMaterial.DIAMOND.refractionIndex,
+                )
+            }
 
         var glassType by remember { mutableStateOf<GlassType>(GlassType.MOD) }
 
@@ -125,18 +121,20 @@ object ShaderTestScreen {
 
         val panelSize = Size(screenSize.width * sliderSizeState.value, screenSize.height * sliderSizeState.value)
         val top = max((screenSize.height / 2 - panelSize.height / 2).toInt(), offset.toInt())
-        val rect = Rect(
-            (screenSize.width / 2 - panelSize.width / 2).toInt(),
-            top,
-            (screenSize.width / 2 + panelSize.width / 2).toInt(),
-            (top + panelSize.height).toInt(),
-        )
+        val rect =
+            Rect(
+                (screenSize.width / 2 - panelSize.width / 2).toInt(),
+                top,
+                (screenSize.width / 2 + panelSize.width / 2).toInt(),
+                (top + panelSize.height).toInt(),
+            )
 
         Box(
-            parentModifier.fillMaxSize()
+            parentModifier
+                .fillMaxSize()
                 .onSizeChanged {
                     screenSize = Size(it.width.toFloat(), it.height.toFloat())
-                }
+                },
         ) {
             Column(
                 Modifier
@@ -150,59 +148,59 @@ object ShaderTestScreen {
                             blurRadius = sliderBlurRadiusState.value,
                             tilt = glassType.motion,
                         )
-                    }
-                    .verticalScroll(scrollState)
+                    }.verticalScroll(scrollState),
             ) {
-
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onSizeChanged { settingsBlockSize = Size(it.width.toFloat(), it.height.toFloat()) }
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .onSizeChanged { settingsBlockSize = Size(it.width.toFloat(), it.height.toFloat()) },
                 ) {
                     // Scale
                     Slider(
                         text = stringResource(R.string.shader_test_panel_size, (sliderSizeState.value * 100).toInt()),
-                        state = sliderSizeState
+                        state = sliderSizeState,
                     )
 
                     // Aberraion
                     Slider(
                         text = stringResource(R.string.shader_test_glass_aberration, sliderAberrationState.value),
-                        state = sliderAberrationState
+                        state = sliderAberrationState,
                     )
 
                     // Refraction Index
                     Slider(
                         text = stringResource(R.string.shader_test_glass_refraction, sliderRefractionIndexState.value),
-                        state = sliderRefractionIndexState
+                        state = sliderRefractionIndexState,
                     )
 
                     // Blur radius
                     Slider(
                         text = stringResource(R.string.shader_test_blur_radius, sliderBlurRadiusState.value),
-                        state = sliderBlurRadiusState
+                        state = sliderBlurRadiusState,
                     )
 
                     // Glass type
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         text = stringResource(R.string.shader_test_glass_type),
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceAround) {
                         GlassType.entries.forEach { type ->
                             FilterChip(
                                 onClick = { glassType = type },
-                                trailingIcon = type.imageRes?.let {
-                                    {
-                                        Icon(
-                                            modifier = Modifier.size(32.dp),
-                                            painter = painterResource(id = it),
-                                            tint = MaterialTheme.colorScheme.onSurface,
-                                            contentDescription = null,
-                                        )
-                                    }
-                                },
+                                trailingIcon =
+                                    type.imageRes?.let {
+                                        {
+                                            Icon(
+                                                modifier = Modifier.size(32.dp),
+                                                painter = painterResource(id = it),
+                                                tint = MaterialTheme.colorScheme.onSurface,
+                                                contentDescription = null,
+                                            )
+                                        }
+                                    },
                                 selected = glassType == type,
                                 label = { Text(stringResource(type.nameRes)) },
                             )
@@ -211,17 +209,16 @@ object ShaderTestScreen {
 
                     AnimatedVisibility(glassType.curveSupport) {
                         Column(modifier = Modifier.fillMaxWidth()) {
-
                             // Curve amplitude
                             Slider(
                                 text = stringResource(R.string.shader_test_curve_amplitude, sliderAmplitudeState.value),
-                                state = sliderAmplitudeState
+                                state = sliderAmplitudeState,
                             )
 
                             // Curve length
                             Slider(
                                 text = stringResource(R.string.shader_test_curve_length, sliderLengthState.value),
-                                state = sliderLengthState
+                                state = sliderLengthState,
                             )
                         }
                     }
@@ -232,13 +229,13 @@ object ShaderTestScreen {
                     modifier = Modifier.fillMaxWidth(),
                     painter = painterResource(id = R.drawable.monstera),
                     contentDescription = "",
-                    contentScale = ContentScale.FillWidth
+                    contentScale = ContentScale.FillWidth,
                 )
                 Image(
                     modifier = Modifier.fillMaxWidth(),
                     painter = painterResource(id = R.drawable.appa),
                     contentDescription = stringResource(id = R.string.secret_cat),
-                    contentScale = ContentScale.FillWidth
+                    contentScale = ContentScale.FillWidth,
                 )
                 Spacer(modifier = Modifier.height(200.dp))
             }
@@ -247,13 +244,11 @@ object ShaderTestScreen {
                 Modifier
                     .size(
                         height = pxToDp(rect.height().toFloat()).dp,
-                        width = pxToDp(rect.width().toFloat()).dp
-                    )
-                    .offset(
+                        width = pxToDp(rect.width().toFloat()).dp,
+                    ).offset(
                         x = pxToDp(rect.left.toFloat()).dp,
                         y = pxToDp(rect.top.toFloat()).dp,
-                    )
-                    .background(Color.Gray.copy(alpha = 0.1f))
+                    ).background(Color.Gray.copy(alpha = 0.1f)),
             )
 
             Text(
@@ -264,7 +259,6 @@ object ShaderTestScreen {
         }
     }
 
-
     private enum class GlassType(
         val curveType: (A: Float, k: Float) -> GlassShader.CurveType,
         val nameRes: Int,
@@ -272,36 +266,57 @@ object ShaderTestScreen {
         val curveSupport: Boolean,
         val motion: Tilt.Motion = Tilt.Motion,
     ) {
-        MOD({ A, k -> GlassShader.CurveType.Mod(A, k) }, R.string.shader_test_glass_type_mod, R.drawable.glass_type_fluted, curveSupport = true),
-        SIN({ A, k -> GlassShader.CurveType.Sin(A, k) }, R.string.shader_test_glass_type_sin, R.drawable.glass_type_curved, curveSupport = true),
+        MOD({
+            A,
+            k,
+            ->
+            GlassShader.CurveType.Mod(A, k)
+        }, R.string.shader_test_glass_type_mod, R.drawable.glass_type_fluted, curveSupport = true),
+        SIN({
+            A,
+            k,
+            ->
+            GlassShader.CurveType.Sin(A, k)
+        }, R.string.shader_test_glass_type_sin, R.drawable.glass_type_curved, curveSupport = true),
         FLAT({ _, _ -> GlassShader.CurveType.Flat }, R.string.shader_test_glass_type_flat, null, curveSupport = false),
     }
 
     @Composable
-    private fun Slider(text: String, state: SliderState) {
+    private fun Slider(
+        text: String,
+        state: SliderState,
+    ) {
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
-        Slider(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp), state = state)
+        Slider(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            state = state,
+        )
     }
 
     @Composable
-    private fun AppBar(scrollState: TopAppBarScrollBehavior, onBackClick: () -> Unit) {
+    private fun AppBar(
+        scrollState: TopAppBarScrollBehavior,
+        onBackClick: () -> Unit,
+    ) {
         TopAppBar(
             scrollBehavior = scrollState,
-            colors = TopAppBarDefaults.topAppBarColors(
-                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                ),
             title = { Text(text = stringResource(R.string.shader_test_title)) },
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
-            }
+            },
         )
     }
 }

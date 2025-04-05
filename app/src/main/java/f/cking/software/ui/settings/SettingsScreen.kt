@@ -39,15 +39,15 @@ import f.cking.software.utils.graphic.ThemedDialog
 import org.koin.androidx.compose.koinViewModel
 
 object SettingsScreen {
-
     @Composable
     fun Screen() {
         val viewModel: SettingsViewModel = koinViewModel()
         Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             ProjectInformationBlock(viewModel = viewModel)
@@ -118,7 +118,7 @@ object SettingsScreen {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { viewModel.onRemoveGarbageClick() },
-            enabled = !viewModel.garbageRemovingInProgress
+            enabled = !viewModel.garbageRemovingInProgress,
         ) {
             Text(text = stringResource(R.string.clear_garbage), color = MaterialTheme.colorScheme.onPrimary)
         }
@@ -133,9 +133,12 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                positiveButton(
+                    text = stringResource(R.string.confirm),
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                ) {
                     dialogState.hide()
                     viewModel.onRestoreDBClick()
                 }
@@ -150,7 +153,7 @@ object SettingsScreen {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { dialogState.show() },
-            enabled = !viewModel.backupDbInProgress
+            enabled = !viewModel.backupDbInProgress,
         ) {
             Text(text = stringResource(R.string.settings_restore_database), color = MaterialTheme.colorScheme.onPrimary)
         }
@@ -165,9 +168,12 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                positiveButton(
+                    text = stringResource(R.string.confirm),
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                ) {
                     dialogState.hide()
                     viewModel.onBackupDBClick()
                 }
@@ -182,7 +188,7 @@ object SettingsScreen {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { dialogState.show() },
-            enabled = !viewModel.backupDbInProgress
+            enabled = !viewModel.backupDbInProgress,
         ) {
             Text(text = stringResource(R.string.settings_backup_database), color = MaterialTheme.colorScheme.onPrimary)
         }
@@ -194,13 +200,14 @@ object SettingsScreen {
             BottomNavigationSpacer()
             repeat(50) {
                 Image(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .alpha(0.1f)
-                        .width(30.dp),
+                    modifier =
+                        Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .alpha(0.1f)
+                            .width(30.dp),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                     painter = painterResource(id = R.drawable.cat_footprint),
-                    contentDescription = null
+                    contentDescription = null,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
             }
@@ -209,7 +216,7 @@ object SettingsScreen {
                 Image(
                     painter = painterResource(id = R.drawable.appa),
                     contentDescription = stringResource(id = R.string.secret_cat),
-                    contentScale = ContentScale.FillWidth
+                    contentScale = ContentScale.FillWidth,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = stringResource(id = R.string.secret_cat), fontWeight = FontWeight.Light)
@@ -219,7 +226,6 @@ object SettingsScreen {
 
     @Composable
     private fun ClearLocationsButton(viewModel: SettingsViewModel) {
-
         val dialogState = rememberMaterialDialogState()
 
         ThemedDialog(
@@ -227,23 +233,30 @@ object SettingsScreen {
             buttons = {
                 negativeButton(
                     text = stringResource(R.string.cancel),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                 ) { dialogState.hide() }
-                positiveButton(text = stringResource(R.string.confirm), textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                positiveButton(
+                    text = stringResource(R.string.confirm),
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                ) {
                     dialogState.hide()
                     viewModel.onClearLocationsClick()
                 }
             },
         ) {
             Column(Modifier.padding(16.dp)) {
-                Text(text = stringResource(R.string.clear_all_location_history_dialog_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.clear_all_location_history_dialog_title),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
 
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { dialogState.show() },
-            enabled = !viewModel.locationRemovingInProgress
+            enabled = !viewModel.locationRemovingInProgress,
         ) {
             Text(text = stringResource(R.string.settings_clear_all_location_history), color = MaterialTheme.colorScheme.onPrimary)
         }
@@ -255,32 +268,36 @@ object SettingsScreen {
             value = viewModel.useGpsLocationOnly,
             title = stringResource(R.string.settings_use_gps_title),
             subtitle = stringResource(R.string.settings_use_gps_subtitle),
-            onClick = { viewModel.onUseGpsLocationOnlyClick() }
+            onClick = { viewModel.onUseGpsLocationOnlyClick() },
         )
     }
 
     @Composable
     private fun AppSettings(viewModel: SettingsViewModel) {
         RoundedBox(internalPaddings = 0.dp) {
-            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.app_settings_title), fontWeight = FontWeight.SemiBold)
+            Text(
+                modifier = Modifier.padding(16.dp),
+                text = stringResource(id = R.string.app_settings_title),
+                fontWeight = FontWeight.SemiBold,
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Switcher(
                 value = viewModel.silentModeEnabled,
                 title = stringResource(R.string.silent_mode_title),
                 subtitle = stringResource(id = R.string.silent_mode_subtitle),
-                onClick = { viewModel.changeSilentMode() }
+                onClick = { viewModel.changeSilentMode() },
             )
             Switcher(
                 value = viewModel.runOnStartup,
                 title = stringResource(R.string.launch_on_system_startup_title),
                 subtitle = null,
-                onClick = { viewModel.setRunOnStartup() }
+                onClick = { viewModel.setRunOnStartup() },
             )
             Switcher(
                 value = viewModel.deepAnalysisEnabled,
                 title = stringResource(R.string.enable_deep_analysis),
                 subtitle = stringResource(R.string.enable_deep_analysis_description),
-                onClick = { viewModel.onEnableDeepAnalysisClick() }
+                onClick = { viewModel.onEnableDeepAnalysisClick() },
             )
         }
     }
@@ -288,7 +305,10 @@ object SettingsScreen {
     @Composable
     private fun ProjectInformationBlock(viewModel: SettingsViewModel) {
         RoundedBox {
-            Text(text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)), fontWeight = FontWeight.SemiBold)
+            Text(
+                text = stringResource(R.string.project_github_title, stringResource(id = R.string.app_name)),
+                fontWeight = FontWeight.SemiBold,
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.onGithubClick() }) {
                 Text(text = stringResource(R.string.open_github), color = MaterialTheme.colorScheme.onPrimary)

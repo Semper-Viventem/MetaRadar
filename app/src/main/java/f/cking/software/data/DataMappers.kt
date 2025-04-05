@@ -14,32 +14,27 @@ import f.cking.software.domain.model.LocationModel
 import f.cking.software.domain.model.ManufacturerInfo
 import f.cking.software.domain.model.ProfileDetect
 import f.cking.software.domain.model.RadarProfile
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 
-fun Location.toDomain(time: Long): LocationModel {
-    return LocationModel(
+fun Location.toDomain(time: Long): LocationModel =
+    LocationModel(
         lat = this.latitude,
         lng = this.longitude,
         time = time,
     )
-}
 
-fun LocationModel.toData(): LocationEntity {
-    return LocationEntity(
+fun LocationModel.toData(): LocationEntity =
+    LocationEntity(
         time = time,
         lat = lat,
         lng = lng,
     )
-}
 
-fun LocationEntity.toDomain(): LocationModel {
-    return LocationModel(lat, lng, time)
-}
+fun LocationEntity.toDomain(): LocationModel = LocationModel(lat, lng, time)
 
-fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
-    return DeviceData(
+fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData =
+    DeviceData(
         address = address,
         name = name,
         lastDetectTimeMs = lastDetectTimeMs,
@@ -47,9 +42,10 @@ fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
         detectCount = detectCount,
         customName = customName,
         favorite = favorite,
-        manufacturerInfo = manufacturerId?.let { id ->
-            manufacturerName?.let { name -> ManufacturerInfo(id, name, appleAirDrop) }
-        },
+        manufacturerInfo =
+            manufacturerId?.let { id ->
+                manufacturerName?.let { name -> ManufacturerInfo(id, name, appleAirDrop) }
+            },
         lastFollowingDetectionTimeMs = lastFollowingDetectionMs,
         tags = tags.toSet(),
         rssi = lastSeenRssi,
@@ -61,10 +57,9 @@ fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
         metadata = metadata?.let { json.decodeFromStringOrNull(it) },
         isConnectable = isConnectable,
     )
-}
 
-fun DeviceData.toData(): DeviceEntity {
-    return DeviceEntity(
+fun DeviceData.toData(): DeviceEntity =
+    DeviceEntity(
         address = address,
         name = name,
         lastDetectTimeMs = lastDetectTimeMs,
@@ -85,10 +80,9 @@ fun DeviceData.toData(): DeviceEntity {
         metadata = metadata?.let { json.encodeToString(it) },
         isConnectable = isConnectable,
     )
-}
 
-fun RadarProfile.toData(): RadarProfileEntity {
-    return RadarProfileEntity(
+fun RadarProfile.toData(): RadarProfileEntity =
+    RadarProfileEntity(
         id = id,
         name = name,
         description = description,
@@ -96,10 +90,9 @@ fun RadarProfile.toData(): RadarProfileEntity {
         detectFilter = json.encodeToString(detectFilter),
         cooldown = cooldownMs,
     )
-}
 
-fun RadarProfileEntity.toDomain(): RadarProfile {
-    return RadarProfile(
+fun RadarProfileEntity.toDomain(): RadarProfile =
+    RadarProfile(
         id = id,
         name = name,
         description = description,
@@ -107,65 +100,61 @@ fun RadarProfileEntity.toDomain(): RadarProfile {
         detectFilter = detectFilter?.let { json.decodeFromStringOrNull(detectFilter) },
         cooldownMs = cooldown,
     )
-}
 
-fun ProfileDetectEntity.toDomain(): ProfileDetect {
-    return ProfileDetect(
+fun ProfileDetectEntity.toDomain(): ProfileDetect =
+    ProfileDetect(
         id = id,
         profileId = profileId,
         triggerTime = triggerTime,
-        deviceAddress = deviceAddress
+        deviceAddress = deviceAddress,
     )
-}
 
-fun ProfileDetect.toData(): ProfileDetectEntity {
-    return ProfileDetectEntity(
+fun ProfileDetect.toData(): ProfileDetectEntity =
+    ProfileDetectEntity(
         id = id,
         profileId = profileId,
         triggerTime = triggerTime,
-        deviceAddress = deviceAddress
+        deviceAddress = deviceAddress,
     )
-}
 
-fun AppleAirDrop.AppleContact.toData(associatedAddress: String): AppleContactEntity {
-    return AppleContactEntity(
+fun AppleAirDrop.AppleContact.toData(associatedAddress: String): AppleContactEntity =
+    AppleContactEntity(
         sha256,
         associatedAddress,
         lastDetectTimeMs = lastDetectionTimeMs,
-        firstDetectTimeMs = firstDetectionTimeMs
+        firstDetectTimeMs = firstDetectionTimeMs,
     )
-}
 
-fun AppleContactEntity.toDomain(): AppleAirDrop.AppleContact {
-    return AppleAirDrop.AppleContact(
+fun AppleContactEntity.toDomain(): AppleAirDrop.AppleContact =
+    AppleAirDrop.AppleContact(
         sha256,
         lastDetectionTimeMs = lastDetectTimeMs,
-        firstDetectionTimeMs = firstDetectTimeMs
+        firstDetectionTimeMs = firstDetectTimeMs,
     )
-}
 
-fun JournalEntryEntity.toDomain(): JournalEntry {
-    return JournalEntry(
+fun JournalEntryEntity.toDomain(): JournalEntry =
+    JournalEntry(
         id = id,
         timestamp = timestamp,
         report = json.decodeFromString(report),
     )
-}
 
-fun JournalEntry.toData(): JournalEntryEntity {
-    return JournalEntryEntity(
+fun JournalEntry.toData(): JournalEntryEntity =
+    JournalEntryEntity(
         id = id,
         timestamp = timestamp,
         report = json.encodeToString(report),
     )
-}
 
 private val json = Json { ignoreUnknownKeys = true }
-private inline fun <reified T> Json.decodeFromStringOrNull(str: String, ignoreUnknown: Boolean = true): T? {
-    return try {
+
+private inline fun <reified T> Json.decodeFromStringOrNull(
+    str: String,
+    ignoreUnknown: Boolean = true,
+): T? =
+    try {
         decodeFromString<T>(str)
     } catch (e: Exception) {
         Timber.e(e)
         null
     }
-}
