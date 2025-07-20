@@ -1,0 +1,5 @@
+<i>Bluetooth Radar</i> ist ein Tool zur Analyse von Bluetooth (BLE) Umgebungen. Es scannt den BLE-Ether im Hintergrund und benachrichtigt Sie, wenn sich das gesuchte Gerät in Ihrer Nähe befindet oder wenn Ihnen ein unbekanntes Gerät zu lange folgt. Kann Hersteller unterscheiden, Apple Airdrop-Pakete erkunden und sie mit bekannten Kontakten abgleichen. Erstellen Sie eine Gerätebewegungskarte basierend auf dem gescannten BLE-Ether um Sie herum. Flexible Filtereinstellungen für das Radar.
+
+<i>Bluetooth Radar</i> gibt Ihre persönlichen Daten oder Geolokalisierung nicht weiter, alle Arbeiten sind offline. Dies ist ein Open-Source-Projekt.
+
+> Dieses Projekt wird ausschließlich zu Bildungs-, Sicherheitsforschungs- und persönlichen Untersuchungszwecken entwickelt. Der Autor befürwortet oder ermutigt nicht die Nutzung dieser Software für rechtswidrige oder unethische Aktivitäten. Sie allein sind dafür verantwortlich sicherzustellen, dass Ihre Nutzung dieses Werkzeugs allen geltenden Gesetzen und Vorschriften entspricht.

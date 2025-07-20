@@ -1,9 +1,9 @@
 Bluetooth Radar in the background scans and analyzes Bluetooth Low Energy devices around you (eg smartwatches, headphones, speakers) and allows you to set complex rules to search for devices by specified filters. For example, by device name, address, location and time of discovery, manufacturer, and if an unknown device has been chasing you for a long time. Can be used to find your missing devices, or notify you if the device that you are looking for is nearby.
 
-DISCLAIMER
-This project is developed solely for educational, security research, and personal investigative purposes. The author does not endorse or encourage any use of this software for unlawful or unethical activities. You are solely responsible for ensuring your use of this tool complies with all applicable laws and regulations.
+<b>DISCLAIMER:</b> This project is developed solely for educational, security research, and personal investigative purposes. The author does not endorse or encourage any use of this software for unlawful or unethical activities. You are solely responsible for ensuring your use of this tool complies with all applicable laws and regulations.
 
 In general, the app is capable:
+
 * Scan, analyze and track Bluetooth devices around;
 * Create flexible filters for the radar;
 * Deep analysis of the scanned BLE devices, getting data from the available GATT services;
