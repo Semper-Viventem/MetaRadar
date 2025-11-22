@@ -1,5 +1,6 @@
 package f.cking.software.ui.settings
 
+import android.text.format.Formatter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -100,9 +102,19 @@ object SettingsScreen {
     @Composable
     private fun DatabaseBlock(viewModel: SettingsViewModel) {
         RoundedBox {
-            Text(text = stringResource(id = R.string.database_block_title), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(R.string.database_information), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(8.dp))
 
+            val databaseInfo = viewModel.databaseInfo
+            if (databaseInfo != null) {
+                Text(text = stringResource(R.string.database_size, Formatter.formatFileSize(LocalContext.current, databaseInfo.sizeBytes)))
+                Text(text = stringResource(R.string.database_devices_count, databaseInfo.totalDevices.toString()))
+                Text(text = stringResource(R.string.database_locations_count, databaseInfo.totalGeotags.toString()))
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            Text(text = stringResource(R.string.database_actions), fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(8.dp))
             BackupDB(viewModel = viewModel)
             Spacer(modifier = Modifier.height(8.dp))
             RestoreDB(viewModel = viewModel)

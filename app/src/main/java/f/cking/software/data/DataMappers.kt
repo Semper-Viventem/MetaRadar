@@ -38,7 +38,7 @@ fun LocationEntity.toDomain(): LocationModel {
     return LocationModel(lat, lng, time)
 }
 
-fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop?): DeviceData {
+fun DeviceEntity.toDomain(appleAirDrop: AppleAirDrop? = null): DeviceData {
     return DeviceData(
         address = address,
         name = name,

@@ -38,7 +38,7 @@ class SelectDeviceViewModel(
     private fun refreshDevices() {
         viewModelScope.launch {
             loading = true
-            devices = devicesRepository.getDevices().asSequence()
+            devices = devicesRepository.getDevices(withAirdropInfo = false).asSequence()
                 .filter { device ->
                     searchStr.takeIf { it.isNotBlank() }?.let { searchStr ->
                         (device.resolvedName?.contains(searchStr, true) ?: false)

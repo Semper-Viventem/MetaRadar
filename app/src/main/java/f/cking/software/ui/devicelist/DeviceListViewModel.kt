@@ -27,7 +27,6 @@ import f.cking.software.mapParallel
 import f.cking.software.service.BgScanService
 import f.cking.software.splitToBatches
 import f.cking.software.ui.ScreenNavigationCommands
-import f.cking.software.ui.devicelist.DeviceListViewModel.ActiveScannerExpandedState.entries
 import f.cking.software.utils.navigation.Router
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -200,6 +199,7 @@ class DeviceListViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeAllDevices(): Job {
+        isLoading = true
         return viewModelScope.launch {
             combine(
                 appliedFilter,
@@ -207,17 +207,17 @@ class DeviceListViewModel(
                 devicesRepository.observeAllDevices(),
             ) { filters, query, devices -> Triple(filters, query, devices) }
                 .flatMapLatest { (filters, query, devices) ->
-                flow {
-                    val result = withContext(Dispatchers.Default) {
-                        isLoading = true
-                        devices
-                            .withFilters(filters, query)
-                            .sortedWith(GENERAL_COMPARATOR)
-                            .apply { showEnjoyTheAppIfNeeded() }
+                    flow {
+                        val result = withContext(Dispatchers.Default) {
+                            isLoading = true
+                            devices
+                                .withFilters(filters, query)
+                                .sortedWith(GENERAL_COMPARATOR)
+                                .apply { showEnjoyTheAppIfNeeded() }
+                        }
+                        emit(result)
                     }
-                    emit(result)
                 }
-            }
                 .onStart {
                     isLoading = true
                 }

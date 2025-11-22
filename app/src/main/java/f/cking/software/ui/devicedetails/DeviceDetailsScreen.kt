@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
@@ -92,6 +94,7 @@ import f.cking.software.utils.graphic.SignalData
 import f.cking.software.utils.graphic.SystemNavbarSpacer
 import f.cking.software.utils.graphic.TagChip
 import f.cking.software.utils.graphic.ThemedDialog
+import f.cking.software.utils.graphic.infoDialog
 import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -754,6 +757,26 @@ object DeviceDetailsScreen {
                         .fillMaxWidth()
                         .height(5.dp),
                     color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            val dialog = infoDialog(
+                title = stringResource(R.string.device_map_disclaimer_title),
+                content = stringResource(R.string.device_map_disclaimer_content)
+            )
+
+            IconButton(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                onClick = {
+                    dialog.show()
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = stringResource(R.string.device_map_disclaimer_title),
+                    modifier = Modifier.size(24.dp)
+                        .background(Color.Black.copy(alpha = 0.1f), shape = CircleShape),
+                    tint = Color.DarkGray,
                 )
             }
         }

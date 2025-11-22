@@ -5,12 +5,16 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import f.cking.software.data.database.entity.DeviceEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DeviceDao {
 
     @Query("SELECT * FROM device")
     fun getAll(): List<DeviceEntity>
+
+    @Query("SELECT * FROM device")
+    fun observeAll(): Flow<List<DeviceEntity>>
 
     @Query("SELECT * FROM device ORDER BY last_detect_time_ms DESC LIMIT :limit OFFSET :offset")
     fun getPaginated(offset: Int, limit: Int): List<DeviceEntity>

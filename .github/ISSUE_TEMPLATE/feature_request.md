@@ -7,6 +7,11 @@ assignees: Semper-Viventem
 
 ---
 
+<!-- 
+ATTENTION: Not following this template might lead to closing your issue.
+DELETE THIS PARAGRAPH BEFORE PUBLISHING
+-->
+
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 

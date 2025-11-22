@@ -29,4 +29,7 @@ interface AppleContactDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(contacts: List<AppleContactEntity>)
+
+    @Query("DELETE FROM apple_contacts WHERE associated_address IN (:addresses)")
+    fun deleteAllByAddresses(addresses: List<String>)
 }

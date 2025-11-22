@@ -6,28 +6,26 @@ import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class JournalRepository(
-    private val database: AppDatabase,
-) {
+class JournalRepository(database: AppDatabase) {
 
-    val journalDao = database.journalDao()
-    private val journal = MutableStateFlow(emptyList<JournalEntry>())
-
-    suspend fun observe(): Flow<List<JournalEntry>> {
-        return journal.apply {
-            if (journal.value.isEmpty()) {
-                notifyListeners()
+    private val journalDao = database.journalDao()
+    private val journal = journalDao.observe()
+        .map {
+            withContext(Dispatchers.Default) {
+                it.map { it.toDomain() }
             }
         }
+
+    fun observe(): Flow<List<JournalEntry>> {
+        return journal
     }
 
     suspend fun newEntry(journalEntry: JournalEntry) {
         withContext(Dispatchers.IO) {
             journalDao.insert(journalEntry.toData())
-            notifyListeners()
         }
     }
 
@@ -41,10 +39,5 @@ class JournalRepository(
         return withContext(Dispatchers.IO) {
             journalDao.getById(id)?.toDomain()
         }
-    }
-
-    private suspend fun notifyListeners() {
-        val data = getAllEntries()
-        journal.emit(data)
     }
 }

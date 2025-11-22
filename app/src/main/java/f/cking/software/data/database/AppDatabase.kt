@@ -103,6 +103,13 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 
+    suspend fun getDatabaseSize(context: Context): Long {
+        return withContext(Dispatchers.IO) {
+            val dbFile = File(context.getDatabasePath(openHelper.databaseName).toString())
+            dbFile.length()
+        }
+    }
+
     private fun testDatabase(name: String, context: Context) {
         val testDb = build(context, name)
         testDb.openHelper.writableDatabase.isDatabaseIntegrityOk
@@ -232,10 +239,12 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 """.trimIndent()
             )
-            it.execSQL("""
+            it.execSQL(
+                """
                 CREATE INDEX IF NOT EXISTS index_profile_detect_profile_id_trigger_time 
                 ON profile_detect(profile_id, trigger_time)
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         private fun migration(

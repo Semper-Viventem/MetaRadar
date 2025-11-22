@@ -11,6 +11,7 @@ Glücklicherweise implementieren viele moderne Geräte Datenschutzfunktionen in 
 Ziel dieser App ist es, Ihnen Wissen und Kontrolle über die BLE-Geräte in Ihrer Umgebung zu geben. Zu verstehen, welche Geräte nachverfolgbare Informationen senden und welche datenschutzbewusst sind, ermöglicht es Ihnen, fundierte Entscheidungen darüber zu treffen, welche Geräte Sie täglich verwenden, tragen oder mit denen Sie interagieren.
 
 Im Allgemeinen kann die App:
+
 * Bluetooth-Geräte in der Umgebung scannen, analysieren und verfolgen;
 * Flexible Filter für das Radar erstellen;
 * Tiefergehende Analyse der gescannten BLE-Geräte durchführen, einschließlich Daten aus verfügbaren GATT-Services;

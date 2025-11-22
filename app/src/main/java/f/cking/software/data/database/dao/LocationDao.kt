@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import f.cking.software.data.database.entity.DeviceToLocationEntity
 import f.cking.software.data.database.entity.LocationEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocationDao {
@@ -21,6 +22,9 @@ interface LocationDao {
         ON dtl.location_time = location.time;
     """)
     fun getAllLocationsByDeviceAddress(address: String, fromTime: Long = 0, toTime: Long = Long.MAX_VALUE): List<LocationEntity>
+
+    @Query("SELECT * FROM location")
+    fun observeAllLocations(): Flow<List<LocationEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveLocation(locationEntity: LocationEntity)

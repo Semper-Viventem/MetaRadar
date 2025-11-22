@@ -1,1 +1,1 @@
-Ein Tool, um BLE-Geräte in Ihrer Umgebung zu überwachen, zu analysieren und zu finden.
+BLE-Geräte finden, überwachen, und analysieren.

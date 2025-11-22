@@ -47,7 +47,7 @@ class BleFiltersProvider(
 
     suspend fun getKnownDevicesFilters(): List<ScanFilter> {
         return withContext(Dispatchers.Default) {
-            val allKnownDevices = getAllDevicesInteractor.execute()
+            val allKnownDevices = getAllDevicesInteractor.execute(withAirdropInfo = false)
 
             val lastSeenDevices = allKnownDevices
                 .sortedByDescending { it.lastDetectTimeMs }

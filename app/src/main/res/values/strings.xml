@@ -99,7 +99,11 @@
     <string name="secret_cat">A secret cat photo</string>
     <string name="silent_mode_title">Offline mode</string>
     <string name="silent_mode_subtitle">Turn off any network communications in the app. It might be helpful to save traffic.</string>
-    <string name="database_block_title">Database actions</string>
+    <string name="database_actions">Database actions</string>
+    <string name="database_information">Database information</string>
+    <string name="database_size">Size: %s</string>
+    <string name="database_devices_count">Devices records: %s</string>
+    <string name="database_locations_count">Location records: %s</string>
     <string name="app_settings_title">App settings</string>
     <string name="silent_mode_is_off_toast">Offline mode is turned off. You can change it in the settings.</string>
     <string name="enable_deep_analysis">Deep analysis</string>
@@ -284,6 +288,8 @@
     <string name="device_details_disconnect">Disconnect</string>
     <string name="read">Read</string>
     <string name="device_details_metadata">Metadata</string>
+    <string name="device_map_disclaimer_title">Map disclaimer</string>
+    <string name="device_map_disclaimer_content">The map does not display the device’s actual location; it only records your smartphone’s coordinates at the moment of scanning. The location marker reflects where the device was detected, not where it truly is. The map is not designed to locate devices, but to show where they were previously observed and how their movement relates to your own.</string>
 
     <!-- Main Screen -->
     <string name="menu_device_list">Device list</string>

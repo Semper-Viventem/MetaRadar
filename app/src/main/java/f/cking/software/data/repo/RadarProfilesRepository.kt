@@ -7,8 +7,8 @@ import f.cking.software.domain.model.RadarProfile
 import f.cking.software.domain.toData
 import f.cking.software.domain.toDomain
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class RadarProfilesRepository(
@@ -16,15 +16,15 @@ class RadarProfilesRepository(
 ) {
 
     val dao = database.radarProfileDao()
-    private val allProfiles = MutableStateFlow(emptyList<RadarProfile>())
-
-    suspend fun observeAllProfiles(): StateFlow<List<RadarProfile>> {
-        return withContext(Dispatchers.IO) {
-            if (allProfiles.value.isEmpty()) {
-                notifyListeners()
+    private val allProfiles = dao.observe()
+        .map {
+            withContext(Dispatchers.Default) {
+                it.map { it.toDomain() }
             }
-            allProfiles
         }
+
+    suspend fun observeAllProfiles(): Flow<List<RadarProfile>> {
+        return allProfiles
     }
 
     suspend fun getAllProfiles(): List<RadarProfile> {
@@ -33,23 +33,27 @@ class RadarProfilesRepository(
         }
     }
 
-    suspend fun getById(id: Int): RadarProfile?{
+    suspend fun getById(id: Int): RadarProfile? {
         return withContext(Dispatchers.IO) {
             dao.getById(id)?.toDomain()
+        }
+    }
+
+    suspend fun getAllByIds(ids: List<Int>): List<RadarProfile> {
+        return withContext(Dispatchers.IO) {
+            dao.getAllById(ids).map { it.toDomain() }
         }
     }
 
     suspend fun saveProfile(profile: RadarProfile) {
         withContext(Dispatchers.IO) {
             dao.insert(profile.toData())
-            notifyListeners()
         }
     }
 
     suspend fun deleteProfile(profileId: Int) {
         withContext(Dispatchers.IO) {
             dao.delete(profileId)
-            notifyListeners()
         }
     }
 
@@ -69,10 +73,5 @@ class RadarProfilesRepository(
         return withContext(Dispatchers.IO) {
             dao.getProfileDetectLocations(profileId).map { it.toDomain() }
         }
-    }
-
-    private suspend fun notifyListeners() {
-        val data = getAllProfiles()
-        allProfiles.emit(data)
     }
 }

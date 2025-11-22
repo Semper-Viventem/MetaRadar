@@ -13,7 +13,7 @@ import f.cking.software.ui.selectmanufacturer.SelectManufacturerViewModel
 import f.cking.software.ui.settings.SettingsViewModel
 import f.cking.software.utils.navigation.Router
 import f.cking.software.utils.navigation.RouterImpl
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 object UiModule {
@@ -22,7 +22,7 @@ object UiModule {
         single<Router> { get<RouterImpl>() }
         viewModel { MainViewModel(get(), get(), get(), get(), get(), get(), get()) }
         viewModel { DeviceListViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-        viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel { ProfilesListViewModel(get(), get()) }
         viewModel { ProfileDetailsViewModel(profileId = it[0], template = it[1], get(), get(), get(), get(), get()) }
         viewModel { SelectManufacturerViewModel(get()) }

@@ -16,13 +16,14 @@ class ClearGarbageInteractor(
 
     suspend fun execute(): Int {
         return withContext(Dispatchers.Default) {
-            val devices = devicesRepository.getDevices()
+            val devices = devicesRepository.getDevices(withAirdropInfo = false)
                 .asSequence()
                 .filter { isGarbage(it) }
                 .map { it.address }
                 .toList()
 
             devicesRepository.deleteAllByAddress(devices)
+            devicesRepository.clearUnAssociatedAirdrops()
             locationRepository.removeDeviceLocationsByAddresses(devices)
             devices.count()
         }

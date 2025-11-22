@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import f.cking.software.BuildConfig
 import f.cking.software.R
+import f.cking.software.collectAsState
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.LocationProvider
 import f.cking.software.data.helpers.PermissionHelper
@@ -19,6 +20,7 @@ import f.cking.software.data.repo.SettingsRepository
 import f.cking.software.domain.interactor.BackupDatabaseInteractor
 import f.cking.software.domain.interactor.ClearGarbageInteractor
 import f.cking.software.domain.interactor.CreateBackupFileInteractor
+import f.cking.software.domain.interactor.GetDatabaseInfoInteractor
 import f.cking.software.domain.interactor.RestoreDatabaseInteractor
 import f.cking.software.domain.interactor.SaveReportInteractor
 import f.cking.software.domain.interactor.SelectBackupFileInteractor
@@ -43,6 +45,7 @@ class SettingsViewModel(
     private val intentHelper: IntentHelper,
     private val permissionHelper: PermissionHelper,
     private val router: Router,
+    private val getDatabaseInfoInteractor: GetDatabaseInfoInteractor,
 ) : ViewModel() {
 
     var garbageRemovingInProgress: Boolean by mutableStateOf(false)
@@ -54,6 +57,8 @@ class SettingsViewModel(
     var wakeUpWhileScanning: Boolean by mutableStateOf(settingsRepository.getWakeUpScreenWhileScanning())
     var silentModeEnabled: Boolean by mutableStateOf(settingsRepository.getSilentMode())
     var deepAnalysisEnabled: Boolean by mutableStateOf(settingsRepository.getEnableDeepAnalysis())
+
+    val databaseInfo by getDatabaseInfoInteractor.execute().collectAsState(viewModelScope, null)
 
     init {
         observeLocationData()

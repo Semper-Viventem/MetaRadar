@@ -15,11 +15,16 @@ import f.cking.software.data.repo.DevicesRepository
 import f.cking.software.data.repo.JournalRepository
 import f.cking.software.data.repo.RadarProfilesRepository
 import f.cking.software.dateTimeStringFormat
+import f.cking.software.domain.model.DeviceData
 import f.cking.software.domain.model.JournalEntry
+import f.cking.software.domain.model.RadarProfile
 import f.cking.software.ui.ScreenNavigationCommands
 import f.cking.software.utils.navigation.Router
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.min
 
 class JournalViewModel(
@@ -53,18 +58,41 @@ class JournalViewModel(
         viewModelScope.launch {
             journalRepository.observe()
                 .onStart { loading = true }
-                .collect { update ->
+                .map {
                     loading = true
-                    journal = update.sortedBy { it.timestamp }.reversed().map { map(it) }
+                    mapJournalHistory(it)
+                }
+                .collect { update ->
+                    journal = update
                     loading = false
                 }
         }
     }
 
-    private suspend fun map(from: JournalEntry): JournalEntryUiModel {
+    private suspend fun mapJournalHistory(history: List<JournalEntry>): List<JournalEntryUiModel> {
+        return withContext(Dispatchers.Default) {
+            val associatedAddresses =
+                history.flatMapTo(mutableSetOf()) { (it.report as? JournalEntry.Report.ProfileReport)?.deviceAddresses ?: emptyList() }
+            val associatedDevices = devicesRepository.getAllByAddresses(associatedAddresses.toList()).associateBy { it.address }
+
+            val profileIds = history.mapNotNull { (it.report as? JournalEntry.Report.ProfileReport)?.profileId }.toSet()
+            val associatedProfiles = profileRepository.getAllByIds(profileIds.toList()).associateBy { it.id }
+
+            history.asSequence()
+                .sortedByDescending { it.timestamp }
+                .map { map(it, associatedDevices, associatedProfiles) }
+                .toList()
+        }
+    }
+
+    private fun map(
+        from: JournalEntry,
+        associatedDevices: Map<String, DeviceData>,
+        associatedProfiles: Map<Int?, RadarProfile>,
+    ): JournalEntryUiModel {
         return when (from.report) {
             is JournalEntry.Report.Error -> mapReportError(from, from.report)
-            is JournalEntry.Report.ProfileReport -> mapReportProfile(from, from.report)
+            is JournalEntry.Report.ProfileReport -> mapReportProfile(from, from.report, associatedDevices, associatedProfiles)
         }
     }
 
@@ -90,32 +118,33 @@ class JournalViewModel(
         )
     }
 
-    private suspend fun mapReportProfile(
+    private fun mapReportProfile(
         journalEntry: JournalEntry,
         report: JournalEntry.Report.ProfileReport,
+        associatedDevices: Map<String, DeviceData>,
+        associatedProfiles: Map<Int?, RadarProfile>,
     ): JournalEntryUiModel {
+        val profileName = associatedProfiles[report.profileId]?.name ?: context.getString(R.string.unknown_capital_case)
         return JournalEntryUiModel(
             dateTime = journalEntry.timestamp.formattedDate(),
             color = { MaterialTheme.colorScheme.surface },
             colorForeground = { MaterialTheme.colorScheme.onSurface },
-            title = context.getString(R.string.journal_profile_detected, getProfileName(report.profileId)),
+            title = context.getString(R.string.journal_profile_detected, profileName),
             subtitle = null,
             subtitleCollapsed = null,
             journalEntry = journalEntry,
-            items = mapListItems(report.deviceAddresses),
+            items = mapListItems(report.deviceAddresses, associatedDevices),
         )
     }
 
     private fun Long.formattedDate() = dateTimeStringFormat("dd MMM yyyy, HH:mm")
 
-    private suspend fun getProfileName(id: Int): String {
-        return profileRepository.getById(id)?.name ?: context.getString(R.string.unknown_capital_case)
-    }
-
-    private suspend fun mapListItems(addresses: List<String>): List<JournalEntryUiModel.ListItemUiModel> {
-        val matchedDevices = devicesRepository.getAllByAddresses(addresses)
+    private fun mapListItems(
+        addresses: List<String>,
+        associatedDevices: Map<String, DeviceData>,
+    ): List<JournalEntryUiModel.ListItemUiModel> {
         return addresses.map { address ->
-            val device = matchedDevices.firstOrNull { it.address == address }
+            val device = associatedDevices[address]
             JournalEntryUiModel.ListItemUiModel(
                 displayName = device?.buildDisplayName() ?: context.getString(R.string.journal_profile_removed, address),
                 payload = device?.address,

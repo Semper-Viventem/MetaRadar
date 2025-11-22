@@ -81,7 +81,7 @@
     <string name="secret_cat">Секретный кот</string>
     <string name="silent_mode_title">Оффлайн режим</string>
     <string name="silent_mode_subtitle">Выключить любую сетевую коммуникацию от приложения. Может быть полезно чтобы экономить трафик или оставаться незаметным в сети.</string>
-    <string name="database_block_title">Управление базой данных</string>
+    <string name="database_actions">Управление базой данных</string>
     <string name="app_settings_title">Настройки</string>
     <string name="silent_mode_is_off_toast">Оффлайн режим выключен. Вы можете включить его в настройках.</string>
     <string name="select_manufacturer">Поиск производителя</string>

@@ -36,5 +36,6 @@ object InteractorsModule {
         factory { CheckBatchForRadarMatchesInteractor(get(), get(), get(), get(), get()) }
         factory { SaveOrMergeBatchInteractor(get(), get(), get(), get(), get(), get(), get()) }
         factory { FetchDeviceServiceInfo(get(), get()) }
+        factory { GetDatabaseInfoInteractor(get(), get()) }
     }
 }

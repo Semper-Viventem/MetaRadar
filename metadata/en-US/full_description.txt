@@ -11,6 +11,7 @@ Beyond analysis, BLE Radar can help protect you in real-time. The app can alert 
 By making this app, the goal is to empower you with knowledge and control over the BLE devices in your environment. Understanding which devices are broadcasting trackable information and which are privacy-conscious allows you to make informed decisions about what you use, wear, and interact with daily.
 
 In general, the app is capable:
+
 * Scan, analyze and track Bluetooth devices around;
 * Create flexible filters for the radar;
 * Deep analysis of the scanned BLE devices, getting data from the available GATT services;

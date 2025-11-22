@@ -7,6 +7,7 @@ import androidx.room.Query
 import f.cking.software.data.database.entity.LocationEntity
 import f.cking.software.data.database.entity.ProfileDetectEntity
 import f.cking.software.data.database.entity.RadarProfileEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RadarProfileDao {
@@ -14,8 +15,14 @@ interface RadarProfileDao {
     @Query("SELECT * FROM radar_profile")
     fun getAll(): List<RadarProfileEntity>
 
+    @Query("SELECT * FROM radar_profile")
+    fun observe(): Flow<List<RadarProfileEntity>>
+
     @Query("SELECT * FROM radar_profile WHERE id = :id")
     fun getById(id: Int): RadarProfileEntity?
+
+    @Query("SELECT * FROM radar_profile WHERE id IN (:ids)")
+    fun getAllById(ids: List<Int>): List<RadarProfileEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(radarProfile: RadarProfileEntity)

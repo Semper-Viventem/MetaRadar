@@ -7,7 +7,7 @@ class GetAllDevicesInteractor(
     private val devicesRepository: DevicesRepository,
 ) {
 
-    suspend fun execute(): List<DeviceData> {
-        return devicesRepository.getDevices()
+    suspend fun execute(withAirdropInfo: Boolean = false): List<DeviceData> {
+        return devicesRepository.getDevices(withAirdropInfo)
     }
 }
