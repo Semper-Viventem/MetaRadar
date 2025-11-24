@@ -64,6 +64,7 @@ class DeviceDetailsViewModel(
     var cameraState: MapCameraState by mutableStateOf(DEFAULT_MAP_CAMERA_STATE)
     var historyPeriod by mutableStateOf(DEFAULT_HISTORY_PERIOD)
     var markersInLoadingState by mutableStateOf(false)
+    var loadingHeatmap by mutableStateOf(false)
     var onlineStatusData: OnlineStatus? by mutableStateOf(null)
     var pointsStyle: PointsStyle by mutableStateOf(DEFAULT_POINTS_STYLE)
     var rawData: List<Pair<String, String>> by mutableStateOf(listOf())
@@ -71,6 +72,10 @@ class DeviceDetailsViewModel(
     var connectionStatus: ConnectionStatus by mutableStateOf(ConnectionStatus.DISCONNECTED)
     private var connectionJob: Job? = null
     var matadataIsFetching by mutableStateOf(false)
+
+    var mapExpanded: Boolean by mutableStateOf(false)
+
+    var useHeatmap: Boolean by mutableStateOf(true)
 
     sealed class ConnectionStatus(@StringRes val statusRes: Int) {
         data class CONNECTED(val gatt: BluetoothGatt) : ConnectionStatus(R.string.device_details_status_connected)
@@ -361,6 +366,10 @@ class DeviceDetailsViewModel(
             pointsStyle = PointsStyle.PATH
         }
 
+        if (fetched.size > MAX_POINTS_FOR_HEATMAP) {
+            useHeatmap = false
+        }
+
         pointsState = fetched
         updateCameraPosition(pointsState, currentLocation)
     }
@@ -438,6 +447,7 @@ class DeviceDetailsViewModel(
     enum class PointsStyle(@StringRes val displayNameRes: Int) {
         MARKERS(R.string.device_history_pint_style_markers),
         PATH(R.string.device_history_pint_style_path),
+        HIDE_MARKERS(R.string.device_history_pint_style_hide_markers),
     }
 
     sealed interface MapCameraState {
@@ -461,6 +471,7 @@ class DeviceDetailsViewModel(
     companion object {
         private const val DESCRIPTOR_CHARACTERISTIC_USER_DESCRIPTION = "00002901-0000-1000-8000-00805f9b34fb"
         private const val MAX_POINTS_FOR_MARKERS = 5_000
+        private const val MAX_POINTS_FOR_HEATMAP = 30_000
         private const val HISTORY_PERIOD_DAY = 24 * 60 * 60 * 1000L // 24 hours
         private const val HISTORY_PERIOD_WEEK = 7 * 24 * 60 * 60 * 1000L // 1 week
         private const val HISTORY_PERIOD_MONTH = 31 * 24 * 60 * 60 * 1000L // 1 month

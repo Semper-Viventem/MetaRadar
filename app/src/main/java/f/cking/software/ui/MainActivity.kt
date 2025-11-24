@@ -13,6 +13,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -21,11 +23,18 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -35,6 +44,7 @@ import f.cking.software.data.helpers.ActivityProvider
 import f.cking.software.data.helpers.IntentHelper
 import f.cking.software.data.helpers.PermissionHelper
 import f.cking.software.isDarkModeOn
+import f.cking.software.utils.ScreenSizeLocal
 import f.cking.software.utils.graphic.rememberProgressDialog
 import f.cking.software.utils.navigation.BackCommand
 import f.cking.software.utils.navigation.Navigator
@@ -86,13 +96,24 @@ class MainActivity : AppCompatActivity() {
                         bodySmall = MaterialTheme.typography.bodySmall.copy(color = colors.onSurface),
                     )
                 ) {
-                    val stack = viewModel.navigator.stack
-                    if (stack.isEmpty()) {
-                        finish()
-                    } else {
-                        focusManager.clearFocus(true)
-                        stack.forEach { screen ->
-                            screen()
+                    var screenSize by remember { mutableStateOf(IntSize(0, 0)) }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .onGloballyPositioned { layoutCoordinates ->
+                                screenSize = layoutCoordinates.size
+                            }
+                    ) {
+                        val stack = viewModel.navigator.stack
+                        if (stack.isEmpty()) {
+                            finish()
+                        } else {
+                            focusManager.clearFocus(true)
+                            CompositionLocalProvider(ScreenSizeLocal provides screenSize) {
+                                stack.forEach { screen ->
+                                    screen()
+                                }
+                            }
                         }
                     }
 
@@ -183,6 +204,7 @@ class MainActivity : AppCompatActivity() {
                 outlineVariant = colorResource(id = R.color.md_theme_dark_outlineVariant),
                 scrim = colorResource(id = R.color.md_theme_dark_scrim),
             )
+
             !darkMode -> lightColorScheme(
                 primary = colorResource(id = R.color.md_theme_light_primary),
                 onPrimary = colorResource(id = R.color.md_theme_light_onPrimary),
@@ -217,6 +239,7 @@ class MainActivity : AppCompatActivity() {
                 outlineVariant = colorResource(id = R.color.md_theme_light_outlineVariant),
                 scrim = colorResource(id = R.color.md_theme_light_scrim),
             )
+
             else -> throw IllegalStateException("This state is unreachable")
         }
         return colors

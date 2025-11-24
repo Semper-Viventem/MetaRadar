@@ -251,6 +251,8 @@
     <string name="device_history_pint_style">History style</string>
     <string name="device_history_pint_style_markers">Markers</string>
     <string name="device_history_pint_style_path">Path</string>
+    <string name="device_history_pint_style_hide_markers">Hide markers</string>
+    <string name="device_history_pint_style_heatmap">Range heatmap</string>
     <string name="time_ago">%s ago</string>
     <string name="lifetime_data_last_update">lifetime: %1$s | last update: %2$s ago</string>
     <string name="lifetime_data">lifetime: %1$s</string>
@@ -288,6 +290,7 @@
     <string name="device_details_disconnect">Disconnect</string>
     <string name="read">Read</string>
     <string name="device_details_metadata">Metadata</string>
+    <string name="device_map_expand_title">Expand map</string>
     <string name="device_map_disclaimer_title">Map disclaimer</string>
     <string name="device_map_disclaimer_content">The map does not display the device’s actual location; it only records your smartphone’s coordinates at the moment of scanning. The location marker reflects where the device was detected, not where it truly is. The map is not designed to locate devices, but to show where they were previously observed and how their movement relates to your own.</string>
 

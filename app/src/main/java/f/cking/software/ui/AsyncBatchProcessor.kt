@@ -3,10 +3,9 @@ package f.cking.software.ui
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import java.util.*
 
 /**
- * The helper class splits large rendering operations into small subtasks to don't stuck the main thread for a long time.
+ * The helper class splits large rendering operations into small subtasks in order not to freeze the main thread.
  *
  * @param frameRate frames per second
  * @param renderLoad percentage of one frame rendering time that may be busy bu batch processor's task
