@@ -38,6 +38,7 @@ import f.cking.software.utils.graphic.FABSpacer
 import f.cking.software.utils.graphic.RoundedBox
 import f.cking.software.utils.graphic.Switcher
 import f.cking.software.utils.graphic.ThemedDialog
+import f.cking.software.utils.graphic.agreementDialog
 import org.koin.androidx.compose.koinViewModel
 
 object SettingsScreen {
@@ -288,17 +289,46 @@ object SettingsScreen {
                 subtitle = null,
                 onClick = { viewModel.setRunOnStartup() }
             )
+
+            val deepAnalysisDialog = agreementDialog(
+                title = stringResource(R.string.deep_analysis_warning_title),
+                content = stringResource(R.string.deep_analysis_warning_text),
+                agreement = stringResource(R.string.deep_analysis_agreement_text),
+                buttons = { state ->
+                    {
+                        negativeButton(
+                            stringResource(R.string.deep_analysis_decline),
+                            textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                        ) { state.hide() }
+                        positiveButton(
+                            stringResource(R.string.deep_analysis_enable),
+                            textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                        ) {
+                            state.hide()
+                            viewModel.onEnableDeepAnalysisClick()
+                        }
+                    }
+                }
+            )
             Switcher(
                 value = viewModel.deepAnalysisEnabled,
                 title = stringResource(R.string.enable_deep_analysis),
                 subtitle = stringResource(R.string.enable_deep_analysis_description),
-                onClick = { viewModel.onEnableDeepAnalysisClick() }
+                onClick = {
+                    if (viewModel.deepAnalysisEnabled) {
+                        viewModel.onEnableDeepAnalysisClick()
+                    } else {
+                        deepAnalysisDialog.show()
+                    }
+                }
             )
             Switcher(
                 value = viewModel.wakeUpWhileScanning,
                 title = stringResource(R.string.settings_keep_screen_on_while_scanning_title),
                 subtitle = stringResource(R.string.settings_keep_screen_on_while_scanning_description),
-                onClick = { viewModel.toggleWakeUpOnScreen() }
+                onClick = {
+                    viewModel.toggleWakeUpOnScreen()
+                }
             )
         }
     }

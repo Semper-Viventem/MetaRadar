@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
@@ -215,6 +216,41 @@ fun infoDialog(
 }
 
 @Composable
+fun agreementDialog(
+    title: String,
+    content: String,
+    agreement: String,
+    buttons: ((state: MaterialDialogState) -> (@Composable MaterialDialogButtons.() -> Unit)),
+): MaterialDialogState {
+    val dialogState = rememberMaterialDialogState()
+    ThemedDialog(
+        dialogState = dialogState,
+        buttons = buttons.invoke(dialogState),
+    ) {
+        var agreed: Boolean by remember { mutableStateOf(false) }
+        positiveButtonEnabled[0] = agreed
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = title, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = content)
+            Spacer(modifier = Modifier.height(8.dp))
+            val agreedClick = {
+                agreed = !agreed
+                positiveButtonEnabled[0] = agreed
+            }
+            Row(Modifier.clickable(onClick = agreedClick), verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = agreed,
+                    onCheckedChange = { agreedClick.invoke() }
+                )
+                Text(text = agreement)
+            }
+        }
+    }
+    return dialogState
+}
+
+@Composable
 fun ThemedDialog(
     dialogState: MaterialDialogState = rememberMaterialDialogState(),
     properties: DialogProperties = DialogProperties(),
@@ -286,7 +322,9 @@ fun DeviceListItem(
             .clickable { onClick.invoke() },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             DeviceTypeIcon(
                 modifier = Modifier.size(64.dp),
@@ -374,7 +412,8 @@ fun DevicePairedIcon(isPaired: Boolean, extended: Boolean = false) {
             content = null,
         )
         Row(
-            modifier = Modifier.background(color.copy(0.2f), RoundedCornerShape(20.dp))
+            modifier = Modifier
+                .background(color.copy(0.2f), RoundedCornerShape(20.dp))
                 .clickable { infoDialog.show() },
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -407,7 +446,8 @@ fun DeviceTypeIcon(
     val icon = remember(device) { GetIconForDeviceClass.getIcon(device) }
     val color = colorByHash(device.address.hashCode())
     Icon(
-        modifier = modifier.background(color.copy(0.2f), CircleShape)
+        modifier = modifier
+            .background(color.copy(0.2f), CircleShape)
             .padding(paddingDp),
         painter = painterResource(icon),
         contentDescription = stringResource(R.string.device_type),
@@ -696,9 +736,10 @@ fun Switcher(
     subtitle: String?,
     onClick: () -> Unit,
 ) {
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .clickable { onClick.invoke() }
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick.invoke() }
     ) {
         Row(
             modifier = Modifier

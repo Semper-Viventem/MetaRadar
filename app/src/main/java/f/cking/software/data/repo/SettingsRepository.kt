@@ -13,6 +13,7 @@ class SettingsRepository(
 
     private val silentModeState = MutableStateFlow(getSilentMode())
     private val hideBackgroundLocationWarning = MutableStateFlow(getHideBackgroundLocationWarning())
+    private val enableDeepAnalysisState = MutableStateFlow(false)
 
     fun setGarbagingTime(time: Long) {
         sharedPreferences.edit().putLong(KEY_GARBAGING_TIME, time).apply()
@@ -105,11 +106,13 @@ class SettingsRepository(
     }
 
     fun setEnableDeepAnalysis(value: Boolean) {
-        sharedPreferences.edit { putBoolean(KEY_ENABLE_DEEP_ANALYSIS, value) }
+        enableDeepAnalysisState.value = value
+        //sharedPreferences.edit { putBoolean(KEY_ENABLE_DEEP_ANALYSIS, value) }
     }
 
     fun getEnableDeepAnalysis(): Boolean {
-        return sharedPreferences.getBoolean(KEY_ENABLE_DEEP_ANALYSIS, false)
+        return enableDeepAnalysisState.value
+        //return sharedPreferences.getBoolean(KEY_ENABLE_DEEP_ANALYSIS, false)
     }
 
     fun setDisclaimerWasAccepted(value: Boolean) {
@@ -147,7 +150,7 @@ class SettingsRepository(
         private const val KEY_SILENT_NETWORK_MODE = "silent_network_mode"
         private const val KEY_CURRENT_BATCH_SORTING_STRATEGY_ID = "key_current_batch_sorting_strategy_id"
         private const val KEY_HIDE_BACKGROUND_LOCATION_WARNING = "key_hide_background_location_warning"
-        private const val KEY_ENABLE_DEEP_ANALYSIS = "key_enable_deep_analysis"
+        private const val KEY_ENABLE_DEEP_ANALYSIS = "key_enable_deep_analysis_v2"
         private const val KEY_DISCLAIMER_WAS_ACCEPTED = "key_disclaimer_was_accepted"
         private const val KEY_WHAT_IS_THIS_APP_FOR_WAS_SHOWN = "what_is_this_app_for_was_shown"
         private const val KEY_WAKE_UP_SCREEN_WHILE_SCANNING = "key_wake_up_screen_while_scanning"

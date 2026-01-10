@@ -106,8 +106,13 @@
     <string name="database_locations_count">Location records: %s</string>
     <string name="app_settings_title">App settings</string>
     <string name="silent_mode_is_off_toast">Offline mode is turned off. You can change it in the settings.</string>
-    <string name="enable_deep_analysis">Deep analysis</string>
-    <string name="enable_deep_analysis_description">Enabling deep analysis for all found devices will provide more data for each scan, but increase scan time and power consumption.</string>
+    <string name="enable_deep_analysis">Deep analysis (Experimental)</string>
+    <string name="enable_deep_analysis_description">If Deep Analysis is enabled, the app will request more information from all found devices. It will provide more data for each scan, but will also increase scan time and power consumption and may disclose your presence.</string>
+    <string name="deep_analysis_warning_title">Enable Deep Analysis? (EXPERIMENTAL)</string>
+    <string name="deep_analysis_warning_text">Deep Analysis does not only scan for BLE devices. It also actively requests data from their accessible GATT services.\n\nSome devices may require authentication or encryption to access certain services. In such cases, this may trigger a pairing request.\n\nThis mode may also make your device more visible to nearby devices.\n\nOnly enable this feature if you understand how it works and accept these side effects.</string>
+    <string name="deep_analysis_agreement_text">I know what I\'m doing</string>
+    <string name="deep_analysis_decline">Cancel</string>
+    <string name="deep_analysis_enable">Enable</string>
 
     <!-- Select manufacturer -->
     <string name="select_manufacturer">Search manufacturer</string>
