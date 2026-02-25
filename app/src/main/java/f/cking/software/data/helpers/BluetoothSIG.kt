@@ -449,6 +449,7 @@ object BluetoothSIG {
         0x01BD to "Syszone Co., Ltd",
         0x01BE to "Pulsate Mobile Ltd.",
         0x01BF to "Hongkong OnMicro Electronics Limited (formerly Hong Kong HunterSun Electronic Limited)",
+        0x01C0 to "pironex GmbH",
         0x01C1 to "BRADATECH Corp.",
         0x01C2 to "Transenergooil AG",
         0x01C3 to "Bunch",
