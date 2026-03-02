@@ -6,37 +6,51 @@
     <string name="confirm">Подтвердить</string>
     <string name="back">Назад</string>
     <string name="save">Сохранить</string>
+	<string name="close">Закрыть</string>
+    <string name="understood">Понял</string>
     <string name="delete">Удалить</string>
     <string name="select">Выбрать</string>
     <string name="clear">Отчистить</string>
+	<string name="fetch">Получить</string>
+    <string name="analyse">Анализировать</string>
     <string name="decline">Отменить</string>
     <string name="ok">ОК</string>
     <string name="turn_on">Включить</string>
     <string name="report">Сообщить о проблеме</string>
+	<string name="accept">Принять</string>
+	<string name="preparing_database">Оптимизация базы данных, это может занять некоторое время…</string>
 
     <plurals name="day">
+		<item quantity="zero">%d дней</item>
         <item quantity="one">%d день</item>
+		<item quantity="two">%d дней</item>
         <item quantity="few">%d дня</item>
         <item quantity="many">%d дней</item>
         <item quantity="other">%d дней</item>
     </plurals>
 
     <plurals name="hour">
+	    <item quantity="zero">%d часов</item>
         <item quantity="one">%d час</item>
+		<item quantity="two">%d часа</item>
         <item quantity="few">%d часа</item>
         <item quantity="many">%d часов</item>
         <item quantity="other">%d часов</item>
     </plurals>
 
     <plurals name="min">
+	    <item quantity="zero">%d минут</item>
         <item quantity="one">%1$d мин</item>
+		<item quantity="two">%d минуты</item>
         <item quantity="few">%1$d мин</item>
         <item quantity="many">%1$d мин</item>
         <item quantity="other">%1$d мин</item>
     </plurals>
 
     <plurals name="sec">
+		<item quantity="zero">%d секунд</item>
         <item quantity="one">%1$d сек</item>
+		<item quantity="two">%d секнуд</item>
         <item quantity="few">%1$d сек</item>
         <item quantity="many">%1$d сек</item>
         <item quantity="other">%1$d сек</item>
@@ -51,6 +65,7 @@
     <string name="clear_garbage">Очистить мусор</string>
     <string name="restore_data_from_file_title">Восстановить Базу Данных из файла?</string>
     <string name="restore_data_from_file_subtitle">Текущая База Данных будет перезаписана. Данные будут удалены.</string>
+	<string name="button_project_purpose">Цель проекта</string>
     <string name="settings_restore_database">Восстановить БД</string>
     <string name="backup_database_title">Сохранить Базу Данных в память устройства?</string>
     <string name="backup_database_subtitle">База Данных содержит вашу историю перемещений. Пожалуйста, никуда не передавайте ее — это ваши персональные данные.</string>
@@ -73,22 +88,31 @@
     <string name="app_info_version">Версия: %1$s (%2$s)</string>
     <string name="app_info_build_type_release">Тип сборки: Release</string>
     <string name="app_info_build_type_debug">Тип сборки: Debug</string>
-    <string name="app_info_distribution">Доставка сборки: %s</string>
-
-    <!-- Select manufacturer -->
-    <string name="project_github_title">%s — это проект с открытым исходным кодом. Вы можете найти исходники на Github, задать свой вопрос или оценить репозиторий!</string>
-    <string name="open_github">Открыть GitHub</string>
+    <string name="app_info_distribution">Источник установки: %s</string>
+    <string name="modify_settings_toast">Это разрешение необходимо для обеспечения возможности отключения экрана во время фонового сканирования, чтобы экономить заряд батареи.</string>
+    <string name="settings_keep_screen_on_while_scanning_title">Держите экран включенным для сканирования BLE</string>
+    <string name="settings_keep_screen_on_while_scanning_description">Включение этой функции временно удерживает экран в активном режиме, пока приложение сканирует устройства BLE. На Android сканирование BLE ограничивается или приостанавливается, когда экран выключен, поэтому активация этой опции обеспечивает более частое сканирование устройств. Отключение этой функции экономит заряд батареи, но сканирование может быть менее точным, когда экран выключен.</string>
+	<string name="project_github_title">%s — это проект с открытым исходным кодом. Вы можете найти исходники на Github, задать свой вопрос или оценить репозиторий!</string>
+    <string name="open_github">Перейти в GitHub</string>
     <string name="secret_cat">Секретный кот</string>
     <string name="silent_mode_title">Оффлайн режим</string>
     <string name="silent_mode_subtitle">Выключить любую сетевую коммуникацию от приложения. Может быть полезно чтобы экономить трафик или оставаться незаметным в сети.</string>
-    <string name="database_actions">Управление базой данных</string>
+    <string name="database_actions">Действия с базой данных</string>
+    <string name="database_information">Информация о базе данных</string>
+    <string name="database_size">Размер: %s</string>
+	<string name="database_devices_count">Записи устройств: %s</string>
+    <string name="database_locations_count">Записи о местоположении: %s</string>
     <string name="app_settings_title">Настройки</string>
     <string name="silent_mode_is_off_toast">Оффлайн режим выключен. Вы можете включить его в настройках.</string>
+	<string name="enable_deep_analysis">Глубокий анализ</string>
+    <string name="enable_deep_analysis_description">Включение глубокого анализа предоставит больше данных, но увеличит время сканирования и энергопотребление.</string>
+
+    <!-- Select manufacturer -->
     <string name="select_manufacturer">Поиск производителя</string>
 
     <!-- Select location -->
     <string name="select_location">Выбор геолокации</string>
-    <string name="select_location_radius">Радиус: %.1f m.</string>
+    <string name="select_location_radius">Радиус: %.1f м</string>
 
     <!-- Select filter -->
     <string name="select_filter">Выбор фильтра</string>
@@ -103,6 +127,8 @@
     <string name="filter_by_last_detection_period_description">Срабатывает если устройство было последний раз обнаружено в определенный промежуток времени</string>
     <string name="filter_by_is_favorite">По флагу избранное</string>
     <string name="filter_by_is_favorite_description">Срабатывает если устройство добавлено в избранное</string>
+	<string name="filter_by_is_paired">По паре</string>
+	<string name="filter_by_is_paired_description">Срабатывает если найденное устройство подключено к вашему устройству</string>
     <string name="filter_by_manufacturer">По производителю</string>
     <string name="filter_by_manufacturer_description">Срабатывает когда производитель чипсета соответствует фильтру</string>
     <string name="filter_by_min_lost_period">По минимальному отсутствию в эфире</string>
@@ -122,23 +148,26 @@
     <string name="filter_user_location">По вашей геолокации</string>
     <string name="filter_user_location_description">Срабатывает если вы в данный момент находитесь в определенной локации. Может быть полезен чтобы избежать срабатывания радара когда вы дома или в офисе.</string>
     <string name="filter_by_tag">По тэгу</string>
+	<string name="filter_by_tag_description">Срабатывает если устройство имеет выбранный тэг</string>
 
     <!-- Profiles list -->
-    <string name="filter_by_tag_description">Срабатывает если устройство имеет выбранный тэг</string>
     <string name="create_new">Создать новый</string>
     <string name="profile_is_active">Активен</string>
     <string name="profile_is_not_active">Не активен</string>
-    <string name="radar_profile_placeholder">Профили радара помогут вам найти устройство по нужным кретериям. Приложение отправит уведомление, если одно из устройств в эфире подходит под условия профиля радара. Нажмите \"Создать новый\" либо выберите один из шаблонов прояиля.</string>
+    <string name="radar_profile_placeholder">Профили радара помогут вам найти устройство по нужным кретериям. Приложение отправит уведомление, если одно из устройств в эфире подходит под условия профиля радара. Нажмите "Создать новый", либо выберите один из шаблонов профиля.</string>
 
     <!-- Profile details -->
     <string name="radar_profile_title">Профиль радара</string>
     <string name="name">Имя</string>
     <string name="description">Описания (не обязательно)</string>
     <string name="is_active">Активный ли</string>
+	<string name="profile_cooldown">Период ожидания</string>
+    <string name="profile_cooldown_description">Период ожидания после загрузки профиля. Может быть полезно, чтобы небыло постоянных уведомлений</string>
     <string name="add_filter">Добавить фильтр</string>
     <string name="filter_unknown">Неизвестный фильтр</string>
     <string name="min_following_duration">Минимальная продолжительность следования</string>
     <string name="min_interval_to_detect">Минимальный интервал между обнаружениями</string>
+	<string name="min_interval_to_detect_description">Предотвращает срабатывание этого правила оповещения для одного и того же устройства более одного раза в течение выбранного периода времени. Полезно, чтобы избежать частых уведомлений.</string>
     <string name="time_placeholder">ЧЧ:ММ</string>
     <string name="filter_unknown_title">Данный фильтр не поддерживается вашей версией приложения</string>
     <string name="placeholder_device_name">Имя устройства</string>
@@ -154,17 +183,24 @@
     <string name="to_date">До даты</string>
     <string name="to_time">До времени</string>
     <string name="is_favorite">В избранном</string>
+	<string name="is_paired">По паре</string>
     <string name="filter_user_location_if_no_location">Пропустить этот фильтр если ваша геолокация недоступна (в противном случае значение по умолчанию False)</string>
     <string name="change">Изменить</string>
-    <string name="cannot_save_profile">Не удается сохранить профиль. Проверьте конфигурацию</string>
+    <string name="cannot_save_profile">Не удается сохранить профиль. Проверьте конфигурацию.</string>
     <string name="profile_has_been_removed">Профиль был удален</string>
     <string name="delete_profile_dialog_title">Удалить профиль %s?</string>
     <string name="discard_changes_dialog_title">Ваши изменения будут потеряны. Продолжить?</string>
     <string name="stay">Остаться</string>
     <string name="discard_changes">Отменить изменения</string>
-    <string name="filter_location_has_data">Геолокация задана. Радиус: %.1f m</string>
+    <string name="filter_location_has_data">Геолокация задана. Радиус: %.1f м</string>
     <string name="filter_location_no_data">Выбрать целевую геолокацию</string>
     <string name="select_tag">Выбрать тэг</string>
+
+	<string name="address_type_public_description">Статичный публичный адрес (отслеживаемый)</string>
+    <string name="address_type_random_static_description">Случайный статический адрес (отслеживание ограничено)</string>
+    <string name="address_type_non_resolvable_description">Нерешённый случайный адрес (обычно не остлеживаемый)</string>
+    <string name="address_type_resolvable_private_description">Решённый случайный адрес (обычно не остлеживаемый)</string>
+    <string name="address_private_disclamer">Некоторые устройства могут периодически менять свой адрес, чтобы избежать отслеживания. Эта метка не очень точная, но может помочь приблизительно определить доступный уровень отслеживания, применимый к устройству.</string>
 
     <!-- Devices List -->
     <string name="custom_filter">Пользовательский фильтр</string>
@@ -175,9 +211,7 @@
     <string name="clear_search">Очистить поиск</string>
     <string name="not_apple">Не Apple</string>
     <string name="favorite">Избранное</string>
-
-    <!-- Device Details -->
-    <string name="enjoy_the_app_question">Вам нравится приложение?</string>
+	<string name="enjoy_the_app_question">Вам нравится приложение?</string>
     <string name="enjoy_the_app_yes">Да</string>
     <string name="enjoy_the_app_not_really">Не очень</string>
     <string name="enjoy_the_app_ask_later">Напомнить позже</string>
@@ -186,10 +220,13 @@
     <string name="current_batch_title">Устройства вокруг</string>
     <string name="current_batch_empty">Устройства еще не обнаружены</string>
     <string name="current_batch_empty_filtered">Ни одно из найденных устройств не соответствует фильтрам</string>
+
+    <!-- Device Details -->
     <string name="device_details_title">Детализация устройства</string>
     <string name="is_not_favorite">Не в избранном</string>
     <string name="device_details_name">Имя</string>
-    <string name="not_applicable">N/A</string>
+    <string name="device_type">Тип устройства</string>
+    <string name="not_applicable">Н/Д</string>
     <string name="device_details_address">Адрес</string>
     <string name="device_details_manufacturer">Производитель</string>
     <string name="device_details_detect_count">Число обнаружений: </string>
@@ -204,24 +241,50 @@
     <string name="device_details_week">Неделя</string>
     <string name="device_details_month">Месяц</string>
     <string name="device_details_all_time">Все время</string>
+	<string name="device_history_pint_style">Стиль истории</string>
+    <string name="device_history_pint_style_markers">Маркеры</string>
     <string name="device_history_pint_style_path">Путь</string>
+	<string name="device_history_pint_style_hide_markers">Скрыть маркеры</string>
+    <string name="device_history_pint_style_heatmap">Тепловая карта диапазона</string>
     <string name="time_ago">%s назад</string>
+    <string name="lifetime_data_last_update">Время жизни: %1$s | Последнее обновление: %2$s назад</string>
     <string name="lifetime_data">Время жизни: %1$s</string>
-    <string name="device_list_placeholder">Пока нет данных. Для начала сканирования нажмите на кнопку \"Сканировать\"</string>
+    <string name="device_list_placeholder">Пока нет данных. Для начала сканирования нажмите на кнопку "Сканировать"</string>
     <string name="tag_name">Имя тэга</string>
     <string name="create_new_tag">Создать новый</string>
     <string name="add_tag">Добавить тэг</string>
     <string name="delete_tag_title">Удалить тэг \"%s\"?</string>
-
-    <!-- Main Screen -->
-    <string name="silent_mode_is_enabled_disclaimer">Карта не доступна в оффлайн режиме. Чтобы включить карту, сначала выключите оффлайн режим.</string>
+	<string name="silent_mode_is_enabled_disclaimer">Карта не доступна в оффлайн режиме. Чтобы включить карту, сначала выключите оффлайн режим.</string>
     <string name="rssi_value">%s dBm</string>
     <string name="distance_to_device">%s м</string>
+    <string name="disclaimer">Внимание</string>
+    <string name="device_distance_disclaimer">Расстояние до устройства считается на основе RSSI и является приблизительным</string>
     <string name="sort_by_title">Сортировка</string>
     <string name="sort_type_standart">По умолчанию</string>
     <string name="sort_type_by_distance">По дистанции</string>
     <string name="active_mode_show_all">Показать все %s видимых устройств</string>
     <string name="device_is_online">Онлайн</string>
+    <plurals name="services_discovered">
+        <item quantity="zero">Сервисов не обнаружено</item>
+        <item quantity="one">%d сервис обнаружен</item>
+        <item quantity="other">%d сервисов обнаружено</item>
+    </plurals>	
+	<plurals name="device_details_raw_data">
+        <item quantity="zero">RAW фрагментов данных не обнаружено</item>
+        <item quantity="one">%d RAW фрагмент</item>
+        <item quantity="other">%d RAW фрагментов</item>
+    </plurals>
+    <string name="device_details_status_connecting">Подключение</string>
+    <string name="device_details_status_connected">Подключено</string>
+    <string name="device_details_status_disconnecting">Отключение</string>
+    <string name="device_details_status_disconnected">Отключено</string>
+    <string name="device_details_connect">Подключить</string>
+    <string name="device_details_disconnect">Отключить</string>
+    <string name="read">Прочитать</string>
+	<string name="device_details_metadata">Метаданные</string>
+	<string name="device_map_expand_title">Развернуть карту</string>
+
+    <!-- Main Screen -->
     <string name="menu_device_list">Список устройств</string>
     <string name="menu_radar_profiles">Профили радара</string>
     <string name="menu_journal">Журнал</string>
@@ -246,7 +309,7 @@
         <item quantity="other">обнаружено %d профилей!</item>
     </plurals>
 
-    <string name="devices_matched_postfix">\"%s\" устройство совпало!</string>
+    <string name="devices_matched_postfix">\" устройство совпало!\"</string>
     <string name="scanner_notification_channel_name">Уведомление о фоновой работе сканера</string>
     <string name="device_found_notification_channel_name">Уведомление радара</string>
     <string name="location_is_turned_off_title">Геолокация выключена</string>
@@ -268,21 +331,25 @@
     <string name="journal_placeholder">Это Журнал событий. Вся история радара и сообщения об ошибках будут сохранены здесь, чтобы ничего не пропустить.</string>
 
     <!-- Permissions -->
-    <string name="permission_intro_bg_location_text">Существует две причины для доступа к геолокации: \n1. Часть функциональности приложения связано с анализом данных на основе вашего местоположения; \n2. Политика безопасности в Android требует разрешения на геолокацию для работы с Bluetooth, поскольку по данным Bluetooth можно косвенно определить ваше местоположение.</string>
+    <string name="permission_intro_bg_location_text">Существует две причины для доступа к геолокации: \n-. Часть функциональности приложения связано с анализом данных на основе вашего местоположения; \n-. Политика безопасности в Android требует разрешения на геолокацию для работы с Bluetooth, поскольку по данным Bluetooth можно косвенно определить ваше местоположение.</string>
     <string name="permissions_intro_bg_location_title">Геолокация в фоне</string>
-    <string name="permissions_intro_nearby_title">Nearby (Bluetooth) access</string>
+    <string name="permissions_intro_nearby_title">Доступ поблизости (Bluetooth)</string>
     <string name="permissions_intro_nearby_description">Сканирование Bluetooth требует разрешения на доступ к Nearby (Bluetooth) устройствам.</string>
     <string name="permissions_intro_doze_mode_title">Doze mode (не обязательно)</string>
     <string name="permissions_intro_doze_mode_text">Android ограничевает работу некоторых процессов в фоновом режиме, в т.ч. для работы с Bluetooth. Данное разрешение требуется для более стабильной работы сканнера в фоновом режиме. Опционально, но очень желательно.</string>
     <string name="permission_data_coolect_info">Приложение не собирает и не передает ваши данные. Исходный код приложения открытый и доступен на github</string>
     <string name="grant_permissions_manually">Предоставьте необходимое разрешение вручную</string>
-    <string name="cannot_open_the_url">Не удаетс яоткрыть URL</string>
-    <string name="disclaimer">Внимание</string>
-    <string name="device_distance_disclaimer">Расстояние до устройства считается на основе RSSI и является приблизительным</string>
-    <string name="lifetime_data_last_update">Время жизни: %1$s | Последнее обновление: %2$s назад</string>
+    <string name="cannot_open_the_url">Не удаётся открыть URL</string>
+																																																																																																																																																																																<!-- Background location request dialog -->
     <string name="background_location_request_title">Почему нужен доступ к геолокации в фоне</string>
     <string name="background_location_request_content">Наше приложение использует технологию Bluetooth Low Energy (BLE) для обеспечения своей основной функциональности. Согласно политикам Android, для доступа к BLE требуется разрешение на использование местоположения, так как ваше местоположение можно определить на основе сигналов BLE и Wi-Fi поблизости.\n\nХотя приложение стабильно работает с доступом к местоположению только во время его использования, предоставление постоянного доступа к местоположению гарантирует непрерывное сканирование BLE, даже когда приложение работает в фоновом режиме. Без этого система Android может ограничить или заблокировать доступ к BLE, что может повлиять на функциональность приложения.\n\nМы уважаем вашу конфиденциальность и используем доступ к местоположению исключительно для сканирования BLE, чтобы обеспечить бесперебойную работу приложения. Приложение не передает ваши данные через интернет, и вся информация надежно хранится локально на вашем устройстве.</string>
     <string name="background_location_request_button">Дать разрешение</string>
-    <string name="device_history_pint_style">Стиль истории</string>
-    <string name="device_history_pint_style_markers">Маркеры</string>
+
+    <string name="bluetooth_status_paired">подключено</string>
+    <string name="bluetooth_status_paired_description">Устройство подключено</string>
+    
+    <string name="unlowful_usage_disclaimer">Этот проект разработан исключительно для целей обучения, исследования безопасности, и исследования личного оборудования. Автор не поддерживает и не поощряет использование этого программного обеспечения для незаконных или неэтичных действий. Вы несёте единоличную ответсвенность за обеспение того, чтобы ваше использование этого инструмента соответсвовало всем действующим законам и предписаниям, в том числе по сообржаениям вашей совести.</string>
+	
+    <string name="what_is_this_app_for_title">Для чего это приложение</string>
+    <string name="what_is_this_app_for_long">Цель создания этого приложения — предоставить вам знания и контроль над устройствами BLE в вашей среде. Понимание того, какие устройства передают отслеживаемую информацию, а какие заботятся о конфиденциальности, позволяет вам принимать обоснованные решения о том, что вы используете, носите и с чем взаимодействуете ежедневно.\n\nBluetooth Low Energy (BLE) — это широко используемый беспроводной протокол, который использует огромное количество устройств вокруг вас: наушники, умные часы и фитнес-трекеры, AirTags, устройства IoT, игровые контроллеры и другие современные гаджеты. Устройства BLE обмениваются данными, передавая небольшие пакеты данных, которые могут включать идентификаторы устройств, метаданные и другую информацию, необходимую для подключения.\n\nЭти трансляции, хотя и важны для функциональности устройства, также могут использоваться для отслеживания вашего присутствия и перемещений. Например, дешевая пара беспроводных наушников может публично раскрывать постоянный идентификатор. Любой, кто прослушивает пакеты BLE поблизости — будь то правительства, компании или злоумышленники — потенциально может использовать эту информацию для отслеживания вас без вашего согласия.\n\nК счастью, многие современные устройства реализуют функции конфиденциальности в BLE для предотвращения отслеживания, такие как случайные адреса, которые меняются автоматически с течением времени. BLE Radar помогает вам отличить устройства, которые защищают вашу конфиденциальность, от тех, которые можно отслеживать. Анализируя трафик BLE в вашем окружении, приложение дает вам представление о том, какие устройства безопасно использовать.\n\nПомимо анализа, BLE Radar может помочь защитить вас в режиме реального времени. Приложение может предупредить вас, когда подозрительное устройство находится поблизости или если устройство какое-то время перемещается вместе с вами, предупреждая вас о потенциальном преследовании или нежелательном отслеживании. Вы можете настроить оповещения на основе идентификаторов, типов или поведения устройств в соответствии с вашими потребностями в безопасности.</string>
 </resources>
